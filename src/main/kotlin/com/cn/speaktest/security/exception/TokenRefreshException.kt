@@ -1,8 +1,7 @@
-package com.cn.speaktest.exception
+package com.cn.speaktest.security.exception
 
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ResponseStatus
-import java.lang.RuntimeException
 
 @ResponseStatus(HttpStatus.FORBIDDEN)
 class TokenRefreshException(token: String?, message: String?) :

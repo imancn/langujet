@@ -1,15 +1,14 @@
-package com.cn.speaktest.model
+package com.cn.speaktest.model.security
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
-import java.util.HashSet
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Size
 
 @Document(collection = "users")
-data class User (
+data class User(
     @Id
     var id: String?,
     var username: @NotBlank @Size(max = 20) String,
@@ -18,5 +17,4 @@ data class User (
 
     @DBRef
     var roles: Set<Role> = HashSet()
-) {
-}
+)

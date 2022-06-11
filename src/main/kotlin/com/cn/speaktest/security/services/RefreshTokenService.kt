@@ -1,9 +1,9 @@
 package com.cn.speaktest.security.services
 
-import com.cn.speaktest.exception.TokenRefreshException
-import com.cn.speaktest.model.RefreshToken
+import com.cn.speaktest.model.security.RefreshToken
 import com.cn.speaktest.repository.RefreshTokenRepository
 import com.cn.speaktest.repository.UserRepository
+import com.cn.speaktest.security.exception.TokenRefreshException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -42,12 +42,8 @@ class RefreshTokenService(
     }
 
     @Transactional
-    fun deleteByUserId(userId: String): Int {
-        return refreshTokenRepository.deleteByUser(userRepository.findById(userId).get())
-    }
-
-    @Transactional
     fun deleteByUsername(username: String): Int {
-        return refreshTokenRepository.deleteByUser(userRepository.findByUsername(username)?.get()!!)
+        val user = userRepository.findByUsername(username) ?: throw RuntimeException("User Not Found with username: $username")
+        return refreshTokenRepository.deleteByUser(user)
     }
 }

@@ -1,7 +1,7 @@
 package com.cn.speaktest.repository
 
-import com.cn.speaktest.model.RefreshToken
-import com.cn.speaktest.model.User
+import com.cn.speaktest.model.security.RefreshToken
+import com.cn.speaktest.model.security.User
 import org.springframework.data.mongodb.repository.MongoRepository
 import java.util.*
 

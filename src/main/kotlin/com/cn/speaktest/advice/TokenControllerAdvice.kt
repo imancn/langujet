@@ -1,6 +1,6 @@
 package com.cn.speaktest.advice
 
-import com.cn.speaktest.exception.TokenRefreshException
+import com.cn.speaktest.security.exception.TokenRefreshException
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus

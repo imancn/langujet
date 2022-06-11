@@ -1,7 +1,7 @@
 package com.cn.speaktest.security.services
 
-import com.cn.speaktest.model.Role
-import com.cn.speaktest.model.User
+import com.cn.speaktest.model.security.Role
+import com.cn.speaktest.model.security.User
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority

@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
-import org.springframework.util.StringUtils
 import org.springframework.web.filter.OncePerRequestFilter
 import java.io.IOException
 import javax.servlet.FilterChain
@@ -28,7 +27,7 @@ class AuthTokenFilter : OncePerRequestFilter() {
         filterChain: FilterChain
     ) {
         try {
-            val jwt = parseJwt(request)
+            val jwt = jwtUtils?.parseJwt(request)
             if (jwt != null && jwtUtils!!.validateJwtToken(jwt)) {
                 val username = jwtUtils.getUserNameFromJwtToken(jwt)
                 val userDetails = userDetailsService!!.loadUserByUsername(username)
@@ -43,13 +42,6 @@ class AuthTokenFilter : OncePerRequestFilter() {
             Companion.logger.error("Cannot set user authentication: {}", e)
         }
         filterChain.doFilter(request, response)
-    }
-
-    private fun parseJwt(request: HttpServletRequest): String? {
-        val headerAuth = request.getHeader("Authorization")
-        return if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
-            headerAuth.substring(7, headerAuth.length)
-        } else null
     }
 
     companion object {

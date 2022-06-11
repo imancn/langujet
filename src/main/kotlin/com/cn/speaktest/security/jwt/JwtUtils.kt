@@ -6,7 +6,9 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Component
+import org.springframework.util.StringUtils
 import java.util.*
+import javax.servlet.http.HttpServletRequest
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Size
 
@@ -54,6 +56,21 @@ class JwtUtils {
             logger.error("JWT claims string is empty: {}", e.message)
         }
         return false
+    }
+
+    fun parseJwt(request: HttpServletRequest): String? {
+        val headerAuth = request.getHeader("Authorization")
+        return if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
+            headerAuth.substring(7, headerAuth.length)
+        } else null
+    }
+
+    fun getUserNameFromAuthToken(auth: String): String {
+        val token = if (StringUtils.hasText(auth) && auth.startsWith("Bearer "))
+            auth.substring(7, auth.length)
+        else null
+
+        return getUserNameFromJwtToken(token)
     }
 
     companion object {

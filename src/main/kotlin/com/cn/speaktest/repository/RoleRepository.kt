@@ -1,7 +1,7 @@
 package com.cn.speaktest.repository
 
-import com.cn.speaktest.model.ERole
-import com.cn.speaktest.model.Role
+import com.cn.speaktest.model.security.ERole
+import com.cn.speaktest.model.security.Role
 import org.springframework.data.mongodb.repository.MongoRepository
 import java.util.*
 
