@@ -8,9 +8,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
 class UserDetailsImpl(
-    val id: String?,
+    val id: String,
     private val username: String,
-    val email: String?,
+    val email: String,
     @field:JsonIgnore private val password: String,
     private val authorities: Collection<GrantedAuthority>
 ) : UserDetails {
@@ -55,14 +55,14 @@ class UserDetailsImpl(
         fun build(user: User): UserDetailsImpl {
             val authorities: List<GrantedAuthority> = user.roles.map { role: Role ->
                 SimpleGrantedAuthority(
-                    role.name?.name
+                    role.name.name
                 )
             }
             return UserDetailsImpl(
-                user.id,
-                user.username!!,
+                user.id!!,
+                user.username,
                 user.email,
-                user.password!!,
+                user.password,
                 authorities
             )
         }

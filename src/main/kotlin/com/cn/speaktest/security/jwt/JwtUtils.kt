@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Component
 import java.util.*
+import javax.validation.constraints.NotBlank
+import javax.validation.constraints.Size
 
 @Component
 class JwtUtils {
@@ -23,6 +25,12 @@ class JwtUtils {
             .setIssuedAt(Date())
             .setExpiration(Date(Date().time + jwtExpirationMs))
             .signWith(SignatureAlgorithm.HS512, jwtSecret)
+            .compact()
+    }
+
+    fun generateTokenFromUsername(username: @NotBlank @Size(max = 20) String?): String {
+        return Jwts.builder().setSubject(username).setIssuedAt(Date())
+            .setExpiration(Date(Date().time + jwtExpirationMs)).signWith(SignatureAlgorithm.HS512, jwtSecret)
             .compact()
     }
 

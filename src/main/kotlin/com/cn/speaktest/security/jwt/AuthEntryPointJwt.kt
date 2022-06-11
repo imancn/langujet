@@ -1,6 +1,5 @@
 package com.cn.speaktest.security.jwt
 
-import com.cn.speaktest.security.jwt.AuthEntryPointJwt
 import org.slf4j.LoggerFactory
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.AuthenticationEntryPoint

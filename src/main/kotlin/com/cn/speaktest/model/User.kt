@@ -9,20 +9,14 @@ import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Size
 
 @Document(collection = "users")
-class User {
+data class User (
     @Id
-    var id: String? = null
-    var username: @NotBlank @Size(max = 20) String? = null
-    var email: @NotBlank @Size(max = 50) @Email String? = null
-    var password: @NotBlank @Size(max = 120) String? = null
+    var id: String?,
+    var username: @NotBlank @Size(max = 20) String,
+    var email: @NotBlank @Size(max = 50) @Email String,
+    var password: @NotBlank @Size(max = 120) String,
 
     @DBRef
     var roles: Set<Role> = HashSet()
-
-    constructor() {}
-    constructor(username: String?, email: String?, password: String?) {
-        this.username = username
-        this.email = email
-        this.password = password
-    }
+) {
 }

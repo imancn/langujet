@@ -1,9 +1,10 @@
 package com.cn.speaktest.payload.response
 
-class JwtResponse(
+data class JwtResponse(
     var accessToken: String,
     var id: String?,
     var username: String,
+    var refreshToken: String,
     var email: String?,
     val roles: List<String>
 ) {
