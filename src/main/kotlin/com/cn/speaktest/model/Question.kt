@@ -13,6 +13,15 @@ data class Question(
     var text: String,
     var usageNumber: Int
 ) {
+
+    constructor(section: Section, topic: String, order: Int, text: String): this(
+        null,
+        section,
+        topic,
+        order,
+        text,
+        0
+    )
     enum class Section(val num: Int) {
         GENERAL_DISCUSSION(1),
         MONOLOGUE(2),

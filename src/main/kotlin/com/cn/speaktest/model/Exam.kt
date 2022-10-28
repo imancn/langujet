@@ -14,11 +14,23 @@ data class Exam(
     @DBRef
     var professor: Professor,
     @DBRef
-    val examIssues: List<ExamIssue>?,
+    var examIssues: List<ExamIssue>?,
     var score: Double?,
     var rank: Double?,
     @DBRef
     var suggestion: Suggestion?,
+    var startDate: Date?,
     var requestDate: Date?,
-    var startDate: Date?
-)
+) {
+    constructor(student: Student, professor: Professor, requestDate: Date): this(
+        null,
+        student,
+        professor,
+        null,
+        null,
+        null,
+        null,
+        null,
+        requestDate
+    )
+}
