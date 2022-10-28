@@ -1,8 +1,8 @@
 package com.cn.speaktest.security.services
 
 import com.cn.speaktest.model.security.RefreshToken
-import com.cn.speaktest.repository.RefreshTokenRepository
-import com.cn.speaktest.repository.UserRepository
+import com.cn.speaktest.repository.user.RefreshTokenRepository
+import com.cn.speaktest.repository.user.UserRepository
 import com.cn.speaktest.security.exception.TokenRefreshException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service

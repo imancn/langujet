@@ -1,6 +1,6 @@
 package com.cn.speaktest.security.services
 
-import com.cn.speaktest.repository.UserRepository
+import com.cn.speaktest.repository.user.UserRepository
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException

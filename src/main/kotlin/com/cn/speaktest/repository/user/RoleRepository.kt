@@ -1,4 +1,4 @@
-package com.cn.speaktest.repository
+package com.cn.speaktest.repository.user
 
 import com.cn.speaktest.model.security.ERole
 import com.cn.speaktest.model.security.Role
