@@ -76,12 +76,12 @@ class AuthController(
 
     @PostMapping("/signup/student")
     fun registerStudent(@RequestBody signUpRequest: @Valid StudentSignupRequest): ResponseEntity<*> {
-        if (userRepository.existsByUsername(signUpRequest.username) == true) {
+        if (userRepository.existsByUsername(signUpRequest.username)) {
             return ResponseEntity
                 .badRequest()
                 .body(MessageResponse("Error: Username is already taken!"))
         }
-        if (userRepository.existsByEmail(signUpRequest.email) == true) {
+        if (userRepository.existsByEmail(signUpRequest.email)) {
             return ResponseEntity
                 .badRequest()
                 .body(MessageResponse("Error: Email is already in use!"))
@@ -112,12 +112,12 @@ class AuthController(
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/signup/professor")
     fun registerProfessor(@RequestBody signUpRequest: @Valid ProfessorSignupRequest): ResponseEntity<*> {
-        if (userRepository.existsByUsername(signUpRequest.username) == true) {
+        if (userRepository.existsByUsername(signUpRequest.username)) {
             return ResponseEntity
                 .badRequest()
                 .body(MessageResponse("Error: Username is already taken!"))
         }
-        if (userRepository.existsByEmail(signUpRequest.email) == true) {
+        if (userRepository.existsByEmail(signUpRequest.email)) {
             return ResponseEntity
                 .badRequest()
                 .body(MessageResponse("Error: Email is already in use!"))
