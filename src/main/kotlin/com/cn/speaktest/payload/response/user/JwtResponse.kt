@@ -1,4 +1,4 @@
-package com.cn.speaktest.payload.response
+package com.cn.speaktest.payload.response.user
 
 data class JwtResponse(
     var accessToken: String,
@@ -9,5 +9,4 @@ data class JwtResponse(
     val roles: List<String>
 ) {
     var tokenType = "Bearer"
-
 }
