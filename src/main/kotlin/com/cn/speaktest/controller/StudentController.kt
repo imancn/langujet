@@ -56,7 +56,7 @@ class StudentController(
         return ResponseEntity.ok(MessageResponse("Profile updated successfully"))
     }
 
-    @PutMapping("/exam-request")
+    @PostMapping("/exam-request")
     @PreAuthorize("hasRole('STUDENT')")
     fun editProfile(
         @RequestHeader("Authorization") auth: String
@@ -74,7 +74,7 @@ class StudentController(
             )
         )
 
-        return ResponseEntity.ok(MessageResponse("Profile updated successfully"))
+        return ResponseEntity.ok(MessageResponse("Your exam request submitted successfully"))
     }
 
     private fun getStudentByAuthToken(auth: String): Student? {
