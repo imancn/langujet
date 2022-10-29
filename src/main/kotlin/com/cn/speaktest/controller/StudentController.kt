@@ -58,7 +58,7 @@ class StudentController(
 
     @PostMapping("/exam-request")
     @PreAuthorize("hasRole('STUDENT')")
-    fun editProfile(
+    fun examRequest(
         @RequestHeader("Authorization") auth: String
     ): ResponseEntity<*> {
         val student = getStudentByAuthToken(auth)
