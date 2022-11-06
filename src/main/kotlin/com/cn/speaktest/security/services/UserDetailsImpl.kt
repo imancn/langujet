@@ -1,6 +1,5 @@
 package com.cn.speaktest.security.services
 
-import com.cn.speaktest.model.security.Role
 import com.cn.speaktest.model.security.User
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.security.core.GrantedAuthority
@@ -53,9 +52,9 @@ class UserDetailsImpl(
     companion object {
         private const val serialVersionUID = 1L
         fun build(user: User): UserDetailsImpl {
-            val authorities: List<GrantedAuthority> = user.roles.map { role: Role ->
+            val authorities: List<GrantedAuthority> = user.roles.map { role ->
                 SimpleGrantedAuthority(
-                    role.name.name
+                    role.name
                 )
             }
             return UserDetailsImpl(

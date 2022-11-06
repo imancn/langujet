@@ -2,9 +2,8 @@ package com.cn.speaktest.controller
 
 import com.cn.speaktest.model.Professor
 import com.cn.speaktest.model.Student
-import com.cn.speaktest.model.security.ERole
-import com.cn.speaktest.model.security.RefreshToken
 import com.cn.speaktest.model.security.Role
+import com.cn.speaktest.model.security.RefreshToken
 import com.cn.speaktest.model.security.User
 import com.cn.speaktest.payload.request.auth.LoginRequest
 import com.cn.speaktest.payload.request.auth.ProfessorSignupRequest
@@ -14,7 +13,6 @@ import com.cn.speaktest.payload.response.MessageResponse
 import com.cn.speaktest.payload.response.user.JwtResponse
 import com.cn.speaktest.payload.response.user.TokenRefreshResponse
 import com.cn.speaktest.repository.user.ProfessorRepository
-import com.cn.speaktest.repository.user.RoleRepository
 import com.cn.speaktest.repository.user.StudentRepository
 import com.cn.speaktest.repository.user.UserRepository
 import com.cn.speaktest.security.exception.TokenRefreshException
@@ -38,7 +36,6 @@ import javax.validation.Valid
 class AuthController(
     val authenticationManager: AuthenticationManager,
     val userRepository: UserRepository,
-    val roleRepository: RoleRepository,
     val studentRepository: StudentRepository,
     val professorRepository: ProfessorRepository,
     val refreshTokenService: RefreshTokenService,
@@ -94,8 +91,7 @@ class AuthController(
         )
         val roles: MutableSet<Role> = HashSet()
         roles.add(
-            roleRepository.findByName(ERole.ROLE_STUDENT)
-                .orElseThrow { RuntimeException("Error: Role is not found.") }
+            Role.ROLE_STUDENT
         )
         user.roles = roles
         user = userRepository.save(user)
@@ -130,8 +126,7 @@ class AuthController(
         )
         val roles: MutableSet<Role> = HashSet()
         roles.add(
-            roleRepository.findByName(ERole.ROLE_PROFESSOR)
-                .orElseThrow { RuntimeException("Error: Role is not found.") }
+            Role.ROLE_PROFESSOR
         )
         user.roles = roles
         user = userRepository.save(user)
