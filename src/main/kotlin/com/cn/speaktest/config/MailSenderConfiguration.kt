@@ -1,20 +1,18 @@
 package com.cn.speaktest.config
 
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.JavaMailSenderImpl
-import org.springframework.stereotype.Service
 import java.util.*
-import javax.annotation.PostConstruct
 
 @Configuration
-@Service
-class MailSenderService {
-    private val mailSender = JavaMailSenderImpl()
+class MailSenderConfiguration {
 
-    @PostConstruct
-    private fun configMailSender(): JavaMailSender {
+    @Bean
+    fun mailSender(): JavaMailSender {
+        val mailSender = JavaMailSenderImpl()
+
         mailSender.host = "smtp.gmail.com"
         mailSender.port = 587
         mailSender.username = "langujet@gmail.com"
@@ -28,14 +26,5 @@ class MailSenderService {
         props["mail.smtp.localhost"] = "127.0.0.1"
         props["mail.debug"] = "true"
         return mailSender
-    }
-
-    fun sendMail(to: String, subject: String, content: String){
-        val message = SimpleMailMessage()
-        message.setFrom("langujet@gmail.com")
-        message.setTo(to)
-        message.setSubject(subject)
-        message.setText(content)
-        mailSender.send(message)
     }
 }
