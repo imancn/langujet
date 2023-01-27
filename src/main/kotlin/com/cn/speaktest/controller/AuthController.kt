@@ -1,21 +1,23 @@
 package com.cn.speaktest.controller
 
+import com.cn.speaktest.advice.InvalidInputException
+import com.cn.speaktest.advice.Message
+import com.cn.speaktest.advice.RefreshTokenException
+import com.cn.speaktest.advice.toOkMessage
 import com.cn.speaktest.model.Professor
 import com.cn.speaktest.model.Student
-import com.cn.speaktest.model.security.Role
 import com.cn.speaktest.model.security.RefreshToken
+import com.cn.speaktest.model.security.Role
 import com.cn.speaktest.model.security.User
 import com.cn.speaktest.payload.request.auth.LoginRequest
 import com.cn.speaktest.payload.request.auth.ProfessorSignupRequest
 import com.cn.speaktest.payload.request.auth.StudentSignupRequest
 import com.cn.speaktest.payload.request.auth.TokenRefreshRequest
-import com.cn.speaktest.payload.response.MessageResponse
 import com.cn.speaktest.payload.response.user.JwtResponse
 import com.cn.speaktest.payload.response.user.TokenRefreshResponse
 import com.cn.speaktest.repository.user.ProfessorRepository
 import com.cn.speaktest.repository.user.StudentRepository
 import com.cn.speaktest.repository.user.UserRepository
-import com.cn.speaktest.security.exception.TokenRefreshException
 import com.cn.speaktest.security.jwt.JwtUtils
 import com.cn.speaktest.security.services.RefreshTokenService
 import com.cn.speaktest.security.services.UserDetailsImpl
@@ -43,7 +45,7 @@ class AuthController(
     val jwtUtils: JwtUtils
 ) {
     @PostMapping("/sign-in")
-    fun authenticateUser(@RequestBody loginRequest: @Valid LoginRequest): ResponseEntity<*> {
+    fun authenticateUser(@RequestBody loginRequest: @Valid LoginRequest): Message {
         val authentication = authenticationManager.authenticate(
             UsernamePasswordAuthenticationToken(loginRequest.username, loginRequest.password)
         )
@@ -59,35 +61,29 @@ class AuthController(
 
         val refreshToken = refreshTokenService.createRefreshToken(userDetails.id)
 
-        return ResponseEntity.ok(
-            JwtResponse(
-                jwt,
-                userDetails.id,
-                userDetails.username,
-                refreshToken.token,
-                userDetails.email,
-                roles
-            )
-        )
+        return JwtResponse(
+            jwt,
+            userDetails.id,
+            userDetails.username,
+            refreshToken.token,
+            userDetails.email,
+            roles
+        ).toOkMessage()
     }
 
     @PostMapping("/signup/student")
-    fun registerStudent(@RequestBody signUpRequest: @Valid StudentSignupRequest): ResponseEntity<*> {
-        if (userRepository.existsByUsername(signUpRequest.username)) {
-            return ResponseEntity
-                .badRequest()
-                .body(MessageResponse("Error: Username is already taken!"))
-        }
-        if (userRepository.existsByEmail(signUpRequest.email)) {
-            return ResponseEntity
-                .badRequest()
-                .body(MessageResponse("Error: Email is already in use!"))
-        }
+    fun registerStudent(@RequestBody signUpRequest: @Valid StudentSignupRequest): Message {
+        if (userRepository.existsByUsername(signUpRequest.username))
+            throw InvalidInputException("Username is already taken!")
+
+        if (userRepository.existsByEmail(signUpRequest.email))
+            throw InvalidInputException("Email is already in use!")
+
         var user = User(
-            null,
-            signUpRequest.username,
-            signUpRequest.email,
-            encoder.encode(signUpRequest.password)
+            id = null,
+            username = signUpRequest.username ?: signUpRequest.email,
+            email = signUpRequest.email,
+            password = encoder.encode(signUpRequest.password)
         )
         val roles: MutableSet<Role> = HashSet()
         roles.add(
@@ -95,34 +91,31 @@ class AuthController(
         )
         user.roles = roles
         user = userRepository.save(user)
+
         studentRepository.save(
             Student(
-                user,
-                signUpRequest.fullName,
-                signUpRequest.biography
+                user = user,
+                fullName = signUpRequest.fullName ?: signUpRequest.username ?: signUpRequest.email,
+                biography = signUpRequest.biography
             )
         )
-        return ResponseEntity.ok(MessageResponse("User registered successfully!"))
+        return Message(null, "User registered successfully!")
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/signup/professor")
-    fun registerProfessor(@RequestBody signUpRequest: @Valid ProfessorSignupRequest): ResponseEntity<*> {
-        if (userRepository.existsByUsername(signUpRequest.username)) {
-            return ResponseEntity
-                .badRequest()
-                .body(MessageResponse("Error: Username is already taken!"))
-        }
-        if (userRepository.existsByEmail(signUpRequest.email)) {
-            return ResponseEntity
-                .badRequest()
-                .body(MessageResponse("Error: Email is already in use!"))
-        }
+    fun registerProfessor(@RequestBody signUpRequest: @Valid ProfessorSignupRequest): Message {
+        if (userRepository.existsByUsername(signUpRequest.username))
+            throw InvalidInputException("Username is already taken!")
+
+        if (userRepository.existsByEmail(signUpRequest.email))
+            throw InvalidInputException("Email is already in use!")
+
         var user = User(
-            null,
-            signUpRequest.username,
-            signUpRequest.email,
-            encoder.encode(signUpRequest.password)
+            id = null,
+            username = signUpRequest.username,
+            email = signUpRequest.email,
+            password = encoder.encode(signUpRequest.password)
         )
         val roles: MutableSet<Role> = HashSet()
         roles.add(
@@ -138,30 +131,27 @@ class AuthController(
                 signUpRequest.ieltsScore
             )
         )
-        return ResponseEntity.ok(MessageResponse("User registered successfully!"))
+        return Message(null, "User registered successfully!")
     }
 
     @PostMapping("/refresh-token")
-    fun refreshToken(@RequestBody request: @Valid TokenRefreshRequest): ResponseEntity<*>? {
-        val requestRefreshToken: String = request.refreshToken
-        return refreshTokenService.findByToken(requestRefreshToken)
+    fun refreshToken(@RequestBody request: @Valid TokenRefreshRequest): Message {
+        val refreshToken = refreshTokenService.findByToken(request.refreshToken)
             .map(refreshTokenService::verifyExpiration)
             .map(RefreshToken::user)
             .map { user ->
                 val token = jwtUtils.generateTokenFromUsername(user.username)
-                ResponseEntity.ok(TokenRefreshResponse(token, requestRefreshToken))
+                ResponseEntity.ok(TokenRefreshResponse(token, request.refreshToken))
             }
             .orElseThrow {
-                TokenRefreshException(
-                    requestRefreshToken,
-                    "Refresh token is not in database!"
-                )
+                RefreshTokenException("Refresh token [${request.refreshToken}] is not in database!")
             }
+        return Message(refreshToken)
     }
 
     @PostMapping("/logout")
-    fun logoutUser(@RequestHeader("Authorization") auth: String): ResponseEntity<*>? {
+    fun logoutUser(@RequestHeader("Authorization") auth: String): Message {
         refreshTokenService.deleteByUsername(jwtUtils.getUserNameFromAuthToken(auth))
-        return ResponseEntity.ok<Any>(MessageResponse("Log out successful!"))
+        return Message(null, "Log out successful!")
     }
 }

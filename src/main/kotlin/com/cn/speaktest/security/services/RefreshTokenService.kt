@@ -1,9 +1,10 @@
 package com.cn.speaktest.security.services
 
+import com.cn.speaktest.advice.NotFoundException
+import com.cn.speaktest.advice.RefreshTokenException
 import com.cn.speaktest.model.security.RefreshToken
 import com.cn.speaktest.repository.user.RefreshTokenRepository
 import com.cn.speaktest.repository.user.UserRepository
-import com.cn.speaktest.security.exception.TokenRefreshException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -36,14 +37,15 @@ class RefreshTokenService(
     fun verifyExpiration(token: RefreshToken): RefreshToken {
         if (token.expiryDate < Instant.now()) {
             refreshTokenRepository.delete(token)
-            throw TokenRefreshException(token.token, "Refresh token was expired. Please make a new signin request")
+            throw RefreshTokenException("Refresh token was expired. Please make a new sign-in request")
         }
         return token
     }
 
     @Transactional
     fun deleteByUsername(username: String): Int {
-        val user = userRepository.findByUsername(username) ?: throw RuntimeException("User Not Found with username: $username")
+        val user = userRepository.findByUsername(username)
+            ?: throw NotFoundException("User Not Found with username: $username")
         return refreshTokenRepository.deleteByUser(user)
     }
 }

@@ -1,17 +1,16 @@
 package com.cn.speaktest.controller
 
+import com.cn.speaktest.advice.InvalidInputException
+import com.cn.speaktest.advice.Message
+import com.cn.speaktest.advice.toOkMessage
 import com.cn.speaktest.model.Exam
-import com.cn.speaktest.model.ExamRequest
-import com.cn.speaktest.model.Professor
 import com.cn.speaktest.model.Question
 import com.cn.speaktest.payload.request.AddQuestionRequest
-import com.cn.speaktest.payload.response.MessageResponse
 import com.cn.speaktest.repository.exam.ExamRepository
 import com.cn.speaktest.repository.exam.ExamRequestRepository
 import com.cn.speaktest.repository.exam.QuestionRepository
 import com.cn.speaktest.repository.user.ProfessorRepository
 import com.cn.speaktest.service.ExamService
-import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
@@ -27,24 +26,18 @@ class AdminController(
 ) {
     @GetMapping("/get-professors")
     @PreAuthorize("hasRole('ADMIN')")
-    fun getProfessors(@RequestHeader("Authorization") auth: String): ResponseEntity<List<Professor>> {
-        return ResponseEntity.ok(
-            professorRepository.findAll().sortedBy {
-                it.fullName
-            }
-        )
-//        @Todo: Change return type
+    fun getProfessors(@RequestHeader("Authorization") auth: String): Message {
+        return professorRepository.findAll().sortedBy {
+            it.fullName
+        }.toOkMessage()
     }
 
     @GetMapping("/get-exam-requests")
     @PreAuthorize("hasRole('ADMIN')")
-    fun getExamRequests(@RequestHeader("Authorization") auth: String): ResponseEntity<List<ExamRequest>> {
-        return ResponseEntity.ok(
-            examRequestRepository.findAll().sortedByDescending {
-                it.date
-            }
-        )
-//        @Todo: Change return type
+    fun getExamRequests(@RequestHeader("Authorization") auth: String): Message {
+        return examRequestRepository.findAll().sortedByDescending {
+            it.date
+        }.toOkMessage()
     }
 
     @PostMapping("/confirm-exam")
@@ -53,8 +46,7 @@ class AdminController(
         @RequestHeader("Authorization") auth: String,
         @RequestParam examRequestId: String,
         @RequestParam professorId: String,
-
-        ): ResponseEntity<*> {
+    ): Message {
         val examRequest = examRequestRepository.findById(examRequestId).get()
         val professor = professorRepository.findById(professorId).get()
 
@@ -67,13 +59,13 @@ class AdminController(
         )
 
         val examIssues = examService.generateExamIssueList(
-            exam.id ?: throw java.lang.RuntimeException("exam.id must not be null")
+            exam.id ?: throw InvalidInputException("exam.id must not be null")
         )
 
         examRepository.save(exam.also { it.examIssues = examIssues })
         examRequestRepository.delete(examRequest)
 
-        return ResponseEntity.ok(MessageResponse("Exam have been confirmed"))
+        return Message(null, "Exam have been confirmed")
     }
 
     @PostMapping("/add-question")
@@ -81,7 +73,7 @@ class AdminController(
     fun editProfile(
         @RequestHeader("Authorization") auth: String,
         @RequestBody addQuestionRequest: AddQuestionRequest
-    ): ResponseEntity<*> {
+    ): Message {
         questionRepository.save(
             Question(
                 addQuestionRequest.section,
@@ -91,6 +83,6 @@ class AdminController(
             )
         )
 
-        return ResponseEntity.ok(MessageResponse("Question added successfully"))
+        return Message(null, "Question added successfully")
     }
 }

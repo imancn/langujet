@@ -1,13 +1,15 @@
 package com.cn.speaktest.controller
 
+import com.cn.speaktest.advice.Message
+import com.cn.speaktest.advice.MethodNotAllowedException
+import com.cn.speaktest.advice.NotFoundException
+import com.cn.speaktest.advice.toOkMessage
 import com.cn.speaktest.model.ExamRequest
 import com.cn.speaktest.model.Student
-import com.cn.speaktest.payload.response.MessageResponse
 import com.cn.speaktest.repository.exam.ExamRequestRepository
 import com.cn.speaktest.repository.user.StudentRepository
 import com.cn.speaktest.repository.user.UserRepository
 import com.cn.speaktest.security.jwt.JwtUtils
-import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
@@ -26,8 +28,8 @@ class StudentController(
 
     @GetMapping("/profile")
     @PreAuthorize("hasRole('STUDENT')")
-    fun getProfile(@RequestHeader("Authorization") auth: String): ResponseEntity<Student> {
-        return ResponseEntity.ok(getStudentByAuthToken(auth))
+    fun getProfile(@RequestHeader("Authorization") auth: String): Message {
+        return getStudentByAuthToken(auth).toOkMessage()
     }
 
     @PutMapping("/profile")
@@ -38,9 +40,8 @@ class StudentController(
         @RequestParam biography: String?,
         @RequestParam email: String?,
         @RequestParam password: String?,
-    ): ResponseEntity<*> {
+    ): Message {
         val student = getStudentByAuthToken(auth)
-        student ?: return ResponseEntity.status(404).body(MessageResponse("User Not found"))
 
         if (fullName != null)
             student.fullName = fullName
@@ -51,21 +52,18 @@ class StudentController(
         if (password != null)
             student.user.password = encoder.encode(password)
 
-        studentRepository.save(student)
-
-        return ResponseEntity.ok(MessageResponse("Profile updated successfully"))
+        return studentRepository.save(student).toOkMessage()
     }
 
     @PostMapping("/exam-request")
     @PreAuthorize("hasRole('STUDENT')")
     fun examRequest(
         @RequestHeader("Authorization") auth: String
-    ): ResponseEntity<*> {
+    ): Message {
         val student = getStudentByAuthToken(auth)
-        student ?: return ResponseEntity.status(404).body(MessageResponse("User Not found"))
 
         if (examRequestRepository.existsByStudent(student))
-            return ResponseEntity.status(400).body(MessageResponse("You have an unhandled exam yet."))
+            throw MethodNotAllowedException("You have an unhandled exam yet.")
 
         examRequestRepository.save(
             ExamRequest(
@@ -73,14 +71,13 @@ class StudentController(
                 student
             )
         )
-
-        return ResponseEntity.ok(MessageResponse("Your exam request submitted successfully"))
+        return Message(null, "Your exam request submitted successfully")
     }
 
-    private fun getStudentByAuthToken(auth: String): Student? {
-        val user = userRepository.findByUsername(jwtUtils.getUserNameFromAuthToken(auth))
-        return studentRepository.findByUser(
-            user ?: return null
-        )
+    private fun getStudentByAuthToken(auth: String): Student {
+        val user = userRepository.findByUsername(
+            jwtUtils.getUserNameFromAuthToken(auth)
+        ) ?: throw NotFoundException("User Not found")
+        return studentRepository.findByUser(user) ?: throw NotFoundException("Student Not found")
     }
 }
