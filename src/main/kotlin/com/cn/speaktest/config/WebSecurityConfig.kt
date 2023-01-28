@@ -2,8 +2,8 @@ package com.cn.speaktest.config
 
 import com.cn.speaktest.security.jwt.AuthEntryPointJwt
 import com.cn.speaktest.security.jwt.AuthTokenFilter
+import com.cn.speaktest.security.jwt.JwtUtils
 import com.cn.speaktest.security.services.UserDetailsServiceImpl
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
@@ -20,16 +20,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-class WebSecurityConfig : WebSecurityConfigurerAdapter() {
-    @Autowired
-    var userDetailsService: UserDetailsServiceImpl? = null
-
-    @Autowired
-    private val unauthorizedHandler: AuthEntryPointJwt? = null
-
+class WebSecurityConfig(
+    private val jwtUtils: JwtUtils,
+    private val userDetailsService: UserDetailsServiceImpl,
+    private val unauthorizedHandler: AuthEntryPointJwt,
+) : WebSecurityConfigurerAdapter() {
     @Bean
     fun authenticationJwtTokenFilter(): AuthTokenFilter {
-        return AuthTokenFilter()
+        return AuthTokenFilter(jwtUtils, userDetailsService)
     }
 
     @Throws(Exception::class)

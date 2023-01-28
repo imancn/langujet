@@ -2,7 +2,6 @@ package com.cn.speaktest.security.jwt
 
 import com.cn.speaktest.security.services.UserDetailsServiceImpl
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
@@ -13,12 +12,10 @@ import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-class AuthTokenFilter : OncePerRequestFilter() {
-    @Autowired
-    private val jwtUtils: JwtUtils? = null
-
-    @Autowired
-    private val userDetailsService: UserDetailsServiceImpl? = null
+class AuthTokenFilter(
+    private val jwtUtils: JwtUtils,
+    private val userDetailsService: UserDetailsServiceImpl
+) : OncePerRequestFilter() {
 
     @Throws(ServletException::class, IOException::class)
     override fun doFilterInternal(
@@ -27,10 +24,10 @@ class AuthTokenFilter : OncePerRequestFilter() {
         filterChain: FilterChain
     ) {
         try {
-            val jwt = jwtUtils?.parseJwt(request)
-            if (jwt != null && jwtUtils!!.validateJwtToken(jwt)) {
+            val jwt = jwtUtils.parseJwt(request)
+            if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
                 val username = jwtUtils.getUserNameFromJwtToken(jwt)
-                val userDetails = userDetailsService!!.loadUserByUsername(username)
+                val userDetails = userDetailsService.loadUserByUsername(username)
                 val authentication = UsernamePasswordAuthenticationToken(
                     userDetails, null,
                     userDetails.authorities
@@ -39,7 +36,7 @@ class AuthTokenFilter : OncePerRequestFilter() {
                 SecurityContextHolder.getContext().authentication = authentication
             }
         } catch (e: Exception) {
-            Companion.logger.error("Cannot set user authentication: {}", e)
+            Companion.logger.error("Cannot set user authentication: ${e.message}\n ${e.stackTraceToString()}")
         }
         filterChain.doFilter(request, response)
     }
