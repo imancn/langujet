@@ -28,3 +28,12 @@ class AuthEntryPointJwt : AuthenticationEntryPoint {
         )
     }
 }
+
+private fun Message.toJson(): String {
+    return "{\n" +
+            "    \"status\": \"$status\",\n" +
+            "    \"code\": $code,\n" +
+            "    \"message\": \"$message\",\n" +
+            "    \"data\": $data\n" +
+            "}"
+}
