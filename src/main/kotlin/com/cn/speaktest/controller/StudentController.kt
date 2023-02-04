@@ -77,7 +77,7 @@ class StudentController(
     private fun getStudentByAuthToken(auth: String): Student {
         val user = userRepository.findById(
             jwtUtils.getUserIdFromAuthToken(auth)
-        ).orElseThrow { throw NotFoundException("User Not found") }
-        return studentRepository.findByUser(user) ?: throw NotFoundException("Student Not found")
+        ).orElseThrow { NotFoundException("User Not found") }
+        return studentRepository.findByUser(user).orElseThrow { NotFoundException("Student Not found") }
     }
 }

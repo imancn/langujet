@@ -16,8 +16,7 @@ class UserDetailsServiceImpl(
     @Throws(UsernameNotFoundException::class)
     override fun loadUserByUsername(userId: String): UserDetails {
         return UserDetailsImpl.build(
-            userRepository.findById(userId)
-                .orElseThrow { throw InvalidTokenException("User Not Found") }
+            userRepository.findById(userId).orElseThrow { InvalidTokenException("User Not Found") }
         )
     }
 }

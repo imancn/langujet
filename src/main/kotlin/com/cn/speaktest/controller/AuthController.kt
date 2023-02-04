@@ -51,7 +51,9 @@ class AuthController(
 ) {
     @PostMapping("/sign-in")
     fun authenticateUser(@Valid @RequestBody loginRequest: LoginRequest): Message {
-        val user = userRepository.findByEmail(loginRequest.email)
+        val user = userRepository.findByEmail(loginRequest.email).orElseThrow {
+            InvalidTokenException("User Not Found")
+        }
 
         val authentication = authenticationManager.authenticate(
             UsernamePasswordAuthenticationToken(user?.id, loginRequest.password)
@@ -126,15 +128,13 @@ class AuthController(
 
     @GetMapping("/signup/email/verify/{email}/{verificationCode}")
     fun verifyEmail(@PathVariable @Email @NotBlank email: String, @PathVariable verificationCode: String): Message {
-        val user = userRepository.findByEmail(email) ?: throw NotFoundException("User Not Found")
+        val user = userRepository.findByEmail(email).orElseThrow { NotFoundException("User Not Found") }
 
         if (user.emailVerified) throw MethodNotAllowedException("Your Email Was Verified")
 
-        val verificationToken = emailVerificationTokenRepository.findByUser(user)
-
-        if (verificationToken == null) {
+        val verificationToken = emailVerificationTokenRepository.findByUser(user).orElseThrow {
             sendVerificationMail(emailVerificationTokenRepository.save(EmailVerificationToken(user)))
-            throw MethodNotAllowedException("Your verification code has been expired.\nWe sent a new verification code.")
+            MethodNotAllowedException("Your verification code has been expired.\nWe sent a new verification code.")
         }
 
         if (verificationToken.token == verificationCode) userRepository.save(user.also { it.emailVerified = true })
@@ -145,14 +145,13 @@ class AuthController(
 
     @PostMapping("/signup/email/verification-mail")
     fun sendVerificationMail(@RequestParam @Email @NotBlank email: String): Message {
-        val user = userRepository.findByEmail(email) ?: throw NotFoundException("User Not Found")
+        val user = userRepository.findByEmail(email).orElseThrow { NotFoundException("User Not Found") }
 
         if (user.emailVerified) throw MethodNotAllowedException("Your Email Was Verified")
 
-        val emailVerificationToken =
-            emailVerificationTokenRepository.findByUser(user) ?: emailVerificationTokenRepository.save(
-                EmailVerificationToken(user)
-            )
+        val emailVerificationToken = emailVerificationTokenRepository.findByUser(user).orElse(
+            emailVerificationTokenRepository.save(EmailVerificationToken(user))
+        )
 
         sendVerificationMail(emailVerificationToken)
 
