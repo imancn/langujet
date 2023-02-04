@@ -13,6 +13,8 @@ import com.cn.speaktest.repository.user.ProfessorRepository
 import com.cn.speaktest.service.ExamService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
+import javax.validation.Valid
+import javax.validation.constraints.NotBlank
 
 @CrossOrigin(origins = ["*"], maxAge = 3600)
 @RestController
@@ -70,19 +72,27 @@ class AdminController(
 
     @PostMapping("/add-question")
     @PreAuthorize("hasRole('ADMIN')")
-    fun editProfile(
+    fun addQuestion(
         @RequestHeader("Authorization") auth: String,
-        @RequestBody addQuestionRequest: AddQuestionRequest
+        @Valid @RequestBody addQuestionRequest: AddQuestionRequest
     ): Message {
-        questionRepository.save(
-            Question(
-                addQuestionRequest.section,
-                addQuestionRequest.topic,
-                addQuestionRequest.order,
-                addQuestionRequest.text,
-            )
-        )
+        val section = addQuestionRequest.section
+        val topic = addQuestionRequest.topic
+        val order = addQuestionRequest.order
 
-        return Message(null, "Question added successfully")
+        val isDuplicate = questionRepository.existsBySectionAndTopicAndOrder(section, topic, order)
+        if (isDuplicate)
+            throw InvalidInputException("A question with section: $section, topic: $topic, order: $order does exist")
+
+        return Message(
+            questionRepository.save(
+                Question(
+                    section,
+                    topic,
+                    order,
+                    addQuestionRequest.text,
+                )
+            ),
+            "Question added successfully")
     }
 }
