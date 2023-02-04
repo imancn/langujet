@@ -1,6 +1,7 @@
 package com.cn.speaktest.security.jwt
 
-import org.slf4j.LoggerFactory
+import com.cn.speaktest.advice.Message
+import org.springframework.http.HttpStatus
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.stereotype.Component
@@ -16,11 +17,14 @@ class AuthEntryPointJwt : AuthenticationEntryPoint {
         request: HttpServletRequest, response: HttpServletResponse,
         authException: AuthenticationException
     ) {
-        logger.error("Unauthorized error: ${authException.message}")
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized error: ${authException.message}")
-    }
-
-    companion object {
-        private val logger = LoggerFactory.getLogger(AuthEntryPointJwt::class.java)
+        response.status = HttpServletResponse.SC_UNAUTHORIZED
+        response.contentType = "application/json"
+        response.writer.print(
+            Message(
+                HttpStatus.UNAUTHORIZED,
+                authException.message,
+                authException.stackTraceToString()
+            ).toJson()
+        )
     }
 }
