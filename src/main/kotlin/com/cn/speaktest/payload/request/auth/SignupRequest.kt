@@ -6,6 +6,6 @@ import javax.validation.constraints.Size
 
 data class SignupRequest(
     var fullName: String?,
-    var email: @NotBlank @Size(max = 50) @Email String,
-    var password: @NotBlank @Size(min = 6, max = 40) String,
+    @field:NotBlank @field:Size(max = 50) @field:Email var email: String,
+    @field:NotBlank @field:Size(min = 6, max = 40) var password: String,
 )

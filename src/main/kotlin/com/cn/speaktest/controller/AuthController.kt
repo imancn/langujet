@@ -27,13 +27,17 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import java.util.stream.Collectors
 import javax.validation.Valid
+import javax.validation.constraints.Email
+import javax.validation.constraints.NotBlank
 
 @CrossOrigin(origins = ["*"], maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
+@Validated
 class AuthController(
     val authenticationManager: AuthenticationManager,
     val userRepository: UserRepository,
@@ -46,7 +50,7 @@ class AuthController(
     val jwtUtils: JwtUtils
 ) {
     @PostMapping("/sign-in")
-    fun authenticateUser(@RequestBody loginRequest: @Valid LoginRequest): Message {
+    fun authenticateUser(@Valid @RequestBody loginRequest: LoginRequest): Message {
         val user = userRepository.findByEmail(loginRequest.email)
 
         val authentication = authenticationManager.authenticate(
@@ -71,7 +75,7 @@ class AuthController(
     }
 
     @PostMapping("/signup/student")
-    fun registerStudent(@RequestBody signUpRequest: @Valid SignupRequest): Message {
+    fun registerStudent(@Valid @RequestBody signUpRequest: SignupRequest): Message {
         val password = signUpRequest.password
         val email = signUpRequest.email
 
@@ -121,7 +125,7 @@ class AuthController(
     }
 
     @GetMapping("/signup/email/verify/{email}/{verificationCode}")
-    fun verifyEmail(@PathVariable email: String, @PathVariable verificationCode: String): Message {
+    fun verifyEmail(@PathVariable @Email @NotBlank email: String, @PathVariable verificationCode: String): Message {
         val user = userRepository.findByEmail(email) ?: throw NotFoundException("User Not Found")
 
         if (user.emailVerified) throw MethodNotAllowedException("Your Email Was Verified")
@@ -140,7 +144,7 @@ class AuthController(
     }
 
     @PostMapping("/signup/email/verification-mail")
-    fun sendVerificationMail(@RequestParam email: String): Message {
+    fun sendVerificationMail(@RequestParam @Email @NotBlank email: String): Message {
         val user = userRepository.findByEmail(email) ?: throw NotFoundException("User Not Found")
 
         if (user.emailVerified) throw MethodNotAllowedException("Your Email Was Verified")
