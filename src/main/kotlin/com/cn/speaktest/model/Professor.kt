@@ -29,4 +29,13 @@ data class Professor(
         ieltsScore,
         0.0
     )
+
+    constructor(user: User, fullName: String?) : this(
+        null,
+        user,
+        fullName ?: user.email,
+        null,
+        null,
+        0.0
+    )
 }

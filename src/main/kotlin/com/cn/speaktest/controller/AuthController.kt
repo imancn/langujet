@@ -8,8 +8,7 @@ import com.cn.speaktest.model.security.RefreshToken
 import com.cn.speaktest.model.security.Role
 import com.cn.speaktest.model.security.User
 import com.cn.speaktest.payload.request.auth.LoginRequest
-import com.cn.speaktest.payload.request.auth.ProfessorSignupRequest
-import com.cn.speaktest.payload.request.auth.StudentSignupRequest
+import com.cn.speaktest.payload.request.auth.SignupRequest
 import com.cn.speaktest.payload.request.auth.TokenRefreshRequest
 import com.cn.speaktest.payload.response.user.JwtResponse
 import com.cn.speaktest.payload.response.user.TokenRefreshResponse
@@ -48,8 +47,10 @@ class AuthController(
 ) {
     @PostMapping("/sign-in")
     fun authenticateUser(@RequestBody loginRequest: @Valid LoginRequest): Message {
+        val user = userRepository.findByEmail(loginRequest.email)
+
         val authentication = authenticationManager.authenticate(
-            UsernamePasswordAuthenticationToken(loginRequest.username, loginRequest.password)
+            UsernamePasswordAuthenticationToken(user?.id, loginRequest.password)
         )
         SecurityContextHolder.getContext().authentication = authentication
 
@@ -57,7 +58,7 @@ class AuthController(
 
         val userDetails = authentication.principal as UserDetailsImpl
 
-        if (!userDetails.emailVerified) throw MethodNotAllowedException("User is not enabled. username: ${userDetails.username}")
+        if (!userDetails.emailVerified) throw MethodNotAllowedException("User is not enabled ${userDetails.email}")
 
         val roles = userDetails.authorities.stream().map { item: GrantedAuthority -> item.authority }
             .collect(Collectors.toList())
@@ -65,25 +66,23 @@ class AuthController(
         val refreshToken = refreshTokenService.createRefreshToken(userDetails.id)
 
         return JwtResponse(
-            jwt, userDetails.id, userDetails.username, refreshToken.token, userDetails.email, roles
+            jwt, refreshToken.token, userDetails.email
         ).toOkMessage()
     }
 
     @PostMapping("/signup/student")
-    fun registerStudent(@RequestBody signUpRequest: @Valid StudentSignupRequest): Message {
-        val username = signUpRequest.username
+    fun registerStudent(@RequestBody signUpRequest: @Valid SignupRequest): Message {
         val password = signUpRequest.password
         val email = signUpRequest.email
 
-        val user = registerUser(username, email, password, mutableSetOf(Role.ROLE_STUDENT))
+        val user = registerUser(email, password, mutableSetOf(Role.ROLE_STUDENT))
 
         sendVerificationMail(user.email)
 
         studentRepository.save(
             Student(
                 user = user,
-                fullName = signUpRequest.fullName ?: signUpRequest.username ?: signUpRequest.email,
-                biography = signUpRequest.biography
+                fullName = signUpRequest.fullName
             )
         )
         return Message(null, "User registered successfully!")
@@ -91,34 +90,28 @@ class AuthController(
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/signup/professor")
-    fun registerProfessor(@RequestBody signUpRequest: @Valid ProfessorSignupRequest): Message {
-        val username = signUpRequest.username
+    fun registerProfessor(@RequestBody signUpRequest: @Valid SignupRequest): Message {
         val password = signUpRequest.password
         val email = signUpRequest.email
 
-        val user = registerUser(username, email, password, mutableSetOf(Role.ROLE_PROFESSOR))
+        val user = registerUser(email, password, mutableSetOf(Role.ROLE_PROFESSOR))
 
         sendVerificationMail(email)
 
         professorRepository.save(
             Professor(
-                user, signUpRequest.fullName ?: username ?: email, signUpRequest.biography, signUpRequest.ieltsScore
+                user, signUpRequest.fullName
             )
         )
         return Message(null, "User registered successfully!")
     }
 
-    private fun registerUser(
-        username: String?, email: String, password: String, roles: Set<Role>
-    ): User {
-        if (userRepository.existsByUsername(username)) throw InvalidInputException("Username is already taken!")
-
+    private fun registerUser(email: String, password: String, roles: Set<Role>): User {
         if (userRepository.existsByEmail(email)) throw InvalidInputException("Email is already in use!")
 
         return userRepository.save(
             User(
                 id = null,
-                username = username ?: email,
                 email = email,
                 emailVerified = false,
                 password = encoder.encode(password),
@@ -185,7 +178,7 @@ class AuthController(
             .map(refreshTokenService::verifyExpiration)
             .map(RefreshToken::user)
             .map { user ->
-                val token = jwtUtils.generateTokenFromUsername(user.username)
+                val token = jwtUtils.generateTokenFromUserId(user.id)
                 ResponseEntity.ok(TokenRefreshResponse(token, request.refreshToken))
             }
             .orElseThrow {
@@ -196,7 +189,7 @@ class AuthController(
 
     @PostMapping("/sign-out")
     fun logoutUser(@RequestHeader("Authorization") auth: String): Message {
-        refreshTokenService.deleteByUsername(jwtUtils.getUserNameFromAuthToken(auth))
-        return Message(null, "Log out successful!")
+        refreshTokenService.deleteById(jwtUtils.getUserIdFromAuthToken(auth))
+        return Message(null, "User sign out successfully")
     }
 }

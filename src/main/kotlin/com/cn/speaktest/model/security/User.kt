@@ -10,7 +10,6 @@ import javax.validation.constraints.Size
 data class User(
     @Id
     var id: String?,
-    var username: @NotBlank @Size(max = 20) String,
     var email: @NotBlank @Size(max = 50) @Email String,
     var emailVerified: Boolean,
     var password: @NotBlank @Size(max = 120) String,

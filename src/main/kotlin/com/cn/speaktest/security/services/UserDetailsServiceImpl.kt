@@ -1,6 +1,6 @@
 package com.cn.speaktest.security.services
 
-import com.cn.speaktest.advice.NotFoundException
+import com.cn.speaktest.advice.InvalidTokenException
 import com.cn.speaktest.repository.user.UserRepository
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -14,9 +14,10 @@ class UserDetailsServiceImpl(
 ) : UserDetailsService {
     @Transactional
     @Throws(UsernameNotFoundException::class)
-    override fun loadUserByUsername(username: String): UserDetails {
-        val user = userRepository.findByUsername(username)
-            ?: throw NotFoundException("User Not Found. username: $username")
-        return UserDetailsImpl.build(user)
+    override fun loadUserByUsername(userId: String): UserDetails {
+        return UserDetailsImpl.build(
+            userRepository.findById(userId)
+                .orElseThrow { throw InvalidTokenException("User Not Found") }
+        )
     }
 }

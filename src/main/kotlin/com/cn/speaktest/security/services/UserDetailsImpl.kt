@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails
 
 class UserDetailsImpl(
     val id: String,
-    private val username: String,
     val email: String,
     val emailVerified: Boolean,
     @field:JsonIgnore private val password: String,
@@ -24,7 +23,7 @@ class UserDetailsImpl(
     }
 
     override fun getUsername(): String {
-        return username
+        return id
     }
 
     override fun isAccountNonExpired(): Boolean {
@@ -60,7 +59,6 @@ class UserDetailsImpl(
             }
             return UserDetailsImpl(
                 user.id!!,
-                user.username,
                 user.email,
                 user.emailVerified,
                 user.password,

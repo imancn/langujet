@@ -43,9 +43,8 @@ class RefreshTokenService(
     }
 
     @Transactional
-    fun deleteByUsername(username: String): Int {
-        val user = userRepository.findByUsername(username)
-            ?: throw NotFoundException("User Not Found with username: $username")
+    fun deleteById(id: String): Int {
+        val user = userRepository.findById(id).orElseThrow { throw NotFoundException("User Not Found") }
         return refreshTokenRepository.deleteByUser(user)
     }
 }

@@ -9,8 +9,6 @@ import org.springframework.stereotype.Component
 import org.springframework.util.StringUtils
 import java.util.*
 import javax.servlet.http.HttpServletRequest
-import javax.validation.constraints.NotBlank
-import javax.validation.constraints.Size
 
 @Component
 class JwtUtils {
@@ -30,13 +28,13 @@ class JwtUtils {
             .compact()
     }
 
-    fun generateTokenFromUsername(username: @NotBlank @Size(max = 20) String?): String {
-        return Jwts.builder().setSubject(username).setIssuedAt(Date())
+    fun generateTokenFromUserId(userId: String?): String {
+        return Jwts.builder().setSubject(userId).setIssuedAt(Date())
             .setExpiration(Date(Date().time + jwtExpirationMs)).signWith(SignatureAlgorithm.HS512, jwtSecret)
             .compact()
     }
 
-    fun getUserNameFromJwtToken(token: String?): String {
+    fun getUserIdFromJwtToken(token: String?): String {
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).body.subject
     }
 
@@ -65,12 +63,12 @@ class JwtUtils {
         } else null
     }
 
-    fun getUserNameFromAuthToken(auth: String): String {
+    fun getUserIdFromAuthToken(auth: String): String {
         val token = if (StringUtils.hasText(auth) && auth.startsWith("Bearer "))
             auth.substring(7, auth.length)
         else null
 
-        return getUserNameFromJwtToken(token)
+        return getUserIdFromJwtToken(token)
     }
 
     companion object {

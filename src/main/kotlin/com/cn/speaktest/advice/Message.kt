@@ -17,6 +17,17 @@ class Message(val status: String, val code: Int, val message: String?, val data:
         message = message,
         data = data
     )
+
+    fun toJson(): String {
+        return "{\n" +
+                "    \"status\": \"$status\",\n" +
+                "    \"code\": $code,\n" +
+                "    \"message\": \"$message\",\n" +
+                "    \"data\": $data\n" +
+                "}"
+    }
+
+
 }
 
 fun Any?.toOkMessage(message: String? = null) = Message(this, message)
