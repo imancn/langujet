@@ -2,29 +2,30 @@ package com.cn.speaktest.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.mail.javamail.JavaMailSender
-import org.springframework.mail.javamail.JavaMailSenderImpl
 import java.util.*
+import javax.mail.PasswordAuthentication
+import javax.mail.Session
 
 @Configuration
 class MailSenderConfiguration {
 
     @Bean
-    fun mailSender(): JavaMailSender {
-        val mailSender = JavaMailSenderImpl()
-
-        mailSender.host = "smtp.gmail.com"
-        mailSender.port = 587
-        mailSender.username = "langujet@gmail.com"
-        mailSender.password = "ehhhzfvdnceabntu"
-        val props: Properties = mailSender.javaMailProperties
-        props["mail.smtp.starttls.enable"] = "true"
+    fun session(): Session {
+        val props = Properties()
         props["mail.smtp.auth"] = "true"
-        props["mail.smtp.connectiontimeout"] = 40000000
-        props["mail.smtp.timeout"] = 400000000
+        props["mail.smtp.starttls.enable"] = "true"
+        props["mail.smtp.connectiontimeout"] = 4000
+        props["mail.smtp.timeout"] = 4000
         props["mail.smtp.transport.protocol"] = "smtp"
         props["mail.smtp.localhost"] = "127.0.0.1"
-        props["mail.debug"] = "true"
-        return mailSender
+        props["mail.smtp.host"] = "smtp.gmail.com"
+        props["mail.smtp.port"] = 587
+        props["mail.smtp.ssl.protocols"] = "TLSv1.2"
+
+        return Session.getInstance(props, object : javax.mail.Authenticator() {
+            override fun getPasswordAuthentication(): PasswordAuthentication {
+                return PasswordAuthentication("langujet@gmail.com", "ehhhzfvdnceabntu")
+            }
+        })
     }
 }
