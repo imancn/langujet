@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus
 
 open class HttpException(val httpStatus: HttpStatus, override val message: String?) : RuntimeException(message)
 
-class RefreshTokenException(message: String?) : HttpException(HttpStatus.FORBIDDEN, message)
+class RefreshTokenException(message: String?) : HttpException(HttpStatus.UNAUTHORIZED, message)
 
 class InvalidTokenException(message: String?) : HttpException(HttpStatus.UNAUTHORIZED, message)
 
