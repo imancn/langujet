@@ -1,5 +1,6 @@
 package com.cn.speaktest.security.services
 
+import com.cn.speaktest.advice.NotFoundException
 import com.cn.speaktest.repository.user.UserRepository
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -15,7 +16,7 @@ class UserDetailsServiceImpl(
     @Throws(UsernameNotFoundException::class)
     override fun loadUserByUsername(username: String): UserDetails {
         val user = userRepository.findByUsername(username)
-            ?: throw UsernameNotFoundException("User Not Found with username: $username")
+            ?: throw NotFoundException("User Not Found. username: $username")
         return UserDetailsImpl.build(user)
     }
 }

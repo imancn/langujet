@@ -10,6 +10,7 @@ class UserDetailsImpl(
     val id: String,
     private val username: String,
     val email: String,
+    val emailVerified: Boolean,
     @field:JsonIgnore private val password: String,
     private val authorities: Collection<GrantedAuthority>
 ) : UserDetails {
@@ -61,6 +62,7 @@ class UserDetailsImpl(
                 user.id!!,
                 user.username,
                 user.email,
+                user.emailVerified,
                 user.password,
                 authorities
             )

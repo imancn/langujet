@@ -1,9 +1,7 @@
 package com.cn.speaktest.controller
 
-import com.cn.speaktest.advice.InvalidInputException
-import com.cn.speaktest.advice.Message
-import com.cn.speaktest.advice.RefreshTokenException
-import com.cn.speaktest.advice.toOkMessage
+import com.cn.speaktest.advice.*
+import com.cn.speaktest.model.EmailVerificationToken
 import com.cn.speaktest.model.Professor
 import com.cn.speaktest.model.Student
 import com.cn.speaktest.model.security.RefreshToken
@@ -15,12 +13,14 @@ import com.cn.speaktest.payload.request.auth.StudentSignupRequest
 import com.cn.speaktest.payload.request.auth.TokenRefreshRequest
 import com.cn.speaktest.payload.response.user.JwtResponse
 import com.cn.speaktest.payload.response.user.TokenRefreshResponse
+import com.cn.speaktest.repository.user.EmailVerificationTokenRepository
 import com.cn.speaktest.repository.user.ProfessorRepository
 import com.cn.speaktest.repository.user.StudentRepository
 import com.cn.speaktest.repository.user.UserRepository
 import com.cn.speaktest.security.jwt.JwtUtils
 import com.cn.speaktest.security.services.RefreshTokenService
 import com.cn.speaktest.security.services.UserDetailsImpl
+import com.cn.speaktest.service.MailSenderService
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.authentication.AuthenticationManager
@@ -41,6 +41,8 @@ class AuthController(
     val studentRepository: StudentRepository,
     val professorRepository: ProfessorRepository,
     val refreshTokenService: RefreshTokenService,
+    val emailVerificationTokenRepository: EmailVerificationTokenRepository,
+    val mailSenderService: MailSenderService,
     val encoder: PasswordEncoder,
     val jwtUtils: JwtUtils
 ) {
@@ -55,42 +57,27 @@ class AuthController(
 
         val userDetails = authentication.principal as UserDetailsImpl
 
-        val roles = userDetails.authorities.stream()
-            .map { item: GrantedAuthority -> item.authority }
+        if (!userDetails.emailVerified) throw MethodNotAllowedException("User is not enabled. username: ${userDetails.username}")
+
+        val roles = userDetails.authorities.stream().map { item: GrantedAuthority -> item.authority }
             .collect(Collectors.toList())
 
         val refreshToken = refreshTokenService.createRefreshToken(userDetails.id)
 
         return JwtResponse(
-            jwt,
-            userDetails.id,
-            userDetails.username,
-            refreshToken.token,
-            userDetails.email,
-            roles
+            jwt, userDetails.id, userDetails.username, refreshToken.token, userDetails.email, roles
         ).toOkMessage()
     }
 
     @PostMapping("/signup/student")
     fun registerStudent(@RequestBody signUpRequest: @Valid StudentSignupRequest): Message {
-        if (userRepository.existsByUsername(signUpRequest.username))
-            throw InvalidInputException("Username is already taken!")
+        val username = signUpRequest.username
+        val password = signUpRequest.password
+        val email = signUpRequest.email
 
-        if (userRepository.existsByEmail(signUpRequest.email))
-            throw InvalidInputException("Email is already in use!")
+        val user = registerUser(username, email, password, mutableSetOf(Role.ROLE_STUDENT))
 
-        var user = User(
-            id = null,
-            username = signUpRequest.username ?: signUpRequest.email,
-            email = signUpRequest.email,
-            password = encoder.encode(signUpRequest.password)
-        )
-        val roles: MutableSet<Role> = HashSet()
-        roles.add(
-            Role.ROLE_STUDENT
-        )
-        user.roles = roles
-        user = userRepository.save(user)
+        sendVerificationMail(user.email)
 
         studentRepository.save(
             Student(
@@ -105,33 +92,91 @@ class AuthController(
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/signup/professor")
     fun registerProfessor(@RequestBody signUpRequest: @Valid ProfessorSignupRequest): Message {
-        if (userRepository.existsByUsername(signUpRequest.username))
-            throw InvalidInputException("Username is already taken!")
+        val username = signUpRequest.username
+        val password = signUpRequest.password
+        val email = signUpRequest.email
 
-        if (userRepository.existsByEmail(signUpRequest.email))
-            throw InvalidInputException("Email is already in use!")
+        val user = registerUser(username, email, password, mutableSetOf(Role.ROLE_PROFESSOR))
 
-        var user = User(
-            id = null,
-            username = signUpRequest.username,
-            email = signUpRequest.email,
-            password = encoder.encode(signUpRequest.password)
-        )
-        val roles: MutableSet<Role> = HashSet()
-        roles.add(
-            Role.ROLE_PROFESSOR
-        )
-        user.roles = roles
-        user = userRepository.save(user)
+        sendVerificationMail(email)
+
         professorRepository.save(
             Professor(
-                user,
-                signUpRequest.fullName,
-                signUpRequest.biography,
-                signUpRequest.ieltsScore
+                user, signUpRequest.fullName ?: username ?: email, signUpRequest.biography, signUpRequest.ieltsScore
             )
         )
         return Message(null, "User registered successfully!")
+    }
+
+    private fun registerUser(
+        username: String?, email: String, password: String, roles: Set<Role>
+    ): User {
+        if (userRepository.existsByUsername(username)) throw InvalidInputException("Username is already taken!")
+
+        if (userRepository.existsByEmail(email)) throw InvalidInputException("Email is already in use!")
+
+        return userRepository.save(
+            User(
+                id = null,
+                username = username ?: email,
+                email = email,
+                emailVerified = false,
+                password = encoder.encode(password),
+                roles = roles
+            )
+        )
+    }
+
+    @GetMapping("/signup/email/verify/{email}/{verificationCode}")
+    fun verifyEmail(@PathVariable email: String, @PathVariable verificationCode: String): Message {
+        val user = userRepository.findByEmail(email) ?: throw NotFoundException("User Not Found")
+
+        if (user.emailVerified) throw MethodNotAllowedException("Your Email Was Verified")
+
+        val verificationToken = emailVerificationTokenRepository.findByUser(user)
+
+        if (verificationToken == null) {
+            sendVerificationMail(emailVerificationTokenRepository.save(EmailVerificationToken(user)))
+            throw MethodNotAllowedException("Your verification code has been expired.\nWe sent a new verification code.")
+        }
+
+        if (verificationToken.token == verificationCode) userRepository.save(user.also { it.emailVerified = true })
+        else throw InvalidInputException("Your verification code is not available.")
+
+        return Message(null, "Email Verified successfully!")
+    }
+
+    @PostMapping("/signup/email/verification-mail")
+    fun sendVerificationMail(@RequestParam email: String): Message {
+        val user = userRepository.findByEmail(email) ?: throw NotFoundException("User Not Found")
+
+        if (user.emailVerified) throw MethodNotAllowedException("Your Email Was Verified")
+
+        val emailVerificationToken =
+            emailVerificationTokenRepository.findByUser(user) ?: emailVerificationTokenRepository.save(
+                EmailVerificationToken(user)
+            )
+
+        sendVerificationMail(emailVerificationToken)
+
+        return Message(null, "Verification Mail Has Been Sent.")
+    }
+
+    private fun sendVerificationMail(emailVerificationToken: EmailVerificationToken) {
+        val hostRoot = "http://localhost:8080"
+        val email = emailVerificationToken.user.email
+        val token = emailVerificationToken.token
+        val logoPath =
+            "https://res.cloudinary.com/practicaldev/image/fetch/s--FSZb8Vto--/c_imagga_scale,f_auto,fl_progressive,h_420,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/x7qr5ksfk3zzmkcabvdm.png"
+        val contentParams = mapOf(
+            "TOKEN" to token,
+            "LINK" to "$hostRoot/api/auth/signup/email/verify/$email/$token",
+            "SITE" to hostRoot,
+            "LOGO_PATH" to logoPath
+        )
+        mailSenderService.sendWithTemplate(
+            email, "Verification Mail", contentParams, "email_verification"
+        )
     }
 
     @PostMapping("/refresh-token")
@@ -149,7 +194,7 @@ class AuthController(
         return Message(refreshToken)
     }
 
-    @PostMapping("/logout")
+    @PostMapping("/sign-out")
     fun logoutUser(@RequestHeader("Authorization") auth: String): Message {
         refreshTokenService.deleteByUsername(jwtUtils.getUserNameFromAuthToken(auth))
         return Message(null, "Log out successful!")
