@@ -190,6 +190,20 @@ class AuthController(
         return Message(refreshToken)
     }
 
+    @PostMapping("/change-password")
+    fun changePassword(
+        @RequestHeader("Authorization") auth: String,
+        @RequestParam @NotBlank oldPassword: String,
+        @RequestParam @Size(min = 6, max = 40) @NotBlank newPassword: String
+    ): Message {
+        val userId = jwtUtils.getUserIdFromAuthToken(auth)
+        val user = userRepository.findById(userId).orElseThrow { NotFoundException("User Not Found") }
+        if (user.password == encoder.encode(oldPassword))
+            user.password = encoder.encode(newPassword)
+        else throw InvalidInputException("Old Password is not correct.")
+        return Message(null, "Your password has been changed.")
+    }
+
     @PostMapping("/sign-out")
     fun signOutUser(@RequestHeader("Authorization") auth: String): Message {
         refreshTokenService.deleteByUserId(jwtUtils.getUserIdFromAuthToken(auth))
