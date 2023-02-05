@@ -191,8 +191,8 @@ class AuthController(
     }
 
     @PostMapping("/sign-out")
-    fun logoutUser(@RequestHeader("Authorization") auth: String): Message {
-        refreshTokenService.deleteById(jwtUtils.getUserIdFromAuthToken(auth))
+    fun signOutUser(@RequestHeader("Authorization") auth: String): Message {
+        refreshTokenService.deleteByUserId(jwtUtils.getUserIdFromAuthToken(auth))
         return Message(null, "User sign out successfully")
     }
 }
