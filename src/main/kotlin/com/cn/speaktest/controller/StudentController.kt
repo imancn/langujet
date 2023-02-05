@@ -12,12 +12,14 @@ import com.cn.speaktest.repository.user.StudentRepository
 import com.cn.speaktest.repository.user.UserRepository
 import com.cn.speaktest.security.jwt.JwtUtils
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
 @CrossOrigin(origins = ["*"], maxAge = 3600)
 @RestController
 @RequestMapping("/api/student")
+@Validated
 class StudentController(
     val jwtUtils: JwtUtils,
     val studentRepository: StudentRepository,
