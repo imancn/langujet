@@ -2,16 +2,13 @@ package com.cn.speaktest.model.security
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
-import javax.validation.constraints.Email
-import javax.validation.constraints.NotBlank
-import javax.validation.constraints.Size
 
 @Document(collection = "users")
 data class User(
     @Id
     var id: String?,
-    var email: @NotBlank @Size(max = 50) @Email String,
+    var email: String,
     var emailVerified: Boolean,
-    var password: @NotBlank @Size(max = 120) String,
+    var password: String,
     var roles: Set<Role> = HashSet()
 )
