@@ -6,12 +6,12 @@ import com.cn.speaktest.advice.NotFoundException
 import com.cn.speaktest.advice.toOkMessage
 import com.cn.speaktest.model.ExamRequest
 import com.cn.speaktest.model.Student
+import com.cn.speaktest.payload.response.user.StudentProfileResponse
 import com.cn.speaktest.repository.exam.ExamRequestRepository
 import com.cn.speaktest.repository.user.StudentRepository
 import com.cn.speaktest.repository.user.UserRepository
 import com.cn.speaktest.security.jwt.JwtUtils
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -23,13 +23,12 @@ class StudentController(
     val studentRepository: StudentRepository,
     val userRepository: UserRepository,
     val examRequestRepository: ExamRequestRepository,
-    val encoder: PasswordEncoder,
 ) {
 
     @GetMapping("/profile")
     @PreAuthorize("hasRole('STUDENT')")
     fun getProfile(@RequestHeader("Authorization") auth: String): Message {
-        return getStudentByAuthToken(auth).toOkMessage()
+        return StudentProfileResponse(getStudentByAuthToken(auth)).toOkMessage()
     }
 
     @PutMapping("/profile")
@@ -38,8 +37,6 @@ class StudentController(
         @RequestHeader("Authorization") auth: String,
         @RequestParam fullName: String?,
         @RequestParam biography: String?,
-        @RequestParam email: String?,
-        @RequestParam password: String?,
     ): Message {
         val student = getStudentByAuthToken(auth)
 
@@ -47,12 +44,10 @@ class StudentController(
             student.fullName = fullName
         if (biography != null)
             student.biography = biography
-        if (email != null)
-            student.user.email = email
-        if (password != null)
-            student.user.password = encoder.encode(password)
 
-        return studentRepository.save(student).toOkMessage()
+        return StudentProfileResponse(
+            studentRepository.save(student)
+        ).toOkMessage()
     }
 
     @PostMapping("/exam-request")
