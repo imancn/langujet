@@ -3,6 +3,7 @@ package com.cn.speaktest.controller
 import com.cn.speaktest.advice.*
 import com.cn.speaktest.model.EmailVerificationToken
 import com.cn.speaktest.model.Professor
+import com.cn.speaktest.model.ResetPasswordToken
 import com.cn.speaktest.model.Student
 import com.cn.speaktest.model.security.RefreshToken
 import com.cn.speaktest.model.security.Role
@@ -12,10 +13,7 @@ import com.cn.speaktest.payload.request.auth.SignupRequest
 import com.cn.speaktest.payload.request.auth.TokenRefreshRequest
 import com.cn.speaktest.payload.response.user.JwtResponse
 import com.cn.speaktest.payload.response.user.TokenRefreshResponse
-import com.cn.speaktest.repository.user.EmailVerificationTokenRepository
-import com.cn.speaktest.repository.user.ProfessorRepository
-import com.cn.speaktest.repository.user.StudentRepository
-import com.cn.speaktest.repository.user.UserRepository
+import com.cn.speaktest.repository.user.*
 import com.cn.speaktest.security.jwt.JwtUtils
 import com.cn.speaktest.security.services.RefreshTokenService
 import com.cn.speaktest.security.services.UserDetailsImpl
@@ -33,6 +31,7 @@ import java.util.stream.Collectors
 import javax.validation.Valid
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
+import javax.validation.constraints.Size
 
 @CrossOrigin(origins = ["*"], maxAge = 3600)
 @RestController
@@ -45,6 +44,7 @@ class AuthController(
     val professorRepository: ProfessorRepository,
     val refreshTokenService: RefreshTokenService,
     val emailVerificationTokenRepository: EmailVerificationTokenRepository,
+    val resetPasswordTokenRepository: ResetPasswordTokenRepository,
     val mailSenderService: MailSenderService,
     val encoder: PasswordEncoder,
     val jwtUtils: JwtUtils
@@ -171,6 +171,37 @@ class AuthController(
                 RefreshTokenException("Refresh token [${request.refreshToken}] is not in database!")
             }
         return Message(refreshToken)
+    }
+
+    @PostMapping("/reset-password")
+    fun resetPassword(@RequestParam @Email @NotBlank email: String): Message {
+        val user = userRepository.findByEmail(email).orElseThrow { NotFoundException("User Not Found") }
+        val token = resetPasswordTokenRepository.findByUser(user).orElse(
+            resetPasswordTokenRepository.save(ResetPasswordToken(user))
+        )
+        mailSenderService.sendResetPasswordMail(token)
+        return Message(null, "The reset password link has been mailed to you.")
+    }
+
+    @PostMapping("/reset-password/set")
+    fun resetPassword(
+        @RequestParam @Email @NotBlank email: String,
+        @RequestParam code: String,
+        @RequestParam @Size(min = 6, max = 40) @NotBlank newPassword: String
+    ): Message {
+        val user = userRepository.findByEmail(email).orElseThrow { NotFoundException("User Not Found") }
+        val token = resetPasswordTokenRepository.findByUser(user).orElseThrow {
+            InvalidTokenException("Your reset password token has been expired. Request for reset password again.")
+        }
+
+        if (token.token == code) {
+            user.password = encoder.encode(newPassword)
+            userRepository.save(user)
+            resetPasswordTokenRepository.delete(token)
+        } else
+            throw InvalidTokenException("Your reset password token is invalid.")
+
+        return Message(null, "Your password has been reset successfully")
     }
 
     @PostMapping("/change-password")

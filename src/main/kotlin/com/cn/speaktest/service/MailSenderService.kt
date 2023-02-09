@@ -1,6 +1,7 @@
 package com.cn.speaktest.service
 
 import com.cn.speaktest.model.EmailVerificationToken
+import com.cn.speaktest.model.ResetPasswordToken
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import javax.mail.Message
@@ -52,6 +53,21 @@ class MailSenderService(
         )
         sendWithTemplate(
             email, "Verification Mail", contentParams, "email_verification"
+        )
+    }
+
+    fun sendResetPasswordMail(resetPasswordToken: ResetPasswordToken) {
+        val hostRoot = "http://localhost:8080"
+        val email = resetPasswordToken.user.email
+        val token = resetPasswordToken.token
+        val logoPath = "https://res.cloudinary.com/practicaldev/image/fetch/s--FSZb8Vto--/c_imagga_scale,f_auto,fl_progressive,h_420,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/x7qr5ksfk3zzmkcabvdm.png"
+        val contentParams = mapOf(
+            "TOKEN" to token,
+            "SITE" to hostRoot,
+            "LOGO_PATH" to logoPath
+        )
+        sendWithTemplate(
+            email, "Reset Password Mail", contentParams, "reset_password"
         )
     }
 
