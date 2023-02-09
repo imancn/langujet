@@ -7,5 +7,5 @@ import java.util.Optional
 
 interface EmailVerificationTokenRepository : MongoRepository<EmailVerificationToken, String> {
 
-    fun findByUser(email: User): Optional<EmailVerificationToken>
+    fun findByUser(user: User): Optional<EmailVerificationToken>
 }
