@@ -133,7 +133,7 @@ class AuthController(
         if (user.emailVerified) throw MethodNotAllowedException("Your Email Was Verified")
 
         val verificationToken = emailVerificationTokenRepository.findByUser(user).orElseThrow {
-            sendVerificationMail(emailVerificationTokenRepository.save(EmailVerificationToken(user)))
+            mailSenderService.sendEmailVerificationMail(emailVerificationTokenRepository.save(EmailVerificationToken(user)))
             MethodNotAllowedException("Your verification code has been expired.\nWe sent a new verification code.")
         }
 
@@ -153,26 +153,9 @@ class AuthController(
             emailVerificationTokenRepository.save(EmailVerificationToken(user))
         )
 
-        sendVerificationMail(emailVerificationToken)
+        mailSenderService.sendEmailVerificationMail(emailVerificationToken)
 
         return Message(null, "Verification Mail Has Been Sent.")
-    }
-
-    private fun sendVerificationMail(emailVerificationToken: EmailVerificationToken) {
-        val hostRoot = "http://localhost:8080"
-        val email = emailVerificationToken.user.email
-        val token = emailVerificationToken.token
-        val logoPath =
-            "https://res.cloudinary.com/practicaldev/image/fetch/s--FSZb8Vto--/c_imagga_scale,f_auto,fl_progressive,h_420,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/x7qr5ksfk3zzmkcabvdm.png"
-        val contentParams = mapOf(
-            "TOKEN" to token,
-            "LINK" to "$hostRoot/api/auth/signup/email/verify/$email/$token",
-            "SITE" to hostRoot,
-            "LOGO_PATH" to logoPath
-        )
-        mailSenderService.sendWithTemplate(
-            email, "Verification Mail", contentParams, "email_verification"
-        )
     }
 
     @PostMapping("/refresh-token")

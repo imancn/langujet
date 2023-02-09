@@ -1,5 +1,6 @@
 package com.cn.speaktest.service
 
+import com.cn.speaktest.model.EmailVerificationToken
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import javax.mail.Message
@@ -37,6 +38,22 @@ class MailSenderService(
             contentParams,
             templateName
         )
+
+    fun sendEmailVerificationMail(emailVerificationToken: EmailVerificationToken) {
+        val hostRoot = "http://localhost:8080"
+        val email = emailVerificationToken.user.email
+        val token = emailVerificationToken.token
+        val logoPath = "https://res.cloudinary.com/practicaldev/image/fetch/s--FSZb8Vto--/c_imagga_scale,f_auto,fl_progressive,h_420,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/x7qr5ksfk3zzmkcabvdm.png"
+        val contentParams = mapOf(
+            "TOKEN" to token,
+            "LINK" to "$hostRoot/api/auth/signup/email/verify/$email/$token",
+            "SITE" to hostRoot,
+            "LOGO_PATH" to logoPath
+        )
+        sendWithTemplate(
+            email, "Verification Mail", contentParams, "email_verification"
+        )
+    }
 
     private fun sendMimeMessage(htmlText: String, message: MimeMessage) {
         val htmlPart = MimeBodyPart()
