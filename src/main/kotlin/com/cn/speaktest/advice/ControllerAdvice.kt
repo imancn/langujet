@@ -1,5 +1,6 @@
 package com.cn.speaktest.advice
 
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
@@ -9,7 +10,9 @@ import org.springframework.web.context.request.WebRequest
 import javax.validation.ValidationException
 
 @RestControllerAdvice
-class ControllerAdvice {
+class ControllerAdvice{
+    private val logger = LoggerFactory.getLogger(javaClass.simpleName)
+
     @ExceptionHandler(value = [HttpException::class])
     fun handleHttpException(ex: HttpException, request: WebRequest): ResponseEntity<Message> {
         return ResponseEntity(
@@ -47,6 +50,7 @@ class ControllerAdvice {
 
     @ExceptionHandler(value = [Exception::class])
     fun handleUnHandledException(ex: Exception, request: WebRequest): ResponseEntity<Message> {
+        logger.error(ex.stackTraceToString())
         return ResponseEntity(
             Message(
                 HttpStatus.INTERNAL_SERVER_ERROR,
