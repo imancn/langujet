@@ -44,4 +44,16 @@ class ControllerAdvice {
             HttpStatus.NOT_ACCEPTABLE
         )
     }
+
+    @ExceptionHandler(value = [Exception::class])
+    fun handleUnHandledException(ex: Exception, request: WebRequest): ResponseEntity<Message> {
+        return ResponseEntity(
+            Message(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                ex.message,
+                ex.stackTraceToString()
+            ),
+            HttpStatus.INTERNAL_SERVER_ERROR
+        )
+    }
 }
