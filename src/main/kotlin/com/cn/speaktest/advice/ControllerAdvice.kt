@@ -47,17 +47,4 @@ class ControllerAdvice{
             HttpStatus.BAD_REQUEST
         )
     }
-
-    @ExceptionHandler(value = [Exception::class])
-    fun handleUnHandledException(ex: Exception, request: WebRequest): ResponseEntity<Message> {
-        logger.error(ex.stackTraceToString())
-        return ResponseEntity(
-            Message(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                ex.message,
-                ex.stackTraceToString()
-            ),
-            HttpStatus.INTERNAL_SERVER_ERROR
-        )
-    }
 }
