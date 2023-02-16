@@ -1,7 +1,7 @@
 package com.cn.speaktest.payload.request
 
 import com.cn.speaktest.model.Question
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotBlank
 
 data class AddQuestionRequest(
     @field:NotBlank val section: Question.Section,
