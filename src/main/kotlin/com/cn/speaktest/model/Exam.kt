@@ -1,5 +1,6 @@
 package com.cn.speaktest.model
 
+import com.cn.speaktest.professor.Professor
 import com.cn.speaktest.student.model.Student
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.DBRef

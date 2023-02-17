@@ -10,7 +10,7 @@ import com.cn.speaktest.student.payload.request.AddQuestionRequest
 import com.cn.speaktest.repository.exam.ExamRepository
 import com.cn.speaktest.repository.exam.ExamRequestRepository
 import com.cn.speaktest.repository.exam.QuestionRepository
-import com.cn.speaktest.repository.user.ProfessorRepository
+import com.cn.speaktest.professor.ProfessorRepository
 import com.cn.speaktest.service.ExamService
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank

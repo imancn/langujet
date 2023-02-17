@@ -1,4 +1,4 @@
-package com.cn.speaktest.model
+package com.cn.speaktest.professor
 
 import com.cn.speaktest.security.model.User
 import org.springframework.data.annotation.Id

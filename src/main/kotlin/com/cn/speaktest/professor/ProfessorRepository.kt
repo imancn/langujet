@@ -1,6 +1,5 @@
-package com.cn.speaktest.repository.user
+package com.cn.speaktest.professor
 
-import com.cn.speaktest.model.Professor
 import org.springframework.data.mongodb.repository.MongoRepository
 
 interface ProfessorRepository : MongoRepository<Professor, String>
