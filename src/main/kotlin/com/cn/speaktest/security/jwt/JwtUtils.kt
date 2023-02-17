@@ -1,12 +1,11 @@
 package com.cn.speaktest.security.jwt
 
+import com.cn.speaktest.advice.InvalidTokenException
 import com.cn.speaktest.security.services.UserDetailsImpl
 import io.jsonwebtoken.*
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Component
-import org.springframework.util.StringUtils
 import java.util.*
 import jakarta.servlet.http.HttpServletRequest
 
@@ -35,43 +34,39 @@ class JwtUtils {
     }
 
     fun getUserIdFromJwtToken(token: String?): String {
-        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).body.subject
-    }
-
-    fun validateJwtToken(authToken: String?): Boolean {
-        try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken)
-            return true
+        return try {
+            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).body.subject
         } catch (e: SignatureException) {
-            logger.error("Invalid JWT signature: {}", e.message)
+            throw InvalidTokenException("Authorization JWT token is invalid: Invalid JWT signature")
         } catch (e: MalformedJwtException) {
-            logger.error("Invalid JWT token: {}", e.message)
+            throw InvalidTokenException("Authorization JWT token is invalid: Invalid JWT token")
         } catch (e: ExpiredJwtException) {
-            logger.error("JWT token is expired: {}", e.message)
+            throw InvalidTokenException("Authorization JWT token is invalid: JWT token is expired")
         } catch (e: UnsupportedJwtException) {
-            logger.error("JWT token is unsupported: {}", e.message)
+            throw InvalidTokenException("Authorization JWT token is invalid: JWT token is unsupported")
         } catch (e: IllegalArgumentException) {
-            logger.error("JWT claims string is empty: {}", e.message)
+            throw InvalidTokenException("Authorization JWT token is invalid: JWT claims string is empty")
+        } catch (ex: Exception) {
+            throw InvalidTokenException("Authorization JWT token is invalid")
         }
-        return false
     }
 
-    fun parseJwt(request: HttpServletRequest): String? {
-        val headerAuth = request.getHeader("Authorization")
-        return if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
-            headerAuth.substring(7, headerAuth.length)
-        } else null
+    fun parseJwt(request: HttpServletRequest): String {
+        return parseAuthorizationHeader(request.getHeader("Authorization"))
     }
 
-    fun getUserIdFromAuthToken(auth: String): String {
-        val token = if (StringUtils.hasText(auth) && auth.startsWith("Bearer "))
-            auth.substring(7, auth.length)
-        else null
-
-        return getUserIdFromJwtToken(token)
+    fun getUserIdFromAuthorizationHeader(authorizationHeader: String?): String {
+        return getUserIdFromJwtToken(
+            parseAuthorizationHeader(authorizationHeader)
+        )
     }
 
-    companion object {
-        private val logger = LoggerFactory.getLogger(JwtUtils::class.java)
+    private fun parseAuthorizationHeader(authorizationHeader: String?): String {
+        if (authorizationHeader.isNullOrEmpty())
+            throw InvalidTokenException("Authorization header is missing")
+        if (!authorizationHeader.startsWith("Bearer "))
+            throw InvalidTokenException("Authorization header is invalid")
+
+        return authorizationHeader.substring(7, authorizationHeader.length)
     }
 }

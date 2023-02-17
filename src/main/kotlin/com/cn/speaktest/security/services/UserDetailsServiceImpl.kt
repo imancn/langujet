@@ -19,4 +19,8 @@ class UserDetailsServiceImpl(
             userRepository.findById(userId).orElseThrow { InvalidTokenException("User Not Found") }
         )
     }
+
+    fun userExist(userId: String): Boolean {
+        return userRepository.existsById(userId)
+    }
 }

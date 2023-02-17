@@ -19,7 +19,6 @@ import com.cn.speaktest.security.services.RefreshTokenService
 import com.cn.speaktest.security.services.UserDetailsImpl
 import com.cn.speaktest.service.MailSenderService
 import jakarta.validation.Valid
-import jakarta.validation.Validation
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
@@ -27,12 +26,10 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-import java.util.stream.Collectors
 
 @CrossOrigin(origins = ["*"], maxAge = 3600)
 @RestController
@@ -54,7 +51,7 @@ class AuthController(
     fun authenticateUser(@Valid @RequestBody signInRequest: SignInRequest): Message {
 
         val user = userRepository.findByEmail(signInRequest.email).orElseThrow {
-            InvalidTokenException("User Not Found")
+            InvalidTokenException("Bad credentials")
         }
 
         val authentication = authenticationManager.authenticate(
@@ -211,7 +208,7 @@ class AuthController(
         @RequestParam @Size(min = 6, max = 40) @NotBlank oldPassword: String,
         @RequestParam @Size(min = 6, max = 40) @NotBlank newPassword: String
     ): Message {
-        val userId = jwtUtils.getUserIdFromAuthToken(auth)
+        val userId = jwtUtils.getUserIdFromAuthorizationHeader(auth)
         val user = userRepository.findById(userId).orElseThrow { NotFoundException("User Not Found") }
         if (user.password == encoder.encode(oldPassword))
             user.password = encoder.encode(newPassword)
@@ -220,8 +217,8 @@ class AuthController(
     }
 
     @PostMapping("/sign-out")
-    fun signOutUser(@RequestHeader("Authorization") auth: String): Message {
-        refreshTokenService.deleteByUserId(jwtUtils.getUserIdFromAuthToken(auth))
+    fun signOutUser(@RequestHeader("Authorization") auth: String?): Message {
+        refreshTokenService.deleteByUserId(jwtUtils.getUserIdFromAuthorizationHeader(auth))
         return Message(null, "User signed out successfully")
     }
 }
