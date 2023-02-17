@@ -12,11 +12,11 @@ import com.cn.speaktest.repository.exam.ExamRequestRepository
 import com.cn.speaktest.repository.exam.QuestionRepository
 import com.cn.speaktest.repository.user.ProfessorRepository
 import com.cn.speaktest.service.ExamService
+import jakarta.validation.Valid
+import jakarta.validation.constraints.NotBlank
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-import jakarta.validation.Valid
-import jakarta.validation.constraints.NotBlank
 
 @CrossOrigin(origins = ["*"], maxAge = 3600)
 @RestController
@@ -31,7 +31,7 @@ class AdminController(
 ) {
     @GetMapping("/get-professors")
     @PreAuthorize("hasRole('ADMIN')")
-    fun getProfessors(@RequestHeader("Authorization") auth: String): Message {
+    fun getProfessors(@RequestHeader("Authorization") auth: String?): Message {
         return professorRepository.findAll().sortedBy {
             it.fullName
         }.toOkMessage()
@@ -39,7 +39,7 @@ class AdminController(
 
     @GetMapping("/get-exam-requests")
     @PreAuthorize("hasRole('ADMIN')")
-    fun getExamRequests(@RequestHeader("Authorization") auth: String): Message {
+    fun getExamRequests(@RequestHeader("Authorization") auth: String?): Message {
         return examRequestRepository.findAll().sortedByDescending {
             it.date
         }.toOkMessage()
@@ -48,7 +48,7 @@ class AdminController(
     @PostMapping("/confirm-exam")
     @PreAuthorize("hasRole('ADMIN')")
     fun confirmExam(
-        @RequestHeader("Authorization") auth: String,
+        @RequestHeader("Authorization") auth: String?,
         @NotBlank @RequestParam examRequestId: String,
         @NotBlank @RequestParam professorId: String,
     ): Message {
@@ -80,7 +80,7 @@ class AdminController(
     @PostMapping("/add-question")
     @PreAuthorize("hasRole('ADMIN')")
     fun addQuestion(
-        @RequestHeader("Authorization") auth: String,
+        @RequestHeader("Authorization") auth: String?,
         @Valid @RequestBody addQuestionRequest: AddQuestionRequest
     ): Message {
         val section = addQuestionRequest.section
@@ -91,15 +91,14 @@ class AdminController(
         if (isDuplicate)
             throw InvalidInputException("A question with section: $section, topic: $topic, order: $order does exist")
 
-        return Message(
-            questionRepository.save(
-                Question(
-                    section,
-                    topic,
-                    order,
-                    addQuestionRequest.text,
-                )
-            ),
-            "Question added successfully")
+        val question = questionRepository.save(
+            Question(
+                section,
+                topic,
+                order,
+                addQuestionRequest.text,
+            )
+        )
+        return Message(question, "Question added successfully")
     }
 }

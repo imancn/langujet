@@ -83,8 +83,7 @@ class AuthController(
 
         studentRepository.save(
             Student(
-                user = user,
-                fullName = signUpRequest.fullName
+                user = user, fullName = signUpRequest.fullName
             )
         )
         return Message(null, "User registered successfully!")
@@ -113,11 +112,7 @@ class AuthController(
 
         return userRepository.save(
             User(
-                id = null,
-                email = email,
-                emailVerified = false,
-                password = encoder.encode(password),
-                roles = roles
+                id = null, email = email, emailVerified = false, password = encoder.encode(password), roles = roles
             )
         )
     }
@@ -160,14 +155,12 @@ class AuthController(
     fun refreshToken(@RequestBody request: @Valid TokenRefreshRequest): Message {
         val refreshToken = refreshTokenService.findByToken(request.refreshToken)
             .map(refreshTokenService::verifyExpiration)
-            .map(RefreshToken::user)
-            .map { user ->
-                val token = jwtUtils.generateTokenFromUserId(user.id)
-                ResponseEntity.ok(TokenRefreshResponse(token, request.refreshToken))
-            }
-            .orElseThrow {
-                RefreshTokenException("Refresh token [${request.refreshToken}] is not in database!")
-            }
+                .map(RefreshToken::user).map { user ->
+                    val token = jwtUtils.generateTokenFromUserId(user.id)
+                    ResponseEntity.ok(TokenRefreshResponse(token, request.refreshToken))
+                }.orElseThrow {
+                    RefreshTokenException("Refresh token [${request.refreshToken}] is not in database!")
+                }
         return Message(refreshToken)
     }
 
@@ -196,8 +189,7 @@ class AuthController(
             user.password = encoder.encode(newPassword)
             userRepository.save(user)
             resetPasswordTokenRepository.delete(token)
-        } else
-            throw InvalidTokenException("Your reset password token is invalid.")
+        } else throw InvalidTokenException("Your reset password token is invalid.")
 
         return Message(null, "Your password has been reset successfully")
     }
@@ -205,15 +197,16 @@ class AuthController(
     @PostMapping("/change-password")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     fun changePassword(
-        @RequestHeader("Authorization") auth: String,
+        @RequestHeader("Authorization") auth: String?,
         @RequestParam @Size(min = 6, max = 40) @NotBlank oldPassword: String,
         @RequestParam @Size(min = 6, max = 40) @NotBlank newPassword: String
     ): Message {
         val userId = jwtUtils.getUserIdFromAuthorizationHeader(auth)
         val user = userRepository.findById(userId).orElseThrow { NotFoundException("User Not Found") }
-        if (user.password == encoder.encode(oldPassword))
-            user.password = encoder.encode(newPassword)
+
+        if (user.password == encoder.encode(oldPassword)) user.password = encoder.encode(newPassword)
         else throw InvalidInputException("Old Password is not correct.")
+
         return Message(null, "Your password has been changed.")
     }
 
