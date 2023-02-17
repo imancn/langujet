@@ -1,4 +1,4 @@
-package com.cn.speaktest.service
+package com.cn.speaktest.mail
 
 import com.hubspot.jinjava.Jinjava
 

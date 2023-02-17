@@ -1,4 +1,4 @@
-package com.cn.speaktest.config
+package com.cn.speaktest.mail
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

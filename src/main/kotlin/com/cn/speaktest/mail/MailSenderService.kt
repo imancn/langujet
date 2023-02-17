@@ -1,7 +1,7 @@
-package com.cn.speaktest.service
+package com.cn.speaktest.mail
 
-import com.cn.speaktest.model.EmailVerificationToken
-import com.cn.speaktest.model.ResetPasswordToken
+import com.cn.speaktest.security.model.EmailVerificationToken
+import com.cn.speaktest.security.model.ResetPasswordToken
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import javax.mail.Message
@@ -15,7 +15,6 @@ import javax.mail.internet.MimeMultipart
 @Service
 class MailSenderService(
     private val session: Session
-
 ) {
     private val logger = LoggerFactory.getLogger(javaClass.simpleName)
     fun sendWithTemplate(to: List<String>, subject: String, contentParams: Map<String, String>, templateName: String) {
@@ -71,7 +70,7 @@ class MailSenderService(
         )
     }
 
-    private fun sendMimeMessage(htmlText: String, message: MimeMessage) {
+    fun sendMimeMessage(htmlText: String, message: MimeMessage) {
         val htmlPart = MimeBodyPart()
         htmlPart.setContent(htmlText, "text/html; charset=utf-8")
 
