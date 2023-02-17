@@ -1,6 +1,6 @@
-package com.cn.speaktest.security.payload.response
+package com.cn.speaktest.student.payload.response
 
-import com.cn.speaktest.model.Student
+import com.cn.speaktest.student.model.Student
 
 data class StudentProfileResponse(
     var id: String?,

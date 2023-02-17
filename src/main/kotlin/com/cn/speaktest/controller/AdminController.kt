@@ -6,7 +6,7 @@ import com.cn.speaktest.advice.NotFoundException
 import com.cn.speaktest.advice.toOkMessage
 import com.cn.speaktest.model.Exam
 import com.cn.speaktest.model.Question
-import com.cn.speaktest.payload.request.AddQuestionRequest
+import com.cn.speaktest.student.payload.request.AddQuestionRequest
 import com.cn.speaktest.repository.exam.ExamRepository
 import com.cn.speaktest.repository.exam.ExamRequestRepository
 import com.cn.speaktest.repository.exam.QuestionRepository

@@ -4,7 +4,7 @@ import com.cn.speaktest.advice.*
 import com.cn.speaktest.security.model.EmailVerificationToken
 import com.cn.speaktest.model.Professor
 import com.cn.speaktest.security.model.ResetPasswordToken
-import com.cn.speaktest.model.Student
+import com.cn.speaktest.student.model.Student
 import com.cn.speaktest.security.model.RefreshToken
 import com.cn.speaktest.security.model.Role
 import com.cn.speaktest.security.model.User
@@ -21,6 +21,7 @@ import com.cn.speaktest.mail.MailSenderService
 import com.cn.speaktest.security.repository.EmailVerificationTokenRepository
 import com.cn.speaktest.security.repository.ResetPasswordTokenRepository
 import com.cn.speaktest.security.repository.UserRepository
+import com.cn.speaktest.student.repository.StudentRepository
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
