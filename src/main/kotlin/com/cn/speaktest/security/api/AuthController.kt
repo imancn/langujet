@@ -26,7 +26,6 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
-import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -162,7 +161,7 @@ class AuthController(
             .map(refreshTokenService::verifyExpiration)
                 .map(RefreshToken::user).map { user ->
                     val token = jwtService.generateTokenFromUserId(user.id)
-                    ResponseEntity.ok(TokenRefreshResponse(token, request.refreshToken))
+                    TokenRefreshResponse(token, request.refreshToken)
                 }.orElseThrow {
                     RefreshTokenException("Refresh token [${request.refreshToken}] is not in database!")
                 }
