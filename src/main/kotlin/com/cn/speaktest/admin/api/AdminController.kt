@@ -1,4 +1,4 @@
-package com.cn.speaktest.controller
+package com.cn.speaktest.admin.api
 
 import com.cn.speaktest.advice.InvalidInputException
 import com.cn.speaktest.advice.Message
@@ -7,7 +7,7 @@ import com.cn.speaktest.advice.toOkMessage
 import com.cn.speaktest.exam.api.ExamService
 import com.cn.speaktest.exam.model.Exam
 import com.cn.speaktest.exam.model.Question
-import com.cn.speaktest.student.payload.request.AddQuestionRequest
+import com.cn.speaktest.admin.payload.request.AddQuestionRequest
 import com.cn.speaktest.exam.repository.ExamRepository
 import com.cn.speaktest.exam.repository.ExamRequestRepository
 import com.cn.speaktest.exam.repository.QuestionRepository

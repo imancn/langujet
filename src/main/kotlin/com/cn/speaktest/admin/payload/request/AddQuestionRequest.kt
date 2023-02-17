@@ -1,4 +1,4 @@
-package com.cn.speaktest.student.payload.request
+package com.cn.speaktest.admin.payload.request
 
 import com.cn.speaktest.exam.model.Question
 import jakarta.validation.constraints.NotBlank
