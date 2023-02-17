@@ -1,7 +1,6 @@
 package com.cn.speaktest.security.jwt
 
 import com.cn.speaktest.security.services.UserDetailsServiceImpl
-import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
@@ -25,23 +24,17 @@ class AuthTokenFilter(
     ) {
         try {
             val jwt = jwtUtils.parseJwt(request)
-            if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-                val userId = jwtUtils.getUserIdFromJwtToken(jwt)
-                val userDetails = userDetailsService.loadUserByUsername(userId)
-                val authentication = UsernamePasswordAuthenticationToken(
-                    userDetails, null,
-                    userDetails.authorities
-                )
-                authentication.details = WebAuthenticationDetailsSource().buildDetails(request)
-                SecurityContextHolder.getContext().authentication = authentication
-            }
+            val userId = jwtUtils.getUserIdFromJwtToken(jwt)
+            val userDetails = userDetailsService.loadUserByUsername(userId)
+            val authentication = UsernamePasswordAuthenticationToken(
+                userDetails, null,
+                userDetails.authorities
+            )
+            authentication.details = WebAuthenticationDetailsSource().buildDetails(request)
+            SecurityContextHolder.getContext().authentication = authentication
         } catch (e: Exception) {
-            Companion.logger.error("Cannot set user authentication: ${e.message}\n ${e.stackTraceToString()}")
+            logger.warn("Cannot set user authentication: ${e.message}")
         }
         filterChain.doFilter(request, response)
-    }
-
-    companion object {
-        private val logger = LoggerFactory.getLogger(AuthTokenFilter::class.java)
     }
 }
