@@ -1,17 +1,18 @@
-package com.cn.speaktest.service
+package com.cn.speaktest.exam.service
 
-import com.cn.speaktest.model.ExamIssue
-import com.cn.speaktest.model.Question
-import com.cn.speaktest.repository.exam.ExamIssueRepository
-import com.cn.speaktest.repository.exam.QuestionRepository
+import com.cn.speaktest.exam.api.ExamService
+import com.cn.speaktest.exam.model.ExamIssue
+import com.cn.speaktest.exam.model.Question
+import com.cn.speaktest.exam.repository.ExamIssueRepository
+import com.cn.speaktest.exam.repository.QuestionRepository
 import org.springframework.stereotype.Service
 
 @Service
-class ExamService(
+class ExamServiceImpl(
     val questionRepository: QuestionRepository,
     val examIssueRepository: ExamIssueRepository
-) {
-    fun generateExamIssueList(examId: String): List<ExamIssue> {
+): ExamService {
+    override fun generateExamIssueList(examId: String): List<ExamIssue> {
         val examIssues = mutableListOf<ExamIssue>().toMutableList()
         val usedQuestions = mutableListOf<Question>().toMutableList()
         Question.Section.values().sortedBy { it.num }.forEach { section ->

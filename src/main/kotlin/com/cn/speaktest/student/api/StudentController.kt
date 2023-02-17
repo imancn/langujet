@@ -4,10 +4,10 @@ import com.cn.speaktest.advice.Message
 import com.cn.speaktest.advice.MethodNotAllowedException
 import com.cn.speaktest.advice.NotFoundException
 import com.cn.speaktest.advice.toOkMessage
-import com.cn.speaktest.model.ExamRequest
+import com.cn.speaktest.exam.model.ExamRequest
 import com.cn.speaktest.student.model.Student
 import com.cn.speaktest.student.payload.response.StudentProfileResponse
-import com.cn.speaktest.repository.exam.ExamRequestRepository
+import com.cn.speaktest.exam.repository.ExamRequestRepository
 import com.cn.speaktest.student.repository.StudentRepository
 import com.cn.speaktest.security.api.AuthService
 import com.cn.speaktest.security.repository.UserRepository

@@ -1,6 +1,6 @@
 package com.cn.speaktest.student.payload.request
 
-import com.cn.speaktest.model.Question
+import com.cn.speaktest.exam.model.Question
 import jakarta.validation.constraints.NotBlank
 
 data class AddQuestionRequest(

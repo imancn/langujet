@@ -1,4 +1,4 @@
-package com.cn.speaktest.model
+package com.cn.speaktest.exam.model
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document

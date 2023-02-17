@@ -1,6 +1,6 @@
-package com.cn.speaktest.repository.exam
+package com.cn.speaktest.exam.repository
 
-import com.cn.speaktest.model.Suggestion
+import com.cn.speaktest.exam.model.Suggestion
 import org.springframework.data.mongodb.repository.MongoRepository
 
 interface SuggestionRepository : MongoRepository<Suggestion, String>

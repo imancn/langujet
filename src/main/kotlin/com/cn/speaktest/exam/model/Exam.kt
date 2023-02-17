@@ -1,4 +1,4 @@
-package com.cn.speaktest.model
+package com.cn.speaktest.exam.model
 
 import com.cn.speaktest.professor.Professor
 import com.cn.speaktest.student.model.Student

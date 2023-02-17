@@ -1,6 +1,6 @@
-package com.cn.speaktest.repository.exam
+package com.cn.speaktest.exam.repository
 
-import com.cn.speaktest.model.Question
+import com.cn.speaktest.exam.model.Question
 import org.springframework.data.mongodb.repository.MongoRepository
 
 interface QuestionRepository : MongoRepository<Question, String> {
