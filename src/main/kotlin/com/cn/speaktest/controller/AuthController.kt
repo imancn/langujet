@@ -52,8 +52,6 @@ class AuthController(
 ) {
     @PostMapping("/sign-in")
     fun authenticateUser(@Valid @RequestBody signInRequest: SignInRequest): Message {
-        val validator = Validation.buildDefaultValidatorFactory().validator
-        validator.validate(signInRequest)
 
         val user = userRepository.findByEmail(signInRequest.email).orElseThrow {
             InvalidTokenException("User Not Found")
