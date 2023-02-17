@@ -16,7 +16,7 @@ import com.cn.speaktest.security.payload.response.TokenRefreshResponse
 import com.cn.speaktest.security.services.JwtService
 import com.cn.speaktest.security.services.RefreshTokenService
 import com.cn.speaktest.security.model.UserDetailsImpl
-import com.cn.speaktest.mail.MailSenderService
+import com.cn.speaktest.smtp.MailSenderService
 import com.cn.speaktest.professor.ProfessorRepository
 import com.cn.speaktest.security.repository.EmailVerificationTokenRepository
 import com.cn.speaktest.security.repository.ResetPasswordTokenRepository
