@@ -12,6 +12,8 @@ import java.io.IOException
 import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.security.authentication.BadCredentialsException
+import org.springframework.security.authentication.InsufficientAuthenticationException
 
 @Component
 class AuthEntryPointJwt(
@@ -24,13 +26,19 @@ class AuthEntryPointJwt(
         authException: AuthenticationException
     ) {
         try {
-            val jwt = jwtService.parseJwt(request)
-            val userId = jwtService.getUserIdFromJwtToken(jwt)
+            when (authException) {
+                is BadCredentialsException -> throw authException
 
-            if (!userDetailsService.userExist(userId))
-                throw InvalidTokenException("User Not Found")
+                is InsufficientAuthenticationException -> {
+                    val jwt = jwtService.parseJwt(request)
+                    val userId = jwtService.getUserIdFromJwtToken(jwt)
 
-            throw authException
+                    if (!userDetailsService.userExist(userId))
+                        throw InvalidTokenException("User Not Found")
+                }
+
+                else -> throw authException
+            }
         } catch (exception: Exception){
             response.status = HttpServletResponse.SC_UNAUTHORIZED
             response.contentType = "application/json"
