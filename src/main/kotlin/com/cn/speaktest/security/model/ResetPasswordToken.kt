@@ -1,14 +1,13 @@
-package com.cn.speaktest.model
+package com.cn.speaktest.security.model
 
-import com.cn.speaktest.model.security.User
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
 
-@Document(collection = "email_verification_token")
-data class EmailVerificationToken(
+@Document(collection = "reset_password_token")
+data class ResetPasswordToken(
     @Id
     var id: String?,
     @DBRef
@@ -29,7 +28,7 @@ data class EmailVerificationToken(
 
         private fun makeRandom6DigitsToken(): String {
             val digit = Random().nextInt(899_999) + 100_000
-            return String. format("%06d", digit)
+            return String.format("%06d", digit)
         }
 
         private fun calculateExpiryDate(expiryTimeInMinutes: Int = EXPIRATION): Date {

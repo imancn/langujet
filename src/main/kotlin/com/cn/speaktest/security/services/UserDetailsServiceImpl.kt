@@ -1,7 +1,8 @@
 package com.cn.speaktest.security.services
 
 import com.cn.speaktest.advice.InvalidTokenException
-import com.cn.speaktest.repository.user.UserRepository
+import com.cn.speaktest.security.model.UserDetailsImpl
+import com.cn.speaktest.security.repository.UserRepository
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException

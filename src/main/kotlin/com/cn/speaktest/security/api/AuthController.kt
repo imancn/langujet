@@ -1,23 +1,26 @@
-package com.cn.speaktest.controller
+package com.cn.speaktest.security.api
 
 import com.cn.speaktest.advice.*
-import com.cn.speaktest.model.EmailVerificationToken
+import com.cn.speaktest.security.model.EmailVerificationToken
 import com.cn.speaktest.model.Professor
-import com.cn.speaktest.model.ResetPasswordToken
+import com.cn.speaktest.security.model.ResetPasswordToken
 import com.cn.speaktest.model.Student
-import com.cn.speaktest.model.security.RefreshToken
-import com.cn.speaktest.model.security.Role
-import com.cn.speaktest.model.security.User
-import com.cn.speaktest.payload.request.auth.SignInRequest
-import com.cn.speaktest.payload.request.auth.SignupRequest
-import com.cn.speaktest.payload.request.auth.TokenRefreshRequest
-import com.cn.speaktest.payload.response.user.JwtResponse
-import com.cn.speaktest.payload.response.user.TokenRefreshResponse
+import com.cn.speaktest.security.model.RefreshToken
+import com.cn.speaktest.security.model.Role
+import com.cn.speaktest.security.model.User
+import com.cn.speaktest.security.payload.request.SignInRequest
+import com.cn.speaktest.security.payload.request.SignupRequest
+import com.cn.speaktest.security.payload.request.TokenRefreshRequest
+import com.cn.speaktest.security.payload.response.JwtResponse
+import com.cn.speaktest.security.payload.response.TokenRefreshResponse
 import com.cn.speaktest.repository.user.*
-import com.cn.speaktest.security.jwt.JwtUtils
+import com.cn.speaktest.security.services.JwtService
 import com.cn.speaktest.security.services.RefreshTokenService
-import com.cn.speaktest.security.services.UserDetailsImpl
-import com.cn.speaktest.service.MailSenderService
+import com.cn.speaktest.security.model.UserDetailsImpl
+import com.cn.speaktest.mail.MailSenderService
+import com.cn.speaktest.security.repository.EmailVerificationTokenRepository
+import com.cn.speaktest.security.repository.ResetPasswordTokenRepository
+import com.cn.speaktest.security.repository.UserRepository
 import jakarta.validation.Valid
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
@@ -45,7 +48,8 @@ class AuthController(
     val resetPasswordTokenRepository: ResetPasswordTokenRepository,
     val mailSenderService: MailSenderService,
     val encoder: PasswordEncoder,
-    val jwtUtils: JwtUtils
+    val jwtService: JwtService,
+    val authService: AuthService
 ) {
     @PostMapping("/sign-in")
     fun authenticateUser(@Valid @RequestBody signInRequest: SignInRequest): Message {
@@ -59,7 +63,7 @@ class AuthController(
         )
         SecurityContextHolder.getContext().authentication = authentication
 
-        val jwt = jwtUtils.generateJwtToken(authentication)
+        val jwt = jwtService.generateJwtToken(authentication)
 
         val userDetails = authentication.principal as UserDetailsImpl
 
@@ -156,7 +160,7 @@ class AuthController(
         val refreshToken = refreshTokenService.findByToken(request.refreshToken)
             .map(refreshTokenService::verifyExpiration)
                 .map(RefreshToken::user).map { user ->
-                    val token = jwtUtils.generateTokenFromUserId(user.id)
+                    val token = jwtService.generateTokenFromUserId(user.id)
                     ResponseEntity.ok(TokenRefreshResponse(token, request.refreshToken))
                 }.orElseThrow {
                     RefreshTokenException("Refresh token [${request.refreshToken}] is not in database!")
@@ -201,7 +205,7 @@ class AuthController(
         @RequestParam @Size(min = 6, max = 40) @NotBlank oldPassword: String,
         @RequestParam @Size(min = 6, max = 40) @NotBlank newPassword: String
     ): Message {
-        val userId = jwtUtils.getUserIdFromAuthorizationHeader(auth)
+        val userId = authService.getUserIdFromAuthorizationHeader(auth)
         val user = userRepository.findById(userId).orElseThrow { NotFoundException("User Not Found") }
 
         if (user.password == encoder.encode(oldPassword)) user.password = encoder.encode(newPassword)
@@ -212,7 +216,7 @@ class AuthController(
 
     @PostMapping("/sign-out")
     fun signOutUser(@RequestHeader("Authorization") auth: String?): Message {
-        refreshTokenService.deleteByUserId(jwtUtils.getUserIdFromAuthorizationHeader(auth))
+        refreshTokenService.deleteByUserId(authService.getUserIdFromAuthorizationHeader(auth))
         return Message(null, "User signed out successfully")
     }
 }

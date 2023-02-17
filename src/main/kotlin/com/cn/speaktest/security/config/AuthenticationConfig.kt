@@ -1,4 +1,4 @@
-package com.cn.speaktest.config
+package com.cn.speaktest.security.config
 
 import com.cn.speaktest.security.services.UserDetailsServiceImpl
 import org.springframework.beans.factory.annotation.Autowired

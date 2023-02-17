@@ -1,5 +1,6 @@
-package com.cn.speaktest.security.jwt
+package com.cn.speaktest.security.config
 
+import com.cn.speaktest.security.services.JwtService
 import com.cn.speaktest.security.services.UserDetailsServiceImpl
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
@@ -12,7 +13,7 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 
 class AuthTokenFilter(
-    private val jwtUtils: JwtUtils,
+    private val jwtService: JwtService,
     private val userDetailsService: UserDetailsServiceImpl
 ) : OncePerRequestFilter() {
 
@@ -23,8 +24,8 @@ class AuthTokenFilter(
         filterChain: FilterChain
     ) {
         try {
-            val jwt = jwtUtils.parseJwt(request)
-            val userId = jwtUtils.getUserIdFromJwtToken(jwt)
+            val jwt = jwtService.parseJwt(request)
+            val userId = jwtService.getUserIdFromJwtToken(jwt)
             val userDetails = userDetailsService.loadUserByUsername(userId)
             val authentication = UsernamePasswordAuthenticationToken(
                 userDetails, null,

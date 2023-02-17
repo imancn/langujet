@@ -1,6 +1,5 @@
-package com.cn.speaktest.security.services
+package com.cn.speaktest.security.model
 
-import com.cn.speaktest.model.security.User
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority

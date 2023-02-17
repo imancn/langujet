@@ -1,4 +1,4 @@
-package com.cn.speaktest.payload.response.user
+package com.cn.speaktest.security.payload.response
 
 import com.cn.speaktest.model.Student
 

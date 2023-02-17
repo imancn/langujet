@@ -1,7 +1,8 @@
-package com.cn.speaktest.security.jwt
+package com.cn.speaktest.security.config
 
 import com.cn.speaktest.advice.InvalidTokenException
 import com.cn.speaktest.advice.Message
+import com.cn.speaktest.security.services.JwtService
 import com.cn.speaktest.security.services.UserDetailsServiceImpl
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.AuthenticationException
@@ -14,7 +15,7 @@ import jakarta.servlet.http.HttpServletResponse
 
 @Component
 class AuthEntryPointJwt(
-    private val jwtUtils: JwtUtils,
+    private val jwtService: JwtService,
     private val userDetailsService: UserDetailsServiceImpl
 ) : AuthenticationEntryPoint {
     @Throws(IOException::class, ServletException::class)
@@ -23,8 +24,8 @@ class AuthEntryPointJwt(
         authException: AuthenticationException
     ) {
         try {
-            val jwt = jwtUtils.parseJwt(request)
-            val userId = jwtUtils.getUserIdFromJwtToken(jwt)
+            val jwt = jwtService.parseJwt(request)
+            val userId = jwtService.getUserIdFromJwtToken(jwt)
 
             if (!userDetailsService.userExist(userId))
                 throw InvalidTokenException("User Not Found")

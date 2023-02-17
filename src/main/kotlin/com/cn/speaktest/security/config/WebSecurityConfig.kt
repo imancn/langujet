@@ -1,9 +1,7 @@
-package com.cn.speaktest.config
+package com.cn.speaktest.security.config
 
 import com.cn.speaktest.advice.CustomAccessDeniedHandler
-import com.cn.speaktest.security.jwt.AuthEntryPointJwt
-import com.cn.speaktest.security.jwt.AuthTokenFilter
-import com.cn.speaktest.security.jwt.JwtUtils
+import com.cn.speaktest.security.services.JwtService
 import com.cn.speaktest.security.services.UserDetailsServiceImpl
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -22,7 +20,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 class WebSecurityConfig(
-    private val jwtUtils: JwtUtils,
+    private val jwtService: JwtService,
     private val userDetailsService: UserDetailsServiceImpl,
     private val unauthorizedHandler: AuthEntryPointJwt,
 ) {
@@ -43,7 +41,7 @@ class WebSecurityConfig(
             .exceptionHandling().accessDeniedHandler(accessDeniedHandler()).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
             .addFilterBefore(
-                AuthTokenFilter(jwtUtils, userDetailsService),
+                AuthTokenFilter(jwtService, userDetailsService),
                 UsernamePasswordAuthenticationFilter::class.java
             )
             .build()

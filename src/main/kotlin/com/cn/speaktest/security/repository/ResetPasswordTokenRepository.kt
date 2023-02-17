@@ -1,7 +1,7 @@
-package com.cn.speaktest.repository.user
+package com.cn.speaktest.security.repository
 
-import com.cn.speaktest.model.ResetPasswordToken
-import com.cn.speaktest.model.security.User
+import com.cn.speaktest.security.model.ResetPasswordToken
+import com.cn.speaktest.security.model.User
 import org.springframework.data.mongodb.repository.MongoRepository
 import java.util.*
 

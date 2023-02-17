@@ -1,4 +1,4 @@
-package com.cn.speaktest.model.security
+package com.cn.speaktest.security.model
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document

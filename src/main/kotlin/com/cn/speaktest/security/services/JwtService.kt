@@ -1,7 +1,7 @@
-package com.cn.speaktest.security.jwt
+package com.cn.speaktest.security.services
 
 import com.cn.speaktest.advice.InvalidTokenException
-import com.cn.speaktest.security.services.UserDetailsImpl
+import com.cn.speaktest.security.model.UserDetailsImpl
 import io.jsonwebtoken.*
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.Authentication
@@ -10,7 +10,7 @@ import java.util.*
 import jakarta.servlet.http.HttpServletRequest
 
 @Component
-class JwtUtils {
+class JwtService {
     @Value("\${app.jwtSecret}")
     private val jwtSecret: String? = null
 
@@ -55,13 +55,7 @@ class JwtUtils {
         return parseAuthorizationHeader(request.getHeader("Authorization"))
     }
 
-    fun getUserIdFromAuthorizationHeader(authorizationHeader: String?): String {
-        return getUserIdFromJwtToken(
-            parseAuthorizationHeader(authorizationHeader)
-        )
-    }
-
-    private fun parseAuthorizationHeader(authorizationHeader: String?): String {
+    fun parseAuthorizationHeader(authorizationHeader: String?): String {
         if (authorizationHeader.isNullOrEmpty())
             throw InvalidTokenException("Authorization header is missing")
         if (!authorizationHeader.startsWith("Bearer "))

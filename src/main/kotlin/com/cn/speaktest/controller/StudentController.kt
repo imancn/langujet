@@ -6,11 +6,11 @@ import com.cn.speaktest.advice.NotFoundException
 import com.cn.speaktest.advice.toOkMessage
 import com.cn.speaktest.model.ExamRequest
 import com.cn.speaktest.model.Student
-import com.cn.speaktest.payload.response.user.StudentProfileResponse
+import com.cn.speaktest.security.payload.response.StudentProfileResponse
 import com.cn.speaktest.repository.exam.ExamRequestRepository
 import com.cn.speaktest.repository.user.StudentRepository
-import com.cn.speaktest.repository.user.UserRepository
-import com.cn.speaktest.security.jwt.JwtUtils
+import com.cn.speaktest.security.api.AuthService
+import com.cn.speaktest.security.repository.UserRepository
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
@@ -21,7 +21,7 @@ import java.util.*
 @RequestMapping("/api/student")
 @Validated
 class StudentController(
-    val jwtUtils: JwtUtils,
+    val authService: AuthService,
     val studentRepository: StudentRepository,
     val userRepository: UserRepository,
     val examRequestRepository: ExamRequestRepository,
@@ -67,7 +67,7 @@ class StudentController(
 
     private fun getStudentByAuthToken(auth: String?): Student {
         val user = userRepository.findById(
-            jwtUtils.getUserIdFromAuthorizationHeader(auth)
+            authService.getUserIdFromAuthorizationHeader(auth)
         ).orElseThrow { NotFoundException("User Not found") }
         return studentRepository.findByUser(user).orElseThrow { NotFoundException("Student Not found") }
     }

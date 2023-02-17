@@ -1,4 +1,4 @@
-package com.cn.speaktest.payload.request.auth
+package com.cn.speaktest.security.payload.request
 
 import jakarta.validation.constraints.NotBlank
 
