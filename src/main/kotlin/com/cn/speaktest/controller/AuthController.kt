@@ -68,9 +68,6 @@ class AuthController(
 
         if (!userDetails.emailVerified) throw MethodNotAllowedException("User is not enabled ${userDetails.email}")
 
-        val roles = userDetails.authorities.stream().map { item: GrantedAuthority -> item.authority }
-            .collect(Collectors.toList())
-
         val refreshToken = refreshTokenService.createRefreshToken(userDetails.id)
 
         return JwtResponse(
