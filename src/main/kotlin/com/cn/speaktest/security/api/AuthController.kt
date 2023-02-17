@@ -1,13 +1,8 @@
 package com.cn.speaktest.security.api
 
 import com.cn.speaktest.advice.*
-import com.cn.speaktest.security.model.EmailVerificationToken
 import com.cn.speaktest.professor.Professor
-import com.cn.speaktest.security.model.ResetPasswordToken
 import com.cn.speaktest.student.model.Student
-import com.cn.speaktest.security.model.RefreshToken
-import com.cn.speaktest.security.model.Role
-import com.cn.speaktest.security.model.User
 import com.cn.speaktest.security.payload.request.SignInRequest
 import com.cn.speaktest.security.payload.request.SignupRequest
 import com.cn.speaktest.security.payload.request.TokenRefreshRequest
@@ -15,9 +10,9 @@ import com.cn.speaktest.security.payload.response.JwtResponse
 import com.cn.speaktest.security.payload.response.TokenRefreshResponse
 import com.cn.speaktest.security.services.JwtService
 import com.cn.speaktest.security.services.RefreshTokenService
-import com.cn.speaktest.security.model.UserDetailsImpl
 import com.cn.speaktest.smtp.MailSenderService
 import com.cn.speaktest.professor.ProfessorRepository
+import com.cn.speaktest.security.model.*
 import com.cn.speaktest.security.repository.EmailVerificationTokenRepository
 import com.cn.speaktest.security.repository.ResetPasswordTokenRepository
 import com.cn.speaktest.security.repository.UserRepository
@@ -33,6 +28,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
+import kotlin.jvm.optionals.getOrElse
 
 @CrossOrigin(origins = ["*"], maxAge = 3600)
 @RestController
@@ -171,9 +167,9 @@ class AuthController(
     @PostMapping("/reset-password")
     fun resetPassword(@RequestParam @Email @NotBlank email: String): Message {
         val user = userRepository.findByEmail(email).orElseThrow { NotFoundException("User Not Found") }
-        val token = resetPasswordTokenRepository.findByUser(user).orElse(
+        val token = resetPasswordTokenRepository.findByUser(user).getOrElse {
             resetPasswordTokenRepository.save(ResetPasswordToken(user))
-        )
+        }
         mailSenderService.sendResetPasswordMail(token)
         return Message(null, "The reset password link has been mailed to you.")
     }
