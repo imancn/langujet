@@ -203,6 +203,7 @@ class AuthController(
     }
 
     @PostMapping("/change-password")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     fun changePassword(
         @RequestHeader("Authorization") auth: String,
         @RequestParam @Size(min = 6, max = 40) @NotBlank oldPassword: String,
