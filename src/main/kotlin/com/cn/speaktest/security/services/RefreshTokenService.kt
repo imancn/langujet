@@ -2,9 +2,9 @@ package com.cn.speaktest.security.services
 
 import com.cn.speaktest.advice.NotFoundException
 import com.cn.speaktest.advice.RefreshTokenException
-import com.cn.speaktest.model.security.RefreshToken
-import com.cn.speaktest.repository.user.RefreshTokenRepository
-import com.cn.speaktest.repository.user.UserRepository
+import com.cn.speaktest.security.model.RefreshToken
+import com.cn.speaktest.security.repository.RefreshTokenRepository
+import com.cn.speaktest.security.repository.UserRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
