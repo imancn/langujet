@@ -8,7 +8,7 @@ import com.cn.speaktest.model.Student
 import com.cn.speaktest.model.security.RefreshToken
 import com.cn.speaktest.model.security.Role
 import com.cn.speaktest.model.security.User
-import com.cn.speaktest.payload.request.auth.LoginRequest
+import com.cn.speaktest.payload.request.auth.SignInRequest
 import com.cn.speaktest.payload.request.auth.SignupRequest
 import com.cn.speaktest.payload.request.auth.TokenRefreshRequest
 import com.cn.speaktest.payload.response.user.JwtResponse
@@ -18,6 +18,11 @@ import com.cn.speaktest.security.jwt.JwtUtils
 import com.cn.speaktest.security.services.RefreshTokenService
 import com.cn.speaktest.security.services.UserDetailsImpl
 import com.cn.speaktest.service.MailSenderService
+import jakarta.validation.Valid
+import jakarta.validation.Validation
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Size
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.authentication.AuthenticationManager
@@ -28,10 +33,6 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import java.util.stream.Collectors
-import javax.validation.Valid
-import javax.validation.constraints.Email
-import javax.validation.constraints.NotBlank
-import javax.validation.constraints.Size
 
 @CrossOrigin(origins = ["*"], maxAge = 3600)
 @RestController
@@ -50,13 +51,14 @@ class AuthController(
     val jwtUtils: JwtUtils
 ) {
     @PostMapping("/sign-in")
-    fun authenticateUser(@Valid @RequestBody loginRequest: LoginRequest): Message {
-        val user = userRepository.findByEmail(loginRequest.email).orElseThrow {
+    fun authenticateUser(@Valid @RequestBody signInRequest: SignInRequest): Message {
+
+        val user = userRepository.findByEmail(signInRequest.email).orElseThrow {
             InvalidTokenException("User Not Found")
         }
 
         val authentication = authenticationManager.authenticate(
-            UsernamePasswordAuthenticationToken(user?.id, loginRequest.password)
+            UsernamePasswordAuthenticationToken(user?.id, signInRequest.password)
         )
         SecurityContextHolder.getContext().authentication = authentication
 
@@ -96,7 +98,7 @@ class AuthController(
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/signup/professor")
-    fun registerProfessor(@RequestBody signUpRequest: @Valid SignupRequest): Message {
+    fun registerProfessor(@Valid @RequestBody signUpRequest: SignupRequest): Message {
         val password = signUpRequest.password
         val email = signUpRequest.email
 
@@ -133,7 +135,9 @@ class AuthController(
         if (user.emailVerified) throw MethodNotAllowedException("Your Email Was Verified")
 
         val verificationToken = emailVerificationTokenRepository.findByUser(user).orElseThrow {
-            mailSenderService.sendEmailVerificationMail(emailVerificationTokenRepository.save(EmailVerificationToken(user)))
+            mailSenderService.sendEmailVerificationMail(
+                emailVerificationTokenRepository.save(EmailVerificationToken(user))
+            )
             MethodNotAllowedException("Your verification code has been expired.\nWe sent a new verification code.")
         }
 
@@ -207,7 +211,7 @@ class AuthController(
     @PostMapping("/change-password")
     fun changePassword(
         @RequestHeader("Authorization") auth: String,
-        @RequestParam @NotBlank oldPassword: String,
+        @RequestParam @Size(min = 6, max = 40) @NotBlank oldPassword: String,
         @RequestParam @Size(min = 6, max = 40) @NotBlank newPassword: String
     ): Message {
         val userId = jwtUtils.getUserIdFromAuthToken(auth)
@@ -221,6 +225,6 @@ class AuthController(
     @PostMapping("/sign-out")
     fun signOutUser(@RequestHeader("Authorization") auth: String): Message {
         refreshTokenService.deleteByUserId(jwtUtils.getUserIdFromAuthToken(auth))
-        return Message(null, "User sign out successfully")
+        return Message(null, "User signed out successfully")
     }
 }

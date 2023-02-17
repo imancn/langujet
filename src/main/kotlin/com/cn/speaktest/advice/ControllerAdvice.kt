@@ -7,7 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.WebRequest
-import javax.validation.ValidationException
+import jakarta.validation.ValidationException
 
 @RestControllerAdvice
 class ControllerAdvice{
@@ -28,11 +28,11 @@ class ControllerAdvice{
     fun handleValidationException(ex: MethodArgumentNotValidException, request: WebRequest): ResponseEntity<Message> {
         return ResponseEntity(
             Message(
-                HttpStatus.NOT_ACCEPTABLE,
-                ex.message,
-                ex.stackTraceToString()
+                HttpStatus.BAD_REQUEST,
+                "MethodArgumentNotValidException",
+                ex.message
             ),
-            HttpStatus.NOT_ACCEPTABLE
+            HttpStatus.BAD_REQUEST
         )
     }
 
@@ -40,24 +40,11 @@ class ControllerAdvice{
     fun handleValidationException(ex: ValidationException, request: WebRequest): ResponseEntity<Message> {
         return ResponseEntity(
             Message(
-                HttpStatus.NOT_ACCEPTABLE,
+                HttpStatus.BAD_REQUEST,
+                "ValidationException",
                 ex.message,
-                ex.stackTraceToString()
             ),
-            HttpStatus.NOT_ACCEPTABLE
-        )
-    }
-
-    @ExceptionHandler(value = [Exception::class])
-    fun handleUnHandledException(ex: Exception, request: WebRequest): ResponseEntity<Message> {
-        logger.error(ex.stackTraceToString())
-        return ResponseEntity(
-            Message(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                ex.message,
-                ex.stackTraceToString()
-            ),
-            HttpStatus.INTERNAL_SERVER_ERROR
+            HttpStatus.BAD_REQUEST
         )
     }
 }
