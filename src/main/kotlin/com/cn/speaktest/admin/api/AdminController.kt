@@ -14,6 +14,7 @@ import com.cn.speaktest.exam.repository.QuestionRepository
 import com.cn.speaktest.professor.ProfessorRepository
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
@@ -49,13 +50,13 @@ class AdminController(
     @PreAuthorize("hasRole('ADMIN')")
     fun confirmExam(
         @RequestHeader("Authorization") auth: String?,
-        @NotBlank @RequestParam examRequestId: String,
-        @NotBlank @RequestParam professorId: String,
+        @RequestParam @NotBlank examRequestId: String?,
+        @RequestParam @NotBlank professorId: String?,
     ): Message {
-        val examRequest = examRequestRepository.findById(examRequestId).orElseThrow {
+        val examRequest = examRequestRepository.findById(examRequestId!!).orElseThrow {
             NotFoundException("ExamRequest not found")
         }
-        val professor = professorRepository.findById(professorId).orElseThrow {
+        val professor = professorRepository.findById(professorId!!).orElseThrow {
             NotFoundException("Professor not found")
         }
 
@@ -81,11 +82,11 @@ class AdminController(
     @PreAuthorize("hasRole('ADMIN')")
     fun addQuestion(
         @RequestHeader("Authorization") auth: String?,
-        @Valid @RequestBody addQuestionRequest: AddQuestionRequest
+        @Valid @NotNull @RequestBody addQuestionRequest: AddQuestionRequest?
     ): Message {
-        val section = addQuestionRequest.section
-        val topic = addQuestionRequest.topic
-        val order = addQuestionRequest.order
+        val section = addQuestionRequest!!.section!!
+        val topic = addQuestionRequest.topic!!
+        val order = addQuestionRequest.order!!
 
         val isDuplicate = questionRepository.existsBySectionAndTopicAndOrder(section, topic, order)
         if (isDuplicate)
@@ -96,7 +97,7 @@ class AdminController(
                 section,
                 topic,
                 order,
-                addQuestionRequest.text,
+                addQuestionRequest.text!!,
             )
         )
         return Message(question, "Question added successfully")
