@@ -3,11 +3,8 @@ package com.cn.speaktest.security.api
 import com.cn.speaktest.advice.*
 import com.cn.speaktest.professor.Professor
 import com.cn.speaktest.student.model.Student
-import com.cn.speaktest.security.payload.request.SignInRequest
-import com.cn.speaktest.security.payload.request.SignupRequest
-import com.cn.speaktest.security.payload.request.TokenRefreshRequest
 import com.cn.speaktest.security.payload.response.JwtResponse
-import com.cn.speaktest.security.payload.response.TokenRefreshResponse
+import com.cn.speaktest.security.payload.response.RefreshTokenResponse
 import com.cn.speaktest.security.services.JwtService
 import com.cn.speaktest.security.services.RefreshTokenService
 import com.cn.speaktest.smtp.MailSenderService
@@ -17,7 +14,6 @@ import com.cn.speaktest.security.repository.EmailVerificationTokenRepository
 import com.cn.speaktest.security.repository.ResetPasswordTokenRepository
 import com.cn.speaktest.security.repository.UserRepository
 import com.cn.speaktest.student.repository.StudentRepository
-import jakarta.validation.Valid
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
@@ -48,21 +44,19 @@ class AuthController(
     val authService: AuthService
 ) {
     @PostMapping("/sign-in")
-    fun authenticateUser(@Valid @RequestBody signInRequest: SignInRequest): Message {
-
-        val user = userRepository.findByEmail(signInRequest.email).orElseThrow {
+    fun authenticateUser(
+        @RequestParam @NotBlank @Email email: String?,
+        @RequestParam @NotBlank password: String?,
+    ): Message {
+        val user = userRepository.findByEmail(email).orElseThrow {
             InvalidTokenException("Bad credentials")
         }
-
         val authentication = authenticationManager.authenticate(
-            UsernamePasswordAuthenticationToken(user?.id, signInRequest.password)
+            UsernamePasswordAuthenticationToken(user?.id, password)
         )
         SecurityContextHolder.getContext().authentication = authentication
-
         val jwt = jwtService.generateJwtToken(authentication)
-
         val userDetails = authentication.principal as UserDetailsImpl
-
         if (!userDetails.emailVerified) throw MethodNotAllowedException("User is not enabled ${userDetails.email}")
 
         val refreshToken = refreshTokenService.createRefreshToken(userDetails.id)
@@ -73,37 +67,29 @@ class AuthController(
     }
 
     @PostMapping("/signup/student")
-    fun registerStudent(@Valid @RequestBody signUpRequest: SignupRequest): Message {
-        val password = signUpRequest.password
-        val email = signUpRequest.email
-
-        val user = registerUser(email, password, mutableSetOf(Role.ROLE_STUDENT))
-
+    fun registerStudent(
+        @NotBlank fullName: String?,
+        @NotBlank @Size(max = 50) @Email email: String?,
+        @NotBlank @Size(min = 6, max = 40) password: String?,
+    ): Message {
+        val user = registerUser(email!!, password!!, mutableSetOf(Role.ROLE_STUDENT))
         sendVerificationMail(user.email)
+        studentRepository.save(Student(user, fullName))
 
-        studentRepository.save(
-            Student(
-                user = user, fullName = signUpRequest.fullName
-            )
-        )
         return Message(null, "User registered successfully!")
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/signup/professor")
-    fun registerProfessor(@Valid @RequestBody signUpRequest: SignupRequest): Message {
-        val password = signUpRequest.password
-        val email = signUpRequest.email
-
-        val user = registerUser(email, password, mutableSetOf(Role.ROLE_PROFESSOR))
-
+    fun registerProfessor(
+        @NotBlank fullName: String?,
+        @NotBlank @Size(max = 50) @Email email: String?,
+        @NotBlank @Size(min = 6, max = 40) password: String?,
+    ): Message {
+        val user = registerUser(email!!, password!!, mutableSetOf(Role.ROLE_PROFESSOR))
         sendVerificationMail(email)
+        professorRepository.save(Professor(user, fullName))
 
-        professorRepository.save(
-            Professor(
-                user, signUpRequest.fullName
-            )
-        )
         return Message(null, "User registered successfully!")
     }
 
@@ -152,16 +138,17 @@ class AuthController(
     }
 
     @PostMapping("/refresh-token")
-    fun refreshToken(@RequestBody request: @Valid TokenRefreshRequest): Message {
-        val refreshToken = refreshTokenService.findByToken(request.refreshToken)
-            .map(refreshTokenService::verifyExpiration)
+    fun refreshToken(@RequestParam @NotBlank refreshToken: String?): Message {
+        return Message(
+            refreshTokenService.findByToken(refreshToken)
+                .map(refreshTokenService::verifyExpiration)
                 .map(RefreshToken::user).map { user ->
                     val token = jwtService.generateTokenFromUserId(user.id)
-                    TokenRefreshResponse(token, request.refreshToken)
+                    RefreshTokenResponse(token, refreshToken!!)
                 }.orElseThrow {
-                    RefreshTokenException("Refresh token [${request.refreshToken}] is not in database!")
+                    RefreshTokenException("Refresh token [${refreshToken}] is not in database!")
                 }
-        return Message(refreshToken)
+        )
     }
 
     @PostMapping("/reset-password")
