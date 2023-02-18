@@ -19,7 +19,7 @@ class Message(
     )
 
     constructor(data: Any?, message: String? = null) : this(
-        description = HttpStatus.OK.name,
+        description = HttpStatus.OK.reasonPhrase,
         status = HttpStatus.OK.value(),
         message = message,
         data = data,
