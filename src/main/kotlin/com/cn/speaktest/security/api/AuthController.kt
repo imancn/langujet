@@ -118,7 +118,7 @@ class AuthController(
     }
 
     @GetMapping("/signup/email/verify/{email}/{verificationCode}")
-    fun verifyEmail(@PathVariable @Email @NotBlank email: String, @PathVariable verificationCode: String): Message {
+    fun verifyEmail(@PathVariable @Email @NotBlank email: String?, @PathVariable @NotBlank verificationCode: String?): Message {
         val user = userRepository.findByEmail(email).orElseThrow { NotFoundException("User Not Found") }
 
         if (user.emailVerified) throw MethodNotAllowedException("Your Email Was Verified")
@@ -137,7 +137,7 @@ class AuthController(
     }
 
     @PostMapping("/signup/email/verification-mail")
-    fun sendVerificationMail(@RequestParam @Email @NotBlank email: String): Message {
+    fun sendVerificationMail(@RequestParam @Email @NotBlank email: String?): Message {
         val user = userRepository.findByEmail(email).orElseThrow { NotFoundException("User Not Found") }
 
         if (user.emailVerified) throw MethodNotAllowedException("Your Email Was Verified")
@@ -165,7 +165,7 @@ class AuthController(
     }
 
     @PostMapping("/reset-password")
-    fun resetPassword(@RequestParam @Email @NotBlank email: String): Message {
+    fun resetPassword(@RequestParam @Email @NotBlank email: String?): Message {
         val user = userRepository.findByEmail(email).orElseThrow { NotFoundException("User Not Found") }
         val token = resetPasswordTokenRepository.findByUser(user).getOrElse {
             resetPasswordTokenRepository.save(ResetPasswordToken(user))
@@ -176,9 +176,9 @@ class AuthController(
 
     @PostMapping("/reset-password/set")
     fun resetPassword(
-        @RequestParam @Email @NotBlank email: String,
-        @RequestParam code: String,
-        @RequestParam @Size(min = 6, max = 40) @NotBlank newPassword: String
+        @RequestParam @Email @NotBlank email: String?,
+        @RequestParam @NotBlank code: String?,
+        @RequestParam @Size(min = 6, max = 40) @NotBlank newPassword: String?
     ): Message {
         val user = userRepository.findByEmail(email).orElseThrow { NotFoundException("User Not Found") }
         val token = resetPasswordTokenRepository.findByUser(user).orElseThrow {
@@ -198,8 +198,8 @@ class AuthController(
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     fun changePassword(
         @RequestHeader("Authorization") auth: String?,
-        @RequestParam @Size(min = 6, max = 40) @NotBlank oldPassword: String,
-        @RequestParam @Size(min = 6, max = 40) @NotBlank newPassword: String
+        @RequestParam @Size(min = 6, max = 40) @NotBlank oldPassword: String?,
+        @RequestParam @Size(min = 6, max = 40) @NotBlank newPassword: String?
     ): Message {
         val userId = authService.getUserIdFromAuthorizationHeader(auth)
         val user = userRepository.findById(userId).orElseThrow { NotFoundException("User Not Found") }
