@@ -127,9 +127,9 @@ class AuthController(
 
         if (user.emailVerified) throw MethodNotAllowedException("Your Email Was Verified")
 
-        val emailVerificationToken = emailVerificationTokenRepository.findByUser(user).orElse(
+        val emailVerificationToken = emailVerificationTokenRepository.findByUser(user).getOrElse {
             emailVerificationTokenRepository.save(EmailVerificationToken(user))
-        )
+        }
 
         mailSenderService.sendEmailVerificationMail(emailVerificationToken)
 
