@@ -19,7 +19,25 @@ class ExamServiceImpl(
     val questionRepository: QuestionRepository,
     val examIssueRepository: ExamIssueRepository,
 ) : ExamService {
-    override fun generateExamIssueList(examId: String): List<ExamIssue> {
+    override fun submitExam(
+        examRequest: ExamRequest, professor: Professor
+    ): Exam {
+        var exam = examRepository.save(
+            Exam(
+                examRequest.student, professor, examRequest.date
+            )
+        )
+
+        val examIssues = generateExamIssueList(
+            exam.id ?: throw RuntimeException("exam.id must not be null")
+        )
+
+        exam = examRepository.save(exam.also { it.examIssues = examIssues })
+        examRequestRepository.delete(examRequest)
+        return exam
+    }
+
+    private fun generateExamIssueList(examId: String): List<ExamIssue> {
         val examIssues = mutableListOf<ExamIssue>().toMutableList()
         val usedQuestions = mutableListOf<Question>().toMutableList()
         Question.Section.values().sortedBy { it.num }.forEach { section ->
@@ -42,23 +60,4 @@ class ExamServiceImpl(
         })
         return examIssues
     }
-
-    override fun submitExam(
-        examRequest: ExamRequest, professor: Professor
-    ): Exam {
-        var exam = examRepository.save(
-            Exam(
-                examRequest.student, professor, examRequest.date
-            )
-        )
-
-        val examIssues = generateExamIssueList(
-            exam.id ?: throw RuntimeException("exam.id must not be null")
-        )
-
-        exam = examRepository.save(exam.also { it.examIssues = examIssues })
-        examRequestRepository.delete(examRequest)
-        return exam
-    }
-
 }
