@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 data class ExamIssue(
     @Id
     var id: String?,
-    var examId: String,
+    var examSessionId: String,
     @DBRef
     var question: Question,
     @DBRef
