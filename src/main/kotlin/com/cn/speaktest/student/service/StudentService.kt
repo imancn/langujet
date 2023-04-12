@@ -45,4 +45,16 @@ class StudentService(
             authService.getUserByAuthToken(auth).id!!
         ).orElseThrow { NotFoundException("Student Not found") }
     }
+
+    fun getStudentByStudentId(studentId: String): Student {
+        return studentRepository.findById(studentId).orElseThrow {
+            throw NotFoundException("Student not found")
+        }
+    }
+
+    fun getStudentByUserId(userId: String): Student {
+        return studentRepository.findByUser_Id(authService.getUserById(userId).id!!).orElseThrow {
+            throw NotFoundException("Student not found")
+        }
+    }
 }
