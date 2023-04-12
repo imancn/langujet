@@ -17,15 +17,13 @@ class AdminService(
     private val examService: ExamService,
 ) {
 
-    fun confirmExam(examRequestId: String?, professorId: String?): String? {
-        val examRequest = examRequestRepository.findById(examRequestId!!).orElseThrow {
-            NotFoundException("ExamRequest not found")
-        }
+    fun confirmExamRequest(examRequestId: String?, professorId: String?): String? {
+        val examRequest = examRequestService.getExamRequestById(examRequestId)
+        val exam = examService.getExamById(examRequest.examId)
         val professor = professorRepository.findById(professorId!!).orElseThrow {
             NotFoundException("Professor not found")
         }
-
-        return examService.submitExam(examRequest, professor).id
+        return examSessionService.enrollExamSession(examRequest, professor, exam).id
     }
 
     fun getProfessors() = professorRepository.findAll().sortedBy {

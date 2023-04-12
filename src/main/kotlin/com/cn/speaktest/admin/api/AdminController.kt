@@ -27,16 +27,16 @@ class AdminController(
         return adminService.getExamRequests().toOkMessage()
     }
 
-    @PostMapping("/confirm-exam")
+    @PostMapping("/confirm-exam-request")
     @PreAuthorize("hasRole('ADMIN')")
-    fun confirmExam(
+    fun confirmExamRequest(
         @RequestHeader("Authorization") auth: String?,
         @RequestParam @NotBlank examRequestId: String?,
         @RequestParam @NotBlank professorId: String?,
     ): Message {
         return Message(
             ConfirmExamResponse(
-                adminService.confirmExam(examRequestId, professorId)
+                adminService.confirmExamRequest(examRequestId, professorId)
             ),
             "Exam have been confirmed"
         )
