@@ -1,13 +1,10 @@
 package com.cn.speaktest.admin.api
 
 import com.cn.speaktest.admin.AdminService
-import com.cn.speaktest.admin.payload.request.AddQuestionRequest
 import com.cn.speaktest.admin.payload.response.ConfirmExamResponse
 import com.cn.speaktest.advice.Message
 import com.cn.speaktest.advice.toOkMessage
-import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotNull
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
@@ -43,15 +40,5 @@ class AdminController(
             ),
             "Exam have been confirmed"
         )
-    }
-
-    @PostMapping("/add-question")
-    @PreAuthorize("hasRole('ADMIN')")
-    fun addQuestion(
-        @RequestHeader("Authorization") auth: String?,
-        @Valid @NotNull @RequestBody addQuestionRequest: AddQuestionRequest?
-    ): Message {
-        val question = adminService.addQuestion(addQuestionRequest)
-        return Message(question, "Question added successfully")
     }
 }
