@@ -29,4 +29,8 @@ class AuthServiceImpl(
             getUserIdFromAuthorizationHeader(auth)
         ).orElseThrow { NotFoundException("User Not found") }
     }
+
+    override fun doesUserOwnsAuthToken(authToken: String, id: String?): Boolean {
+        return getUserByAuthToken(authToken).id == id
+    }
 }
