@@ -16,9 +16,10 @@ class ExamIssueService(
     private val examIssueRepository: ExamIssueRepository,
     private val questionService: QuestionService,
     private val examService: ExamService,
-    private val examSessionService: ExamSessionService,
     private val authService: AuthService
 ) {
+    private lateinit var examSessionService: ExamSessionService
+
     fun findById(id: String): ExamIssue {
         return examIssueRepository.findById(id)
             .orElseThrow { NotFoundException("ExamIssue with id: $id not found") }
