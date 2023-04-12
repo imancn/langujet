@@ -7,7 +7,8 @@ import org.springframework.data.mongodb.core.mapping.Document
 data class Suggestion(
     @Id
     var id: String?,
-    var grammer: String,
-    var fulency: String,
+    var grammar: String,
+    var fluency: String,
     var vocabulary: String,
+    var pronunciation: String
 )
