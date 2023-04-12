@@ -35,9 +35,10 @@ class StudentController(
     @PostMapping("/exam-request")
     @PreAuthorize("hasRole('STUDENT')")
     fun examRequest(
+        @RequestParam examId: String,
         @RequestHeader("Authorization") auth: String?
     ): Message {
-        studentService.examRequest(auth)
+        studentService.createExamRequest(auth, examId)
         return Message(null, "Your exam request submitted successfully")
     }
 }

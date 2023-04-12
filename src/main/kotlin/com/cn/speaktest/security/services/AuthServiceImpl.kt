@@ -18,6 +18,12 @@ class AuthServiceImpl(
         )
     }
 
+    override fun getUserById(userId: String): User {
+        return userRepository.findById(userId).orElseThrow {
+            throw NotFoundException("User not found")
+        }
+    }
+
     override fun getUserByAuthToken(auth: String?): User {
         return userRepository.findById(
             getUserIdFromAuthorizationHeader(auth)
