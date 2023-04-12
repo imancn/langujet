@@ -1,5 +1,6 @@
 package com.cn.speaktest.exam.model
 
+import com.cn.speaktest.answer.model.Answer
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
