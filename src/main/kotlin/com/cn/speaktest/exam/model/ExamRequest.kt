@@ -1,4 +1,4 @@
-package com.cn.speaktest.exam.model
+package com.cn.speaktest.exam.api.request
 
 import com.cn.speaktest.student.model.Student
 import org.springframework.data.annotation.Id
@@ -8,13 +8,12 @@ import java.util.*
 
 @Document(collection = "exam_request")
 data class ExamRequest(
-    @Id
-    var id: String?,
+    @Id var id: String?,
+    var examId: String,
     var date: Date,
-    @DBRef
-    var student: Student,
+    @DBRef var student: Student,
 ) {
-    constructor(date: Date, student: Student): this(
-        null, date, student
+    constructor(examId: String, student: Student) : this(
+        null, examId, Date(System.currentTimeMillis()), student
     )
 }
