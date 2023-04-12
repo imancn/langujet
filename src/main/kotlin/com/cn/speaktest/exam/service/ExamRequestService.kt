@@ -2,7 +2,7 @@ package com.cn.speaktest.exam.service
 
 import com.cn.speaktest.advice.MethodNotAllowedException
 import com.cn.speaktest.advice.NotFoundException
-import com.cn.speaktest.exam.api.request.ExamRequest
+import com.cn.speaktest.exam.model.ExamRequest
 import com.cn.speaktest.exam.repository.ExamRequestRepository
 import com.cn.speaktest.student.service.StudentService
 import org.springframework.stereotype.Service

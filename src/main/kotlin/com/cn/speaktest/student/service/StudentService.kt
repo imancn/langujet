@@ -1,7 +1,7 @@
 package com.cn.speaktest.student.service
 
 import com.cn.speaktest.advice.NotFoundException
-import com.cn.speaktest.exam.api.request.ExamRequest
+import com.cn.speaktest.exam.model.ExamRequest
 import com.cn.speaktest.exam.service.ExamRequestService
 import com.cn.speaktest.security.api.AuthService
 import com.cn.speaktest.student.model.Student

@@ -1,6 +1,6 @@
 package com.cn.speaktest.exam.api
 
-import com.cn.speaktest.exam.api.request.ExamRequest
+import com.cn.speaktest.exam.model.ExamRequest
 import com.cn.speaktest.exam.service.ExamRequestService
 import jakarta.validation.constraints.NotBlank
 import org.springframework.security.access.prepost.PreAuthorize

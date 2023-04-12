@@ -1,4 +1,4 @@
-package com.cn.speaktest.exam.api.request
+package com.cn.speaktest.exam.model
 
 import com.cn.speaktest.student.model.Student
 import org.springframework.data.annotation.Id
