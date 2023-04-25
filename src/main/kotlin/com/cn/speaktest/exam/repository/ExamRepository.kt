@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.repository.Query
 
 interface ExamRepository : MongoRepository<Exam, String> {
 
-    @Query("{'id': ?0, 'name': { \$regex: ?1, \$options: 'i' }, 'sectionsNumber': ?2, 'questionNumber': ?3, 'examDuration': ?4}")
+    @Query("{\$or: [{'id': ?0}, {'name': { \$regex: ?1, \$options: 'i' }}, {'sectionsNumber': ?2}, {'questionNumber': ?3}, {'examDuration': ?4}]}")
     fun findAllExamsByFilters(
         id: String?,
         name: String?,
