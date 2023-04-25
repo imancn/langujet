@@ -47,7 +47,7 @@ class ExamSessionController(private val examSessionService: ExamSessionServiceIn
     @PostMapping("/start")
     fun startExamSession(
         @RequestHeader("Authorization") auth: String?,
-        @RequestBody examSessionId: String
+        @RequestParam examSessionId: String
     ): ExamIssue {
         return examSessionService.startExamSession(auth!!, examSessionId)
     }
@@ -66,7 +66,7 @@ class ExamSessionController(private val examSessionService: ExamSessionServiceIn
     @PostMapping("/finish")
     fun finishExamSession(
         @RequestHeader("Authorization") auth: String?,
-        @RequestBody examSessionId: String
+        @RequestParam examSessionId: String
     ): ExamSession {
         return examSessionService.finishExamSession(auth!!, examSessionId)
     }
