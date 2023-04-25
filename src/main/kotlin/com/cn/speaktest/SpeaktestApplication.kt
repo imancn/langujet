@@ -9,5 +9,5 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 class SpeaktestApplication
 
 fun main(args: Array<String>) {
-	runApplication<SpeaktestApplication>(*args)
+    runApplication<SpeaktestApplication>(*args)
 }
