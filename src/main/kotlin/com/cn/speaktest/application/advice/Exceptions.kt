@@ -15,3 +15,5 @@ class InvalidInputException(message: String?) : HttpException(HttpStatus.NOT_ACC
 class NotFoundException(message: String?) : HttpException(HttpStatus.NOT_FOUND, message)
 
 class MethodNotAllowedException(message: String?) : HttpException(HttpStatus.METHOD_NOT_ALLOWED, message)
+
+class EmailNotSentException(message: String?) : HttpException(HttpStatus.INTERNAL_SERVER_ERROR, message)

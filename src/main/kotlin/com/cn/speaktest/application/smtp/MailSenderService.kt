@@ -1,5 +1,6 @@
 package com.cn.speaktest.application.smtp
 
+import com.cn.speaktest.application.advice.EmailNotSentException
 import com.cn.speaktest.application.security.security.model.EmailVerificationToken
 import com.cn.speaktest.application.security.security.model.ResetPasswordToken
 import org.slf4j.LoggerFactory
@@ -24,10 +25,10 @@ class MailSenderService(
             message.setFrom(InternetAddress("langujet@gmail.com"))
             message.setRecipients(Message.RecipientType.TO, to.map { InternetAddress(it) }.toTypedArray())
             message.subject = subject
-
             sendMimeMessage(content, message)
         } catch (e: Exception) {
             logger.error("Email not sent. error: ${e.message}")
+            throw EmailNotSentException("Email not sent.\nerror: ${e.message}")
         }
     }
 
