@@ -1,4 +1,4 @@
-package com.cn.speaktest.application.security.security.api
+package com.cn.speaktest.domain.security.services
 
 import com.cn.speaktest.application.security.security.model.User
 

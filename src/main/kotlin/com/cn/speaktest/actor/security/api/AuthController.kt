@@ -1,7 +1,6 @@
-package com.cn.speaktest.application.security.api
+package com.cn.speaktest.actor.security.api
 
 import com.cn.speaktest.application.advice.*
-import com.cn.speaktest.application.security.security.api.AuthService
 import com.cn.speaktest.application.security.security.model.*
 import com.cn.speaktest.application.security.security.payload.response.JwtResponse
 import com.cn.speaktest.application.security.security.payload.response.RefreshTokenResponse
@@ -10,6 +9,7 @@ import com.cn.speaktest.application.security.security.repository.ResetPasswordTo
 import com.cn.speaktest.application.security.security.repository.UserRepository
 import com.cn.speaktest.application.security.security.services.JwtService
 import com.cn.speaktest.application.security.security.services.RefreshTokenService
+import com.cn.speaktest.domain.security.services.AuthService
 import com.cn.speaktest.application.smtp.MailSenderService
 import com.cn.speaktest.domain.professor.Professor
 import com.cn.speaktest.domain.professor.ProfessorRepository
@@ -68,9 +68,9 @@ class AuthController(
 
     @PostMapping("/signup/student")
     fun registerStudent(
-        @NotBlank fullName: String?,
-        @NotBlank @Size(max = 50) @Email email: String?,
-        @NotBlank @Size(min = 6, max = 40) password: String?,
+        @RequestParam @NotBlank fullName: String?,
+        @RequestParam @NotBlank @Size(max = 50) @Email email: String?,
+        @RequestParam @NotBlank @Size(min = 6, max = 40) password: String?,
     ): Message {
         val user = registerUser(email!!, password!!, mutableSetOf(Role.ROLE_STUDENT))
         sendVerificationMail(user.email)

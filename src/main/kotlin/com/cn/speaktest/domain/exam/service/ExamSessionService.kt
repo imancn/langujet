@@ -4,7 +4,7 @@ import com.cn.speaktest.application.advice.AccessDeniedException
 import com.cn.speaktest.application.advice.InvalidTokenException
 import com.cn.speaktest.application.advice.MethodNotAllowedException
 import com.cn.speaktest.application.advice.NotFoundException
-import com.cn.speaktest.application.security.security.api.AuthService
+import com.cn.speaktest.domain.security.services.AuthService
 import com.cn.speaktest.application.security.security.model.Role
 import com.cn.speaktest.domain.exam.model.*
 import com.cn.speaktest.domain.exam.repository.ExamSessionRepository

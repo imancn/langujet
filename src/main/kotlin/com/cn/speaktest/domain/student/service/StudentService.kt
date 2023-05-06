@@ -2,7 +2,7 @@ package com.cn.speaktest.domain.student.service
 
 import com.cn.speaktest.actor.student.payload.response.StudentProfileResponse
 import com.cn.speaktest.application.advice.NotFoundException
-import com.cn.speaktest.application.security.security.api.AuthService
+import com.cn.speaktest.domain.security.services.AuthService
 import com.cn.speaktest.domain.exam.model.ExamRequest
 import com.cn.speaktest.domain.exam.service.ExamRequestService
 import com.cn.speaktest.domain.student.model.Student

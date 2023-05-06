@@ -1,7 +1,7 @@
 package com.cn.speaktest.application.security.security.services
 
 import com.cn.speaktest.application.advice.NotFoundException
-import com.cn.speaktest.application.security.security.api.AuthService
+import com.cn.speaktest.domain.security.services.AuthService
 import com.cn.speaktest.application.security.security.model.User
 import com.cn.speaktest.application.security.security.repository.UserRepository
 import org.springframework.stereotype.Service
