@@ -19,7 +19,7 @@ class ControllerAdvice {
             Message(
                 ex.httpStatus,
                 ex.message,
-                ex.stackTraceToString()
+                null
             ),
             ex.httpStatus
         )
