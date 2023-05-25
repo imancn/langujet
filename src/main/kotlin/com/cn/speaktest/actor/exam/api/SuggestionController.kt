@@ -2,6 +2,7 @@ package com.cn.speaktest.actor.exam.api
 
 import com.cn.speaktest.application.advice.Message
 import com.cn.speaktest.application.advice.toOkMessage
+import com.cn.speaktest.domain.exam.model.Suggestion
 import com.cn.speaktest.domain.exam.service.SuggestionService
 import jakarta.validation.constraints.NotBlank
 import org.springframework.security.access.prepost.PreAuthorize
@@ -30,12 +31,8 @@ class SuggestionController(
     @PreAuthorize("hasAnyRole('ADMIN','PROFESSOR') ")
     fun updateSuggestion(
         @RequestHeader("Authorization") auth: String?,
-        @PathVariable @NotBlank id: String?,
-        @RequestParam grammar: String?,
-        @RequestParam fluency: String?,
-        @RequestParam vocabulary: String?,
-        @RequestParam pronunciation: String?
+        @RequestBody suggestion: Suggestion
     ): Message {
-        return service.updateSuggestion(auth, id!!, grammar, fluency, vocabulary, pronunciation).toOkMessage()
+        return service.updateSuggestion(auth!!, suggestion).toOkMessage()
     }
 }
