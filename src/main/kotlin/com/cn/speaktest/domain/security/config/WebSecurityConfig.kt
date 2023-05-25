@@ -51,7 +51,7 @@ class WebSecurityConfig(
     fun corsConfigurationSource(): CorsConfigurationSource = UrlBasedCorsConfigurationSource().also { cors ->
         CorsConfiguration().apply {
             allowedOrigins = listOf("*")
-            allowedMethods = listOf("POST", "PUT", "DELETE", "GET", "OPTIONS", "HEAD")
+            allowedMethods = listOf("POST", "GET")
             allowedHeaders = listOf(
                 "Authorization",
                 "Content-Type",
