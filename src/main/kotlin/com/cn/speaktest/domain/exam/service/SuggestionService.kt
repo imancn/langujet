@@ -2,10 +2,10 @@ package com.cn.speaktest.domain.exam.service
 
 import com.cn.speaktest.application.advice.AccessDeniedException
 import com.cn.speaktest.application.advice.NotFoundException
-import com.cn.speaktest.domain.security.services.AuthService
 import com.cn.speaktest.application.security.security.model.Role
 import com.cn.speaktest.domain.exam.model.Suggestion
 import com.cn.speaktest.domain.exam.repository.SuggestionRepository
+import com.cn.speaktest.domain.security.services.AuthService
 import org.springframework.stereotype.Service
 
 @Service
@@ -24,24 +24,18 @@ class SuggestionService(
             ?: throw NotFoundException("Suggestion for ExamSession with ID: $examSessionId not found")
     }
 
-    @Suppress("BlockingMethodInNonBlockingContext")
     fun updateSuggestion(
-        auth: String?,
-        id: String,
-        grammar: String?,
-        fluency: String?,
-        vocabulary: String?,
-        pronunciation: String?,
+        auth: String,
+        suggestion: Suggestion
     ): Suggestion {
-        return doWithPreAuth(
-            auth!!, id
-        ) {
-            suggestionRepository.save(getSuggestionById(id).also { suggestion ->
-                grammar?.let { suggestion.grammar = it }
-                fluency?.let { suggestion.fluency = it }
-                vocabulary?.let { suggestion.vocabulary = it }
-                pronunciation?.let { suggestion.pronunciation = it }
-            })
+        return doWithPreAuth(auth, suggestion.id!!) {
+            suggestionRepository.save(
+                getSuggestionById(suggestion.id!!).also { suggestion ->
+                    suggestion.overallRecommendation.let { suggestion.overallRecommendation = it }
+                    suggestion.score.let { suggestion.score = it }
+                    suggestion.issues.let { suggestion.issues = it }
+                }
+            )
         }
     }
 

@@ -11,19 +11,17 @@ import java.util.*
 data class ExamSession(
     @Id
     var id: String?,
+
     @DBRef
     var exam: Exam,
     @DBRef
     var student: Student,
     @DBRef
     var professor: Professor,
-
     @DBRef
     var examIssues: List<ExamIssue>?,
-
     @DBRef
     var suggestion: Suggestion?,
-    var score: Double?,
 
     var requestDate: Date,
     var startDate: Date?,
@@ -39,7 +37,6 @@ data class ExamSession(
         exam,
         student,
         professor,
-        null,
         null,
         null,
         requestDate,

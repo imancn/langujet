@@ -4,17 +4,14 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
 
-@Document(collection = "suggestions")
-data class Suggestion(
+@Document(collection = "scores")
+data class Score(
     @Id
-    var id: String?,
+    val id: String?,
 
     @DBRef
-    var exam: Exam,
-    @DBRef
-    var score: Score,
-    @DBRef
-    var issues: List<Issue>,
+    val detailedScores: List<Score>,
 
-    var overallRecommendation: String,
+    val name: String,
+    val score: Int,
 )
