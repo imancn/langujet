@@ -4,6 +4,7 @@ import com.cn.speaktest.application.advice.InvalidTokenException
 import com.cn.speaktest.application.advice.Message
 import com.cn.speaktest.application.security.security.services.JwtService
 import com.cn.speaktest.application.security.security.services.UserDetailsServiceImpl
+import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -18,12 +19,12 @@ import java.io.IOException
 @Component
 class AuthEntryPointJwt(
     private val jwtService: JwtService,
-    private val userDetailsService: UserDetailsServiceImpl
+    private val userDetailsService: UserDetailsServiceImpl,
+    private val modelMapper: ObjectMapper
 ) : AuthenticationEntryPoint {
     @Throws(IOException::class, ServletException::class)
     override fun commence(
-        request: HttpServletRequest, response: HttpServletResponse,
-        authException: AuthenticationException
+        request: HttpServletRequest, response: HttpServletResponse, authException: AuthenticationException
     ) {
         try {
             when (authException) {
@@ -33,8 +34,7 @@ class AuthEntryPointJwt(
                     val jwt = jwtService.parseJwt(request)
                     val userId = jwtService.getUserIdFromJwtToken(jwt)
 
-                    if (!userDetailsService.userExist(userId))
-                        throw InvalidTokenException("User Not Found")
+                    if (!userDetailsService.userExist(userId)) throw InvalidTokenException("User Not Found")
                 }
 
                 else -> throw authException
@@ -43,11 +43,11 @@ class AuthEntryPointJwt(
             response.status = HttpServletResponse.SC_UNAUTHORIZED
             response.contentType = "application/json"
             response.writer.print(
-                Message(
-                    HttpStatus.UNAUTHORIZED,
-                    exception.message,
-                    exception.stackTraceToString()
-                ).toJson()
+                modelMapper.writeValueAsString(
+                    Message(
+                        HttpStatus.UNAUTHORIZED, exception.message, null
+                    )
+                )
             )
         }
 
