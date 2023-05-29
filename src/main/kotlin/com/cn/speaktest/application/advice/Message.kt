@@ -25,16 +25,6 @@ class Message(
         data = data,
         timestamp = Date(System.currentTimeMillis())
     )
-
-    fun toJson(): String {
-        return "{\n" +
-                "    \"description\": \"$description\",\n" +
-                "    \"status\": $status,\n" +
-                "    \"message\": \"$message\",\n" +
-                "    \"data\": $data\n" +
-                "    \"timestamp\": $timestamp\n" +
-                "}"
-    }
 }
 
 fun Any?.toOkMessage(message: String? = null) = Message(this, message)
