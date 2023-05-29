@@ -3,6 +3,7 @@ package com.cn.speaktest.application.security.security.config
 import com.cn.speaktest.application.advice.CustomAccessDeniedHandler
 import com.cn.speaktest.application.security.security.services.JwtService
 import com.cn.speaktest.application.security.security.services.UserDetailsServiceImpl
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
@@ -23,11 +24,12 @@ class WebSecurityConfig(
     private val jwtService: JwtService,
     private val userDetailsService: UserDetailsServiceImpl,
     private val unauthorizedHandler: AuthEntryPointJwt,
+    private val modelMapper: ObjectMapper
 ) {
 
     @Bean
     fun accessDeniedHandler(): AccessDeniedHandler {
-        return CustomAccessDeniedHandler()
+        return CustomAccessDeniedHandler(modelMapper)
     }
 
     @Bean
