@@ -127,7 +127,6 @@ class ExamSessionService(
             return examSessionRepository.save(
                 examSession.also {
                     it.rateDate = Date(System.currentTimeMillis())
-                    it.score = score
                     it.suggestion = suggestion
                     it.isRated = true
                 }
