@@ -1,4 +1,4 @@
-package com.cn.speaktest.application.file.http
+package com.cn.speaktest.application.file.http.controller
 
 import com.cn.speaktest.application.file.data.model.Directory
 import com.cn.speaktest.application.file.service.DirectoryService

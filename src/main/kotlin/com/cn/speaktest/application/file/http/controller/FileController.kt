@@ -1,6 +1,7 @@
-package com.cn.speaktest.application.file.http
+package com.cn.speaktest.application.file.http.controller
 
 import com.cn.speaktest.application.file.data.model.File
+import com.cn.speaktest.application.file.http.model.FileMeta
 import com.cn.speaktest.application.file.service.FileService
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -16,19 +17,19 @@ class FileController(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass.simpleName)
 
-    @PostMapping("/upload")
+    @PostMapping("/push")
     fun uploadFile(
         @RequestParam file: MultipartFile,
         @RequestParam format: String,
         @RequestParam dir: String?,
         @RequestParam bucket: String?,
-    ): ResponseEntity<String> {
+    ): ResponseEntity<FileMeta> {
         return try {
-            fileService.storeFileToKafka(file, format, dir, bucket)
-            ResponseEntity.ok("File uploaded successfully.\nyou can fetch it with a few delay.")
+            logger.info("File uploaded successfully.\nyou can fetch it with a few delay.")
+            ResponseEntity.ok(FileMeta(fileService.storeFileToKafka(file, format, dir, bucket)))
         } catch (e: Exception) {
             logger.error("Upload api is not available.")
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file.")
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null)
         }
     }
 
@@ -38,13 +39,13 @@ class FileController(
         @RequestParam format: String,
         @RequestParam dir: String?,
         @RequestParam bucket: String?,
-    ): ResponseEntity<String> {
+    ): ResponseEntity<FileMeta> {
         return try {
-            fileService.persistFile(file, format, dir, bucket)
-            ResponseEntity.ok("File uploaded successfully.")
+            logger.info("File uploaded successfully.")
+            ResponseEntity.ok(FileMeta(fileService.persistFile(file, format, dir, bucket)))
         } catch (e: Exception) {
             logger.error("Upload api is not available.")
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file.")
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null)
         }
     }
 
