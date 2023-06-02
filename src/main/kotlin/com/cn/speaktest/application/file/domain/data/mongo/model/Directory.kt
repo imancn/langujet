@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document
 class Directory (
     @Id
-    val id: String,
+    val id: String?,
     // todo: name could not contains "/" or "\" or "."
     var name: String?,
     var files: List<String>?,

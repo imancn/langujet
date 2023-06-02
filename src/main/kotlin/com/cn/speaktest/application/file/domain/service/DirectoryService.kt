@@ -17,8 +17,8 @@ class DirectoryService(private val directoryRepository: DirectoryRepository) {
             .orElseThrow { NotFoundException("Directory not found with id: $id") }
     }
 
-    fun updateDirectory(dir: Directory): Directory {
-        val existingDirectory = getDirectoryById(dir.id)
+    fun updateDirectory(id: String, dir: Directory): Directory {
+        val existingDirectory = getDirectoryById(id)
 
         dir.name?.let { existingDirectory.name = it }
         dir.files?.let { existingDirectory.files = it }

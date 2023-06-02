@@ -5,7 +5,7 @@ import com.cn.speaktest.application.file.domain.service.DirectoryService
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/directories")
+@RequestMapping("api/dir/")
 class DirectoryController(private val directoryService: DirectoryService) {
 
     @PostMapping
@@ -18,9 +18,12 @@ class DirectoryController(private val directoryService: DirectoryService) {
         return directoryService.getDirectoryById(id)
     }
 
-    @PostMapping
-    fun updateDirectory(@RequestBody directory: Directory): Directory {
-        return directoryService.updateDirectory(directory)
+    @PostMapping("/{id}")
+    fun updateDirectory(
+        @PathVariable id: String,
+        @RequestBody directory: Directory
+    ): Directory {
+        return directoryService.updateDirectory(id, directory)
     }
 
     @PostMapping("/{id}")
