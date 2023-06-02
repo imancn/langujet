@@ -1,6 +1,6 @@
-package com.cn.speaktest.application.file.http.model
+package com.cn.speaktest.application.file.actor.http.model
 
-import com.cn.speaktest.application.file.data.model.File
+import com.cn.speaktest.application.file.domain.data.mongo.model.File
 
 data class FileMeta(
     val id: String?,

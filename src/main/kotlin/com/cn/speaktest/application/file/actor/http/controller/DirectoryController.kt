@@ -1,7 +1,7 @@
-package com.cn.speaktest.application.file.http.controller
+package com.cn.speaktest.application.file.actor.http.controller
 
-import com.cn.speaktest.application.file.data.model.Directory
-import com.cn.speaktest.application.file.service.DirectoryService
+import com.cn.speaktest.application.file.domain.data.mongo.model.Directory
+import com.cn.speaktest.application.file.domain.service.DirectoryService
 import org.springframework.web.bind.annotation.*
 
 @RestController

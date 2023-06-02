@@ -1,6 +1,6 @@
 package com.cn.speaktest.application.kafka.producer.file
 
-import com.cn.speaktest.application.file.data.model.File
+import com.cn.speaktest.application.file.domain.data.mongo.model.File
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.core.KafkaTemplate
@@ -17,7 +17,7 @@ class FileProducer(
     fun sendFile(file: File) {
         kafkaTemplate.send(
             fileTopic,
-            file.name,
+            file.id ?: "N/A",
             mapper.writeValueAsString(file))
     }
 

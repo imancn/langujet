@@ -1,8 +1,8 @@
-package com.cn.speaktest.application.file.http.controller
+package com.cn.speaktest.application.file.actor.http.controller
 
-import com.cn.speaktest.application.file.data.model.File
-import com.cn.speaktest.application.file.http.model.FileMeta
-import com.cn.speaktest.application.file.service.FileService
+import com.cn.speaktest.application.file.domain.data.mongo.model.File
+import com.cn.speaktest.application.file.actor.http.model.FileMeta
+import com.cn.speaktest.application.file.domain.service.FileService
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

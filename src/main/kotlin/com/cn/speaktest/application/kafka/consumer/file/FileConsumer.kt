@@ -1,7 +1,7 @@
 package com.cn.speaktest.application.kafka.consumer.file
 
-import com.cn.speaktest.application.file.data.model.File
-import com.cn.speaktest.application.file.service.FileService
+import com.cn.speaktest.application.file.domain.data.mongo.model.File
+import com.cn.speaktest.application.file.domain.service.FileService
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.stereotype.Component
 

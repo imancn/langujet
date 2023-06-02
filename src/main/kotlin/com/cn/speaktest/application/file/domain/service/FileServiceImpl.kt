@@ -1,7 +1,8 @@
-package com.cn.speaktest.application.file.service
+package com.cn.speaktest.application.file.domain.service
 
-import com.cn.speaktest.application.file.data.model.File
-import com.cn.speaktest.application.file.data.repository.FileRepository
+import com.cn.speaktest.application.advice.NotFoundException
+import com.cn.speaktest.application.file.domain.data.mongo.model.File
+import com.cn.speaktest.application.file.domain.data.mongo.repository.FileRepository
 import com.cn.speaktest.application.kafka.producer.file.FileProducer
 import org.springframework.stereotype.Component
 import org.springframework.util.DigestUtils
@@ -22,12 +23,14 @@ class FileServiceImpl(
         return makeFile(format, bucket, dirId, file).also { persistFile(it) }
     }
 
-    override fun persistFile(file: File) {
-        return fileRepository.save(file)
+    override fun persistFile(file: File): File {
+        return fileRepository.save(file).also { it.value = ByteArray(1) }
     }
 
     override fun downloadFile(id: String): File? {
-        return fileRepository.fetchFile(id)
+        return fileRepository.findById(id).orElseThrow {
+            NotFoundException("Directory not found with id: $id")
+        }
     }
 
     override fun deleteFile(id: String) {
