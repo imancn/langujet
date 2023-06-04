@@ -5,7 +5,7 @@ import com.cn.speaktest.application.advice.Message
 import com.cn.speaktest.application.advice.toOkMessage
 import com.cn.speaktest.domain.exam.model.Currency
 import com.cn.speaktest.domain.exam.model.Difficulty
-import com.cn.speaktest.domain.exam.model.Exam
+import com.cn.speaktest.domain.exam.model.ExamInfo
 import com.cn.speaktest.domain.exam.model.Price
 import com.cn.speaktest.domain.exam.service.ExamService
 import jakarta.validation.constraints.NotBlank
@@ -34,7 +34,7 @@ class ExamController(private val examService: ExamService) {
         @RequestParam @NotNull priceCurrency: Currency?,
     ): Message {
         return examService.createExam(
-            Exam(
+            ExamInfo(
                 null,
                 name!!,
                 description!!,

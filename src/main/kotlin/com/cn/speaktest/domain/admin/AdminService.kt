@@ -19,7 +19,7 @@ class AdminService(
 
     fun confirmExamRequest(examRequestId: String?, professorId: String?): String? {
         val examRequest = examRequestService.getExamRequestById(examRequestId)
-        val exam = examService.getExamById(examRequest.examId)
+        val exam = examService.getExamById(examRequest.examInfo.id)
         val professor = professorRepository.findById(professorId!!).orElseThrow {
             NotFoundException("Professor not found")
         }

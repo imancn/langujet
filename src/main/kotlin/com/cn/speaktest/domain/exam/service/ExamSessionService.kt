@@ -20,10 +20,10 @@ class ExamSessionService(
     val authService: AuthService,
 ) : ExamSessionServiceInterface {
 
-    override fun enrollExamSession(examRequest: ExamRequest, professor: Professor, exam: Exam): ExamSession {
+    override fun enrollExamSession(examRequest: ExamRequest, professor: Professor, examInfo: ExamInfo): ExamSession {
         var examSession = examSessionRepository.save(
             ExamSession(
-                exam, examRequest.student, professor, examRequest.date
+                examInfo, examRequest.student, professor, examRequest.date
             )
         )
         val examIssues = examIssueService.generateExamIssueList(examSession.id!!)
@@ -67,7 +67,7 @@ class ExamSessionService(
                 examSession.also {
                     val now = Date(System.currentTimeMillis())
                     it.startDate = now
-                    it.endDate = Date(now.time + examSession.exam.examDuration)
+                    it.endDate = Date(now.time + examSession.examInfo.examDuration)
                     it.isStarted = true
                 }
             )

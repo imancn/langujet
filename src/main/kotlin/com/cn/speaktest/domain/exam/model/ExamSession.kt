@@ -13,7 +13,7 @@ data class ExamSession(
     var id: String?,
 
     @DBRef
-    var exam: Exam,
+    var examInfo: ExamInfo,
     @DBRef
     var student: Student,
     @DBRef

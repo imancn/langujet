@@ -166,14 +166,14 @@ class QuestionService(
     private fun checkNotExist(question: Question): Question {
         return if (
             questionRepository.existsByExam_IdAndSectionAndTopicAndOrder(
-                question.exam.id,
+                question.examInfo.id,
                 question.section,
                 question.topic,
                 question.order
             )
         ) throw InvalidInputException(
             "A question with " +
-                    " exam: ${question.exam}," +
+                    " exam: ${question.examInfo}," +
                     " section: ${question.section}," +
                     " topic: ${question.topic}," +
                     " order: ${question.order}," +
@@ -264,7 +264,7 @@ class QuestionService(
         question: Question,
         questionRequest: QuestionRequest
     ) {
-        questionRequest.examId?.let { question.exam = examService.getExamById(it) }
+        questionRequest.examId?.let { question.examInfo = examService.getExamById(it) }
         questionRequest.topic?.let { question.topic = it }
         questionRequest.section?.let { question.section = it }
         questionRequest.order?.let { question.order = it }
