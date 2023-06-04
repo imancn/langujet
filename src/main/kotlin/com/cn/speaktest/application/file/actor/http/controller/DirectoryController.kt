@@ -9,25 +9,30 @@ import org.springframework.web.bind.annotation.*
 class DirectoryController(private val directoryService: DirectoryService) {
 
     @PostMapping
-    fun createDirectory(@RequestBody directory: Directory): Directory {
+    fun createDirectory(
+        @RequestBody directory: Directory
+    ): Directory {
         return directoryService.createDirectory(directory)
     }
 
-    @GetMapping("/{id}")
-    fun getDirectoryById(@PathVariable id: String): Directory? {
+    @GetMapping("/")
+    fun getDirectoryById(
+        @RequestParam id: String,
+    ): Directory? {
         return directoryService.getDirectoryById(id)
     }
 
-    @PostMapping("/{id}")
+    @PostMapping("/update")
     fun updateDirectory(
-        @PathVariable id: String,
         @RequestBody directory: Directory
     ): Directory {
-        return directoryService.updateDirectory(id, directory)
+        return directoryService.updateDirectory(directory)
     }
 
-    @PostMapping("/{id}")
-    fun deleteDirectoryById(@PathVariable id: String) {
+    @PostMapping("delete/")
+    fun deleteDirectoryById(
+        @RequestParam id: String,
+    ) {
         directoryService.deleteDirectoryById(id)
     }
 }
