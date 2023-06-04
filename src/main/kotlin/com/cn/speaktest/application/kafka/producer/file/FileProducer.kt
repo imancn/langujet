@@ -17,8 +17,7 @@ class FileProducer(
     fun sendFile(file: File) {
         kafkaTemplate.send(
             fileTopic,
-            file.id ?: "N/A",
+            file.id,
             mapper.writeValueAsString(file))
     }
-
 }
