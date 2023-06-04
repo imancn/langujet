@@ -8,19 +8,14 @@ import java.util.*
 
 @Document(collection = "email_verification_token")
 data class EmailVerificationToken(
-    @Id
-    var id: String?,
-    @DBRef
-    var user: User,
+    @Id var id: String?,
+    @DBRef var user: User,
     var token: String,
     @Indexed(name = "expiry_date_ttl", expireAfterSeconds = 0)
     var expiryDate: Date,
 ) {
     constructor(user: User) : this(
-        id = null,
-        user = user,
-        token = makeRandom6DigitsToken(),
-        expiryDate = calculateExpiryDate()
+        id = null, user = user, token = makeRandom6DigitsToken(), expiryDate = calculateExpiryDate()
     )
 
     companion object {
