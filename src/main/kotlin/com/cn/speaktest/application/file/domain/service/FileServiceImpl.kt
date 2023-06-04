@@ -27,9 +27,9 @@ class FileServiceImpl(
         return fileRepository.save(file).also { it.value = ByteArray(1) }
     }
 
-    override fun downloadFile(id: String): File? {
+    override fun getFileById(id: String): File {
         return fileRepository.findById(id).orElseThrow {
-            NotFoundException("Directory not found with id: $id")
+            NotFoundException("File not found with id: $id")
         }
     }
 

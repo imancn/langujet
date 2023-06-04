@@ -1,13 +1,17 @@
 package com.cn.speaktest.application.file.actor.http.controller
 
-import com.cn.speaktest.application.file.domain.data.mongo.model.File
 import com.cn.speaktest.application.file.actor.http.model.FileMeta
 import com.cn.speaktest.application.file.domain.service.FileService
 import org.slf4j.LoggerFactory
+import org.springframework.core.io.ByteArrayResource
+import org.springframework.core.io.Resource
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import java.io.IOException
 import java.util.*
 
 @RestController
@@ -49,17 +53,32 @@ class FileController(
         }
     }
 
-    @GetMapping("/download/{id}")
+    @GetMapping("/download/")
     fun downloadFile(
-        @PathVariable id: String,
-    ): ResponseEntity<File> {
-        val file = fileService.downloadFile(id)
-        return ResponseEntity.ok().header("Content-Disposition", "attachment; filename=\"${file?.name}\"").body(file)
+        @RequestParam id: String,
+    ): ResponseEntity<Resource> {
+        val file = fileService.getFileById(id)
+        val resource = try {
+            ByteArrayResource(file.value)
+        } catch (e: IOException) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build<Resource>()
+        }
+        val headers = HttpHeaders().also {
+            it.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=${resource.filename}")
+        }
+        return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource)
     }
 
-    @PostMapping("/file/delete/{id}")
+    @GetMapping("/")
+    fun getFileMeta(
+        @RequestParam id: String,
+    ): ResponseEntity<FileMeta> {
+        return ResponseEntity(FileMeta(fileService.getFileById(id)), HttpStatus.OK)
+    }
+
+    @PostMapping("/delete/")
     fun deleteFile(
-        @PathVariable id: String
+        @RequestParam id: String,
     ): ResponseEntity<String> {
         fileService.deleteFile(id)
         return ResponseEntity("File Deleted", HttpStatus.OK)
