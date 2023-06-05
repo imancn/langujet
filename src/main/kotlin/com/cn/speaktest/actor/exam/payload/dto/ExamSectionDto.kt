@@ -9,6 +9,7 @@ data class ExamSectionDto(
     var examSessionId: String?,
     @get:NotBlank(message = "Name is required.")
     var name: String?,
+    val order: Int,
     var examIssues: List<ExamIssueDto>?,
     var suggestion: SuggestionDto?
 ) {
@@ -16,6 +17,7 @@ data class ExamSectionDto(
         examSection.id,
         examSection.examSessionId,
         examSection.name,
+        examSection.order,
         examSection.examIssues?.map { ExamIssueDto(it) },
         examSection.suggestion?.let { SuggestionDto(it) }
     )
