@@ -24,7 +24,7 @@ class ExamSectionController(private val examSectionService: ExamSectionService) 
     }
 
     @PostMapping("")
-    fun createExamSection(@RequestBody @Valid examSectionDto: ExamSectionDto): ExamSection {
+    fun createExamSection(@RequestBody @Valid examSectionDto: ExamSectionDto): ExamSectionDto {
         return examSectionService.createExamSection(examSectionDto)
     }
 

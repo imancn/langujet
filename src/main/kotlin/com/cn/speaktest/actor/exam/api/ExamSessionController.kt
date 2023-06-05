@@ -1,10 +1,7 @@
 package com.cn.speaktest.actor.exam.api
 
-import com.cn.speaktest.actor.exam.payload.request.RateRequest
-import com.cn.speaktest.domain.exam.model.ExamMeta
-import com.cn.speaktest.domain.exam.model.ExamIssue
-import com.cn.speaktest.domain.exam.model.ExamRequest
-import com.cn.speaktest.domain.exam.model.ExamSession
+import com.cn.speaktest.actor.exam.payload.dto.SuggestionDto
+import com.cn.speaktest.domain.exam.model.*
 import com.cn.speaktest.domain.exam.service.ExamSessionServiceInterface
 import com.cn.speaktest.domain.professor.Professor
 import org.springframework.security.access.prepost.PreAuthorize
@@ -76,13 +73,8 @@ class ExamSessionController(private val examSessionService: ExamSessionServiceIn
     fun rateExamSession(
         @RequestHeader("Authorization") auth: String?,
         @RequestBody examSessionId: String,
-        @RequestBody rate: RateRequest
+        @RequestBody suggestion: SuggestionDto
     ): ExamSession {
-        return examSessionService.rateExamSession(
-            auth!!,
-            examSessionId,
-            rate.score,
-            rate.suggestion
-        )
+        return examSessionService.rateExamSession(auth!!, examSessionId, suggestion)
     }
 }

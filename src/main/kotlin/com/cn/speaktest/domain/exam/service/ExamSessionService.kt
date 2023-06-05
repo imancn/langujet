@@ -1,5 +1,6 @@
 package com.cn.speaktest.domain.exam.service
 
+import com.cn.speaktest.actor.exam.payload.dto.SuggestionDto
 import com.cn.speaktest.application.advice.AccessDeniedException
 import com.cn.speaktest.application.advice.InvalidTokenException
 import com.cn.speaktest.application.advice.MethodNotAllowedException
@@ -15,6 +16,7 @@ import java.util.*
 @Service
 class ExamSessionService(
     val examSessionRepository: ExamSessionRepository,
+    val examSectionService: ExamSectionService,
     val examRequestService: ExamRequestService,
     val examIssueService: ExamIssueService,
     val authService: AuthService,
@@ -26,10 +28,21 @@ class ExamSessionService(
                 examMeta, examRequest.student, professor, examRequest.date
             )
         )
-        val examIssues = examIssueService.generateExamIssueList(examSession.id!!)
-        examSession = examSessionRepository.save(examSession.also { it.examIssues = examIssues })
+        examSession = examSessionRepository.save(
+            examSession.also {
+                it.examSections = initializeExamSections(examSession)
+            }
+        )
         examRequestService.deleteExamRequest(examRequest)
         return examSession
+    }
+
+    private fun initializeExamSections(examSession: ExamSession): List<ExamSection> {
+        val examIssues = examIssueService.generateExamIssueList(examSession.id!!)
+        return listOf(
+            ExamSection(null, examSession.id!!, "Section name", 0, examIssues, null)
+        )
+        TODO("Not yet implemented")
     }
 
     override fun getStudentExamSessionWithAuthToken(
@@ -57,7 +70,7 @@ class ExamSessionService(
         examSessionId: String
     ): ExamIssue {
         val examSession = getStudentExamSessionWithAuthToken(authToken, examSessionId)
-        val examIssues = examSession.examIssues
+        val examIssues = examSession.examSections?.first()?.examIssues
             ?: throw MethodNotAllowedException("ExamIssues for examSession with id: $examSessionId is null")
 
         if (examSession.isStarted)
@@ -80,14 +93,22 @@ class ExamSessionService(
         examSessionId: String,
         currentExamIssueOrder: Int
     ): ExamIssue {
-        val examSession = getExamSessionIfIsInProgress(authToken, examSessionId)
-        val examIssues = examSession.examIssues
-            ?: throw MethodNotAllowedException("Exam Issues for Exam Session with id: $examSessionId")
+        val examSection = examSectionService.getExamSectionById(examSessionId)
+        val examSession = getExamSessionIfIsInProgress(authToken, examSection.examSessionId)
+        val examIssues = getExamIssues(examSection)
 
-        if (examIssues.size <= currentExamIssueOrder + 1)
-            throw MethodNotAllowedException("There is no next Exam Issue")
-        else
-            return examIssues[currentExamIssueOrder + 1]
+        return if (examIssues.size <= currentExamIssueOrder + 1) {
+            if (examSession.examMeta.sectionsNumber == examSection.order + 1)
+                throw MethodNotAllowedException("There is no next Exam Issue")
+            else
+                getExamIssues(examSession.examSections?.get(examSection.order + 1))[0]
+        } else
+            examIssues[currentExamIssueOrder + 1]
+    }
+
+    private fun getExamIssues(examSection: ExamSection?): List<ExamIssue> {
+        return examSection?.examIssues
+            ?: throw MethodNotAllowedException("Exam Issues for Exam Session with id: $examSection.id")
     }
 
     override fun finishExamSession(
@@ -108,8 +129,7 @@ class ExamSessionService(
     override fun rateExamSession(
         authToken: String,
         examSessionId: String,
-        score: Double,
-        suggestion: Suggestion?
+        suggestion: SuggestionDto,
     ): ExamSession {
         val examSession = getExamSessionById(examSessionId)
         val user = authService.getUserByAuthToken(authToken)
@@ -127,14 +147,20 @@ class ExamSessionService(
             return examSessionRepository.save(
                 examSession.also {
                     it.rateDate = Date(System.currentTimeMillis())
-                    it.suggestion = suggestion
+                    it.examSections?.find {
+                            examSection -> examSection.id == suggestion.examSectionId
+                    }?.suggestion = Suggestion(suggestion)
                     it.isRated = true
                 }
             )
     }
 
     override fun isExamIssueAvailable(examIssueId: String): Boolean {
-        val examSession = getExamSessionById(examIssueService.findById(examIssueId).examSessionId)
+        val examSession = getExamSessionById(
+            examSectionService.getExamSectionById(
+                examIssueService.findById(examIssueId).examSectionId
+            ).examSessionId
+        )
         return !examSession.isFinished && examSession.isStarted
     }
 

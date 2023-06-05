@@ -43,7 +43,7 @@ class ExamIssueService(
 
     fun preAuthCheck(auth: String, examIssueId: String) {
         val examIssue = findById(examIssueId)
-        val examSession = examSessionService.getExamSessionById(examIssue.examSessionId)
+        val examSession = examSessionService.getExamSessionById(examIssue.examSectionId)
         val doesStudentOwnsAuthToken = authService.doesUserOwnsAuthToken(auth, examSession.student.id)
         val doesProfessorOwnsAuthToken = authService.doesUserOwnsAuthToken(auth, examSession.professor.id)
         val isAdmin = authService.getUserByAuthToken(auth).roles.contains(Role.ROLE_ADMIN)

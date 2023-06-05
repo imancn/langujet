@@ -18,8 +18,12 @@ class ExamSectionService(private val examSectionRepository: ExamSectionRepositor
         return examSectionRepository.findById(id).orElseThrow { NotFoundException("Exam with id $id not found") }
     }
 
-    fun createExamSection(examSectionDto: ExamSectionDto): ExamSection {
+    fun createExamSection(examSectionDto: ExamSectionDto): ExamSectionDto {
         val examSection = ExamSection(examSectionDto)
+        return ExamSectionDto(examSectionRepository.save(examSection))
+    }
+
+    fun createExamSection(examSection: ExamSection): ExamSection {
         return examSectionRepository.save(examSection)
     }
 

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service
 class SuggestionService(
     private val suggestionRepository: SuggestionRepository,
     private val examSessionService: ExamSessionService,
+    private val examSectionService: ExamSectionService,
     val authService: AuthService
 ) {
     fun getSuggestionById(id: String): Suggestion {
@@ -19,9 +20,15 @@ class SuggestionService(
             .orElseThrow { throw NotFoundException("Suggestion with ID: $id not found") }
     }
 
-    fun getSuggestionByExamSessionId(examSessionId: String): Suggestion {
-        return examSessionService.getExamSessionById(examSessionId).suggestion
-            ?: throw NotFoundException("Suggestion for ExamSession with ID: $examSessionId not found")
+    fun getSuggestionsByExamSessionId(examSessionId: String): List<Suggestion> {
+        val examSections = examSessionService.getExamSessionById(examSessionId).examSections
+        return examSections?.mapNotNull { it.suggestion }
+            ?: throw NotFoundException("Suggestions for ExamSession with ID: $examSessionId not found")
+    }
+
+    fun getSuggestionByExamSectionId(examSectionId: String): Suggestion {
+        return examSectionService.getExamSectionById(examSectionId).suggestion
+            ?: throw NotFoundException("Suggestion for ExamSection with ID: $examSectionId not found")
     }
 
     fun updateSuggestion(
@@ -33,7 +40,7 @@ class SuggestionService(
                 getSuggestionById(suggestion.id!!).also { suggestion ->
                     suggestion.overallRecommendation.let { suggestion.overallRecommendation = it }
                     suggestion.score.let { suggestion.score = it }
-                    suggestion.issues.let { suggestion.issues = it }
+                    suggestion.recommendations.let { suggestion.recommendations = it }
                 }
             )
         }
