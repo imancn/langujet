@@ -4,7 +4,7 @@ import com.cn.speaktest.actor.question.payload.request.*
 import com.cn.speaktest.application.advice.InvalidInputException
 import com.cn.speaktest.application.advice.NotFoundException
 import com.cn.speaktest.domain.answer.model.AnswerType
-import com.cn.speaktest.domain.exam.service.ExamService
+import com.cn.speaktest.domain.exam.service.ExamMetaService
 import com.cn.speaktest.domain.question.model.Question
 import com.cn.speaktest.domain.question.model.QuestionType
 import org.springframework.data.domain.Page
@@ -16,7 +16,7 @@ private const val EXAM_ID_MUST_NOT_BE_NULL = "questionRequest.examId must not be
 @Service
 class QuestionService(
     private val questionRepository: QuestionRepository,
-    private val examService: ExamService
+    private val examMetaService: ExamMetaService
 ) {
 
     fun getQuestionById(id: String): Question? {
@@ -95,7 +95,7 @@ class QuestionService(
         return questionRepository.save(
             checkNotExist(
                 questionRequest.toQuestion(
-                    examService.getExamById(
+                    examMetaService.getExamById(
                         questionRequest.examId ?: throw InvalidInputException(EXAM_ID_MUST_NOT_BE_NULL)
                     )
                 )
@@ -107,7 +107,7 @@ class QuestionService(
         return questionRepository.save(
             checkNotExist(
                 questionRequest.toQuestion(
-                    examService.getExamById(
+                    examMetaService.getExamById(
                         questionRequest.examId ?: throw InvalidInputException(EXAM_ID_MUST_NOT_BE_NULL)
                     )
                 )
@@ -119,7 +119,7 @@ class QuestionService(
         return questionRepository.save(
             checkNotExist(
                 questionRequest.toQuestion(
-                    examService.getExamById(
+                    examMetaService.getExamById(
                         questionRequest.examId ?: throw InvalidInputException(EXAM_ID_MUST_NOT_BE_NULL)
                     )
                 )
@@ -131,7 +131,7 @@ class QuestionService(
         return questionRepository.save(
             checkNotExist(
                 questionRequest.toQuestion(
-                    examService.getExamById(
+                    examMetaService.getExamById(
                         questionRequest.examId ?: throw InvalidInputException(EXAM_ID_MUST_NOT_BE_NULL)
                     )
                 )
@@ -143,7 +143,7 @@ class QuestionService(
         return questionRepository.save(
             checkNotExist(
                 questionRequest.toQuestion(
-                    examService.getExamById(
+                    examMetaService.getExamById(
                         questionRequest.examId ?: throw InvalidInputException(EXAM_ID_MUST_NOT_BE_NULL)
                     )
                 )
@@ -155,7 +155,7 @@ class QuestionService(
         return questionRepository.save(
             checkNotExist(
                 questionRequest.toQuestion(
-                    examService.getExamById(
+                    examMetaService.getExamById(
                         questionRequest.examId ?: throw InvalidInputException(EXAM_ID_MUST_NOT_BE_NULL)
                     )
                 )
@@ -166,14 +166,14 @@ class QuestionService(
     private fun checkNotExist(question: Question): Question {
         return if (
             questionRepository.existsByExam_IdAndSectionAndTopicAndOrder(
-                question.exam.id,
+                question.examMeta.id,
                 question.section,
                 question.topic,
                 question.order
             )
         ) throw InvalidInputException(
             "A question with " +
-                    " exam: ${question.exam}," +
+                    " exam: ${question.examMeta}," +
                     " section: ${question.section}," +
                     " topic: ${question.topic}," +
                     " order: ${question.order}," +
@@ -264,7 +264,7 @@ class QuestionService(
         question: Question,
         questionRequest: QuestionRequest
     ) {
-        questionRequest.examId?.let { question.exam = examService.getExamById(it) }
+        questionRequest.examId?.let { question.examMeta = examMetaService.getExamById(it) }
         questionRequest.topic?.let { question.topic = it }
         questionRequest.section?.let { question.section = it }
         questionRequest.order?.let { question.order = it }

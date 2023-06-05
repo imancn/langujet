@@ -1,9 +1,13 @@
 package com.cn.speaktest.domain.exam.model
 
-class Price(
-    val value: Double, val currency: Currency
-)
+import com.cn.speaktest.actor.exam.payload.dto.PriceDto
+import java.util.*
 
-enum class Currency {
-    IRT, USD, EUR, GBP
+class Price(
+    var value: Double, var currency: Currency
+) {
+    constructor(price: PriceDto) : this(
+        price.value,
+        price.currency
+    )
 }

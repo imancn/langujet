@@ -9,11 +9,13 @@ import java.util.*
 @Document(collection = "exam_request")
 data class ExamRequest(
     @Id var id: String?,
-    var examId: String,
-    var date: Date,
+    @DBRef var examMeta: ExamMeta,
     @DBRef var student: Student,
+    var date: Date,
 ) {
-    constructor(examId: String, student: Student) : this(
-        null, examId, Date(System.currentTimeMillis()), student
+    constructor(examMeta: ExamMeta, student: Student) : this(
+        null, examMeta, student, Date(System.currentTimeMillis())
     )
+
+    constructor(examMeta: ExamMeta, student: Student, date: Date) : this(null, examMeta, student, date)
 }

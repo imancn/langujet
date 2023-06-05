@@ -14,10 +14,17 @@ class SuggestionController(
     private var service: SuggestionService
 ) {
     @GetMapping("/exam-session/{id}")
-    fun getSuggestionByExamSessionId(
+    fun getSuggestionsByExamSessionId(
         @PathVariable @NotBlank id: String?
     ): Message {
-        return service.getSuggestionByExamSessionId(id!!).toOkMessage()
+        return service.getSuggestionsByExamSessionId(id!!).toOkMessage()
+    }
+
+    @GetMapping("/exam-section/{id}")
+    fun getSuggestionByExamSectionId(
+        @PathVariable @NotBlank id: String?
+    ): Message {
+        return service.getSuggestionByExamSectionId(id!!).toOkMessage()
     }
 
     @GetMapping("/{id}")
