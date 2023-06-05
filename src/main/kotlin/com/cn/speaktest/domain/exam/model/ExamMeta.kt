@@ -1,11 +1,11 @@
 package com.cn.speaktest.domain.exam.model
 
-import com.cn.speaktest.actor.exam.payload.dto.ExamInfoDto
+import com.cn.speaktest.actor.exam.payload.dto.ExamMetaDto
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
-@Document(collection = "exam_infos")
-data class ExamInfo(
+@Document(collection = "exam_metas")
+data class ExamMeta(
     @Id var id: String?,
     var name: String,
     var description: String,
@@ -15,7 +15,7 @@ data class ExamInfo(
     var difficulty: Difficulty,
     var price: Price,
 ) {
-    constructor(examInfo: ExamInfoDto) : this(
+    constructor(examInfo: ExamMetaDto) : this(
         examInfo.id,
         examInfo.name,
         examInfo.description,

@@ -1,7 +1,7 @@
 package com.cn.speaktest.actor.question.payload.request
 
 import com.cn.speaktest.domain.answer.model.AnswerType
-import com.cn.speaktest.domain.exam.model.ExamInfo
+import com.cn.speaktest.domain.exam.model.ExamMeta
 import com.cn.speaktest.domain.question.model.Question
 
 class TextQuestionRequest(
@@ -14,9 +14,9 @@ class TextQuestionRequest(
     answerType: AnswerType?
 ) : QuestionRequest(examId, topic, section, order, usageNumber, answerType) {
 
-    fun toQuestion(examInfo: ExamInfo): Question.Text {
+    fun toQuestion(examMeta: ExamMeta): Question.Text {
         return Question.Text(
-            examInfo,
+            examMeta,
             this.topic!!,
             this.section!!,
             this.order!!,

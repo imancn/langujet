@@ -9,7 +9,7 @@ data class ExamRequestDto(
     val date: Date,
 ) {
     constructor(examRequest: ExamRequest) : this(
-        examRequest.examInfo.id,
+        examRequest.examMeta.id,
         examRequest.student.id,
         examRequest.date
     )

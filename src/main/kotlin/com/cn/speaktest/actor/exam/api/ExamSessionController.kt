@@ -1,7 +1,7 @@
 package com.cn.speaktest.actor.exam.api
 
 import com.cn.speaktest.actor.exam.payload.request.RateRequest
-import com.cn.speaktest.domain.exam.model.ExamInfo
+import com.cn.speaktest.domain.exam.model.ExamMeta
 import com.cn.speaktest.domain.exam.model.ExamIssue
 import com.cn.speaktest.domain.exam.model.ExamRequest
 import com.cn.speaktest.domain.exam.model.ExamSession
@@ -20,9 +20,9 @@ class ExamSessionController(private val examSessionService: ExamSessionServiceIn
     fun enrollExamSession(
         @RequestBody examRequest: ExamRequest,
         @RequestBody professor: Professor,
-        @RequestBody examInfo: ExamInfo
+        @RequestBody examMeta: ExamMeta
     ): ExamSession {
-        return examSessionService.enrollExamSession(examRequest, professor, examInfo)
+        return examSessionService.enrollExamSession(examRequest, professor, examMeta)
     }
 
     @PreAuthorize("hasRole('STUDENT')")

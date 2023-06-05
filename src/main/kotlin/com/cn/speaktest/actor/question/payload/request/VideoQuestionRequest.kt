@@ -1,7 +1,7 @@
 package com.cn.speaktest.actor.question.payload.request
 
 import com.cn.speaktest.domain.answer.model.AnswerType
-import com.cn.speaktest.domain.exam.model.ExamInfo
+import com.cn.speaktest.domain.exam.model.ExamMeta
 import com.cn.speaktest.domain.question.model.Question
 
 class VideoQuestionRequest(
@@ -14,9 +14,9 @@ class VideoQuestionRequest(
     answerType: AnswerType?
 ) : QuestionRequest(examId, topic, section, order, usageNumber, answerType) {
 
-    fun toQuestion(examInfo: ExamInfo): Question.Video {
+    fun toQuestion(examMeta: ExamMeta): Question.Video {
         return Question.Video(
-            examInfo,
+            examMeta,
             this.topic!!,
             this.section!!,
             this.order!!,

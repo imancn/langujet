@@ -14,7 +14,7 @@ data class ExamSession(
     var id: String?,
 
     @DBRef
-    var examInfo: ExamInfo,
+    var examMeta: ExamMeta,
     @DBRef
     var student: Student,
     @DBRef
@@ -31,9 +31,9 @@ data class ExamSession(
     var isFinished: Boolean = false,
     var isRated: Boolean = false,
 ) {
-    constructor(examInfo: ExamInfo, student: Student, professor: Professor, requestDate: Date) : this(
+    constructor(examMeta: ExamMeta, student: Student, professor: Professor, requestDate: Date) : this(
         null,
-        examInfo,
+        examMeta,
         student,
         professor,
         null,
@@ -45,7 +45,7 @@ data class ExamSession(
 
     constructor(examSession: ExamSessionDto, student: Student, professor: Professor) : this(
         examSession.id,
-        ExamInfo(examSession.examInfo),
+        ExamMeta(examSession.examInfo),
         student,
         professor,
         examSession.examSections?.map { ExamSection(it) },
