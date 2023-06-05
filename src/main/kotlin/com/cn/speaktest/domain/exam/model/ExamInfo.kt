@@ -1,9 +1,10 @@
 package com.cn.speaktest.domain.exam.model
 
+import com.cn.speaktest.actor.exam.payload.dto.ExamInfoDto
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
-@Document(collection = "exams")
+@Document(collection = "exam_infos")
 data class ExamInfo(
     @Id var id: String?,
     var name: String,
@@ -13,4 +14,15 @@ data class ExamInfo(
     var examDuration: Long, // Milliseconds
     var difficulty: Difficulty,
     var price: Price,
-)
+) {
+    constructor(examInfo: ExamInfoDto) : this(
+        examInfo.id,
+        examInfo.name,
+        examInfo.description,
+        examInfo.sectionsNumber,
+        examInfo.questionNumber,
+        examInfo.examDuration,
+        examInfo.difficulty,
+        Price(examInfo.price)
+    )
+}
