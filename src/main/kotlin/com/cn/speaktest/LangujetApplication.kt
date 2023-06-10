@@ -6,8 +6,8 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 @SpringBootApplication
 @EnableMongoRepositories
-class SpeaktestApplication
+class LangujetApplication
 
 fun main(args: Array<String>) {
-    runApplication<SpeaktestApplication>(*args)
+    runApplication<LangujetApplication>(*args)
 }
