@@ -38,12 +38,14 @@ data class ExamSession(
         null,
     )
 
-    constructor(examSession: ExamSessionDto, student: Student, professor: Professor) : this(
+    constructor(
+        examSession: ExamSessionDto, student: Student, professor: Professor, exam: Exam, examSectionList: List<ExamSection>
+    ) : this(
         examSession.id,
-        ExamMeta(examSession.examInfo),
+        exam,
         student,
         professor,
-        examSession.examSections?.map { ExamSection(it) },
+        examSectionList,
         examSession.requestDate,
         examSession.startDate,
         examSession.endDate,

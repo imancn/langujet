@@ -9,6 +9,7 @@ import com.cn.speaktest.domain.exam.model.Section
 import com.cn.speaktest.domain.exam.service.ExamService
 import com.cn.speaktest.domain.question.model.Question
 import com.cn.speaktest.domain.question.model.QuestionType
+import com.cn.speaktest.domain.exam.service.SectionService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -18,7 +19,8 @@ private const val EXAM_ID_MUST_NOT_BE_NULL = "questionRequest.examId must not be
 @Service
 class QuestionService(
     private val questionRepository: QuestionRepository,
-    private val examMetaService: ExamMetaService
+    private val examService: ExamService,
+    private val sectionService: SectionService,
 ) {
 
     fun getQuestionById(id: String): Question? {
@@ -57,7 +59,7 @@ class QuestionService(
         return questionRepository.findAllByTopic(topic)
     }
 
-    fun getAllQuestionsBySection(section: Int): List<Question> {
+    fun getAllQuestionsBySection(section: Section): List<Question> {
         return questionRepository.findAllBySection(section)
     }
 
@@ -94,90 +96,108 @@ class QuestionService(
     }
 
     fun createTextQuestion(questionRequest: TextQuestionRequest): Question.Text {
+        val exam = examService.getExamById(
+            questionRequest.examId ?: throw InvalidInputException(EXAM_ID_MUST_NOT_BE_NULL)
+        )
         return questionRepository.save(
             checkNotExist(
                 questionRequest.toQuestion(
-                    examMetaService.getExamById(
-                        questionRequest.examId ?: throw InvalidInputException(EXAM_ID_MUST_NOT_BE_NULL)
-                    )
+                    exam,
+                    findSection(exam, questionRequest.sectionId!!)
                 )
             )
         ) as Question.Text
     }
 
     fun createMultipleChoiceQuestion(questionRequest: MultipleChoiceQuestionRequest): Question.MultipleChoice {
+        val exam = examService.getExamById(
+            questionRequest.examId ?: throw InvalidInputException(EXAM_ID_MUST_NOT_BE_NULL)
+        )
         return questionRepository.save(
             checkNotExist(
                 questionRequest.toQuestion(
-                    examMetaService.getExamById(
-                        questionRequest.examId ?: throw InvalidInputException(EXAM_ID_MUST_NOT_BE_NULL)
-                    )
+                    exam,
+                    findSection(exam, questionRequest.sectionId!!)
                 )
             )
         ) as Question.MultipleChoice
     }
 
     fun createTrueFalseQuestion(questionRequest: TrueFalseQuestionRequest): Question.TrueFalse {
+        val exam = examService.getExamById(
+            questionRequest.examId ?: throw InvalidInputException(EXAM_ID_MUST_NOT_BE_NULL)
+        )
         return questionRepository.save(
             checkNotExist(
                 questionRequest.toQuestion(
-                    examMetaService.getExamById(
-                        questionRequest.examId ?: throw InvalidInputException(EXAM_ID_MUST_NOT_BE_NULL)
-                    )
+                    exam,
+                    findSection(exam, questionRequest.sectionId!!)
                 )
             )
         ) as Question.TrueFalse
     }
 
     fun createPhotoQuestion(questionRequest: PhotoQuestionRequest): Question.Photo {
+        val exam = examService.getExamById(
+            questionRequest.examId ?: throw InvalidInputException(EXAM_ID_MUST_NOT_BE_NULL)
+        )
         return questionRepository.save(
             checkNotExist(
                 questionRequest.toQuestion(
-                    examMetaService.getExamById(
-                        questionRequest.examId ?: throw InvalidInputException(EXAM_ID_MUST_NOT_BE_NULL)
-                    )
+                    exam,
+                    findSection(exam, questionRequest.sectionId!!)
                 )
             )
         ) as Question.Photo
     }
 
     fun createVoiceQuestion(questionRequest: VoiceQuestionRequest): Question.Voice {
+        val exam = examService.getExamById(
+            questionRequest.examId ?: throw InvalidInputException(EXAM_ID_MUST_NOT_BE_NULL)
+        )
         return questionRepository.save(
             checkNotExist(
                 questionRequest.toQuestion(
-                    examMetaService.getExamById(
-                        questionRequest.examId ?: throw InvalidInputException(EXAM_ID_MUST_NOT_BE_NULL)
-                    )
+                    exam,
+                    findSection(exam, questionRequest.sectionId!!)
                 )
             )
         ) as Question.Voice
     }
 
     fun createVideoQuestion(questionRequest: VideoQuestionRequest): Question.Video {
+        val exam = examService.getExamById(
+            questionRequest.examId ?: throw InvalidInputException(EXAM_ID_MUST_NOT_BE_NULL)
+        )
         return questionRepository.save(
             checkNotExist(
                 questionRequest.toQuestion(
-                    examMetaService.getExamById(
-                        questionRequest.examId ?: throw InvalidInputException(EXAM_ID_MUST_NOT_BE_NULL)
-                    )
+                    exam,
+                    findSection(exam, questionRequest.sectionId!!)
                 )
             )
         ) as Question.Video
     }
 
+    private fun findSection(
+        exam: Exam,
+        sectionId: String
+    ) = exam.sections.find { it.id == sectionId }
+            ?: throw NotFoundException("Section with id $sectionId not found")
+
     private fun checkNotExist(question: Question): Question {
         return if (
-            questionRepository.existsByExam_IdAndSectionAndTopicAndOrder(
-                question.examMeta.id,
-                question.section,
+            questionRepository.existsByExam_IdAndSection_IdAndTopicAndOrder(
+                question.exam.id,
+                question.section.id,
                 question.topic,
                 question.order
             )
         ) throw InvalidInputException(
             "A question with " +
-                    " exam: ${question.examMeta}," +
-                    " section: ${question.section}," +
-                    " topic: ${question.topic}," +
+                    " exam: ${question.exam}," +
+                    " section: ${question.topic}," +
+                    " topic: ${question.section}," +
                     " order: ${question.order}," +
                     "does exist."
         )
@@ -266,9 +286,9 @@ class QuestionService(
         question: Question,
         questionRequest: QuestionRequest
     ) {
-        questionRequest.examId?.let { question.examMeta = examMetaService.getExamById(it) }
+        questionRequest.examId?.let { question.exam = examService.getExamById(it) }
+        questionRequest.sectionId?.let { question.section = Section(sectionService.getSectionById(it)) }
         questionRequest.topic?.let { question.topic = it }
-        questionRequest.section?.let { question.section = it }
         questionRequest.order?.let { question.order = it }
         questionRequest.usageNumber?.let { question.usageNumber = it }
         questionRequest.answerType?.let { question.answerType = it }

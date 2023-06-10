@@ -39,10 +39,16 @@ class ExamSessionService(
 
     private fun initializeExamSections(examSession: ExamSession): List<ExamSection> {
         val examIssues = examIssueService.generateExamIssueList(examSession.id!!)
-        return listOf(
-            ExamSection(null, examSession.id!!, "Section name", 0, examIssues, null)
-        )
-        TODO("Not yet implemented")
+        return examSession.exam.sections.map { section ->
+            ExamSection(
+                null,
+                examSession.id!!,
+                examSession.exam,
+                section,
+                examIssues,
+                null
+            )
+        }
     }
 
     override fun getStudentExamSessionWithAuthToken(
@@ -101,7 +107,7 @@ class ExamSessionService(
             if (examSession.exam.sectionsNumber == examSection.section.order + 1)
                 throw MethodNotAllowedException("There is no next Exam Issue")
             else
-                getExamIssues(examSession.examSections?.get(examSection.order + 1))[0]
+                getExamIssues(examSession.examSections?.get(examSection.section.order + 1))[0]
         } else
             examIssues[currentExamIssueOrder + 1]
     }
@@ -187,8 +193,8 @@ class ExamSessionService(
         return examSession
     }
 
-    fun getExamSessionById(id: String): ExamSession {
-        return examSessionRepository.findById(id).orElseThrow {
+    fun getExamSessionById(id: String?): ExamSession {
+        return examSessionRepository.findById(id!!).orElseThrow {
             NotFoundException("ExamSession with id: $id not found")
         }
     }

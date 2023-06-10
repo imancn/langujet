@@ -9,17 +9,31 @@ import org.springframework.data.mongodb.core.mapping.Document
 class ExamSection(
     @Id var id: String?,
     var examSessionId: String,
-    var name: String,
-    val order: Int,
-    @DBRef var examIssues: List<ExamIssue>?,
+    @DBRef var exam: Exam,
+    @DBRef var section: Section,
+    @DBRef var examIssues: List<ExamIssue>,
     @DBRef var suggestion: Suggestion?,
 ) {
-    constructor(examSection: ExamSectionDto) : this(
+    constructor(examSection: ExamSectionDto, exam: Exam, section: Section) : this(
         examSection.id,
         examSection.examSessionId!!,
-        examSection.name!!,
-        examSection.order,
-        examSection.examIssues?.map { ExamIssue(it) },
+        exam,
+        section,
+        examSection.examIssues?.map { ExamIssue(it) }!!,
         examSection.suggestion?.let { Suggestion(it) }
+    )
+
+    constructor(
+        examSessionId: String,
+        exam: Exam,
+        section: Section,
+        examIssues: List<ExamIssue>
+    ) : this(
+        null,
+        examSessionId,
+        exam,
+        section,
+        examIssues,
+        null
     )
 }

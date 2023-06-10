@@ -1,6 +1,7 @@
 package com.cn.speaktest.domain.question
 
 import com.cn.speaktest.domain.answer.model.AnswerType
+import com.cn.speaktest.domain.exam.model.Section
 import com.cn.speaktest.domain.question.model.Question
 import com.cn.speaktest.domain.question.model.QuestionType
 import org.springframework.data.domain.Page
@@ -9,7 +10,7 @@ import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.mongodb.repository.Query
 
 interface QuestionRepository : MongoRepository<Question, String> {
-    fun findAllBySection(section: Int): List<Question>
+    fun findAllBySection(section: Section): List<Question>
     fun findAllByTopic(topic: String): List<Question>
 
     fun findAllByQuestionType(questionType: QuestionType): List<Question>
@@ -28,5 +29,5 @@ interface QuestionRepository : MongoRepository<Question, String> {
         pageRequest: PageRequest
     ): Page<Question>
 
-    fun existsByExam_IdAndSectionAndTopicAndOrder(examId: String?, section: Int, topic: String, order: Int): Boolean
+    fun existsByExam_IdAndSection_IdAndTopicAndOrder(examId: String?, section: String?, topic: String, order: Int): Boolean
 }

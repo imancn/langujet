@@ -2,14 +2,15 @@ package com.cn.speaktest.domain.exam.service
 
 import com.cn.speaktest.actor.exam.payload.dto.ExamSectionDto
 import com.cn.speaktest.application.advice.NotFoundException
-import com.cn.speaktest.domain.exam.model.ExamIssue
-import com.cn.speaktest.domain.exam.model.ExamSection
-import com.cn.speaktest.domain.exam.model.Suggestion
+import com.cn.speaktest.domain.exam.model.*
 import com.cn.speaktest.domain.exam.repository.ExamSectionRepository
 import org.springframework.stereotype.Service
 
 @Service
-class ExamSectionService(private val examSectionRepository: ExamSectionRepository) {
+class ExamSectionService(
+    private val examSectionRepository: ExamSectionRepository,
+    private val examSessionService: ExamSessionService,
+) {
     fun getAllExamSections(): List<ExamSection> {
         return examSectionRepository.findAll()
     }
@@ -19,20 +20,20 @@ class ExamSectionService(private val examSectionRepository: ExamSectionRepositor
     }
 
     fun createExamSection(examSectionDto: ExamSectionDto): ExamSectionDto {
-        val examSection = ExamSection(examSectionDto)
+        val examSession = examSessionService.getExamSessionById(examSectionDto.examSessionId)
+        val exam = examSession.exam
+        val section = examSession.examSections?.find {
+            it.id == examSectionDto.sectionId
+        }?.section ?: throw NotFoundException("Section with id ${examSectionDto.examSessionId} not found")
+        val examSection = ExamSection(examSectionDto, exam, section)
         return ExamSectionDto(examSectionRepository.save(examSection))
-    }
-
-    fun createExamSection(examSection: ExamSection): ExamSection {
-        return examSectionRepository.save(examSection)
     }
 
     fun updateExamSection(id: String, examSectionDto: ExamSectionDto): ExamSection? {
         val existingExamSection = getExamSectionById(id)
-        existingExamSection.examSessionId = examSectionDto.examSessionId!!
-        existingExamSection.name = examSectionDto.name!!
-        existingExamSection.examIssues = examSectionDto.examIssues?.map { ExamIssue(it) }
-        existingExamSection.suggestion = examSectionDto.suggestion?.let { Suggestion(it) }
+        examSectionDto.examSessionId?.let { existingExamSection.examSessionId = it }
+        examSectionDto.examIssues?.let { list -> existingExamSection.examIssues = list.map { ExamIssue(it) } }
+        examSectionDto.suggestion?.let { existingExamSection.suggestion = Suggestion(it) }
         return examSectionRepository.save(existingExamSection)
     }
 

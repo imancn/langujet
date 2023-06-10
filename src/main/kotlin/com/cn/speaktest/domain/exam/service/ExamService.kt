@@ -3,6 +3,7 @@ package com.cn.speaktest.domain.exam.service
 import com.cn.speaktest.actor.exam.payload.dto.ExamDto
 import com.cn.speaktest.application.advice.NotFoundException
 import com.cn.speaktest.domain.exam.model.Exam
+import com.cn.speaktest.domain.exam.model.Section
 import com.cn.speaktest.domain.exam.repository.ExamRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -20,15 +21,16 @@ class ExamService(
     }
 
     fun updateExam(id: String, exam: ExamDto): Exam {
-        val existingExam = examRepository.findById(id).orElseThrow { NotFoundException("Exam with id $id not found") }
-        exam.name.let { existingExam.name = it }
-        exam.description.let { existingExam.description = it }
-        exam.sectionsNumber.let { existingExam.sectionsNumber = it }
-        exam.questionNumber.let { existingExam.questionNumber = it }
-        exam.examDuration.let { existingExam.examDuration = it }
-        exam.difficulty.let { existingExam.difficulty = it }
-        exam.price.value.let { existingExam.price.value =  it}
-        exam.price.currency.let { existingExam.price.currency = it }
+        val existingExam = getExamById(id)
+        exam.name?.let { existingExam.name = it }
+        exam.sections?.let { existingExam.sections = it.map { section -> Section(section) } }
+        exam.description?.let { existingExam.description = it }
+        exam.sectionsNumber?.let { existingExam.sectionsNumber = it }
+        exam.questionNumber?.let { existingExam.questionNumber = it }
+        exam.examDuration?.let { existingExam.examDuration = it }
+        exam.difficulty?.let { existingExam.difficulty = it }
+        exam.price?.value?.let { existingExam.price.value =  it}
+        exam.price?.currency?.let { existingExam.price.currency = it }
         return examRepository.save(existingExam)
     }
 

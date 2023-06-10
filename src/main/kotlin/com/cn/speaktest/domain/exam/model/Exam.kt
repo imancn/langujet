@@ -21,13 +21,13 @@ data class Exam(
 ) {
     constructor(examDto: ExamDto) : this(
         examDto.id,
-        examDto.sections,
-        examDto.name,
-        examDto.description,
-        examDto.sectionsNumber,
-        examDto.questionNumber,
-        examDto.examDuration,
-        examDto.difficulty,
-        Price(examDto.price)
+        examDto.sections?.map { Section(it) } ?: emptyList<Section>(),
+        examDto.name!!,
+        examDto.description!!,
+        examDto.sectionsNumber!!,
+        examDto.questionNumber!!,
+        examDto.examDuration!!,
+        examDto.difficulty!!,
+        Price(examDto.price!!)
     )
 }
