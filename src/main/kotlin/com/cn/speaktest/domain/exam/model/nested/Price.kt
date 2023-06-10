@@ -1,4 +1,4 @@
-package com.cn.speaktest.domain.exam.model
+package com.cn.speaktest.domain.exam.model.nested
 
 import com.cn.speaktest.actor.exam.payload.dto.PriceDto
 import java.util.*

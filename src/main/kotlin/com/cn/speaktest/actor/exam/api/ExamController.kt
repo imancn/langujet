@@ -1,12 +1,12 @@
 package com.cn.speaktest.actor.exam.api
 
-import com.cn.speaktest.actor.exam.payload.dto.ExamMetaDto
+import com.cn.speaktest.actor.exam.payload.dto.ExamDto
 import com.cn.speaktest.application.advice.Message
 import com.cn.speaktest.application.advice.toOkMessage
-import com.cn.speaktest.domain.exam.model.Difficulty
-import com.cn.speaktest.domain.exam.model.ExamMeta
-import com.cn.speaktest.domain.exam.model.Price
-import com.cn.speaktest.domain.exam.service.ExamMetaService
+import com.cn.speaktest.domain.exam.model.nested.Difficulty
+import com.cn.speaktest.domain.exam.model.Exam
+import com.cn.speaktest.domain.exam.model.nested.Price
+import com.cn.speaktest.domain.exam.service.ExamService
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import org.springframework.data.domain.PageRequest
@@ -19,11 +19,11 @@ import java.util.*
 @RestController
 @RequestMapping("/api/exams")
 @Validated
-class ExamMetaController(private val examMetaService: ExamMetaService) {
+class ExamController(private val examService: ExamService) {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    fun createExamMeta(
+    fun createExam(
         @RequestParam @NotBlank name: String?,
         @RequestParam @NotBlank description: String?,
         @RequestParam @NotNull sectionsNumber: Int?,
@@ -33,9 +33,10 @@ class ExamMetaController(private val examMetaService: ExamMetaService) {
         @RequestParam @NotNull priceValue: Double?,
         @RequestParam @NotNull priceCurrency: Currency?,
     ): Message {
-        return examMetaService.createExam(
-            ExamMeta(
+        return examService.createExam(
+            Exam(
                 null,
+                emptyList(),
                 name!!,
                 description!!,
                 sectionsNumber!!,
@@ -52,25 +53,25 @@ class ExamMetaController(private val examMetaService: ExamMetaService) {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    fun updateExamMeta(
+    fun updateExam(
         @PathVariable @NotBlank id: String?,
-        @RequestBody examMetaDto: ExamMetaDto
+        @RequestBody examDto: ExamDto
     ): Message {
-        return examMetaService.updateExam(
+        return examService.updateExam(
             id!!,
-            examMetaDto
+            examDto
         ).toOkMessage()
     }
 
     @GetMapping("/{id}")
     fun getExamById(@PathVariable id: String): Message {
-        return examMetaService.getExamById(id).toOkMessage()
+        return examService.getExamById(id).toOkMessage()
     }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     fun getAllExams(): Message {
-        return examMetaService.getAllExams().toOkMessage()
+        return examService.getAllExams().toOkMessage()
     }
 
     @GetMapping("/ filters")
@@ -84,7 +85,7 @@ class ExamMetaController(private val examMetaService: ExamMetaService) {
         @RequestParam(defaultValue = "0") pageNumber: Int,
         @RequestParam(defaultValue = "id") sortBy: String?
     ): Message {
-        return examMetaService.getAllExamsByFilters(
+        return examService.getAllExamsByFilters(
             id,
             name,
             sectionsNumber,

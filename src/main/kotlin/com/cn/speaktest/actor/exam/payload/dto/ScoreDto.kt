@@ -1,6 +1,6 @@
 package com.cn.speaktest.actor.exam.payload.dto
 
-import com.cn.speaktest.domain.exam.model.Score
+import com.cn.speaktest.domain.exam.model.nested.Score
 
 data class ScoreDto(
     val id: String?,

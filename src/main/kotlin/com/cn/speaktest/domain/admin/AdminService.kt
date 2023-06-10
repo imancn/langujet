@@ -3,7 +3,7 @@ package com.cn.speaktest.domain.admin
 import com.cn.speaktest.application.advice.NotFoundException
 import com.cn.speaktest.domain.exam.repository.ExamRequestRepository
 import com.cn.speaktest.domain.exam.service.ExamRequestService
-import com.cn.speaktest.domain.exam.service.ExamMetaService
+import com.cn.speaktest.domain.exam.service.ExamService
 import com.cn.speaktest.domain.exam.service.ExamSessionServiceInterface
 import com.cn.speaktest.domain.professor.ProfessorRepository
 import org.springframework.stereotype.Service
@@ -14,12 +14,12 @@ class AdminService(
     private val examRequestService: ExamRequestService,
     private val professorRepository: ProfessorRepository,
     private val examSessionService: ExamSessionServiceInterface,
-    private val examMetaService: ExamMetaService,
+    private val examService: ExamService,
 ) {
 
     fun confirmExamRequest(examRequestId: String?, professorId: String?): String? {
         val examRequest = examRequestService.getExamRequestById(examRequestId)
-        val exam = examMetaService.getExamById(examRequest.examMeta.id)
+        val exam = examService.getExamById(examRequest.exam.id)
         val professor = professorRepository.findById(professorId!!).orElseThrow {
             NotFoundException("Professor not found")
         }

@@ -5,7 +5,7 @@ import java.util.*
 
 data class ExamSessionDto(
     val id: String?,
-    val examInfo: ExamMetaDto,
+    val examId: String?,
     val studentId: String?,
     val professorId: String?,
     val examSections: List<ExamSectionDto>?,
@@ -19,7 +19,7 @@ data class ExamSessionDto(
 ) {
     constructor(examSession: ExamSession) : this(
         examSession.id,
-        ExamMetaDto(examSession.examMeta),
+        examSession.exam.id,
         examSession.student.id,
         examSession.professor.id,
         examSession.examSections?.map { ExamSectionDto(it) },

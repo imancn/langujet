@@ -1,6 +1,6 @@
 package com.cn.speaktest.actor.exam.payload.dto
 
-import com.cn.speaktest.domain.exam.model.Recommendation
+import com.cn.speaktest.domain.exam.model.nested.Recommendation
 
 data class RecommendationDto(
     val id: String?,

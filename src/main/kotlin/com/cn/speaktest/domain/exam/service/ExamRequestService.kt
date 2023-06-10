@@ -11,15 +11,15 @@ import org.springframework.stereotype.Service
 class ExamRequestService(
     private val examRequestRepository: ExamRequestRepository,
     private val studentService: StudentService,
-    private val examMetaService: ExamMetaService
+    private val examService: ExamService
 ) {
-    fun createExamRequest(studentId: String?, examMetaId: String?): ExamRequest {
+    fun createExamRequest(studentId: String?, examId: String?): ExamRequest {
         val student = studentService.getStudentByStudentId(studentId!!)
-        val examMeta = examMetaService.getExamById(examMetaId)
-        if (examRequestRepository.existsByStudentAndExamId(student, examMetaId!!))
+        val exam = examService.getExamById(examId)
+        if (examRequestRepository.existsByStudentAndExamId(student, examId!!))
             throw MethodNotAllowedException("You have an unhandled exam yet.")
 
-        return examRequestRepository.save(ExamRequest(examMeta, student))
+        return examRequestRepository.save(ExamRequest(exam, student))
     }
 
     fun getExamRequestById(id: String?): ExamRequest {

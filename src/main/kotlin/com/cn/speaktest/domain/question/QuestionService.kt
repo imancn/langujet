@@ -4,7 +4,9 @@ import com.cn.speaktest.actor.question.payload.request.*
 import com.cn.speaktest.application.advice.InvalidInputException
 import com.cn.speaktest.application.advice.NotFoundException
 import com.cn.speaktest.domain.answer.model.AnswerType
-import com.cn.speaktest.domain.exam.service.ExamMetaService
+import com.cn.speaktest.domain.exam.model.Exam
+import com.cn.speaktest.domain.exam.model.Section
+import com.cn.speaktest.domain.exam.service.ExamService
 import com.cn.speaktest.domain.question.model.Question
 import com.cn.speaktest.domain.question.model.QuestionType
 import org.springframework.data.domain.Page

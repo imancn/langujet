@@ -22,10 +22,10 @@ class ExamSessionService(
     val authService: AuthService,
 ) : ExamSessionServiceInterface {
 
-    override fun enrollExamSession(examRequest: ExamRequest, professor: Professor, examMeta: ExamMeta): ExamSession {
+    override fun enrollExamSession(examRequest: ExamRequest, professor: Professor, exam: Exam): ExamSession {
         var examSession = examSessionRepository.save(
             ExamSession(
-                examMeta, examRequest.student, professor, examRequest.date
+                exam, examRequest.student, professor, examRequest.date
             )
         )
         examSession = examSessionRepository.save(
@@ -80,7 +80,7 @@ class ExamSessionService(
                 examSession.also {
                     val now = Date(System.currentTimeMillis())
                     it.startDate = now
-                    it.endDate = Date(now.time + examSession.examMeta.examDuration)
+                    it.endDate = Date(now.time + examSession.exam.examDuration)
                     it.isStarted = true
                 }
             )
@@ -98,7 +98,7 @@ class ExamSessionService(
         val examIssues = getExamIssues(examSection)
 
         return if (examIssues.size <= currentExamIssueOrder + 1) {
-            if (examSession.examMeta.sectionsNumber == examSection.order + 1)
+            if (examSession.exam.sectionsNumber == examSection.section.order + 1)
                 throw MethodNotAllowedException("There is no next Exam Issue")
             else
                 getExamIssues(examSession.examSections?.get(examSection.order + 1))[0]

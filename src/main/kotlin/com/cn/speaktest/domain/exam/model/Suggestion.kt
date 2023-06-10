@@ -1,6 +1,8 @@
 package com.cn.speaktest.domain.exam.model
 
 import com.cn.speaktest.actor.exam.payload.dto.SuggestionDto
+import com.cn.speaktest.domain.exam.model.nested.Recommendation
+import com.cn.speaktest.domain.exam.model.nested.Score
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document

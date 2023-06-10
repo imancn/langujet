@@ -1,6 +1,6 @@
 package com.cn.speaktest.actor.exam.payload.dto
 
-import com.cn.speaktest.domain.exam.model.Price
+import com.cn.speaktest.domain.exam.model.nested.Price
 import java.util.*
 
 data class PriceDto(

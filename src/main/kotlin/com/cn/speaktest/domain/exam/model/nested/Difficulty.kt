@@ -1,4 +1,4 @@
-package com.cn.speaktest.domain.exam.model
+package com.cn.speaktest.domain.exam.model.nested
 
 enum class Difficulty(val grade: Int) {
     EASY(1),

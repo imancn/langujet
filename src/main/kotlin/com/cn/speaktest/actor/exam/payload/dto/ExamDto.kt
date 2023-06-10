@@ -1,9 +1,10 @@
 package com.cn.speaktest.actor.exam.payload.dto
 
-import com.cn.speaktest.domain.exam.model.Difficulty
-import com.cn.speaktest.domain.exam.model.ExamMeta
+import com.cn.speaktest.domain.exam.model.nested.Difficulty
+import com.cn.speaktest.domain.exam.model.Exam
+import com.cn.speaktest.domain.exam.model.Section
 
-data class ExamMetaDto(
+data class ExamDto(
     val id: String?,
     val name: String,
     val description: String,

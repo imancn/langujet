@@ -10,17 +10,12 @@ import java.util.*
 
 @Document(collection = "exam_sessions")
 data class ExamSession(
-    @Id
-    var id: String?,
+    @Id var id: String?,
 
-    @DBRef
-    var examMeta: ExamMeta,
-    @DBRef
-    var student: Student,
-    @DBRef
-    var professor: Professor,
-    @DBRef
-    var examSections: List<ExamSection>?,
+    @DBRef var exam: Exam,
+    @DBRef var student: Student,
+    @DBRef var professor: Professor,
+    @DBRef var examSections: List<ExamSection>?,
 
     var requestDate: Date,
     var startDate: Date?,
@@ -31,9 +26,9 @@ data class ExamSession(
     var isFinished: Boolean = false,
     var isRated: Boolean = false,
 ) {
-    constructor(examMeta: ExamMeta, student: Student, professor: Professor, requestDate: Date) : this(
+    constructor(exam: Exam, student: Student, professor: Professor, requestDate: Date) : this(
         null,
-        examMeta,
+        exam,
         student,
         professor,
         null,

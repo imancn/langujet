@@ -17,9 +17,9 @@ class ExamSessionController(private val examSessionService: ExamSessionServiceIn
     fun enrollExamSession(
         @RequestBody examRequest: ExamRequest,
         @RequestBody professor: Professor,
-        @RequestBody examMeta: ExamMeta
+        @RequestBody exam: Exam
     ): ExamSession {
-        return examSessionService.enrollExamSession(examRequest, professor, examMeta)
+        return examSessionService.enrollExamSession(examRequest, professor, exam)
     }
 
     @PreAuthorize("hasRole('STUDENT')")
