@@ -10,7 +10,7 @@ import com.cn.speaktest.application.security.security.repository.UserRepository
 import com.cn.speaktest.application.security.security.services.JwtService
 import com.cn.speaktest.application.security.security.services.RefreshTokenService
 import com.cn.speaktest.domain.security.services.AuthService
-import com.cn.speaktest.application.smtp.MailSenderService
+import com.cn.speaktest.application.thirdparty.smtp.MailSenderService
 import com.cn.speaktest.domain.professor.Professor
 import com.cn.speaktest.domain.professor.ProfessorRepository
 import com.cn.speaktest.domain.student.model.Student
