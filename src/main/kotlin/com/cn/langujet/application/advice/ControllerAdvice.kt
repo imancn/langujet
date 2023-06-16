@@ -14,37 +14,28 @@ class ControllerAdvice {
     private val logger = LoggerFactory.getLogger(javaClass.simpleName)
 
     @ExceptionHandler(value = [HttpException::class])
-    fun handleHttpException(ex: HttpException, request: WebRequest): ResponseEntity<Message> {
+    fun handleHttpException(ex: HttpException, request: WebRequest): ResponseEntity<String> {
+        logger.error(ex.stackTraceToString())
         return ResponseEntity(
-            Message(
-                ex.httpStatus,
-                ex.message,
-                null
-            ),
+            "${ex.message}",
             ex.httpStatus
         )
     }
 
     @ExceptionHandler(value = [MethodArgumentNotValidException::class])
-    fun handleValidationException(ex: MethodArgumentNotValidException, request: WebRequest): ResponseEntity<Message> {
+    fun handleValidationException(ex: MethodArgumentNotValidException, request: WebRequest): ResponseEntity<String> {
+        logger.error(ex.stackTraceToString())
         return ResponseEntity(
-            Message(
-                HttpStatus.BAD_REQUEST,
-                "MethodArgumentNotValidException",
-                ex.message
-            ),
+            ex.message,
             HttpStatus.BAD_REQUEST
         )
     }
 
     @ExceptionHandler(value = [ValidationException::class])
-    fun handleValidationException(ex: ValidationException, request: WebRequest): ResponseEntity<Message> {
+    fun handleValidationException(ex: ValidationException, request: WebRequest): ResponseEntity<String> {
+        logger.error(ex.stackTraceToString())
         return ResponseEntity(
-            Message(
-                HttpStatus.BAD_REQUEST,
-                "ValidationException",
-                ex.message,
-            ),
+            ex.message,
             HttpStatus.BAD_REQUEST
         )
     }
