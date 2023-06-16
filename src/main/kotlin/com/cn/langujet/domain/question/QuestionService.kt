@@ -23,7 +23,7 @@ class QuestionService(
     private val sectionService: SectionService,
 ) {
 
-    fun getQuestionById(id: String): Question? {
+    fun getQuestionById(id: String): Question {
         return questionRepository.findById(id).orElseThrow {
             throw NotFoundException("Question with id: $id not found")
         }
@@ -204,7 +204,7 @@ class QuestionService(
         else question
     }
 
-    fun updateTextQuestion(id: String, questionRequest: TextQuestionRequest): Question.Text? {
+    fun updateTextQuestion(id: String, questionRequest: TextQuestionRequest): Question.Text {
         return (getQuestionById(id) as Question.Text).also { question ->
             if (question.questionType == QuestionType.TEXT) {
                 updateQuestion(question, questionRequest)
@@ -219,7 +219,7 @@ class QuestionService(
     fun updateMultipleChoiceQuestion(
         id: String,
         questionRequest: MultipleChoiceQuestionRequest
-    ): Question.MultipleChoice? {
+    ): Question.MultipleChoice {
         return (getQuestionById(id) as Question.MultipleChoice).also { question ->
             if (question.questionType == QuestionType.CHOICE) {
                 updateQuestion(question, questionRequest)
@@ -233,7 +233,7 @@ class QuestionService(
         }
     }
 
-    fun updateTrueFalseQuestion(id: String, questionRequest: TrueFalseQuestionRequest): Question.TrueFalse? {
+    fun updateTrueFalseQuestion(id: String, questionRequest: TrueFalseQuestionRequest): Question.TrueFalse {
         return (getQuestionById(id) as Question.TrueFalse).also { question ->
             if (question.questionType == QuestionType.TRUE_FALSE) {
                 updateQuestion(question, questionRequest)
@@ -246,7 +246,7 @@ class QuestionService(
         }
     }
 
-    fun updatePhotoQuestion(id: String, questionRequest: PhotoQuestionRequest): Question.Photo? {
+    fun updatePhotoQuestion(id: String, questionRequest: PhotoQuestionRequest): Question.Photo {
         return (getQuestionById(id) as Question.Photo).also { question ->
             if (question.questionType == QuestionType.PHOTO) {
                 updateQuestion(question, questionRequest)
@@ -258,7 +258,7 @@ class QuestionService(
         }
     }
 
-    fun updateVoiceQuestion(id: String, questionRequest: VoiceQuestionRequest): Question.Voice? {
+    fun updateVoiceQuestion(id: String, questionRequest: VoiceQuestionRequest): Question.Voice {
         return (getQuestionById(id) as Question.Voice).also { question ->
             if (question.questionType == QuestionType.VOICE) {
                 updateQuestion(question, questionRequest)
@@ -270,7 +270,7 @@ class QuestionService(
         }
     }
 
-    fun updateVideoQuestion(id: String, questionRequest: VideoQuestionRequest): Question.Video? {
+    fun updateVideoQuestion(id: String, questionRequest: VideoQuestionRequest): Question.Video {
         return (getQuestionById(id) as Question.Video).also { question ->
             if (question.questionType == QuestionType.VIDEO) {
                 updateQuestion(question, questionRequest)
