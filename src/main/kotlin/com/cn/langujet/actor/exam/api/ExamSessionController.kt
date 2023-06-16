@@ -1,9 +1,11 @@
 package com.cn.langujet.actor.exam.api
 
 import com.cn.langujet.actor.exam.payload.dto.SuggestionDto
+import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.domain.exam.model.*
 import com.cn.langujet.domain.exam.service.ExamSessionServiceInterface
 import com.cn.langujet.domain.professor.Professor
+import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -18,17 +20,15 @@ class ExamSessionController(private val examSessionService: ExamSessionServiceIn
         @RequestBody examRequest: ExamRequest,
         @RequestBody professor: Professor,
         @RequestBody exam: Exam
-    ): ExamSession {
-        return examSessionService.enrollExamSession(examRequest, professor, exam)
-    }
+    ): ResponseEntity<ExamSession> = toOkResponseEntity(examSessionService.enrollExamSession(examRequest, professor, exam))
 
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/student")
     fun getStudentExamSession(
         @RequestHeader("Authorization") auth: String?,
         @RequestBody examSessionId: String
-    ): ExamSession {
-        return examSessionService.getStudentExamSessionWithAuthToken(auth!!, examSessionId)
+    ): ResponseEntity<ExamSession> {
+        return toOkResponseEntity(examSessionService.getStudentExamSessionWithAuthToken(auth!!, examSessionId))
     }
 
     @PreAuthorize("hasRole('PROFESSOR')")
@@ -36,8 +36,8 @@ class ExamSessionController(private val examSessionService: ExamSessionServiceIn
     fun getProfessorExamSession(
         @RequestHeader("Authorization") auth: String?,
         @RequestBody examSessionId: String
-    ): ExamSession {
-        return examSessionService.getProfessorExamSessionWithAuthToken(auth!!, examSessionId)
+    ): ResponseEntity<ExamSession> {
+        return toOkResponseEntity(examSessionService.getProfessorExamSessionWithAuthToken(auth!!, examSessionId))
     }
 
     @PreAuthorize("hasRole('STUDENT')")
@@ -45,8 +45,8 @@ class ExamSessionController(private val examSessionService: ExamSessionServiceIn
     fun startExamSession(
         @RequestHeader("Authorization") auth: String?,
         @RequestParam examSessionId: String
-    ): ExamIssue {
-        return examSessionService.startExamSession(auth!!, examSessionId)
+    ): ResponseEntity<ExamIssue> {
+        return toOkResponseEntity(examSessionService.startExamSession(auth!!, examSessionId))
     }
 
     @PreAuthorize("hasRole('STUDENT')")
@@ -55,8 +55,8 @@ class ExamSessionController(private val examSessionService: ExamSessionServiceIn
         @RequestHeader("Authorization") auth: String?,
         @RequestBody examSessionId: String,
         @RequestParam currentExamIssueOrder: Int
-    ): ExamIssue {
-        return examSessionService.nextExamIssue(auth!!, examSessionId, currentExamIssueOrder)
+    ): ResponseEntity<ExamIssue> {
+        return toOkResponseEntity(examSessionService.nextExamIssue(auth!!, examSessionId, currentExamIssueOrder))
     }
 
     @PreAuthorize("hasRole('STUDENT')")
@@ -64,8 +64,8 @@ class ExamSessionController(private val examSessionService: ExamSessionServiceIn
     fun finishExamSession(
         @RequestHeader("Authorization") auth: String?,
         @RequestParam examSessionId: String
-    ): ExamSession {
-        return examSessionService.finishExamSession(auth!!, examSessionId)
+    ): ResponseEntity<ExamSession> {
+        return toOkResponseEntity(examSessionService.finishExamSession(auth!!, examSessionId))
     }
 
     @PreAuthorize("hasAnyRole('PROFESSOR', 'ADMIN')")
@@ -74,7 +74,7 @@ class ExamSessionController(private val examSessionService: ExamSessionServiceIn
         @RequestHeader("Authorization") auth: String?,
         @RequestBody examSessionId: String,
         @RequestBody suggestion: SuggestionDto
-    ): ExamSession {
-        return examSessionService.rateExamSession(auth!!, examSessionId, suggestion)
+    ): ResponseEntity<ExamSession> {
+        return toOkResponseEntity(examSessionService.rateExamSession(auth!!, examSessionId, suggestion))
     }
 }

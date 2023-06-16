@@ -41,7 +41,7 @@ class ExamIssueService(
         return examIssue
     }
 
-    fun preAuthCheck(auth: String, examIssueId: String) {
+    fun preAuthCheck(auth: String, examIssueId: String): Boolean {
         val examIssue = findById(examIssueId)
         val examSession = examSessionService.getExamSessionById(examIssue.examSectionId)
         val doesStudentOwnsAuthToken = authService.doesUserOwnsAuthToken(auth, examSession.student.id)
@@ -49,6 +49,7 @@ class ExamIssueService(
         val isAdmin = authService.getUserByAuthToken(auth).roles.contains(Role.ROLE_ADMIN)
         if (!doesStudentOwnsAuthToken && !doesProfessorOwnsAuthToken && !isAdmin)
             throw AccessDeniedException("Exam Issue with id: $examIssueId is not belong to your token")
+        return true
     }
 
     fun create(examIssue: ExamIssue): ExamIssue {

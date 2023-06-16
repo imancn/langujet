@@ -1,6 +1,7 @@
 package com.cn.langujet.actor.exam.api
 
 import com.cn.langujet.actor.exam.payload.dto.ExamSectionDto
+import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.domain.exam.model.ExamSection
 import com.cn.langujet.domain.exam.service.ExamSectionService
 import jakarta.validation.Valid
@@ -19,25 +20,19 @@ class ExamSectionController(private val examSectionService: ExamSectionService) 
 
     @GetMapping("/{id}")
     fun getExamSectionById(@PathVariable("id") id: String): ResponseEntity<ExamSection> {
-        val examSection = examSectionService.getExamSectionById(id)
-        return ResponseEntity.ok(examSection)
+        return toOkResponseEntity(examSectionService.getExamSectionById(id))
     }
 
     @PostMapping("")
-    fun createExamSection(@RequestBody @Valid examSectionDto: ExamSectionDto): ExamSectionDto {
-        return examSectionService.createExamSection(examSectionDto)
+    fun createExamSection(@RequestBody @Valid examSectionDto: ExamSectionDto): ResponseEntity<ExamSectionDto> {
+        return toOkResponseEntity(examSectionService.createExamSection(examSectionDto))
     }
 
     @PutMapping("/{id}")
     fun updateExamSection(
         @PathVariable("id") id: String, @RequestBody @Valid examSectionDto: ExamSectionDto
     ): ResponseEntity<ExamSection> {
-        val updatedExamSection = examSectionService.updateExamSection(id, examSectionDto)
-        return if (updatedExamSection != null) {
-            ResponseEntity.ok(updatedExamSection)
-        } else {
-            ResponseEntity.notFound().build()
-        }
+        return toOkResponseEntity(examSectionService.updateExamSection(id, examSectionDto))
     }
 
     @DeleteMapping("/{id}")

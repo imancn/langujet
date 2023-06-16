@@ -1,16 +1,17 @@
 package com.cn.langujet.actor.exam.api
 
 import com.cn.langujet.actor.exam.payload.dto.ExamDto
-import com.cn.langujet.application.advice.Message
-import com.cn.langujet.application.advice.toOkMessage
-import com.cn.langujet.domain.exam.model.nested.Difficulty
+import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.domain.exam.model.Exam
+import com.cn.langujet.domain.exam.model.nested.Difficulty
 import com.cn.langujet.domain.exam.model.nested.Price
 import com.cn.langujet.domain.exam.service.ExamService
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
@@ -32,9 +33,7 @@ class ExamController(private val examService: ExamService) {
         @RequestParam @NotNull difficulty: Difficulty?,
         @RequestParam @NotNull priceValue: Double?,
         @RequestParam @NotNull priceCurrency: Currency?,
-    ): Message {
-        return examService.createExam(
-            Exam(
+    ): ResponseEntity<Exam> = toOkResponseEntity(Exam(
                 null,
                 emptyList(),
                 name!!,
@@ -48,31 +47,28 @@ class ExamController(private val examService: ExamService) {
                     priceCurrency!!
                 )
             )
-        ).toOkMessage()
-    }
+        )
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     fun updateExam(
         @PathVariable @NotBlank id: String?,
         @RequestBody examDto: ExamDto
-    ): Message {
-        return examService.updateExam(
+    ): ResponseEntity<Exam> = toOkResponseEntity(
+        examService.updateExam(
             id!!,
             examDto
-        ).toOkMessage()
-    }
+        )
+    )
 
     @GetMapping("/{id}")
-    fun getExamById(@PathVariable id: String): Message {
-        return examService.getExamById(id).toOkMessage()
-    }
+    fun getExamById(@PathVariable id: String): ResponseEntity<Exam> =
+        toOkResponseEntity(examService.getExamById(id))
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    fun getAllExams(): Message {
-        return examService.getAllExams().toOkMessage()
-    }
+    fun getAllExams(): ResponseEntity<List<Exam>> =
+        toOkResponseEntity(examService.getAllExams())
 
     @GetMapping("/ filters")
     fun getAllExamsByFilters(
@@ -84,14 +80,14 @@ class ExamController(private val examService: ExamService) {
         @RequestParam(defaultValue = "10") pageSize: Int,
         @RequestParam(defaultValue = "0") pageNumber: Int,
         @RequestParam(defaultValue = "id") sortBy: String?
-    ): Message {
-        return examService.getAllExamsByFilters(
+    ): ResponseEntity<Page<Exam>> = toOkResponseEntity(
+        examService.getAllExamsByFilters(
             id,
             name,
             sectionsNumber,
             questionNumber,
             examDuration,
             PageRequest.of(pageNumber, pageSize, Sort.by(sortBy))
-        ).toOkMessage()
-    }
+        )
+    )
 }

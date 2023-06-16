@@ -29,7 +29,7 @@ class ExamSectionService(
         return ExamSectionDto(examSectionRepository.save(examSection))
     }
 
-    fun updateExamSection(id: String, examSectionDto: ExamSectionDto): ExamSection? {
+    fun updateExamSection(id: String, examSectionDto: ExamSectionDto): ExamSection {
         val existingExamSection = getExamSectionById(id)
         examSectionDto.examSessionId?.let { existingExamSection.examSessionId = it }
         examSectionDto.examIssues?.let { list -> existingExamSection.examIssues = list.map { ExamIssue(it) } }
