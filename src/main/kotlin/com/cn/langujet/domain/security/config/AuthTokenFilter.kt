@@ -1,7 +1,7 @@
-package com.cn.langujet.application.security.security.config
+package com.cn.langujet.domain.security.config
 
-import com.cn.langujet.application.security.security.services.JwtService
-import com.cn.langujet.application.security.security.services.UserDetailsServiceImpl
+import com.cn.langujet.domain.security.services.JwtService
+import com.cn.langujet.domain.security.services.UserDetailsServiceImpl
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest

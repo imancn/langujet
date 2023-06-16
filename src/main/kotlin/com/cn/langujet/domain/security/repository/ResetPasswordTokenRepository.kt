@@ -1,4 +1,4 @@
-package com.cn.langujet.application.security.security.repository
+package com.cn.langujet.domain.security.repository
 
 import com.cn.langujet.application.security.security.model.ResetPasswordToken
 import com.cn.langujet.application.security.security.model.User
