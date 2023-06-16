@@ -23,7 +23,7 @@ class SectionService(
         return sectionRepository.save(Section(section))
     }
 
-    fun updateSection(id: String, section: SectionDto): SectionDto? {
+    fun updateSection(id: String, section: SectionDto): SectionDto {
         val existingSection = Section(getSectionById(id))
         section.name?.let { existingSection.name = it }
         section.order?.let { existingSection.order = it }
