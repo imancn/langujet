@@ -1,4 +1,4 @@
-package com.cn.langujet.application.security.security.services
+package com.cn.langujet.domain.security.services
 
 import com.cn.langujet.application.advice.InvalidTokenException
 import com.cn.langujet.application.security.security.model.UserDetailsImpl

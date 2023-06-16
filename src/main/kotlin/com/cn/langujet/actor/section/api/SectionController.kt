@@ -1,6 +1,9 @@
 package com.cn.langujet.actor.section.api
 
 import com.cn.langujet.actor.exam.payload.dto.SectionDto
+import com.cn.langujet.actor.util.toCreatedResponseEntity
+import com.cn.langujet.actor.util.toOkResponseEntity
+import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.exam.model.Section
 import com.cn.langujet.domain.exam.service.SectionService
 import org.springframework.http.ResponseEntity
@@ -12,33 +15,28 @@ import java.net.URI
 class SectionController(private val sectionService: SectionService) {
 
     @GetMapping("/{id}")
-    fun getSectionById(@PathVariable id: String): ResponseEntity<SectionDto> {
-        return ResponseEntity.ok(sectionService.getSectionById(id))
-    }
+    fun getSectionById(
+        @PathVariable id: String
+    ): ResponseEntity<SectionDto> = toOkResponseEntity(sectionService.getSectionById(id))
 
     @PostMapping
-    fun createSection(@RequestBody section: SectionDto): ResponseEntity<Section> {
-        val savedSection = sectionService.createSection(section)
-        return ResponseEntity.created(URI("/sections/${savedSection.id}")).body(savedSection)
+    fun createSection(
+        @RequestBody section: SectionDto
+    ): ResponseEntity<Section> = sectionService.createSection(section).let {
+        toCreatedResponseEntity(it, URI("/sections/${it.id}"))
     }
 
     @PutMapping("/{id}")
-    fun updateSection(@PathVariable id: String, @RequestBody section: SectionDto): ResponseEntity<SectionDto> {
-        val updatedSection = sectionService.updateSection(id, section)
-        return if (updatedSection != null) {
-            ResponseEntity.ok(updatedSection)
-        } else {
-            ResponseEntity.notFound().build()
-        }
-    }
+    fun updateSection(
+        @PathVariable id: String,
+        @RequestBody section: SectionDto
+    ): ResponseEntity<SectionDto> =
+        toOkResponseEntity(sectionService.updateSection(id, section))
 
     @DeleteMapping("/{id}")
-    fun deleteSection(@PathVariable id: String): ResponseEntity<Void> {
-        val deleted = sectionService.deleteSection(id)
-        return if (deleted) {
-            ResponseEntity.noContent().build()
-        } else {
-            ResponseEntity.notFound().build()
-        }
-    }
+    fun deleteSection(
+        @PathVariable id: String
+    ): ResponseEntity<String> =
+        if (sectionService.deleteSection(id)) toOkResponseEntity("Section deleted")
+        else throw NotFoundException("Section with id: $id not found")
 }

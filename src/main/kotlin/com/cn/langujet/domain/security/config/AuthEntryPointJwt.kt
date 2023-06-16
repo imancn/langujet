@@ -1,14 +1,14 @@
-package com.cn.langujet.application.security.security.config
+package com.cn.langujet.domain.security.config
 
 import com.cn.langujet.application.advice.InvalidTokenException
-import com.cn.langujet.application.advice.Message
-import com.cn.langujet.application.security.security.services.JwtService
-import com.cn.langujet.application.security.security.services.UserDetailsServiceImpl
+import com.cn.langujet.domain.security.services.JwtService
+import com.cn.langujet.domain.security.services.UserDetailsServiceImpl
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.InsufficientAuthenticationException
 import org.springframework.security.core.AuthenticationException
@@ -44,9 +44,7 @@ class AuthEntryPointJwt(
             response.contentType = "application/json"
             response.writer.print(
                 modelMapper.writeValueAsString(
-                    Message(
-                        HttpStatus.UNAUTHORIZED, exception.message, null
-                    )
+                    ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exception.message)
                 )
             )
         }

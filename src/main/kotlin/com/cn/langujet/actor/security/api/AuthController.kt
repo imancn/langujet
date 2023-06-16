@@ -1,23 +1,25 @@
 package com.cn.langujet.actor.security.api
 
+import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.application.advice.*
 import com.cn.langujet.application.security.security.model.*
 import com.cn.langujet.application.security.security.payload.response.JwtResponse
 import com.cn.langujet.application.security.security.payload.response.RefreshTokenResponse
-import com.cn.langujet.application.security.security.repository.EmailVerificationTokenRepository
-import com.cn.langujet.application.security.security.repository.ResetPasswordTokenRepository
-import com.cn.langujet.application.security.security.repository.UserRepository
-import com.cn.langujet.application.security.security.services.JwtService
-import com.cn.langujet.application.security.security.services.RefreshTokenService
-import com.cn.langujet.domain.security.services.AuthService
+import com.cn.langujet.domain.security.repository.EmailVerificationTokenRepository
+import com.cn.langujet.domain.security.repository.ResetPasswordTokenRepository
+import com.cn.langujet.domain.security.repository.UserRepository
+import com.cn.langujet.domain.security.services.JwtService
+import com.cn.langujet.domain.security.services.RefreshTokenService
 import com.cn.langujet.application.thirdparty.smtp.MailSenderService
 import com.cn.langujet.domain.professor.Professor
 import com.cn.langujet.domain.professor.ProfessorRepository
+import com.cn.langujet.domain.security.services.AuthService
 import com.cn.langujet.domain.student.model.Student
 import com.cn.langujet.domain.student.repository.StudentRepository
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
+import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -43,11 +45,13 @@ class AuthController(
     val jwtService: JwtService,
     val authService: AuthService
 ) {
+//    @Todo: Move the logic to the service layer
+
     @PostMapping("/sign-in")
     fun authenticateUser(
         @RequestParam @NotBlank @Email email: String?,
         @RequestParam @NotBlank password: String?,
-    ): Message {
+    ): ResponseEntity<JwtResponse> {
         val user = userRepository.findByEmail(email).orElseThrow {
             InvalidTokenException("Bad credentials")
         }
@@ -61,9 +65,11 @@ class AuthController(
 
         val refreshToken = refreshTokenService.createRefreshToken(userDetails.id)
 
-        return JwtResponse(
-            jwt, refreshToken.token, userDetails.email
-        ).toOkMessage()
+        return toOkResponseEntity(
+            JwtResponse(
+                jwt, refreshToken.token, userDetails.email
+            )
+        )
     }
 
     @PostMapping("/signup/student")
@@ -71,12 +77,12 @@ class AuthController(
         @RequestParam @NotBlank fullName: String?,
         @RequestParam @NotBlank @Size(max = 50) @Email email: String?,
         @RequestParam @NotBlank @Size(min = 6, max = 40) password: String?,
-    ): Message {
+    ): ResponseEntity<String> {
         val user = registerUser(email!!, password!!, mutableSetOf(Role.ROLE_STUDENT))
         sendVerificationMail(user.email)
         studentRepository.save(Student(user, fullName))
 
-        return Message(null, "User registered successfully!")
+        return toOkResponseEntity("User registered successfully!")
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -85,12 +91,12 @@ class AuthController(
         @NotBlank fullName: String?,
         @NotBlank @Size(max = 50) @Email email: String?,
         @NotBlank @Size(min = 6, max = 40) password: String?,
-    ): Message {
+    ): ResponseEntity<String> {
         val user = registerUser(email!!, password!!, mutableSetOf(Role.ROLE_PROFESSOR))
         sendVerificationMail(email)
         professorRepository.save(Professor(user, fullName))
 
-        return Message(null, "User registered successfully!")
+        return toOkResponseEntity("User registered successfully!")
     }
 
     private fun registerUser(email: String, password: String, roles: Set<Role>): User {
@@ -107,7 +113,7 @@ class AuthController(
     fun verifyEmail(
         @PathVariable @Email @NotBlank email: String?,
         @PathVariable @NotBlank verificationCode: String?
-    ): Message {
+    ): ResponseEntity<String> {
         val user = userRepository.findByEmail(email).orElseThrow { NotFoundException("User Not Found") }
 
         if (user.emailVerified) throw MethodNotAllowedException("Your Email Was Verified")
@@ -122,11 +128,11 @@ class AuthController(
         if (verificationToken.token == verificationCode) userRepository.save(user.also { it.emailVerified = true })
         else throw InvalidInputException("Your verification code is not available.")
 
-        return Message(null, "Email Verified successfully!")
+        return toOkResponseEntity("Email Verified successfully!")
     }
 
     @PostMapping("/signup/email/verification-mail")
-    fun sendVerificationMail(@RequestParam @Email @NotBlank email: String?): Message {
+    fun sendVerificationMail(@RequestParam @Email @NotBlank email: String?): ResponseEntity<String> {
         val user = userRepository.findByEmail(email).orElseThrow { NotFoundException("User Not Found") }
 
         if (user.emailVerified) throw MethodNotAllowedException("Your Email Was Verified")
@@ -137,12 +143,12 @@ class AuthController(
 
         mailSenderService.sendEmailVerificationMail(emailVerificationToken)
 
-        return Message(null, "Verification Mail Has Been Sent.")
+        return toOkResponseEntity("Verification Mail Has Been Sent.")
     }
 
     @PostMapping("/refresh-token")
-    fun refreshToken(@RequestParam @NotBlank refreshToken: String?): Message {
-        return Message(
+    fun refreshToken(@RequestParam @NotBlank refreshToken: String?): ResponseEntity<RefreshTokenResponse> {
+        return toOkResponseEntity(
             refreshTokenService.findByToken(refreshToken)
                 .map(refreshTokenService::verifyExpiration)
                 .map(RefreshToken::user).map { user ->
@@ -155,13 +161,13 @@ class AuthController(
     }
 
     @PostMapping("/reset-password")
-    fun resetPassword(@RequestParam @Email @NotBlank email: String?): Message {
+    fun resetPassword(@RequestParam @Email @NotBlank email: String?): ResponseEntity<String> {
         val user = userRepository.findByEmail(email).orElseThrow { NotFoundException("User Not Found") }
         val token = resetPasswordTokenRepository.findByUser(user).getOrElse {
             resetPasswordTokenRepository.save(ResetPasswordToken(user))
         }
         mailSenderService.sendResetPasswordMail(token)
-        return Message(null, "The reset password link has been mailed to you.")
+        return toOkResponseEntity("The reset password link has been mailed to you.")
     }
 
     @PostMapping("/reset-password/set")
@@ -169,7 +175,7 @@ class AuthController(
         @RequestParam @Email @NotBlank email: String?,
         @RequestParam @NotBlank code: String?,
         @RequestParam @Size(min = 6, max = 40) @NotBlank newPassword: String?
-    ): Message {
+    ): ResponseEntity<String> {
         val user = userRepository.findByEmail(email).orElseThrow { NotFoundException("User Not Found") }
         val token = resetPasswordTokenRepository.findByUser(user).orElseThrow {
             InvalidTokenException("Your reset password token has been expired. Request for reset password again.")
@@ -181,7 +187,7 @@ class AuthController(
             resetPasswordTokenRepository.delete(token)
         } else throw InvalidTokenException("Your reset password token is invalid.")
 
-        return Message(null, "Your password has been reset successfully")
+        return toOkResponseEntity("Your password has been reset successfully")
     }
 
     @PostMapping("/change-password")
@@ -190,19 +196,19 @@ class AuthController(
         @RequestHeader("Authorization") auth: String?,
         @RequestParam @Size(min = 6, max = 40) @NotBlank oldPassword: String?,
         @RequestParam @Size(min = 6, max = 40) @NotBlank newPassword: String?
-    ): Message {
+    ): ResponseEntity<String> {
         val userId = authService.getUserIdFromAuthorizationHeader(auth)
         val user = userRepository.findById(userId).orElseThrow { NotFoundException("User Not Found") }
 
         if (user.password == encoder.encode(oldPassword)) user.password = encoder.encode(newPassword)
         else throw InvalidInputException("Old Password is not correct.")
 
-        return Message(null, "Your password has been changed.")
+        return toOkResponseEntity("Your password has been changed.")
     }
 
     @PostMapping("/sign-out")
-    fun signOutUser(@RequestHeader("Authorization") auth: String?): Message {
+    fun signOutUser(@RequestHeader("Authorization") auth: String?): ResponseEntity<String> {
         refreshTokenService.deleteByUserId(authService.getUserIdFromAuthorizationHeader(auth))
-        return Message(null, "User signed out successfully")
+        return toOkResponseEntity("User signed out successfully")
     }
 }

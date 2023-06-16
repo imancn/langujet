@@ -1,10 +1,12 @@
 package com.cn.langujet.actor.admin.api
 
 import com.cn.langujet.actor.admin.payload.response.ConfirmExamResponse
-import com.cn.langujet.application.advice.Message
-import com.cn.langujet.application.advice.toOkMessage
+import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.domain.admin.AdminService
+import com.cn.langujet.domain.exam.model.ExamRequest
+import com.cn.langujet.domain.professor.Professor
 import jakarta.validation.constraints.NotBlank
+import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
@@ -17,15 +19,13 @@ class AdminController(
 ) {
     @GetMapping("/get-professors")
     @PreAuthorize("hasRole('ADMIN')")
-    fun getProfessors(@RequestHeader("Authorization") auth: String?): Message {
-        return adminService.getProfessors().toOkMessage()
-    }
+    fun getProfessors(@RequestHeader("Authorization") auth: String?): ResponseEntity<List<Professor>> =
+        toOkResponseEntity(adminService.getProfessors())
 
     @GetMapping("/get-exam-requests")
     @PreAuthorize("hasRole('ADMIN')")
-    fun getExamRequests(@RequestHeader("Authorization") auth: String?): Message {
-        return adminService.getExamRequests().toOkMessage()
-    }
+    fun getExamRequests(@RequestHeader("Authorization") auth: String?): ResponseEntity<List<ExamRequest>> =
+        toOkResponseEntity(adminService.getExamRequests())
 
     @PostMapping("/confirm-exam-request")
     @PreAuthorize("hasRole('ADMIN')")
@@ -33,12 +33,7 @@ class AdminController(
         @RequestHeader("Authorization") auth: String?,
         @RequestParam @NotBlank examRequestId: String?,
         @RequestParam @NotBlank professorId: String?,
-    ): Message {
-        return Message(
-            ConfirmExamResponse(
-                adminService.confirmExamRequest(examRequestId, professorId)
-            ),
-            "Exam have been confirmed"
+    ): ResponseEntity<ConfirmExamResponse> = toOkResponseEntity(
+            ConfirmExamResponse(adminService.confirmExamRequest(examRequestId, professorId))
         )
-    }
 }
