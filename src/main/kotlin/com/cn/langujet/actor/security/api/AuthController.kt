@@ -5,11 +5,11 @@ import com.cn.langujet.application.advice.*
 import com.cn.langujet.application.security.security.model.*
 import com.cn.langujet.application.security.security.payload.response.JwtResponse
 import com.cn.langujet.application.security.security.payload.response.RefreshTokenResponse
-import com.cn.langujet.application.security.security.repository.EmailVerificationTokenRepository
-import com.cn.langujet.application.security.security.repository.ResetPasswordTokenRepository
-import com.cn.langujet.application.security.security.repository.UserRepository
-import com.cn.langujet.application.security.security.services.JwtService
-import com.cn.langujet.application.security.security.services.RefreshTokenService
+import com.cn.langujet.domain.security.repository.EmailVerificationTokenRepository
+import com.cn.langujet.domain.security.repository.ResetPasswordTokenRepository
+import com.cn.langujet.domain.security.repository.UserRepository
+import com.cn.langujet.domain.security.services.JwtService
+import com.cn.langujet.domain.security.services.RefreshTokenService
 import com.cn.langujet.application.thirdparty.smtp.MailSenderService
 import com.cn.langujet.domain.professor.Professor
 import com.cn.langujet.domain.professor.ProfessorRepository
