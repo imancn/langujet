@@ -10,22 +10,18 @@ import com.cn.langujet.domain.exam.model.*
 import com.cn.langujet.domain.exam.repository.ExamSessionRepository
 import com.cn.langujet.domain.professor.Professor
 import com.cn.langujet.domain.security.services.AuthService
-import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 import org.springframework.util.DigestUtils
 import java.util.*
 
 @Service
 class ExamSessionService(
-    val examSessionRepository: ExamSessionRepository,
-    val examRequestService: ExamRequestService,
-    val examIssueService: ExamIssueService,
-    val authService: AuthService,
+    private val examSessionRepository: ExamSessionRepository,
+    private val examRequestService: ExamRequestService,
+    private val examIssueService: ExamIssueService,
+    private val authService: AuthService,
+    private val examSectionService: ExamSectionService
 ) : ExamSessionServiceInterface {
-    @Lazy
-    private lateinit var examSectionService: ExamSectionService
-
-
     override fun enrollExamSession(examRequest: ExamRequest, professor: Professor): ExamSession {
         val examSessionId = makeExamSessionId(examRequest, professor)
         val examSession = examSessionRepository.save(

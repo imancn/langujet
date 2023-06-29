@@ -4,12 +4,13 @@ import com.cn.langujet.actor.exam.payload.dto.ExamSectionDto
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.exam.model.*
 import com.cn.langujet.domain.exam.repository.ExamSectionRepository
+import com.cn.langujet.domain.exam.repository.ExamSessionRepository
 import org.springframework.stereotype.Service
 
 @Service
 class ExamSectionService(
     private val examSectionRepository: ExamSectionRepository,
-    private val examSessionService: ExamSessionService,
+    private val examSessionRepository: ExamSessionRepository
 ) {
     fun getAllExamSections(): List<ExamSection> {
         return examSectionRepository.findAll()
@@ -20,7 +21,7 @@ class ExamSectionService(
     }
 
     fun createExamSection(examSectionDto: ExamSectionDto): ExamSectionDto {
-        val examSession = examSessionService.getExamSessionById(examSectionDto.examSessionId)
+        val examSession = getExamSessionById(examSectionDto.examSessionId)
         val exam = examSession.exam
         val section = examSession.examSections.find {
             it.id == examSectionDto.sectionId
@@ -44,6 +45,12 @@ class ExamSectionService(
     fun getExamSectionBySuggestionId(suggestionId: String): ExamSection {
         return examSectionRepository.findBySuggestion_Id(suggestionId).orElseThrow {
             throw NotFoundException("ExamSection not found with id: $suggestionId")
+        }
+    }
+
+    fun getExamSessionById(id: String?): ExamSession {
+        return examSessionRepository.findById(id!!).orElseThrow {
+            NotFoundException("ExamSession with id: $id not found")
         }
     }
 }
