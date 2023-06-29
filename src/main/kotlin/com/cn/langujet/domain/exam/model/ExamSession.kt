@@ -15,7 +15,7 @@ data class ExamSession(
     @DBRef var exam: Exam,
     @DBRef var student: Student,
     @DBRef var professor: Professor,
-    @DBRef var examSections: List<ExamSection>?,
+    @DBRef var examSections: List<ExamSection>,
 
     var requestDate: Date,
     var startDate: Date?,
@@ -26,12 +26,12 @@ data class ExamSession(
     var isFinished: Boolean = false,
     var isRated: Boolean = false,
 ) {
-    constructor(exam: Exam, student: Student, professor: Professor, requestDate: Date) : this(
-        null,
+    constructor(id: String, exam: Exam, examSections: List<ExamSection>, student: Student, professor: Professor, requestDate: Date) : this(
+        id,
         exam,
         student,
         professor,
-        null,
+        examSections,
         requestDate,
         null,
         null,
