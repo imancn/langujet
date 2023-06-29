@@ -5,48 +5,56 @@ import com.cn.langujet.application.advice.AccessDeniedException
 import com.cn.langujet.application.advice.InvalidTokenException
 import com.cn.langujet.application.advice.MethodNotAllowedException
 import com.cn.langujet.application.advice.NotFoundException
-import com.cn.langujet.domain.security.services.AuthService
 import com.cn.langujet.application.security.security.model.Role
 import com.cn.langujet.domain.exam.model.*
 import com.cn.langujet.domain.exam.repository.ExamSessionRepository
 import com.cn.langujet.domain.professor.Professor
+import com.cn.langujet.domain.security.services.AuthService
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
+import org.springframework.util.DigestUtils
 import java.util.*
 
 @Service
 class ExamSessionService(
     val examSessionRepository: ExamSessionRepository,
-    val examSectionService: ExamSectionService,
     val examRequestService: ExamRequestService,
     val examIssueService: ExamIssueService,
     val authService: AuthService,
 ) : ExamSessionServiceInterface {
+    @Lazy
+    private lateinit var examSectionService: ExamSectionService
 
-    override fun enrollExamSession(examRequest: ExamRequest, professor: Professor, exam: Exam): ExamSession {
-        var examSession = examSessionRepository.save(
+
+    override fun enrollExamSession(examRequest: ExamRequest, professor: Professor): ExamSession {
+        val examSessionId = makeExamSessionId(examRequest, professor)
+        val examSession = examSessionRepository.save(
             ExamSession(
-                exam, examRequest.student, professor, examRequest.date
+                examSessionId, examRequest.exam,
+                initializeExamSections(examRequest.exam, examSessionId),
+                examRequest.student, professor, examRequest.date
             )
-        )
-        examSession = examSessionRepository.save(
-            examSession.also {
-                it.examSections = initializeExamSections(examSession)
-            }
         )
         examRequestService.deleteExamRequest(examRequest)
         return examSession
     }
 
-    private fun initializeExamSections(examSession: ExamSession): List<ExamSection> {
-        val examIssues = examIssueService.generateExamIssueList(examSession.id!!)
-        return examSession.exam.sections.map { section ->
+    private fun makeExamSessionId(
+        examRequest: ExamRequest,
+        professor: Professor
+    ) = UUID.nameUUIDFromBytes(DigestUtils.md5Digest(
+            "${examRequest.id}-${examRequest.exam.id}-${examRequest.student.user.id}-${examRequest.student.id}-${examRequest.date}-${professor.id}".toByteArray()
+        )).toString()
+
+    fun initializeExamSections(exam: Exam, examSessionId: String): List<ExamSection> {
+        return exam.sections.map { section ->
             ExamSection(
-                null,
-                examSession.id!!,
-                examSession.exam,
-                section,
-                examIssues,
-                null
+                id = null,
+                examSessionId = examSessionId,
+                exam = exam,
+                section = section,
+                examIssues = examIssueService.generateExamIssueList(section),
+                suggestion = null,
             )
         }
     }
@@ -76,8 +84,7 @@ class ExamSessionService(
         examSessionId: String
     ): ExamIssue {
         val examSession = getStudentExamSessionWithAuthToken(authToken, examSessionId)
-        val examIssues = examSession.examSections?.first()?.examIssues
-            ?: throw MethodNotAllowedException("ExamIssues for examSession with id: $examSessionId is null")
+        val examIssues = examSession.examSections.first().examIssues
 
         if (examSession.isStarted)
             throw MethodNotAllowedException("Exam Session has been started")
@@ -107,14 +114,14 @@ class ExamSessionService(
             if (examSession.exam.sectionsNumber == examSection.section.order + 1)
                 throw MethodNotAllowedException("There is no next Exam Issue")
             else
-                getExamIssues(examSession.examSections?.get(examSection.section.order + 1))[0]
+                getExamIssues(examSession.examSections[examSection.section.order + 1])[0]
         } else
             examIssues[currentExamIssueOrder + 1]
     }
 
     private fun getExamIssues(examSection: ExamSection?): List<ExamIssue> {
         return examSection?.examIssues
-            ?: throw MethodNotAllowedException("Exam Issues for Exam Session with id: $examSection.id")
+            ?: throw MethodNotAllowedException("Exam Issues for Exam Session with id: ${examSection?.id}")
     }
 
     override fun finishExamSession(
@@ -153,8 +160,8 @@ class ExamSessionService(
             return examSessionRepository.save(
                 examSession.also {
                     it.rateDate = Date(System.currentTimeMillis())
-                    it.examSections?.find {
-                            examSection -> examSection.id == suggestion.examSectionId
+                    it.examSections.find { examSection ->
+                        examSection.id == suggestion.examSectionId
                     }?.suggestion = Suggestion(suggestion)
                     it.isRated = true
                 }
@@ -170,11 +177,8 @@ class ExamSessionService(
         return !examSession.isFinished && examSession.isStarted
     }
 
-    override fun getExamSessionBySuggestionId(suggestionId: String): ExamSession {
-        return examSessionRepository.findBySuggestion_Id(suggestionId).orElseThrow {
-            NotFoundException("ExamSession not found")
-        }
-    }
+    override fun getExamSessionBySuggestionId(suggestionId: String): ExamSession =
+        getExamSessionById(examSectionService.getExamSectionBySuggestionId(suggestionId).examSessionId)
 
     private fun getExamSessionIfIsInProgress(authToken: String, examSessionId: String): ExamSession {
         val examSession = getStudentExamSessionWithAuthToken(authToken, examSessionId)
