@@ -22,7 +22,7 @@ class ExamSectionService(
     fun createExamSection(examSectionDto: ExamSectionDto): ExamSectionDto {
         val examSession = examSessionService.getExamSessionById(examSectionDto.examSessionId)
         val exam = examSession.exam
-        val section = examSession.examSections?.find {
+        val section = examSession.examSections.find {
             it.id == examSectionDto.sectionId
         }?.section ?: throw NotFoundException("Section with id ${examSectionDto.examSessionId} not found")
         val examSection = ExamSection(examSectionDto, exam, section)
@@ -39,5 +39,11 @@ class ExamSectionService(
 
     fun deleteExamSection(id: String) {
         examSectionRepository.deleteById(id)
+    }
+
+    fun getExamSectionBySuggestionId(suggestionId: String): ExamSection {
+        return examSectionRepository.findBySuggestion_Id(suggestionId).orElseThrow {
+            throw NotFoundException("ExamSection not found with id: $suggestionId")
+        }
     }
 }
