@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service
 class ExamIssueService(
     private val examIssueRepository: ExamIssueRepository,
     private val questionService: QuestionService,
-    private val examService: ExamService,
     private val examSectionService: ExamSectionService,
     private val authService: AuthService
 ) {
@@ -61,7 +60,6 @@ class ExamIssueService(
     fun generateExamIssueList(section: Section): List<ExamIssue> {
         val examIssues = mutableListOf<ExamIssue>().toMutableList()
         val usedQuestions = mutableListOf<Question>().toMutableList()
-        val exam = examService.getExamById(section.examId)
         val topic = questionService.getAllQuestionsBySection(section).random().topic
         val questions = questionService.getAllQuestionsByTopic(topic).sortedBy { it.order }
         questions.forEach { question ->
