@@ -19,11 +19,10 @@ class AdminService(
 
     fun confirmExamRequest(examRequestId: String?, professorId: String?): String? {
         val examRequest = examRequestService.getExamRequestById(examRequestId)
-        val exam = examService.getExamById(examRequest.exam.id)
         val professor = professorRepository.findById(professorId!!).orElseThrow {
             NotFoundException("Professor not found")
         }
-        return examSessionService.enrollExamSession(examRequest, professor, exam).id
+        return examSessionService.enrollExamSession(examRequest, professor).id
     }
 
     fun getProfessors() = professorRepository.findAll().sortedBy {

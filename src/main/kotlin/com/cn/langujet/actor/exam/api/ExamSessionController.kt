@@ -20,7 +20,7 @@ class ExamSessionController(private val examSessionService: ExamSessionServiceIn
         @RequestBody examRequest: ExamRequest,
         @RequestBody professor: Professor,
         @RequestBody exam: Exam
-    ): ResponseEntity<ExamSession> = toOkResponseEntity(examSessionService.enrollExamSession(examRequest, professor, exam))
+    ): ResponseEntity<ExamSession> = toOkResponseEntity(examSessionService.enrollExamSession(examRequest, professor))
 
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/student")

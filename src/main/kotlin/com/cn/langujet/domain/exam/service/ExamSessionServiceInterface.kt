@@ -8,7 +8,7 @@ interface ExamSessionServiceInterface {
 
     fun getStudentExamSessionWithAuthToken(authToken: String, examSessionId: String): ExamSession
     fun getProfessorExamSessionWithAuthToken(authToken: String, examSessionId: String): ExamSession
-    fun enrollExamSession(examRequest: ExamRequest, professor: Professor, exam: Exam): ExamSession
+    fun enrollExamSession(examRequest: ExamRequest, professor: Professor): ExamSession
     fun startExamSession(authToken: String, examSessionId: String): ExamIssue
     fun nextExamIssue(authToken: String, examSessionId: String, currentExamIssueOrder: Int): ExamIssue
     fun finishExamSession(authToken: String, examSessionId: String): ExamSession

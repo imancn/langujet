@@ -22,7 +22,7 @@ data class ExamSessionDto(
         examSession.exam.id,
         examSession.student.id,
         examSession.professor.id,
-        examSession.examSections?.mapNotNull { it.id },
+        examSession.examSections.mapNotNull { it.id },
         examSession.requestDate,
         examSession.startDate,
         examSession.endDate,

@@ -11,6 +11,7 @@ data class ExamIssueDto(
     val answer: Answer?,
     val order: Int
 ) {
+
     constructor(examIssue: ExamIssue) : this(
         examIssue.id,
         examIssue.examSectionId,

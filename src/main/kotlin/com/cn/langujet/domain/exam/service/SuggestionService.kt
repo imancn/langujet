@@ -22,8 +22,9 @@ class SuggestionService(
 
     fun getSuggestionsByExamSessionId(examSessionId: String): List<Suggestion> {
         val examSections = examSessionService.getExamSessionById(examSessionId).examSections
-        return examSections?.mapNotNull { it.suggestion }
-            ?: throw NotFoundException("Suggestions for ExamSession with ID: $examSessionId not found")
+        return examSections.mapNotNull { it.suggestion }.also {
+            if (it.isEmpty()) throw NotFoundException("Suggestions for ExamSession with ID: $examSessionId not found")
+        }
     }
 
     fun getSuggestionByExamSectionId(examSectionId: String): Suggestion {

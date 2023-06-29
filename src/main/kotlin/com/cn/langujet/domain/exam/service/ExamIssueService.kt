@@ -6,6 +6,7 @@ import com.cn.langujet.domain.security.services.AuthService
 import com.cn.langujet.application.security.security.model.Role
 import com.cn.langujet.domain.answer.model.Answer
 import com.cn.langujet.domain.exam.model.ExamIssue
+import com.cn.langujet.domain.exam.model.Section
 import com.cn.langujet.domain.exam.repository.ExamIssueRepository
 import com.cn.langujet.domain.question.QuestionService
 import com.cn.langujet.domain.question.model.Question
@@ -16,6 +17,7 @@ class ExamIssueService(
     private val examIssueRepository: ExamIssueRepository,
     private val questionService: QuestionService,
     private val examService: ExamService,
+    private val examSectionService: ExamSectionService,
     private val authService: AuthService
 ) {
     private lateinit var examSessionService: ExamSessionService
@@ -25,8 +27,8 @@ class ExamIssueService(
             .orElseThrow { NotFoundException("ExamIssue with id: $id not found") }
     }
 
-    fun findByExamSessionId(auth: String, id: String): List<ExamIssue> {
-        val examIssues = examIssueRepository.findByExamSessionId(id)
+    fun findByExamSectionId(auth: String, id: String): List<ExamIssue> {
+        val examIssues = examSectionService.getExamSectionById(id).examIssues
         examIssues.forEach {
             preAuthCheck(auth, it.id!!)
         }
@@ -56,24 +58,22 @@ class ExamIssueService(
         return examIssueRepository.save(examIssue)
     }
 
-    fun generateExamIssueList(examId: String): List<ExamIssue> {
+    fun generateExamIssueList(section: Section): List<ExamIssue> {
         val examIssues = mutableListOf<ExamIssue>().toMutableList()
         val usedQuestions = mutableListOf<Question>().toMutableList()
-        val exam = examService.getExamById(examId)
-        for (section in exam.sections) {
-            val topic = questionService.getAllQuestionsBySection(section).random().topic
-            val questions = questionService.getAllQuestionsByTopic(topic).sortedBy { it.order }
-            questions.forEach { question ->
-                examIssues.add(
-                    create(
-                        ExamIssue(
-                            examId, question, examIssues.size
-                        )
+        val exam = examService.getExamById(section.examId)
+        val topic = questionService.getAllQuestionsBySection(section).random().topic
+        val questions = questionService.getAllQuestionsByTopic(topic).sortedBy { it.order }
+        questions.forEach { question ->
+            examIssues.add(
+                create(
+                    ExamIssue(
+                        section.id!!, question, examIssues.size
                     )
                 )
-            }
-            usedQuestions.addAll(questions)
+            )
         }
+        usedQuestions.addAll(questions)
         questionService.updateQuestions(
             usedQuestions.onEach { it.usageNumber = it.usageNumber + 1 }
         )

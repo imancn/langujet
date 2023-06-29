@@ -26,14 +26,14 @@ class ExamIssueController(private val examIssueService: ExamIssueService) {
 
     }
 
-    @GetMapping("/exam-session/{id}")
-    fun findByExamSessionId(
+    @GetMapping("/exam-section/{id}")
+    fun findByExamSectionId(
         @RequestHeader("Authorization") @NotBlank auth: String?,
         @PathVariable @NotBlank id: String?
     ): ResponseEntity<List<ExamIssue>> {
         return toOkResponseEntity(
-            examIssueService.findByExamSessionId(auth!!, id!!).filter {
-                examIssueService.preAuthCheck(auth, it.id ?: "")
+            examIssueService.findByExamSectionId(auth!!, id!!).filter {
+                examIssueService.preAuthCheck(auth, it.id!!)
             }
         )
     }
