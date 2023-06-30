@@ -1,7 +1,7 @@
 package com.cn.langujet.actor.exam.payload.dto
 
+import com.cn.langujet.domain.exam.model.nested.Currency
 import com.cn.langujet.domain.exam.model.nested.Price
-import java.util.*
 
 data class PriceDto(
     val value: Double,
