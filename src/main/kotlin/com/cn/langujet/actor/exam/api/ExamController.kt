@@ -33,7 +33,9 @@ class ExamController(private val examService: ExamService) {
         @RequestParam @NotNull difficulty: Difficulty?,
         @RequestParam @NotNull priceValue: Double?,
         @RequestParam @NotNull priceCurrency: Currency?,
-    ): ResponseEntity<Exam> = toOkResponseEntity(Exam(
+    ): ResponseEntity<Exam> = toOkResponseEntity(
+        examService.createExam(
+            Exam(
                 null,
                 emptyList(),
                 name!!,
@@ -48,6 +50,7 @@ class ExamController(private val examService: ExamService) {
                 )
             )
         )
+    )
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
