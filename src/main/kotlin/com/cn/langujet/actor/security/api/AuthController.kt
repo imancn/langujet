@@ -10,7 +10,7 @@ import com.cn.langujet.domain.security.repository.ResetPasswordTokenRepository
 import com.cn.langujet.domain.security.repository.UserRepository
 import com.cn.langujet.domain.security.services.JwtService
 import com.cn.langujet.domain.security.services.RefreshTokenService
-import com.cn.langujet.application.thirdparty.smtp.MailSenderService
+import com.cn.langujet.application.service.smtp.MailSenderService
 import com.cn.langujet.domain.professor.Professor
 import com.cn.langujet.domain.professor.ProfessorRepository
 import com.cn.langujet.domain.security.services.AuthService
