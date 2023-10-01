@@ -15,7 +15,6 @@ sealed class Question(
     @DBRef var section: Section,
     var topic: String,
     var order: Int,
-    var usageNumber: Int,
     var answerType: AnswerType,
     var questionType: QuestionType,
 ) {

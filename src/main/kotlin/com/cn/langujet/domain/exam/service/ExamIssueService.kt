@@ -59,7 +59,6 @@ class ExamIssueService(
 
     fun generateExamIssueList(section: Section): List<ExamIssue> {
         val examIssues = mutableListOf<ExamIssue>().toMutableList()
-        val usedQuestions = mutableListOf<Question>().toMutableList()
         val topic = questionService.getAllQuestionsBySection(section).random().topic
         val questions = questionService.getAllQuestionsByTopic(topic).sortedBy { it.order }
         questions.forEach { question ->
@@ -71,10 +70,6 @@ class ExamIssueService(
                 )
             )
         }
-        usedQuestions.addAll(questions)
-        questionService.updateQuestions(
-            usedQuestions.onEach { it.usageNumber = it.usageNumber + 1 }
-        )
         return examIssues
     }
 
