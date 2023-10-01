@@ -17,17 +17,17 @@ sealed class Answer(
         Answer(null, examIssueId, userId, AnswerType.TEXT)
 
     @Document(collection = "answers")
-    @TypeAlias("choice_answers")
-    class Choice(examIssueId: String, userId: String, var choice: String) :
-        Answer(null, examIssueId, userId, AnswerType.CHOICE)
+    @TypeAlias("text_issues_answers")
+    class TextIssues(examIssueId: String, userId: String, var text: List<String>) :
+        Answer(null, examIssueId, userId, AnswerType.TEXT_ISSUES)
 
     @Document(collection = "answers")
     @TypeAlias("true_false_answers")
-    class TrueFalse(examIssueId: String, userId: String, var isTrue: Boolean) :
+    class TrueFalse(examIssueId: String, userId: String, var isTrue: Boolean?) :
         Answer(null, examIssueId, userId, AnswerType.TRUE_FALSE)
 
     @Document(collection = "answers")
     @TypeAlias("voice_answers")
-    class Voice(examIssueId: String, userId: String, var audioUrl: String) :
+    class Voice(examIssueId: String, userId: String, var audioAddress: String) :
         Answer(null, examIssueId, userId, AnswerType.VOICE)
 }
