@@ -2,10 +2,11 @@ package com.cn.langujet.actor.exam.payload.dto
 
 import com.cn.langujet.domain.exam.model.nested.Difficulty
 import com.cn.langujet.domain.exam.model.Exam
+import com.cn.langujet.domain.exam.model.ExamType
 
 data class ExamDto(
     val id: String?,
-    val sections: List<SectionDto>?,
+    val examType: ExamType,
     val name: String?,
     val description: String?,
     val sectionsNumber: Int?,
@@ -15,9 +16,10 @@ data class ExamDto(
     val price: PriceDto?,
 ) {
 
+
     constructor(exam: Exam) : this(
         exam.id,
-        exam.sections.map { SectionDto(it) },
+        exam.examType,
         exam.name,
         exam.description,
         exam.sectionsNumber,

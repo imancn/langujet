@@ -3,6 +3,7 @@ package com.cn.langujet.actor.exam.api
 import com.cn.langujet.actor.exam.payload.dto.ExamDto
 import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.domain.exam.model.Exam
+import com.cn.langujet.domain.exam.model.ExamType
 import com.cn.langujet.domain.exam.model.nested.Currency
 import com.cn.langujet.domain.exam.model.nested.Difficulty
 import com.cn.langujet.domain.exam.model.nested.Price
@@ -16,7 +17,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-import java.util.*
 
 @RestController
 @RequestMapping("/api/exams")
@@ -27,6 +27,7 @@ class ExamController(private val examService: ExamService) {
     @PreAuthorize("hasRole('ADMIN')")
     fun createExam(
         @RequestParam @NotBlank name: String?,
+        @RequestParam @NotNull type: ExamType?,
         @RequestParam @NotBlank description: String?,
         @RequestParam @NotNull sectionsNumber: Int?,
         @RequestParam @NotNull questionNumber: Int?,
@@ -38,7 +39,7 @@ class ExamController(private val examService: ExamService) {
         examService.createExam(
             Exam(
                 null,
-                emptyList(),
+                type!!,
                 name!!,
                 description!!,
                 sectionsNumber!!,
