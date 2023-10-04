@@ -31,8 +31,8 @@ class ExamService(
         return examRepository.save(existingExam)
     }
 
-    fun getExamById(id: String?): Exam {
-        return examRepository.findById(id!!).orElseThrow { NotFoundException("Exam with id $id not found") }
+    fun getExamById(id: String): Exam {
+        return examRepository.findById(id).orElseThrow { NotFoundException("Exam with id $id not found") }
     }
 
     fun getAllExams(): List<Exam> {
