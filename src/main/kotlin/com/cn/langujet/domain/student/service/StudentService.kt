@@ -3,7 +3,6 @@ package com.cn.langujet.domain.student.service
 import com.cn.langujet.actor.student.payload.response.StudentProfileResponse
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.security.services.AuthService
-import com.cn.langujet.domain.exam.model.ExamRequest
 import com.cn.langujet.domain.exam.service.ExamRequestService
 import com.cn.langujet.domain.student.model.Student
 import com.cn.langujet.domain.student.repository.StudentRepository
@@ -27,10 +26,6 @@ class StudentService(
         return StudentProfileResponse(
             studentRepository.save(student)
         )
-    }
-
-    fun createExamRequest(auth: String?, examId: String): ExamRequest {
-        return examRequestService.createExamRequest(examId, getStudentByAuthToken(auth).id)
     }
 
     fun getStudentByAuthToken(auth: String?): Student {
