@@ -1,4 +1,4 @@
-package com.cn.langujet.domain.question.model
+package com.cn.langujet.domain.exam.model.question
 
 class MultipleChoiceIssue(
     var header: String,

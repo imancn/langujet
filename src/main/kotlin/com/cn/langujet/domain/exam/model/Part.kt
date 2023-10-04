@@ -1,8 +1,8 @@
 package com.cn.langujet.domain.exam.model
 
-import com.cn.langujet.domain.question.model.Question
-import com.cn.langujet.domain.question.model.SpeakingQuestion
-import com.cn.langujet.domain.question.model.WritingQuestion
+import com.cn.langujet.domain.exam.model.question.Question
+import com.cn.langujet.domain.exam.model.question.SpeakingQuestion
+import com.cn.langujet.domain.exam.model.question.WritingQuestion
 
 sealed class Part(
     var index: Int,
