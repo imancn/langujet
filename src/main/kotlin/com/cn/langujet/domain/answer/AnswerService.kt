@@ -6,21 +6,23 @@ import com.cn.langujet.application.advice.MethodNotAllowedException
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.answer.model.Answer
 import com.cn.langujet.domain.exam.service.ExamSessionService
-import com.cn.langujet.domain.security.services.AuthServiceImpl
+import com.cn.langujet.domain.student.service.StudentService
 import org.springframework.stereotype.Service
 
 @Service
 class AnswerService(
     private val answerRepository: AnswerRepository,
     private val examSessionService: ExamSessionService,
-    private val authService: AuthServiceImpl,
+    private val studentService: StudentService
 ) {
     private val EXAM_SESSION_EXPIRED = "There is no available exam session for this answer"
     fun submitAnswer(request: AnswerRequest, token: String): Answer {
         val examSession = examSessionService.getExamSessionById(request.examSessionId)
-        val userId = examSession.studentId
-        if (!authService.doesUserOwnsAuthToken(token, userId))
-            throw InvalidTokenException("Exam Session with id: ${request.examSessionId} is not belong to your token")
+        if (!studentService.doesStudentOwnsAuthToken(
+                token,
+                examSession.studentId
+            )
+        ) throw InvalidTokenException("Exam Session with id: ${request.examSessionId} is not belong to your token")
         return saveAnswer(request.convertToAnswer())
     }
 

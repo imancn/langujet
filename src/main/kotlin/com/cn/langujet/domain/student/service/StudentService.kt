@@ -3,7 +3,6 @@ package com.cn.langujet.domain.student.service
 import com.cn.langujet.actor.student.payload.response.StudentProfileResponse
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.security.services.AuthService
-import com.cn.langujet.domain.exam.service.ExamRequestService
 import com.cn.langujet.domain.student.model.Student
 import com.cn.langujet.domain.student.repository.StudentRepository
 import org.springframework.stereotype.Service
@@ -13,8 +12,6 @@ class StudentService(
     private val authService: AuthService,
     private val studentRepository: StudentRepository,
 ) {
-    private lateinit var examRequestService: ExamRequestService
-
     fun editProfile(
         auth: String?, fullName: String?, biography: String?
     ): StudentProfileResponse {
@@ -38,5 +35,9 @@ class StudentService(
         return studentRepository.findByUser_Id(authService.getUserById(userId).id!!).orElseThrow {
             throw NotFoundException("Student not found")
         }
+    }
+
+    fun doesStudentOwnsAuthToken(token: String, studentId: String): Boolean {
+        return getStudentByAuthToken(token).user.id == studentId
     }
 }
