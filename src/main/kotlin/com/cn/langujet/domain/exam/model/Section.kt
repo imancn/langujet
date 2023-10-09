@@ -11,4 +11,5 @@ class Section(
     var order: Int,
     var sectionType: SectionType,
     var parts: List<Part>,
+    var time: Long
 )
