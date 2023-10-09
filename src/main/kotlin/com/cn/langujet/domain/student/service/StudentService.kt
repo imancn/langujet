@@ -33,11 +33,11 @@ class StudentService(
 
     fun getStudentByUserId(userId: String): Student {
         return studentRepository.findByUser_Id(authService.getUserById(userId).id!!).orElseThrow {
-            throw NotFoundException("Student not found")
+            NotFoundException("Student not found")
         }
     }
 
-    fun doesStudentOwnsAuthToken(token: String, studentId: String): Boolean {
+    fun doesStudentOwnAuthToken(token: String, studentId: String): Boolean {
         return getStudentByAuthToken(token).user.id == studentId
     }
 }
