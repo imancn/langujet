@@ -4,7 +4,6 @@ import com.cn.langujet.domain.answer.model.AnswerType
 
 sealed class Question(
     var index: Int,
-    var time: Long, // seconds
     var header: String,
     var questionType: QuestionType,
     var answerType: AnswerType,
@@ -12,13 +11,13 @@ sealed class Question(
 
 class SpeakingQuestion(
     index: Int,
-    time: Long,
     header: String,
-) : Question(index, time, header, QuestionType.SPEAKING, AnswerType.VOICE)
+    var time: Long,
+) : Question(index, header, QuestionType.SPEAKING, AnswerType.VOICE)
 
 class WritingQuestion(
     index: Int,
-    time: Long,
     header: String,
+    var time: Long,
     var content: String?
-) : Question(index, time, header, QuestionType.WRITING, AnswerType.TEXT)
+) : Question(index, header, QuestionType.WRITING, AnswerType.TEXT)
