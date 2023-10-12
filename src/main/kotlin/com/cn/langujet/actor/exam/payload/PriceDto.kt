@@ -1,4 +1,4 @@
-package com.cn.langujet.actor.exam.payload.dto
+package com.cn.langujet.actor.exam.payload
 
 import com.cn.langujet.domain.exam.model.nested.Currency
 import com.cn.langujet.domain.exam.model.nested.Price
