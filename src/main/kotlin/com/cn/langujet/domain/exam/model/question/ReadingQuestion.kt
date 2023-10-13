@@ -21,7 +21,7 @@ class ReadingTableCompletion(
 class ReadingMultipleChoice(
     index: Int,
     header: String,
-    selectNum: Int,
+    var selectNum: Int,
     var issues: List<MultipleChoiceIssue>,
 ) : Question(
     index, header,
