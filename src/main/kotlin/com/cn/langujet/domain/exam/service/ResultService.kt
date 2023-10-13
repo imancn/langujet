@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.exam.service
 
-import com.cn.langujet.actor.exam.payload.dto.ResultDto
+import com.cn.langujet.actor.exam.payload.ResultDto
 import com.cn.langujet.application.advice.AccessDeniedException
 import com.cn.langujet.application.advice.InvalidTokenException
 import com.cn.langujet.application.advice.MethodNotAllowedException

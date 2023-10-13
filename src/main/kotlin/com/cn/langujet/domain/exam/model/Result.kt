@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.exam.model
 
-import com.cn.langujet.actor.exam.payload.dto.ResultDto
+import com.cn.langujet.actor.exam.payload.ResultDto
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 

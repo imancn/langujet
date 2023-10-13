@@ -1,6 +1,6 @@
 package com.cn.langujet.actor.exam.api
 
-import com.cn.langujet.actor.exam.payload.dto.ResultDto
+import com.cn.langujet.actor.exam.payload.ResultDto
 import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.domain.exam.service.ResultService
 import jakarta.validation.constraints.NotBlank

@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.exam.model.nested
 
-import com.cn.langujet.actor.exam.payload.dto.PriceDto
+import com.cn.langujet.actor.exam.payload.PriceDto
 
 class Price(
     var value: Double, var currency: Currency

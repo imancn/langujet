@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.exam.model
 
-import com.cn.langujet.actor.exam.payload.dto.SectionResultDto
+import com.cn.langujet.actor.exam.payload.SectionResultDto
 
 class SectionResult(
     var sectionId: String,
