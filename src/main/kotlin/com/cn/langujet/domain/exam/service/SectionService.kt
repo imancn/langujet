@@ -16,7 +16,17 @@ class SectionService(
         }
     }
 
-    fun createSection(section: Section): Section {
+    fun getSectionsByExamId(examId: String): List<Section> {
+        return sectionRepository.findAllByExamId(examId)
+    }
+
+    fun getSectionByExamIdAndOrder(examId: String, order: Int): Section {
+        return sectionRepository.findByExamIdAndOrder(examId, order).orElseThrow {
+            throw NotFoundException("Section not found")
+        }
+    }
+
+    fun createSection(section: Section): Section { // TODO: Constraints should be added
         return sectionRepository.save(section)
     }
 

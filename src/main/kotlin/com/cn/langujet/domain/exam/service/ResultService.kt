@@ -7,6 +7,7 @@ import com.cn.langujet.application.advice.MethodNotAllowedException
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.application.security.security.model.Role
 import com.cn.langujet.domain.exam.model.ExamSession
+import com.cn.langujet.domain.exam.model.ExamSessionState
 import com.cn.langujet.domain.exam.model.Result
 import com.cn.langujet.domain.exam.model.SectionResult
 import com.cn.langujet.domain.exam.repository.ResultRepository
@@ -30,12 +31,10 @@ class ResultService(
     ): ResultDto {
         val examSession = examSessionService.getExamSessionById(examSessionId)
         return doWithPreAuth(authToken, examSession) {
-            if (!examSession.isStarted)
-                throw MethodNotAllowedException("The exam session has not been started")
-            else if (!examSession.isFinished)
-                throw MethodNotAllowedException("The exam session has not been finished")
-            else if (examSession.isRated)
-                throw MethodNotAllowedException("The exam session has been rated")
+            if (examSession.state.order < ExamSessionState.FINISHED.order)
+                throw MethodNotAllowedException("The exam session is not ready to evaluate")
+            else if (examSession.state.order == ExamSessionState.EVALUATED.order)
+                throw MethodNotAllowedException("The exam session is already evaluated")
             else
                 ResultDto(resultRepository.save(Result(result)))
         }
@@ -80,7 +79,7 @@ class ResultService(
 
     fun doWithPreAuth(auth: String, examSession: ExamSession, function: () -> ResultDto): ResultDto {
         val user = authService.getUserByAuthToken(auth)
-        val doesProfessorOwnsAuthToken = professorService.doesProfessorOwnAuthToken(auth, examSession.professorId)
+        val doesProfessorOwnsAuthToken = professorService.doesProfessorOwnAuthToken(auth, examSession.professorId ?: "")
         val isAdmin = user.roles.contains(Role.ROLE_ADMIN)
         if (!doesProfessorOwnsAuthToken && !isAdmin)
             throw AccessDeniedException("Exam Session with id: ${examSession.id} is not belong to your token")
