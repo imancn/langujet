@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.exam.model
 
-import com.cn.langujet.actor.exam.payload.dto.ExamDto
+import com.cn.langujet.actor.exam.payload.ExamDto
 import com.cn.langujet.domain.exam.model.nested.Difficulty
 import com.cn.langujet.domain.exam.model.nested.Price
 import org.springframework.data.annotation.Id

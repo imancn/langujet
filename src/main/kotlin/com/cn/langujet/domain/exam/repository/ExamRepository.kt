@@ -1,6 +1,7 @@
 package com.cn.langujet.domain.exam.repository
 
 import com.cn.langujet.domain.exam.model.Exam
+import com.cn.langujet.domain.exam.model.ExamType
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.mongodb.repository.MongoRepository
@@ -17,4 +18,7 @@ interface ExamRepository : MongoRepository<Exam, String> {
         examDuration: Long?,
         pageRequest: PageRequest
     ): Page<Exam>
+
+    @Query(value = "{ 'examType' : ?0 }", fields = "{ 'id' : 1 }")
+    fun findIdsByExamType(examType: ExamType): List<String>
 }

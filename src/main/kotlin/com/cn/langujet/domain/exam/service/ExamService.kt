@@ -1,8 +1,9 @@
 package com.cn.langujet.domain.exam.service
 
-import com.cn.langujet.actor.exam.payload.dto.ExamDto
+import com.cn.langujet.actor.exam.payload.ExamDto
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.exam.model.Exam
+import com.cn.langujet.domain.exam.model.ExamType
 import com.cn.langujet.domain.exam.repository.ExamRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -55,5 +56,9 @@ class ExamService(
             examDuration,
             pageRequest,
         )
+    }
+
+    fun getRandomExamIdByType(examType: ExamType): String {
+        return examRepository.findIdsByExamType(examType).random()
     }
 }
