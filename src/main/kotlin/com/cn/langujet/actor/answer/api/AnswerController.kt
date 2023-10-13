@@ -18,9 +18,7 @@ class AnswerController(
 ) {
     private val SUBMIT_MESSAGE = "Answer Submitted"
 
-    @GetMapping("/{examIssueId}")
-    fun getAnswersByExamIssueId(@PathVariable examIssueId: String): List<Answer> =
-        answerService.getAnswersByExamIssueId(examIssueId)
+    // TODO: Add get by exam session id and section id
 
     @GetMapping("/{id}")
     fun getAnswerById(

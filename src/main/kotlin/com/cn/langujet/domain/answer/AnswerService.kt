@@ -32,10 +32,6 @@ class AnswerService(
         } else throw MethodNotAllowedException(EXAM_SESSION_EXPIRED)
     }
 
-    fun getAnswersByExamIssueId(examIssueId: String): List<Answer> {
-        return answerRepository.findByExamIssueId(examIssueId)
-    }
-
     fun getAnswerById(id: String): Answer {
         return answerRepository.findById(id).orElseThrow {
             NotFoundException("Answer with id: $id not found")
