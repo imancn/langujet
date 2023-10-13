@@ -24,16 +24,6 @@ sealed class PartDTO(
 data class ReadingPartDTO(
     override val index: Int,
     val passage: String,
-    @Schema(oneOf = [
-        ReadingTextCompletionDTO::class,
-        ReadingTableCompletionDTO::class,
-        ReadingMultipleChoiceDTO::class,
-        ReadingMatchingFeaturesDTO::class,
-        ReadingMatchingEndingsDTO::class,
-        ReadingMatchingHeadingsDTO::class,
-        ReadingTrueFalseDTO::class,
-        ReadingSelectiveTextCompletionDTO::class
-    ])
     val questionList: List<QuestionDTO>
 ) : PartDTO(index, SectionType.READING) {
     constructor(part: ReadingPart) : this(
@@ -46,13 +36,6 @@ data class ReadingPartDTO(
 data class ListeningPartDTO(
     override val index: Int,
     val audioAddress: String,
-    @Schema(oneOf = [
-        ListeningTextCompletionDTO::class,
-        ListeningTableCompletionDTO::class,
-        ListeningMultipleChoiceDTO::class,
-        ListeningMatchingFeaturesDTO::class,
-        ListeningLabellingDTO::class
-    ])
     val questionList: List<QuestionDTO>
 ) : PartDTO(index, SectionType.LISTENING) {
     constructor(part: ListeningPart) : this(
