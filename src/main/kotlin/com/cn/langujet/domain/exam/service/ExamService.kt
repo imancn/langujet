@@ -1,9 +1,9 @@
 package com.cn.langujet.domain.exam.service
 
-import com.cn.langujet.actor.exam.payload.dto.ExamDto
+import com.cn.langujet.actor.exam.payload.ExamDto
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.exam.model.Exam
-import com.cn.langujet.domain.exam.model.Section
+import com.cn.langujet.domain.exam.model.ExamType
 import com.cn.langujet.domain.exam.repository.ExamRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -15,27 +15,25 @@ class ExamService(
 ) {
 
     fun createExam(exam: Exam): Exam {
-        return examRepository.save(
-            exam.also { it.id = null }
-        )
+        return examRepository.save(exam.also { it.id = null })
     }
 
     fun updateExam(id: String, exam: ExamDto): Exam {
         val existingExam = getExamById(id)
         exam.name?.let { existingExam.name = it }
-        exam.sections?.let { existingExam.sections = it.map { section -> Section(section) } }
+        exam.examType.let { existingExam.examType = it }
         exam.description?.let { existingExam.description = it }
         exam.sectionsNumber?.let { existingExam.sectionsNumber = it }
         exam.questionNumber?.let { existingExam.questionNumber = it }
         exam.examDuration?.let { existingExam.examDuration = it }
         exam.difficulty?.let { existingExam.difficulty = it }
-        exam.price?.value?.let { existingExam.price.value =  it}
+        exam.price?.value?.let { existingExam.price.value = it }
         exam.price?.currency?.let { existingExam.price.currency = it }
         return examRepository.save(existingExam)
     }
 
-    fun getExamById(id: String?): Exam {
-        return examRepository.findById(id!!).orElseThrow { NotFoundException("Exam with id $id not found") }
+    fun getExamById(id: String): Exam {
+        return examRepository.findById(id).orElseThrow { NotFoundException("Exam with id $id not found") }
     }
 
     fun getAllExams(): List<Exam> {
@@ -58,5 +56,9 @@ class ExamService(
             examDuration,
             pageRequest,
         )
+    }
+
+    fun getRandomExamIdByType(examType: ExamType): String {
+        return examRepository.findIdsByExamType(examType).random()
     }
 }

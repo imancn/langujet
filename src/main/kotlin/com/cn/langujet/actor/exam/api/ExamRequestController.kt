@@ -2,6 +2,8 @@ package com.cn.langujet.actor.exam.api
 
 import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.domain.exam.model.ExamRequest
+import com.cn.langujet.domain.exam.model.ExamType
+import com.cn.langujet.domain.exam.model.SectionType
 import com.cn.langujet.domain.exam.service.ExamRequestService
 import jakarta.validation.constraints.NotBlank
 import org.springframework.http.ResponseEntity
@@ -12,22 +14,25 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @Validated
 @RequestMapping("/exam-requests")
-class ExamRequestController(private val examRequestService: ExamRequestService) {
+class ExamRequestController(
+    private val examRequestService: ExamRequestService
+) {
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('STUDENT')")
     fun createExamRequest(
-        @RequestParam @NotBlank studentId: String?,
-        @RequestParam @NotBlank examId: String?
-    ): ResponseEntity<ExamRequest> =
-        toOkResponseEntity(examRequestService.createExamRequest(studentId, examId))
+        @RequestHeader("Authorization") @NotBlank auth: String?,
+        @RequestParam @NotBlank examType: ExamType?,
+        @RequestParam sectionType: SectionType?
+    ): ResponseEntity<ExamRequest> {
 
-    @GetMapping("/by-exam-id/{examId}")
-    @PreAuthorize("hasAnyRole('ADMIN','STUDENT') ")
-    fun getExamRequestsByExamId(@PathVariable examId: String): ResponseEntity<List<ExamRequest>> =
-        toOkResponseEntity(examRequestService.getExamRequestsByExamId(examId))
-
-    @GetMapping("/by-student-id/{studentId}")
-    @PreAuthorize("hasAnyRole('ADMIN','STUDENT') ")
-    fun getExamRequestsByStudentId(@PathVariable studentId: String): ResponseEntity<List<ExamRequest>> =
-        toOkResponseEntity(examRequestService.getExamRequestsByStudentId(studentId))
+        return toOkResponseEntity(
+            examRequestService.createExamRequest(auth!!, examType!!, sectionType)
+        )
+    }
+    @GetMapping("/by-student-id")
+    @PreAuthorize("hasAnyRole('STUDENT') ")
+    fun getExamRequests(
+        @RequestHeader("Authorization") @NotBlank auth: String?,
+    ): ResponseEntity<List<ExamRequest>> =
+        toOkResponseEntity(examRequestService.getExamRequests(auth!!))
 }

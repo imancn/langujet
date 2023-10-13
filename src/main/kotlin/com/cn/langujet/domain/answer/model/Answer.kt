@@ -7,27 +7,49 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document(collection = "answers")
 sealed class Answer(
     @Id var id: String? = null,
-    var examIssueId: String,
-    var userId: String,
+    var examSessionId: String,
+    var sectionId: String,
     var type: AnswerType,
+    var partIndex: Int,
+    var questionIndex: Int,
 ) {
     @Document(collection = "answers")
     @TypeAlias("text_answers")
-    class Text(examIssueId: String, userId: String, var text: String) :
-        Answer(null, examIssueId, userId, AnswerType.TEXT)
+    class Text(
+        examSessionId: String,
+        sectionId: String,
+        partIndex: Int,
+        questionIndex: Int,
+        var text: String
+    ): Answer(null, examSessionId, sectionId, AnswerType.TEXT, partIndex, questionIndex)
 
     @Document(collection = "answers")
-    @TypeAlias("choice_answers")
-    class Choice(examIssueId: String, userId: String, var choice: String) :
-        Answer(null, examIssueId, userId, AnswerType.CHOICE)
+    @TypeAlias("text_parts_answers")
+    class TextIssues(
+        examSessionId: String,
+        sectionId: String,
+        partIndex: Int,
+        questionIndex: Int,
+        var textList: List<String?>
+    ): Answer(null, examSessionId, sectionId, AnswerType.TEXT_ISSUES, partIndex, questionIndex)
 
     @Document(collection = "answers")
     @TypeAlias("true_false_answers")
-    class TrueFalse(examIssueId: String, userId: String, var isTrue: Boolean) :
-        Answer(null, examIssueId, userId, AnswerType.TRUE_FALSE)
+    class TrueFalse(
+        examSessionId: String,
+        sectionId: String,
+        partIndex: Int,
+        questionIndex: Int,
+        var booleanList: List<Boolean?>
+    ): Answer(null, examSessionId, sectionId, AnswerType.TRUE_FALSE, partIndex, questionIndex)
 
     @Document(collection = "answers")
     @TypeAlias("voice_answers")
-    class Voice(examIssueId: String, userId: String, var audioUrl: String) :
-        Answer(null, examIssueId, userId, AnswerType.VOICE)
+    class Voice(
+        examSessionId: String,
+        sectionId: String,
+        partIndex: Int,
+        questionIndex: Int,
+        var audioAddress: String
+    ): Answer(null, examSessionId, sectionId, AnswerType.VOICE, partIndex, questionIndex)
 }

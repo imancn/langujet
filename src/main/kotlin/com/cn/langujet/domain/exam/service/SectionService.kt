@@ -1,6 +1,5 @@
 package com.cn.langujet.domain.exam.service
 
-import com.cn.langujet.actor.exam.payload.dto.SectionDto
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.exam.model.Section
 import com.cn.langujet.domain.exam.repository.SectionRepository
@@ -11,23 +10,34 @@ class SectionService(
     private val sectionRepository: SectionRepository
 ) {
 
-    fun getSectionById(id: String): SectionDto {
-        return SectionDto(
-            sectionRepository.findById(id).orElseThrow {
-                NotFoundException("Section with id $id not found")
-            }
-        )
+    fun getSectionById(id: String): Section {
+        return sectionRepository.findById(id).orElseThrow {
+            NotFoundException("Section with id $id not found")
+        }
     }
 
-    fun createSection(section: SectionDto): Section {
-        return sectionRepository.save(Section(section))
+    fun getSectionsByExamId(examId: String): List<Section> {
+        return sectionRepository.findAllByExamId(examId)
     }
 
-    fun updateSection(id: String, section: SectionDto): SectionDto {
-        val existingSection = Section(getSectionById(id))
-        section.name?.let { existingSection.name = it }
-        section.order?.let { existingSection.order = it }
-        return SectionDto(sectionRepository.save(existingSection))
+    fun getSectionByExamIdAndOrder(examId: String, order: Int): Section {
+        return sectionRepository.findByExamIdAndOrder(examId, order).orElseThrow {
+            throw NotFoundException("Section not found")
+        }
+    }
+
+    fun createSection(section: Section): Section { // TODO: Constraints should be added
+        return sectionRepository.save(section)
+    }
+
+    fun updateSection(id: String, section: Section): Section {
+        val existingSection = getSectionById(id)
+        section.examId.let { existingSection.examId = it }
+        section.header.let { existingSection.header = it }
+        section.order.let { existingSection.order = it }
+        section.sectionType.let { existingSection.sectionType = it }
+        section.parts.let { existingSection.parts = it }
+        return sectionRepository.save(existingSection)
     }
 
     fun deleteSection(id: String): Boolean {
