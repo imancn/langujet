@@ -75,7 +75,7 @@ class ExamController(private val examService: ExamService) {
     fun getAllExams(): ResponseEntity<List<Exam>> =
         toOkResponseEntity(examService.getAllExams())
 
-    @GetMapping("/ filters")
+    @GetMapping("/filters")
     fun getAllExamsByFilters(
         @RequestParam id: String?,
         @RequestParam name: String?,
