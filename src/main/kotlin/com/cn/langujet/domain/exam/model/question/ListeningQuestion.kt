@@ -26,7 +26,7 @@ class ListeningMultipleChoice(
     var issues: List<MultipleChoiceIssue>,
 ) : Question(
     index, header,
-    QuestionType.LISTENING_MULTIPLE_CHOICE,
+    QuestionType.LISTENING_MULTIPLE_CHOICES,
     run { if (selectNum > 1) AnswerType.TEXT else AnswerType.TEXT_ISSUES }
 )
 

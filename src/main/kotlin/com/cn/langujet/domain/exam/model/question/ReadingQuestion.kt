@@ -25,7 +25,7 @@ class ReadingMultipleChoice(
     var issues: List<MultipleChoiceIssue>,
 ) : Question(
     index, header,
-    QuestionType.READING_CHOICES,
+    QuestionType.READING_MULTIPLE_CHOICES,
     run { if (selectNum > 1) AnswerType.TEXT else AnswerType.TEXT_ISSUES }
 )
 

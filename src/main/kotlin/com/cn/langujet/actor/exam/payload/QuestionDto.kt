@@ -102,7 +102,7 @@ data class ReadingMultipleChoiceDTO(
     override val header: String,
     val selectNum: Int,
     val issues: List<MultipleChoiceIssueDTO>
-) : QuestionDTO(index, header, QuestionType.READING_CHOICES,
+) : QuestionDTO(index, header, QuestionType.READING_MULTIPLE_CHOICES,
     if (selectNum > 1) AnswerType.TEXT else AnswerType.TEXT_ISSUES) {
     constructor(question: ReadingMultipleChoice) : this(
         question.index,
@@ -219,7 +219,7 @@ data class ListeningMultipleChoiceDTO(
     override val header: String,
     val selectNum: Int,
     val issues: List<MultipleChoiceIssueDTO>
-) : QuestionDTO(index, header, QuestionType.LISTENING_MULTIPLE_CHOICE,
+) : QuestionDTO(index, header, QuestionType.LISTENING_MULTIPLE_CHOICES,
     if (selectNum > 1) AnswerType.TEXT else AnswerType.TEXT_ISSUES) {
     constructor(question: ListeningMultipleChoice) : this(
         question.index,
