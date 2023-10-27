@@ -9,7 +9,6 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
@@ -56,6 +55,7 @@ class ExamController(private val examService: ExamService) {
     )
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT')")
     fun getExamById(@PathVariable id: String): ResponseEntity<Exam> =
         toOkResponseEntity(examService.getExamById(id))
 
@@ -64,24 +64,15 @@ class ExamController(private val examService: ExamService) {
     fun getAllExams(): ResponseEntity<List<Exam>> =
         toOkResponseEntity(examService.getAllExams())
 
-    @GetMapping("/filters")
-    fun getAllExamsByFilters(
-        @RequestParam id: String?,
-        @RequestParam name: String?,
-        @RequestParam sectionsNumber: Int?,
-        @RequestParam questionNumber: Int?,
-        @RequestParam examDuration: Long?,
+    @GetMapping("/name")
+    fun getAllExamsByName(
+        @RequestParam @NotBlank name: String?,
         @RequestParam(defaultValue = "10") pageSize: Int,
         @RequestParam(defaultValue = "0") pageNumber: Int,
-        @RequestParam(defaultValue = "id") sortBy: String?
     ): ResponseEntity<Page<Exam>> = toOkResponseEntity(
-        examService.getAllExamsByFilters(
-            id,
-            name,
-            sectionsNumber,
-            questionNumber,
-            examDuration,
-            PageRequest.of(pageNumber, pageSize, Sort.by(sortBy))
+        examService.getAllExamsByName(
+            name!!,
+            PageRequest.of(pageNumber, pageSize)
         )
     )
 }

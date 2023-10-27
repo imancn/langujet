@@ -15,6 +15,7 @@ class ExamService(
 ) {
 
     fun createExam(exam: Exam): Exam {
+        exam.id = null
         return examRepository.save(exam.also { it.id = null })
     }
 
@@ -37,20 +38,12 @@ class ExamService(
         return examRepository.findAll()
     }
 
-    fun getAllExamsByFilters(
-        id: String?,
-        name: String?,
-        sectionsNumber: Int?,
-        questionNumber: Int?,
-        examDuration: Long?,
+    fun getAllExamsByName(
+        name: String,
         pageRequest: PageRequest
     ): Page<Exam> {
-        return examRepository.findAllExamsByFilters(
-            id,
+        return examRepository.findAllByNameContainingIgnoreCaseOrderByNameAsc(
             name,
-            sectionsNumber,
-            questionNumber,
-            examDuration,
             pageRequest,
         )
     }
