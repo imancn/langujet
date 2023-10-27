@@ -26,8 +26,12 @@ class SectionService(
         }
     }
 
-    fun createSection(section: Section): Section { // TODO: Constraints should be added
-        return sectionRepository.save(section)
+    fun createSection(section: Section): Section {
+        return sectionRepository.save(
+            section.also {
+                it.id = null
+            }
+        )
     }
 
     fun updateSection(id: String, section: Section): Section {
