@@ -14,7 +14,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/exams")
+@RequestMapping("/api/exam")
 @Validated
 class ExamController(private val examService: ExamService) {
 
@@ -58,7 +58,7 @@ class ExamController(private val examService: ExamService) {
     fun getExamById(@PathVariable id: String): ResponseEntity<Exam> =
         toOkResponseEntity(examService.getExamById(id))
 
-    @GetMapping
+    @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
     fun getAllExams(): ResponseEntity<List<Exam>> =
         toOkResponseEntity(examService.getAllExams())
