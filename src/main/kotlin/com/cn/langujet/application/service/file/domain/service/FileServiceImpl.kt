@@ -3,7 +3,6 @@ package com.cn.langujet.application.service.file.domain.service
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.application.service.file.domain.data.mongo.model.File
 import com.cn.langujet.application.service.file.domain.data.mongo.repository.FileRepository
-import com.cn.langujet.application.service.kafka.producer.file.FileProducer
 import org.springframework.stereotype.Component
 import org.springframework.util.DigestUtils
 import org.springframework.web.multipart.MultipartFile
@@ -12,13 +11,7 @@ import java.util.*
 @Component
 class FileServiceImpl(
     private val fileRepository: FileRepository,
-    private val fileProducer: FileProducer,
 ) : FileService {
-
-    override fun storeFileToKafka(multipartFile: MultipartFile, format: String, dirId: String?, bucket: String?): File {
-        return makeFile(format, bucket, dirId, multipartFile).also { fileProducer.sendFile(it) }
-    }
-
     override fun persistFile(file: MultipartFile, format: String, dirId: String?, bucket: String?): File {
         return makeFile(format, bucket, dirId, file).also { persistFile(it) }
     }
