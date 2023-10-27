@@ -4,7 +4,7 @@ import com.cn.langujet.actor.exam.payload.SectionDTO
 import com.cn.langujet.application.advice.InvalidTokenException
 import com.cn.langujet.application.advice.MethodNotAllowedException
 import com.cn.langujet.application.advice.NotFoundException
-import com.cn.langujet.domain.exam.model.ExamRequest
+import com.cn.langujet.actor.exam.payload.ExamRequest
 import com.cn.langujet.domain.exam.model.ExamSession
 import com.cn.langujet.domain.exam.model.ExamSessionState
 import com.cn.langujet.domain.exam.repository.ExamSessionRepository
@@ -16,13 +16,16 @@ import java.util.*
 @Service
 class ExamSessionService(
     private val examSessionRepository: ExamSessionRepository,
-    private val examRequestService: ExamRequestService,
     private val examService: ExamService,
     private val sectionService: SectionService,
     private val studentService: StudentService,
     private val professorService: ProfessorService,
 ) {
-    fun enrollExamSession(examRequest: ExamRequest, professorId: String?): ExamSession {
+    fun enrollExamSession(auth: String, examRequest: ExamRequest): ExamSession {
+        val studentId = studentService.getStudentByAuthToken(auth).id!!
+        /**
+            Todo: Payment should be implemented here later!
+         */
         val examId = examService.getRandomExamIdByType(examRequest.examType)
         val sectionId = if (examRequest.sectionType != null) {
             sectionService.getSectionsByExamId(examId).find {
@@ -30,14 +33,12 @@ class ExamSessionService(
             }?.id
                 ?: throw NotFoundException("There is no section with ${examRequest.sectionType} in Exam with id: $examId")
         } else null
-        val examSession = examSessionRepository.save(
+        return examSessionRepository.save(
             ExamSession(
-                examRequest.studentId, null, // this is immediately null, and it means exam professor is AI
-                examId, sectionId, examRequest.date
+                studentId, null, // this is immediately null, and it means exam professor is AI
+                examId, sectionId, Date(System.currentTimeMillis())
             )
         )
-        examRequestService.deleteExamRequest(examRequest) // TODO: use a delete flag instead of deletion
-        return examSession
     }
 
     fun getStudentExamSession(

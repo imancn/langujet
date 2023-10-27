@@ -1,5 +1,6 @@
 package com.cn.langujet.actor.exam.api
 
+import com.cn.langujet.actor.exam.payload.ExamRequest
 import com.cn.langujet.actor.exam.payload.SectionDTO
 import com.cn.langujet.domain.exam.model.*
 import com.cn.langujet.domain.exam.service.ExamSessionService
@@ -14,13 +15,13 @@ class ExamSessionController(
     private val examSessionService: ExamSessionService
 ){
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/enroll")
     fun enrollExamSession(
+        @RequestHeader("Authorization") @NotBlank auth: String?,
         @RequestBody examRequest: ExamRequest,
-        @RequestParam @NotBlank professorId: String?,
     ): ResponseEntity<ExamSession> =
-        ResponseEntity.ok(examSessionService.enrollExamSession(examRequest, professorId!!))
+        ResponseEntity.ok(examSessionService.enrollExamSession(auth!!, examRequest))
 
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/student/{examSessionId}")
