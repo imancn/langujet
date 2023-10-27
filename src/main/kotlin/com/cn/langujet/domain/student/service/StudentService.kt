@@ -38,6 +38,6 @@ class StudentService(
     }
 
     fun doesStudentOwnAuthToken(token: String, studentId: String): Boolean {
-        return getStudentByAuthToken(token).user.id == studentId
+        return getStudentByAuthToken(token).id == studentId
     }
 }
