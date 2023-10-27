@@ -342,7 +342,7 @@ data class ListeningMultipleChoiceDTO(
     index,
     header,
     QuestionType.LISTENING_MULTIPLE_CHOICES,
-    if (selectNum!! > 1) AnswerType.TEXT else AnswerType.TEXT_ISSUES
+    AnswerType.TEXT
 ) {
     constructor(question: ListeningMultipleChoice) : this(
         question.index,
