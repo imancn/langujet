@@ -21,6 +21,13 @@ class SectionController(private val sectionService: SectionService) {
         @PathVariable id: String
     ): ResponseEntity<Section> = toOkResponseEntity(sectionService.getSectionById(id))
 
+    @GetMapping("by-exam-id/{examId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    fun getSectionByExamId(
+        @PathVariable examId: String
+    ): ResponseEntity<List<Section>> =
+        toOkResponseEntity(sectionService.getSectionByExamId(examId))
+
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     fun createSection(

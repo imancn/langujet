@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service
 class SectionService(
     private val sectionRepository: SectionRepository
 ) {
+    fun getSectionByExamId(examId: String): List<Section> {
+        return sectionRepository.findAllByExamId(examId)
+    }
 
     fun getSectionById(id: String): Section {
         return sectionRepository.findById(id).orElseThrow {
