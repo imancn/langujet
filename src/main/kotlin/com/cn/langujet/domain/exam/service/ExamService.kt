@@ -26,9 +26,6 @@ class ExamService(
         exam.sectionsNumber?.let { existingExam.sectionsNumber = it }
         exam.questionNumber?.let { existingExam.questionNumber = it }
         exam.examDuration?.let { existingExam.examDuration = it }
-        exam.difficulty?.let { existingExam.difficulty = it }
-        exam.price?.value?.let { existingExam.price.value = it }
-        exam.price?.currency?.let { existingExam.price.currency = it }
         return examRepository.save(existingExam)
     }
 

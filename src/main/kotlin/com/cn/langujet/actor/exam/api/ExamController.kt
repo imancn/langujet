@@ -4,9 +4,6 @@ import com.cn.langujet.actor.exam.payload.ExamDto
 import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.domain.exam.model.Exam
 import com.cn.langujet.domain.exam.model.ExamType
-import com.cn.langujet.domain.exam.model.nested.Currency
-import com.cn.langujet.domain.exam.model.nested.Difficulty
-import com.cn.langujet.domain.exam.model.nested.Price
 import com.cn.langujet.domain.exam.service.ExamService
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
@@ -32,9 +29,6 @@ class ExamController(private val examService: ExamService) {
         @RequestParam @NotNull sectionsNumber: Int?,
         @RequestParam @NotNull questionNumber: Int?,
         @RequestParam @NotNull examDuration: Long?,
-        @RequestParam @NotNull difficulty: Difficulty?,
-        @RequestParam @NotNull priceValue: Double?,
-        @RequestParam @NotNull priceCurrency: Currency?,
     ): ResponseEntity<Exam> = toOkResponseEntity(
         examService.createExam(
             Exam(
@@ -44,12 +38,7 @@ class ExamController(private val examService: ExamService) {
                 description!!,
                 sectionsNumber!!,
                 questionNumber!!,
-                examDuration!!,
-                difficulty!!,
-                Price(
-                    priceValue!!,
-                    priceCurrency!!
-                )
+                examDuration!!
             )
         )
     )
