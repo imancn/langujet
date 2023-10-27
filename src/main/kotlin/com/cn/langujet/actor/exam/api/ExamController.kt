@@ -1,25 +1,20 @@
 package com.cn.langujet.actor.exam.api
 
-import com.cn.langujet.actor.exam.payload.ExamDto
 import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.domain.exam.model.Exam
 import com.cn.langujet.domain.exam.model.ExamType
-import com.cn.langujet.domain.exam.model.nested.Currency
-import com.cn.langujet.domain.exam.model.nested.Difficulty
-import com.cn.langujet.domain.exam.model.nested.Price
 import com.cn.langujet.domain.exam.service.ExamService
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/exams")
+@RequestMapping("/api/exam")
 @Validated
 class ExamController(private val examService: ExamService) {
 
@@ -32,9 +27,6 @@ class ExamController(private val examService: ExamService) {
         @RequestParam @NotNull sectionsNumber: Int?,
         @RequestParam @NotNull questionNumber: Int?,
         @RequestParam @NotNull examDuration: Long?,
-        @RequestParam @NotNull difficulty: Difficulty?,
-        @RequestParam @NotNull priceValue: Double?,
-        @RequestParam @NotNull priceCurrency: Currency?,
     ): ResponseEntity<Exam> = toOkResponseEntity(
         examService.createExam(
             Exam(
@@ -44,12 +36,7 @@ class ExamController(private val examService: ExamService) {
                 description!!,
                 sectionsNumber!!,
                 questionNumber!!,
-                examDuration!!,
-                difficulty!!,
-                Price(
-                    priceValue!!,
-                    priceCurrency!!
-                )
+                examDuration!!
             )
         )
     )
@@ -58,41 +45,34 @@ class ExamController(private val examService: ExamService) {
     @PreAuthorize("hasRole('ADMIN')")
     fun updateExam(
         @PathVariable @NotBlank id: String?,
-        @RequestBody examDto: ExamDto
+        @RequestBody examResponse: Exam
     ): ResponseEntity<Exam> = toOkResponseEntity(
         examService.updateExam(
             id!!,
-            examDto
+            examResponse
         )
     )
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     fun getExamById(@PathVariable id: String): ResponseEntity<Exam> =
         toOkResponseEntity(examService.getExamById(id))
 
-    @GetMapping
+    @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
     fun getAllExams(): ResponseEntity<List<Exam>> =
         toOkResponseEntity(examService.getAllExams())
 
-    @GetMapping("/filters")
-    fun getAllExamsByFilters(
-        @RequestParam id: String?,
-        @RequestParam name: String?,
-        @RequestParam sectionsNumber: Int?,
-        @RequestParam questionNumber: Int?,
-        @RequestParam examDuration: Long?,
+    @GetMapping("/name")
+    @PreAuthorize("hasRole('ADMIN')")
+    fun getAllExamsByName(
+        @RequestParam @NotBlank name: String?,
         @RequestParam(defaultValue = "10") pageSize: Int,
         @RequestParam(defaultValue = "0") pageNumber: Int,
-        @RequestParam(defaultValue = "id") sortBy: String?
     ): ResponseEntity<Page<Exam>> = toOkResponseEntity(
-        examService.getAllExamsByFilters(
-            id,
-            name,
-            sectionsNumber,
-            questionNumber,
-            examDuration,
-            PageRequest.of(pageNumber, pageSize, Sort.by(sortBy))
+        examService.getAllExamsByName(
+            name!!,
+            PageRequest.of(pageNumber, pageSize)
         )
     )
 }

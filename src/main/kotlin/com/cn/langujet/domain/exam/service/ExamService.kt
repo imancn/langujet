@@ -1,6 +1,5 @@
 package com.cn.langujet.domain.exam.service
 
-import com.cn.langujet.actor.exam.payload.ExamDto
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.exam.model.Exam
 import com.cn.langujet.domain.exam.model.ExamType
@@ -15,20 +14,18 @@ class ExamService(
 ) {
 
     fun createExam(exam: Exam): Exam {
+        exam.id = null
         return examRepository.save(exam.also { it.id = null })
     }
 
-    fun updateExam(id: String, exam: ExamDto): Exam {
+    fun updateExam(id: String, exam: Exam): Exam {
         val existingExam = getExamById(id)
-        exam.name?.let { existingExam.name = it }
+        exam.name.let { existingExam.name = it }
         exam.examType.let { existingExam.examType = it }
-        exam.description?.let { existingExam.description = it }
-        exam.sectionsNumber?.let { existingExam.sectionsNumber = it }
-        exam.questionNumber?.let { existingExam.questionNumber = it }
-        exam.examDuration?.let { existingExam.examDuration = it }
-        exam.difficulty?.let { existingExam.difficulty = it }
-        exam.price?.value?.let { existingExam.price.value = it }
-        exam.price?.currency?.let { existingExam.price.currency = it }
+        exam.description.let { existingExam.description = it }
+        exam.sectionsNumber.let { existingExam.sectionsNumber = it }
+        exam.questionNumber.let { existingExam.questionNumber = it }
+        exam.examDuration.let { existingExam.examDuration = it }
         return examRepository.save(existingExam)
     }
 
@@ -40,20 +37,12 @@ class ExamService(
         return examRepository.findAll()
     }
 
-    fun getAllExamsByFilters(
-        id: String?,
-        name: String?,
-        sectionsNumber: Int?,
-        questionNumber: Int?,
-        examDuration: Long?,
+    fun getAllExamsByName(
+        name: String,
         pageRequest: PageRequest
     ): Page<Exam> {
-        return examRepository.findAllExamsByFilters(
-            id,
+        return examRepository.findAllByNameContainingIgnoreCaseOrderByNameAsc(
             name,
-            sectionsNumber,
-            questionNumber,
-            examDuration,
             pageRequest,
         )
     }
