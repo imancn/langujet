@@ -6,7 +6,7 @@ import com.cn.langujet.domain.exam.model.question.WritingQuestion
 
 sealed class Part(
     var index: Int,
-    var issueType: SectionType,
+    var type: SectionType,
 )
 
 class ReadingPart(
