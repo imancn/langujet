@@ -15,12 +15,12 @@ data class SectionDTO(
     fun toSection(): Section {
         return Section(
             this.id,
-            this.examId,
-            this.header,
-            this.order,
-            this.sectionType,
-            this.parts?.map { it.toPart() },
-            this.time
+            this.examId!!,
+            this.header!!,
+            this.order!!,
+            this.sectionType!!,
+            this.parts?.map { it.toPart() }!!,
+            this.time!!
         )
     }
 
