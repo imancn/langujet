@@ -1,6 +1,5 @@
 package com.cn.langujet.domain.exam.service
 
-import com.cn.langujet.actor.exam.payload.ExamDto
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.exam.model.Exam
 import com.cn.langujet.domain.exam.model.ExamType
@@ -19,14 +18,14 @@ class ExamService(
         return examRepository.save(exam.also { it.id = null })
     }
 
-    fun updateExam(id: String, exam: ExamDto): Exam {
+    fun updateExam(id: String, exam: Exam): Exam {
         val existingExam = getExamById(id)
-        exam.name?.let { existingExam.name = it }
+        exam.name.let { existingExam.name = it }
         exam.examType.let { existingExam.examType = it }
-        exam.description?.let { existingExam.description = it }
-        exam.sectionsNumber?.let { existingExam.sectionsNumber = it }
-        exam.questionNumber?.let { existingExam.questionNumber = it }
-        exam.examDuration?.let { existingExam.examDuration = it }
+        exam.description.let { existingExam.description = it }
+        exam.sectionsNumber.let { existingExam.sectionsNumber = it }
+        exam.questionNumber.let { existingExam.questionNumber = it }
+        exam.examDuration.let { existingExam.examDuration = it }
         return examRepository.save(existingExam)
     }
 

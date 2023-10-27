@@ -1,6 +1,5 @@
 package com.cn.langujet.actor.exam.api
 
-import com.cn.langujet.actor.exam.payload.ExamDto
 import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.domain.exam.model.Exam
 import com.cn.langujet.domain.exam.model.ExamType
@@ -46,16 +45,16 @@ class ExamController(private val examService: ExamService) {
     @PreAuthorize("hasRole('ADMIN')")
     fun updateExam(
         @PathVariable @NotBlank id: String?,
-        @RequestBody examDto: ExamDto
+        @RequestBody examResponse: Exam
     ): ResponseEntity<Exam> = toOkResponseEntity(
         examService.updateExam(
             id!!,
-            examDto
+            examResponse
         )
     )
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'STUDENT')")
+    @PreAuthorize("hasRole('ADMIN')")
     fun getExamById(@PathVariable id: String): ResponseEntity<Exam> =
         toOkResponseEntity(examService.getExamById(id))
 
@@ -65,6 +64,7 @@ class ExamController(private val examService: ExamService) {
         toOkResponseEntity(examService.getAllExams())
 
     @GetMapping("/name")
+    @PreAuthorize("hasRole('ADMIN')")
     fun getAllExamsByName(
         @RequestParam @NotBlank name: String?,
         @RequestParam(defaultValue = "10") pageSize: Int,
