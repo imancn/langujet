@@ -8,9 +8,5 @@ import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.mongodb.repository.Query
 
 interface ExamRepository : MongoRepository<Exam, String> {
-
     fun findAllByNameContainingIgnoreCaseOrderByNameAsc(name: String, pageRequest: PageRequest): Page<Exam>
-
-    @Query(value = "{ 'examType' : ?0 }", fields = "{ 'id' : 1 }")
-    fun findIdsByExamType(examType: ExamType): List<String>
 }

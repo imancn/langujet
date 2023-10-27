@@ -48,6 +48,6 @@ class ExamService(
     }
 
     fun getRandomExamIdByType(examType: ExamType): String {
-        return examRepository.findIdsByExamType(examType).random()
+        return examRepository.findAll().mapNotNull { it.id }.random()
     }
 }
