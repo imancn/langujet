@@ -4,9 +4,10 @@ import com.cn.langujet.actor.exam.payload.SectionDTO
 import com.cn.langujet.application.advice.InvalidTokenException
 import com.cn.langujet.application.advice.MethodNotAllowedException
 import com.cn.langujet.application.advice.NotFoundException
-import com.cn.langujet.actor.exam.payload.ExamRequest
 import com.cn.langujet.domain.exam.model.ExamSession
 import com.cn.langujet.domain.exam.model.ExamSessionState
+import com.cn.langujet.domain.exam.model.ExamType
+import com.cn.langujet.domain.exam.model.SectionType
 import com.cn.langujet.domain.exam.repository.ExamSessionRepository
 import com.cn.langujet.domain.professor.ProfessorService
 import com.cn.langujet.domain.student.service.StudentService
@@ -21,17 +22,17 @@ class ExamSessionService(
     private val studentService: StudentService,
     private val professorService: ProfessorService,
 ) {
-    fun enrollExamSession(auth: String, examRequest: ExamRequest): ExamSession {
+    fun enrollExamSession(auth: String, examType: ExamType, sectionType: SectionType?): ExamSession {
         val studentId = studentService.getStudentByAuthToken(auth).id!!
         /**
-            Todo: Payment should be implemented here later!
+         * Todo: Should check user has not another enrolled exam!
+         * Todo: Payment should be implemented here later!
          */
-        val examId = examService.getRandomExamIdByType(examRequest.examType)
-        val sectionId = if (examRequest.sectionType != null) {
+        val examId = examService.getRandomExamIdByType(examType)
+        val sectionId = if (sectionType != null) {
             sectionService.getSectionsByExamId(examId).find {
-                it.sectionType == examRequest.sectionType
-            }?.id
-                ?: throw NotFoundException("There is no section with ${examRequest.sectionType} in Exam with id: $examId")
+                it.sectionType == sectionType
+            }?.id ?: throw NotFoundException("There is no section with $sectionType in Exam with id: $examId")
         } else null
         return examSessionRepository.save(
             ExamSession(

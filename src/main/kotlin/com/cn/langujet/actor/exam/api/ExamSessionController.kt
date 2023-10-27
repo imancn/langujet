@@ -1,10 +1,10 @@
 package com.cn.langujet.actor.exam.api
 
-import com.cn.langujet.actor.exam.payload.ExamRequest
 import com.cn.langujet.actor.exam.payload.SectionDTO
 import com.cn.langujet.domain.exam.model.*
 import com.cn.langujet.domain.exam.service.ExamSessionService
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -19,9 +19,10 @@ class ExamSessionController(
     @PostMapping("/enroll")
     fun enrollExamSession(
         @RequestHeader("Authorization") @NotBlank auth: String?,
-        @RequestBody examRequest: ExamRequest,
+        @RequestParam @NotNull examType: ExamType?,
+        @RequestParam sectionType: SectionType?
     ): ResponseEntity<ExamSession> =
-        ResponseEntity.ok(examSessionService.enrollExamSession(auth!!, examRequest))
+        ResponseEntity.ok(examSessionService.enrollExamSession(auth!!, examType!!, sectionType))
 
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/student/{examSessionId}")
