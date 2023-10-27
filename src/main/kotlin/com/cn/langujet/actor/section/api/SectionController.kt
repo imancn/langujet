@@ -1,5 +1,6 @@
 package com.cn.langujet.actor.section.api
 
+import com.cn.langujet.actor.exam.payload.SectionDTO
 import com.cn.langujet.actor.util.toCreatedResponseEntity
 import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.application.advice.NotFoundException
@@ -23,8 +24,8 @@ class SectionController(private val sectionService: SectionService) {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     fun createSection(
-        @RequestBody section: Section
-    ): ResponseEntity<Section> = sectionService.createSection(section).let {
+        @RequestBody section: SectionDTO
+    ): ResponseEntity<Section> = sectionService.createSection(section.toSection()).let {
         toCreatedResponseEntity(it, URI("/sections/${it.id}"))
     }
 
@@ -32,9 +33,9 @@ class SectionController(private val sectionService: SectionService) {
     @PreAuthorize("hasRole('ADMIN')")
     fun updateSection(
         @PathVariable id: String,
-        @RequestBody section: Section
+        @RequestBody section: SectionDTO
     ): ResponseEntity<Section> =
-        toOkResponseEntity(sectionService.updateSection(id, section))
+        toOkResponseEntity(sectionService.updateSection(id, section.toSection()))
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
