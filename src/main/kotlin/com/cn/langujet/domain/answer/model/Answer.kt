@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 sealed class Answer(
     @Id var id: String? = null,
     var examSessionId: String,
-    var sectionOrder: String,
+    var sectionOrder: Int,
     var type: AnswerType,
     var partIndex: Int,
     var questionIndex: Int,
@@ -17,7 +17,7 @@ sealed class Answer(
     @TypeAlias("text_answers")
     class Text(
         examSessionId: String,
-        sectionOrder: String,
+        sectionOrder: Int,
         partIndex: Int,
         questionIndex: Int,
         var text: String
@@ -27,7 +27,7 @@ sealed class Answer(
     @TypeAlias("text_parts_answers")
     class TextIssues(
         examSessionId: String,
-        sectionOrder: String,
+        sectionOrder: Int,
         partIndex: Int,
         questionIndex: Int,
         var textList: List<String?>
@@ -37,7 +37,7 @@ sealed class Answer(
     @TypeAlias("true_false_answers")
     class TrueFalse(
         examSessionId: String,
-        sectionOrder: String,
+        sectionOrder: Int,
         partIndex: Int,
         questionIndex: Int,
         var booleanList: List<Boolean?>
@@ -47,9 +47,9 @@ sealed class Answer(
     @TypeAlias("voice_answers")
     class Voice(
         examSessionId: String,
-        sectionOrder: String,
+        sectionOrder: Int,
         partIndex: Int,
         questionIndex: Int,
-        var audioAddress: String
+        var audioId: String
     ): Answer(null, examSessionId, sectionOrder, AnswerType.VOICE, partIndex, questionIndex)
 }

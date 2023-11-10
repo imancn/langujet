@@ -7,6 +7,7 @@ import com.cn.langujet.actor.answer.payload.request.VoiceAnswerRequest
 import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.domain.answer.AnswerService
 import com.cn.langujet.domain.answer.model.Answer
+import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -27,7 +28,7 @@ class AnswerController(
 
     @PostMapping("/text")
     fun submitTextAnswer(
-        @RequestBody request: TextAnswerRequest, @RequestHeader("Authorization") @NotBlank auth: String?
+        @RequestBody @Valid request: TextAnswerRequest, @RequestHeader("Authorization") @NotBlank auth: String?
     ): ResponseEntity<Boolean> {
         answerService.submitAnswer(request, auth!!)
         return toOkResponseEntity(true)
@@ -35,7 +36,7 @@ class AnswerController(
 
     @PostMapping("/text-issues")
     fun submitTextIssuesAnswer(
-        @RequestBody request: TextIssuesAnswerRequest, @RequestHeader("Authorization") @NotBlank auth: String?
+        @RequestBody @Valid request: TextIssuesAnswerRequest, @RequestHeader("Authorization") @NotBlank auth: String?
     ): ResponseEntity<Boolean> {
         answerService.submitAnswer(request, auth!!)
         return toOkResponseEntity(true)
@@ -43,7 +44,7 @@ class AnswerController(
 
     @PostMapping("/true-false")
     fun submitTrueFalseAnswer(
-        @RequestBody request: TrueFalseAnswerRequest, @RequestHeader("Authorization") @NotBlank auth: String?
+        @RequestBody @Valid request: TrueFalseAnswerRequest, @RequestHeader("Authorization") @NotBlank auth: String?
     ): ResponseEntity<Boolean> {
         answerService.submitAnswer(request, auth!!)
         return toOkResponseEntity(true)
@@ -51,7 +52,7 @@ class AnswerController(
 
     @PostMapping("/voice")
     fun submitVoiceAnswer(
-        @RequestBody request: VoiceAnswerRequest, @RequestHeader("Authorization") @NotBlank auth: String?
+        @RequestBody @Valid request: VoiceAnswerRequest, @RequestHeader("Authorization") @NotBlank auth: String?
     ): ResponseEntity<Boolean> {
         answerService.submitAnswer(request, auth!!)
         return toOkResponseEntity(true)
