@@ -14,6 +14,7 @@ data class ExamSession(
     var examId: String,
     var sectionId: String?,
 
+    val sectionOrders: List<Int>,
     var state: ExamSessionState,
 
     var enrollDate: Date,
@@ -26,6 +27,7 @@ data class ExamSession(
         professorId: String?,
         examId: String,
         sectionId: String?,
+        sectionOrders: List<Int>,
         requestDate: Date
     ) : this(
         null,
@@ -33,6 +35,7 @@ data class ExamSession(
         professorId,
         examId,
         sectionId,
+        sectionOrders,
         ExamSessionState.ENROLLED,
         requestDate,
         null,

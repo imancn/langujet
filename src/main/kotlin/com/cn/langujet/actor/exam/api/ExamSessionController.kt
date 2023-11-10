@@ -1,5 +1,7 @@
 package com.cn.langujet.actor.exam.api
 
+import com.cn.langujet.actor.exam.payload.ExamSessionEnrollResponse
+import com.cn.langujet.actor.exam.payload.ExamSessionResponse
 import com.cn.langujet.actor.exam.payload.SectionDTO
 import com.cn.langujet.domain.exam.model.*
 import com.cn.langujet.domain.exam.service.ExamSessionService
@@ -10,7 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/exam-session")
+@RequestMapping("/api/exam-session")
 class ExamSessionController(
     private val examSessionService: ExamSessionService
 ){
@@ -21,7 +23,7 @@ class ExamSessionController(
         @RequestHeader("Authorization") @NotBlank auth: String?,
         @RequestParam @NotNull examType: ExamType?,
         @RequestParam sectionType: SectionType?
-    ): ResponseEntity<ExamSession> =
+    ): ResponseEntity<ExamSessionEnrollResponse> =
         ResponseEntity.ok(examSessionService.enrollExamSession(auth!!, examType!!, sectionType))
 
     @PreAuthorize("hasRole('STUDENT')")
@@ -29,15 +31,15 @@ class ExamSessionController(
     fun getStudentExamSession(
         @RequestHeader("Authorization") @NotBlank auth: String?,
         @PathVariable @NotBlank examSessionId: String?
-    ): ResponseEntity<ExamSession> =
-        ResponseEntity.ok(examSessionService.getStudentExamSession(auth!!, examSessionId!!))
+    ): ResponseEntity<ExamSessionResponse> =
+        ResponseEntity.ok(examSessionService.getStudentExamSessionResponse(auth!!, examSessionId!!))
 
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/student-sessions")
     fun getStudentExamSessions(
         @RequestHeader("Authorization") @NotBlank auth: String?
-    ): ResponseEntity<List<ExamSession>> =
-        ResponseEntity.ok(examSessionService.getStudentExamSessions(auth!!))
+    ): ResponseEntity<List<ExamSessionResponse>> =
+        ResponseEntity.ok(examSessionService.getStudentExamSessionResponses(auth!!))
 
     @PreAuthorize("hasRole('PROFESSOR')")
     @GetMapping("/professor/{examSessionId}")
@@ -55,27 +57,19 @@ class ExamSessionController(
         ResponseEntity.ok(examSessionService.getProfessorExamSessions(auth!!))
 
     @PreAuthorize("hasRole('STUDENT')")
-    @PostMapping("/start")
-    fun startExamSession(
-        @RequestHeader("Authorization") @NotBlank auth: String?,
-        @RequestParam @NotBlank examSessionId: String?
-    ): ResponseEntity<SectionDTO> =
-        ResponseEntity.ok(examSessionService.startExamSession(auth!!, examSessionId!!))
-
-    @PreAuthorize("hasRole('STUDENT')")
-    @PostMapping("/next")
-    fun nextExamIssue(
+    @PostMapping("/section")
+    fun getExamSection(
         @RequestHeader("Authorization") @NotBlank auth: String?,
         @RequestParam @NotBlank examSessionId: String?,
-        @RequestParam @NotBlank currentExamIssueOrder: Int?
+        @RequestParam @NotBlank sectionOrder: Int?
     ): ResponseEntity<SectionDTO> =
-        ResponseEntity.ok(examSessionService.nextExamSection(auth!!, examSessionId!!, currentExamIssueOrder!!))
+        ResponseEntity.ok(examSessionService.getExamSection(auth!!, examSessionId!!, sectionOrder!!))
 
     @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/finish")
     fun finishExamSession(
         @RequestHeader("Authorization") @NotBlank auth: String?,
         @RequestParam @NotBlank examSessionId: String?
-    ): ResponseEntity<ExamSession> =
+    ): ResponseEntity<ExamSessionResponse> =
         ResponseEntity.ok(examSessionService.finishExamSession(auth!!, examSessionId!!))
 }

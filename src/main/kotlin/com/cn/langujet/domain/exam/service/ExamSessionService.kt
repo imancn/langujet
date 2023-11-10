@@ -1,5 +1,7 @@
 package com.cn.langujet.domain.exam.service
 
+import com.cn.langujet.actor.exam.payload.ExamSessionResponse
+import com.cn.langujet.actor.exam.payload.ExamSessionEnrollResponse
 import com.cn.langujet.actor.exam.payload.SectionDTO
 import com.cn.langujet.application.advice.InvalidTokenException
 import com.cn.langujet.application.advice.MethodNotAllowedException
@@ -22,24 +24,46 @@ class ExamSessionService(
     private val studentService: StudentService,
     private val professorService: ProfessorService,
 ) {
-    fun enrollExamSession(auth: String, examType: ExamType, sectionType: SectionType?): ExamSession {
+    fun enrollExamSession(auth: String, examType: ExamType, sectionType: SectionType?): ExamSessionEnrollResponse {
         val studentId = studentService.getStudentByAuthToken(auth).id!!
+
+        val existsByStudentIdAndStateContaining = examSessionRepository.existsByStudentIdAndStateContaining(
+            studentId,
+            listOf(
+                ExamSessionState.ENROLLED,
+                ExamSessionState.STARTED,
+            )
+        )
+        if (existsByStudentIdAndStateContaining) {
+            throw MethodNotAllowedException("Finish current enrolled exam")
+        }
+
         /**
          * Todo: Should check user has not another enrolled exam!
          * Todo: Payment should be implemented here later!
          */
+
         val examId = examService.getRandomExamIdByType(examType)
-        val sectionId = if (sectionType != null) {
-            sectionService.getSectionsByExamId(examId).find {
-                it.sectionType == sectionType
-            }?.id ?: throw NotFoundException("There is no section with $sectionType in Exam with id: $examId")
-        } else null
-        return examSessionRepository.save(
+        val sections = sectionService.getSectionsByExamId(examId)
+        val specifiedSection = sections.find { it.sectionType == sectionType }
+
+        val sectionOrders = if (sectionType == null) {
+            sections.map { it.order }.sorted()
+        } else {
+            listOf(
+                specifiedSection?.order
+                    ?: throw NotFoundException("There is no section with $sectionType in Exam with id: $examId")
+            )
+        }
+
+        val examSession = examSessionRepository.save(
             ExamSession(
                 studentId, null, // this is immediately null, and it means exam professor is AI
-                examId, sectionId, Date(System.currentTimeMillis())
+                examId, specifiedSection?.id, sectionOrders, Date(System.currentTimeMillis())
             )
         )
+
+        return ExamSessionEnrollResponse(examSession)
     }
 
     fun getStudentExamSession(
@@ -54,9 +78,24 @@ class ExamSessionService(
         return examSession
     }
 
+    fun getStudentExamSessionResponse(
+        authToken: String,
+        examSessionId: String,
+    ): ExamSessionResponse {
+        val examSession = getStudentExamSession(authToken, examSessionId)
+        val exam = examService.getExamById(examSession.examId)
+        return ExamSessionResponse(examSession, exam)
+    }
+
     fun getStudentExamSessions(authToken: String): List<ExamSession> {
         val studentId = studentService.getStudentByAuthToken(authToken).id ?: ""
         return examSessionRepository.findAllByStudentId(studentId)
+    }
+
+    fun getStudentExamSessionResponses(authToken: String): List<ExamSessionResponse> {
+        return getStudentExamSessions(authToken).map {
+            ExamSessionResponse(it, null)
+        }
     }
 
     fun getProfessorExamSession(
@@ -76,62 +115,64 @@ class ExamSessionService(
         return examSessionRepository.findAllByProfessorId(professorId)
     }
 
-    fun startExamSession(
-        authToken: String, examSessionId: String
+    fun getExamSection(
+        authToken: String, examSessionId: String, sectionOrder: Int
     ): SectionDTO {
         val examSession = getStudentExamSession(authToken, examSessionId)
 
-        if (examSession.state.order >= ExamSessionState.STARTED.order) throw MethodNotAllowedException("Exam Session has been started once")
-        else {
-            examSessionRepository.save(examSession.also {
-                val now = Date(System.currentTimeMillis())
-                val examDuration = examService.getExamById(examSession.examId).examDuration
-                it.startDate = now
-                it.endDate = Date(now.time + examDuration)
-                it.state = ExamSessionState.STARTED
-            })
-            return SectionDTO(sectionService.getSectionByExamIdAndOrder(examSession.examId, 0))
-        }
-    }
+        if (!examSession.sectionOrders.contains(sectionOrder))
+            throw MethodNotAllowedException("You don't have permission to this section")
 
-    fun nextExamSection(
-        authToken: String, examSessionId: String, currentSectionOrder: Int
-    ): SectionDTO {
-        val examSession = getExamSessionIfIsInProgress(authToken, examSessionId)
-        val section = try {
-            sectionService.getSectionByExamIdAndOrder(examSession.examId, currentSectionOrder + 1)
-        } catch (ex: NotFoundException) {
-            examSessionRepository.save(examSession.also { it.state = ExamSessionState.FINISHED })
-            throw MethodNotAllowedException("There is no section left")
-        }
-        return SectionDTO(section)
-    }
+        if (examSession.state.order >= ExamSessionState.FINISHED.order)
+            throw MethodNotAllowedException("The exam session has been finished")
 
-    fun finishExamSession(
-        authToken: String, examSessionId: String
-    ): ExamSession {
-        return getExamSessionIfIsInProgress(authToken, examSessionId).also { examSession ->
-            if (examSession.state != ExamSessionState.FINISHED) examSessionRepository.save(examSession.also {
-                it.state = ExamSessionState.FINISHED
-            })
-        }
-    }
-
-    fun isExamAvailable(examSessionId: String): Boolean {
-        return getExamSessionById(examSessionId).state == ExamSessionState.STARTED
-    }
-
-    private fun getExamSessionIfIsInProgress(authToken: String, examSessionId: String): ExamSession {
-        val examSession = getStudentExamSession(authToken, examSessionId)
-        if (examSession.state == ExamSessionState.ENROLLED) throw MethodNotAllowedException("The exam session has not been started")
-        else if (examSession.state.order >= ExamSessionState.FINISHED.order) throw MethodNotAllowedException("The exam session has been finished")
-        else if (examSession.endDate?.time!! < System.currentTimeMillis()) {
+        if ((examSession.endDate?.time ?: (Long.MAX_VALUE)) < System.currentTimeMillis()) {
             examSessionRepository.save(examSession.also {
                 it.state = ExamSessionState.FINISHED
             })
             throw MethodNotAllowedException("The exam session time is over")
         }
-        return examSession
+
+        val section = try {
+            sectionService.getSectionByExamIdAndOrder(examSession.examId, sectionOrder)
+        } catch (ex: NotFoundException) {
+            throw MethodNotAllowedException("There is no section left")
+        }
+
+        if (examSession.state == ExamSessionState.ENROLLED) {
+            examSessionRepository.save(examSession.also {
+                val loadingDelay = 30_000L
+                val now = Date(System.currentTimeMillis())
+                val examDuration = examService.getExamById(examSession.examId).examDuration
+                it.startDate = now
+                it.endDate = Date(now.time + (examDuration ?: 0L) + loadingDelay)
+                it.state = ExamSessionState.STARTED
+            })
+        }
+        return SectionDTO(section.also { it.id = null })
+    }
+
+    fun finishExamSession(
+        authToken: String, examSessionId: String
+    ): ExamSessionResponse {
+        return ExamSessionResponse(
+            getStudentExamSession(authToken, examSessionId).also { examSession ->
+                if (examSession.state == ExamSessionState.ENROLLED)
+                    throw MethodNotAllowedException("The exam session has not been started")
+                else if (examSession.state.order >= ExamSessionState.FINISHED.order)
+                    throw MethodNotAllowedException("The exam session has been finished")
+                else {
+                    examSessionRepository.save(examSession.also {
+                        it.state = ExamSessionState.FINISHED
+                    })
+                }
+            },
+            null
+        )
+    }
+
+    fun isExamAvailable(examSessionId: String): Boolean {
+        return getExamSessionById(examSessionId).state == ExamSessionState.STARTED
     }
 
     fun getExamSessionById(id: String?): ExamSession {
