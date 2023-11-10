@@ -17,7 +17,7 @@ class ReadingPart(
 
 class ListeningPart(
     index: Int,
-    var audioAddress: String,
+    var audioId: String,
     var questionList: List<Question>
 ) : Part(index, SectionType.LISTENING)
 

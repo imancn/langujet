@@ -29,7 +29,7 @@ sealed class PartDTO(
 
             is ListeningPartDTO -> ListeningPart(
                 this.index!!,
-                this.audioAddress!!,
+                this.audioId!!,
                 this.questionList?.map { it.toQuestion() }!!
             )
 
