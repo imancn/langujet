@@ -82,12 +82,12 @@ data class ReadingPartDTO(
 
 data class ListeningPartDTO(
     override val index: Int? = null,
-    val audioAddress: String? = null,
+    val audioId: String? = null,
     val questionList: List<QuestionDTO>? = null
 ) : PartDTO(index, SectionType.LISTENING) {
     constructor(part: ListeningPart) : this(
         part.index,
-        part.audioAddress,
+        part.audioId,
         part.questionList.map { QuestionDTO.from(it) }
     )
 }
