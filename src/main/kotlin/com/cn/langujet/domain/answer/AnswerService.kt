@@ -15,7 +15,7 @@ class AnswerService(
     private val examSessionService: ExamSessionService,
     private val studentService: StudentService
 ) {
-    private val EXAM_SESSION_EXPIRED = "There is no available exam session for this answer"
+    private val EXAM_SESSION_EXPIRED = "The exam session time is over"
     fun submitAnswer(request: AnswerRequest, token: String): Answer {
         val examSession = examSessionService.getExamSessionById(request.examSessionId)
         if (!studentService.doesStudentOwnAuthToken(
