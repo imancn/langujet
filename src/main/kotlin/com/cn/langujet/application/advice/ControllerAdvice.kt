@@ -26,7 +26,7 @@ class ControllerAdvice {
     fun handleValidationException(ex: MethodArgumentNotValidException, request: WebRequest): ResponseEntity<String> {
         logger.error(ex.stackTraceToString())
         return ResponseEntity(
-            ex.message,
+            ex.detailMessageArguments.toString(),
             HttpStatus.BAD_REQUEST
         )
     }
