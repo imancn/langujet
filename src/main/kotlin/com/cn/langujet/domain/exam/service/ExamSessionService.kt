@@ -13,6 +13,7 @@ import com.cn.langujet.domain.exam.model.SectionType
 import com.cn.langujet.domain.exam.repository.ExamSessionRepository
 import com.cn.langujet.domain.professor.ProfessorService
 import com.cn.langujet.domain.student.service.StudentService
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -87,19 +88,20 @@ class ExamSessionService(
         return ExamSessionResponse(examSession, exam)
     }
 
-    fun getAllStudentExamSessionResponses(authToken: String): List<ExamSessionResponse> {
+    fun getAllStudentExamSessionResponses(authToken: String, pageRequest: PageRequest): List<ExamSessionResponse> {
         val studentId = studentService.getStudentByAuthToken(authToken).id ?: ""
-        return examSessionRepository.findAllByStudentId(studentId).map {
+        return examSessionRepository.findAllByStudentId(studentId, pageRequest).map {
             ExamSessionResponse(it, null)
         }
     }
 
     fun getAllStudentExamSessionResponsesByState(
         authToken: String,
-        state: ExamSessionState
+        state: ExamSessionState,
+        pageRequest: PageRequest
     ): List<ExamSessionResponse> {
         val studentId = studentService.getStudentByAuthToken(authToken).id ?: ""
-        return examSessionRepository.findAllByStudentIdAndState(studentId, state).map {
+        return examSessionRepository.findAllByStudentIdAndState(studentId, state, pageRequest).map {
             ExamSessionResponse(it, null)
         }
     }

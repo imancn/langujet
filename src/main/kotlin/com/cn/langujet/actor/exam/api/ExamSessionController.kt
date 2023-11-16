@@ -7,6 +7,7 @@ import com.cn.langujet.domain.exam.model.*
 import com.cn.langujet.domain.exam.service.ExamSessionService
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -37,17 +38,31 @@ class ExamSessionController(
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/student/exam-session/all")
     fun getStudentExamSessions(
-        @RequestHeader("Authorization") @NotBlank auth: String?
+        @RequestHeader("Authorization") @NotBlank auth: String?,
+        @RequestParam(defaultValue = "10") pageSize: Int,
+        @RequestParam(defaultValue = "0") pageNumber: Int,
     ): ResponseEntity<List<ExamSessionResponse>> =
-        ResponseEntity.ok(examSessionService.getAllStudentExamSessionResponses(auth!!))
+        ResponseEntity.ok(
+            examSessionService.getAllStudentExamSessionResponses(
+                auth!!,
+                PageRequest.of(pageNumber, pageSize)
+            )
+        )
 
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/student/exam-session/by-state")
     fun getAllStudentExamSessionsByStatus(
         @RequestHeader("Authorization") @NotBlank auth: String?,
-        @RequestParam @NotNull state: ExamSessionState?
+        @RequestParam @NotNull state: ExamSessionState?,
+        @RequestParam(defaultValue = "10") pageSize: Int,
+        @RequestParam(defaultValue = "0") pageNumber: Int,
     ): ResponseEntity<List<ExamSessionResponse>> =
-        ResponseEntity.ok(examSessionService.getAllStudentExamSessionResponsesByState(auth!!, state!!))
+        ResponseEntity.ok(
+            examSessionService.getAllStudentExamSessionResponsesByState(
+                auth!!,
+                state!!,
+                PageRequest.of(pageNumber, pageSize))
+        )
 
     @PreAuthorize("hasRole('PROFESSOR')")
     @GetMapping("/professor/exam-session/{examSessionId}")
