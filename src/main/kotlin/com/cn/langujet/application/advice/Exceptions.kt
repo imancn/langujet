@@ -17,3 +17,5 @@ class NotFoundException(message: String?) : HttpException(HttpStatus.NOT_FOUND, 
 class MethodNotAllowedException(message: String?) : HttpException(HttpStatus.METHOD_NOT_ALLOWED, message)
 
 class EmailNotSentException(message: String?) : HttpException(HttpStatus.INTERNAL_SERVER_ERROR, message)
+
+class FileException(message: String?) : HttpException(HttpStatus.INTERNAL_SERVER_ERROR, message)
