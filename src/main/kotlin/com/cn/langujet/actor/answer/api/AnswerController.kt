@@ -1,60 +1,92 @@
 package com.cn.langujet.actor.answer.api
 
-import com.cn.langujet.actor.answer.payload.request.TextAnswerRequest
-import com.cn.langujet.actor.answer.payload.request.TextIssuesAnswerRequest
-import com.cn.langujet.actor.answer.payload.request.TrueFalseAnswerRequest
-import com.cn.langujet.actor.answer.payload.request.VoiceAnswerRequest
+import com.cn.langujet.actor.answer.payload.request.*
 import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.domain.answer.AnswerService
-import com.cn.langujet.domain.answer.model.Answer
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
-@RequestMapping("/answers")
+@RequestMapping("/api/v1/")
+@Validated
 class AnswerController(
     private val answerService: AnswerService,
 ) {
-    private val SUBMIT_MESSAGE = "Answer Submitted"
-
     // TODO: Add get by exam session id and section id
 
-    @GetMapping("/{id}")
-    fun getAnswerById(
-        @PathVariable id: String, @RequestHeader("Authorization") @NotBlank auth: String?
-    ): ResponseEntity<Answer> = toOkResponseEntity(answerService.getAnswerById(id))
-
-    @PostMapping("/text")
+    @PostMapping("/student/answer/text")
     fun submitTextAnswer(
         @RequestBody @Valid request: TextAnswerRequest, @RequestHeader("Authorization") @NotBlank auth: String?
     ): ResponseEntity<Boolean> {
-        answerService.submitAnswer(request, auth!!)
-        return toOkResponseEntity(true)
+        return toOkResponseEntity(answerService.submitAnswer(request, auth!!))
     }
 
-    @PostMapping("/text-issues")
+    @PostMapping("/student/answer/text-issues")
     fun submitTextIssuesAnswer(
         @RequestBody @Valid request: TextIssuesAnswerRequest, @RequestHeader("Authorization") @NotBlank auth: String?
     ): ResponseEntity<Boolean> {
-        answerService.submitAnswer(request, auth!!)
-        return toOkResponseEntity(true)
+        return toOkResponseEntity(answerService.submitAnswer(request, auth!!))
     }
 
-    @PostMapping("/true-false")
+    @PostMapping("/student/answer/true-false")
     fun submitTrueFalseAnswer(
         @RequestBody @Valid request: TrueFalseAnswerRequest, @RequestHeader("Authorization") @NotBlank auth: String?
     ): ResponseEntity<Boolean> {
-        answerService.submitAnswer(request, auth!!)
+        return toOkResponseEntity(answerService.submitAnswer(request, auth!!))
+    }
+
+    @PostMapping("/student/answer/voice")
+    fun submitVoiceAnswer(
+        @RequestHeader("Authorization") @NotBlank auth: String?,
+        @RequestParam @NotBlank examSessionId: String?,
+        @RequestParam @NotNull sectionOrder: Int?,
+        @RequestParam @NotNull partIndex: Int?,
+        @RequestParam @NotNull questionIndex: Int?,
+        @RequestParam("voice") voice: MultipartFile
+    ): ResponseEntity<Boolean> {
+        answerService.submitVoiceAnswer(
+            auth!!,
+            examSessionId!!,
+            sectionOrder!!,
+            partIndex!!,
+            questionIndex!!,
+            voice,
+        )
         return toOkResponseEntity(true)
     }
 
-    @PostMapping("/voice")
-    fun submitVoiceAnswer(
-        @RequestBody @Valid request: VoiceAnswerRequest, @RequestHeader("Authorization") @NotBlank auth: String?
+    @PostMapping("/student/answer/bulk/text")
+    fun submitBulkTextAnswer(
+        @RequestParam @NotBlank examSessionId: String?,
+        @RequestParam @NotNull sectionOrder: Int?,
+        @RequestBody @Valid request: List<TextBulkAnswerRequest>,
+        @RequestHeader("Authorization") @NotBlank auth: String?
     ): ResponseEntity<Boolean> {
-        answerService.submitAnswer(request, auth!!)
-        return toOkResponseEntity(true)
+        return toOkResponseEntity(answerService.submitBulkAnswers(examSessionId, sectionOrder, request, auth!!))
+    }
+
+    @PostMapping("/student/answer/bulk/text-issues")
+    fun submitBulkTextIssuesAnswer(
+        @RequestParam @NotBlank examSessionId: String?,
+        @RequestParam @NotNull sectionOrder: Int?,
+        @RequestBody @Valid request: List<TextIssuesBulkAnswerRequest>,
+        @RequestHeader("Authorization") @NotBlank auth: String?
+    ): ResponseEntity<Boolean> {
+        return toOkResponseEntity(answerService.submitBulkAnswers(examSessionId, sectionOrder, request, auth!!))
+    }
+
+    @PostMapping("/student/answer/bulk/true-false")
+    fun submitBulkTrueFalseAnswer(
+        @RequestParam @NotBlank examSessionId: String?,
+        @RequestParam @NotNull sectionOrder: Int?,
+        @RequestBody @Valid request: List<TrueFalseBulkAnswerRequest>,
+        @RequestHeader("Authorization") @NotBlank auth: String?
+    ): ResponseEntity<Boolean> {
+        return toOkResponseEntity(answerService.submitBulkAnswers(examSessionId, sectionOrder, request, auth!!))
     }
 }

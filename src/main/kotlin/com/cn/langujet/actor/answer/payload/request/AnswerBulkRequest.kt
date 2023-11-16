@@ -4,33 +4,31 @@ import com.cn.langujet.domain.answer.model.Answer
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 
-sealed class AnswerRequest(
-    open val examSessionId: String?,
-    open val sectionOrder: Int?,
+sealed class AnswerBulkRequest(
     open val partIndex: Int?,
     open val questionIndex: Int?,
 ) {
-    inline fun <reified T : Answer> convertToAnswer(): T {
+    inline fun <reified T : Answer> convertToAnswer(examSessionId: String, sectionOrder: Int): T {
         val answer: Answer = when (this) {
-            is TextAnswerRequest -> Answer.Text(
-                examSessionId!!,
-                sectionOrder!!,
+            is TextBulkAnswerRequest -> Answer.Text(
+                examSessionId,
+                sectionOrder,
                 partIndex!!,
                 questionIndex!!,
                 this.text!!
             )
 
-            is TextIssuesAnswerRequest -> Answer.TextIssues(
-                examSessionId!!,
-                sectionOrder!!,
+            is TextIssuesBulkAnswerRequest -> Answer.TextIssues(
+                examSessionId,
+                sectionOrder,
                 partIndex!!,
                 questionIndex!!,
                 this.textList!!
             )
 
-            is TrueFalseAnswerRequest -> Answer.TrueFalse(
-                examSessionId!!,
-                sectionOrder!!,
+            is TrueFalseBulkAnswerRequest -> Answer.TrueFalse(
+                examSessionId,
+                sectionOrder,
                 partIndex!!,
                 questionIndex!!,
                 booleanList!!
@@ -45,26 +43,20 @@ sealed class AnswerRequest(
     }
 }
 
-data class TextAnswerRequest(
-    @field:NotBlank override val examSessionId: String? = null,
-    @field:NotNull override val sectionOrder: Int? = null,
+data class TextBulkAnswerRequest(
     @field:NotNull override val partIndex: Int? = null,
     @field:NotNull override val questionIndex: Int? = null,
     @field:NotBlank val text: String? = null,
-) : AnswerRequest(examSessionId, sectionOrder, partIndex, questionIndex)
+) : AnswerBulkRequest(partIndex, questionIndex)
 
-data class TextIssuesAnswerRequest(
-    @field:NotBlank override val examSessionId: String? = null,
-    @field:NotNull override val sectionOrder: Int? = null,
+data class TextIssuesBulkAnswerRequest(
     @field:NotNull override val partIndex: Int? = null,
     @field:NotNull override val questionIndex: Int? = null,
     @field:NotNull val textList: List<String?>? = null,
-) : AnswerRequest(examSessionId, sectionOrder, partIndex, questionIndex)
+) : AnswerBulkRequest(partIndex, questionIndex)
 
-data class TrueFalseAnswerRequest(
-    @field:NotBlank override val examSessionId: String? = null,
-    @field:NotNull override val sectionOrder: Int? = null,
+data class TrueFalseBulkAnswerRequest(
     @field:NotNull override val partIndex: Int? = null,
     @field:NotNull override val questionIndex: Int? = null,
     @field:NotNull val booleanList: List<Boolean?>? = null,
-) : AnswerRequest(examSessionId, sectionOrder, partIndex, questionIndex)
+) : AnswerBulkRequest(partIndex, questionIndex)

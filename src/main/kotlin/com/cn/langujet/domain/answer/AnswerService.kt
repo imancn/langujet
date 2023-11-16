@@ -1,41 +1,65 @@
 package com.cn.langujet.domain.answer
 
+import com.cn.langujet.actor.answer.payload.request.AnswerBulkRequest
 import com.cn.langujet.actor.answer.payload.request.AnswerRequest
-import com.cn.langujet.application.advice.InvalidTokenException
-import com.cn.langujet.application.advice.MethodNotAllowedException
-import com.cn.langujet.application.advice.NotFoundException
+import com.cn.langujet.application.service.file.domain.data.model.FileBucket
+import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.answer.model.Answer
 import com.cn.langujet.domain.exam.service.ExamSessionService
-import com.cn.langujet.domain.student.service.StudentService
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 
 @Service
 class AnswerService(
     private val answerRepository: AnswerRepository,
     private val examSessionService: ExamSessionService,
-    private val studentService: StudentService
+    private val fileService: FileService
 ) {
-    private val EXAM_SESSION_EXPIRED = "The exam session time is over"
-    fun submitAnswer(request: AnswerRequest, token: String): Answer {
-        val examSession = examSessionService.getExamSessionById(request.examSessionId)
-        if (!studentService.doesStudentOwnAuthToken(
-                token,
-                examSession.studentId
+    fun submitAnswer(request: AnswerRequest, token: String): Boolean {
+        examSessionPreCheck(request.examSessionId ?: "", request.sectionOrder!!, token)
+        answerRepository.save(request.convertToAnswer())
+        return true
+    }
+
+    fun submitBulkAnswers(
+        examSessionId: String?,
+        sectionOrder: Int?,
+        answerRequestList: List<AnswerBulkRequest>,
+        auth: String
+    ): Boolean {
+        examSessionPreCheck(examSessionId!!, sectionOrder!!, auth)
+        answerRepository.saveAll(
+            answerRequestList.map {
+                it.convertToAnswer(examSessionId, sectionOrder)
+            }
+        )
+        return true
+    }
+
+    fun submitVoiceAnswer(
+        token: String,
+        examSessionId: String,
+        sectionOrder: Int,
+        partIndex: Int,
+        questionIndex: Int,
+        voice: MultipartFile
+    ): Answer.Voice {
+        examSessionPreCheck(examSessionId, sectionOrder, token)
+        val fileEntity = fileService.uploadFile(voice, FileBucket.ANSWERS)
+        return answerRepository.save(
+            Answer.Voice(
+                examSessionId,
+                sectionOrder,
+                partIndex,
+                questionIndex,
+                fileEntity.id!!
             )
-        ) throw InvalidTokenException("Exam Session with id: ${request.examSessionId} is not belong to your token")
-        return saveAnswer(request.convertToAnswer())
+        )
     }
 
-    private fun <T : Answer> saveAnswer(answer: T): T {
-        if (examSessionService.isExamAvailable(answer.examSessionId)) {
-            return answerRepository.save(answer)
-        } else throw MethodNotAllowedException(EXAM_SESSION_EXPIRED)
+    private fun examSessionPreCheck(examSessionId: String, sectionOrder: Int, token: String) {
+        examSessionService.checkExamSessionAndSectionAvailability(
+            examSessionService.getStudentExamSession(token, examSessionId), sectionOrder
+        )
     }
-
-    fun getAnswerById(id: String): Answer {
-        return answerRepository.findById(id).orElseThrow {
-            NotFoundException("Answer with id: $id not found")
-        }
-    }
-
 }
