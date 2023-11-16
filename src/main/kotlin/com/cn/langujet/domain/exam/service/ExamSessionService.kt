@@ -1,7 +1,7 @@
 package com.cn.langujet.domain.exam.service
 
-import com.cn.langujet.actor.exam.payload.ExamSessionResponse
 import com.cn.langujet.actor.exam.payload.ExamSessionEnrollResponse
+import com.cn.langujet.actor.exam.payload.ExamSessionResponse
 import com.cn.langujet.actor.exam.payload.SectionDTO
 import com.cn.langujet.application.advice.InvalidTokenException
 import com.cn.langujet.application.advice.MethodNotAllowedException
@@ -87,13 +87,19 @@ class ExamSessionService(
         return ExamSessionResponse(examSession, exam)
     }
 
-    fun getStudentExamSessions(authToken: String): List<ExamSession> {
+    fun getAllStudentExamSessionResponses(authToken: String): List<ExamSessionResponse> {
         val studentId = studentService.getStudentByAuthToken(authToken).id ?: ""
-        return examSessionRepository.findAllByStudentId(studentId)
+        return examSessionRepository.findAllByStudentId(studentId).map {
+            ExamSessionResponse(it, null)
+        }
     }
 
-    fun getStudentExamSessionResponses(authToken: String): List<ExamSessionResponse> {
-        return getStudentExamSessions(authToken).map {
+    fun getAllStudentExamSessionResponsesByState(
+        authToken: String,
+        state: ExamSessionState
+    ): List<ExamSessionResponse> {
+        val studentId = studentService.getStudentByAuthToken(authToken).id ?: ""
+        return examSessionRepository.findAllByStudentIdAndState(studentId, state).map {
             ExamSessionResponse(it, null)
         }
     }
@@ -110,7 +116,7 @@ class ExamSessionService(
         return examSession
     }
 
-    fun getProfessorExamSessions(authToken: String): List<ExamSession> {
+    fun getAllProfessorExamSessions(authToken: String): List<ExamSession> {
         val professorId = professorService.getProfessorByAuthToken(authToken).id ?: ""
         return examSessionRepository.findAllByProfessorId(professorId)
     }
@@ -120,18 +126,7 @@ class ExamSessionService(
     ): SectionDTO {
         val examSession = getStudentExamSession(authToken, examSessionId)
 
-        if (!examSession.sectionOrders.contains(sectionOrder))
-            throw MethodNotAllowedException("You don't have permission to this section")
-
-        if (examSession.state.order >= ExamSessionState.FINISHED.order)
-            throw MethodNotAllowedException("The exam session has been finished")
-
-        if ((examSession.endDate?.time ?: (Long.MAX_VALUE)) < System.currentTimeMillis()) {
-            examSessionRepository.save(examSession.also {
-                it.state = ExamSessionState.FINISHED
-            })
-            throw MethodNotAllowedException("The exam session time is over")
-        }
+        checkExamSessionAndSectionAvailability(examSession, sectionOrder)
 
         val section = try {
             sectionService.getSectionByExamIdAndOrder(examSession.examId, sectionOrder)
@@ -143,9 +138,9 @@ class ExamSessionService(
             examSessionRepository.save(examSession.also {
                 val loadingDelay = 30_000L
                 val now = Date(System.currentTimeMillis())
-                val examDuration = examService.getExamById(examSession.examId).examDuration
+                val examDuration = (examService.getExamById(examSession.examId).examDuration ?: 0L) * 1000
                 it.startDate = now
-                it.endDate = Date(now.time + (examDuration ?: 0L) + loadingDelay)
+                it.endDate = Date(now.time + examDuration + loadingDelay)
                 it.state = ExamSessionState.STARTED
             })
         }
@@ -171,8 +166,19 @@ class ExamSessionService(
         )
     }
 
-    fun isExamAvailable(examSessionId: String): Boolean {
-        return getExamSessionById(examSessionId).state == ExamSessionState.STARTED
+    fun checkExamSessionAndSectionAvailability(examSession: ExamSession, sectionOrder: Int) {
+        if (!examSession.sectionOrders.contains(sectionOrder))
+            throw MethodNotAllowedException("You don't have permission to this section")
+
+        if (examSession.state.order >= ExamSessionState.FINISHED.order)
+            throw MethodNotAllowedException("The exam session has been finished")
+
+        if ((examSession.endDate?.time ?: (Long.MAX_VALUE)) < System.currentTimeMillis()) {
+            examSessionRepository.save(examSession.also {
+                it.state = ExamSessionState.FINISHED
+            })
+            throw MethodNotAllowedException("The exam session time is over")
+        }
     }
 
     fun getExamSessionById(id: String?): ExamSession {

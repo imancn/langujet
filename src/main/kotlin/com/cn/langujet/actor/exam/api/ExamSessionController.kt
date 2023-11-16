@@ -12,13 +12,13 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/exam-session")
+@RequestMapping("/api/v1")
 class ExamSessionController(
     private val examSessionService: ExamSessionService
 ){
 
     @PreAuthorize("hasRole('STUDENT')")
-    @PostMapping("/enroll")
+    @PostMapping("/student/exam-session/enroll")
     fun enrollExamSession(
         @RequestHeader("Authorization") @NotBlank auth: String?,
         @RequestParam @NotNull examType: ExamType?,
@@ -27,7 +27,7 @@ class ExamSessionController(
         ResponseEntity.ok(examSessionService.enrollExamSession(auth!!, examType!!, sectionType))
 
     @PreAuthorize("hasRole('STUDENT')")
-    @GetMapping("/student/{examSessionId}")
+    @GetMapping("/student/exam-session/{examSessionId}")
     fun getStudentExamSession(
         @RequestHeader("Authorization") @NotBlank auth: String?,
         @PathVariable @NotBlank examSessionId: String?
@@ -35,14 +35,22 @@ class ExamSessionController(
         ResponseEntity.ok(examSessionService.getStudentExamSessionResponse(auth!!, examSessionId!!))
 
     @PreAuthorize("hasRole('STUDENT')")
-    @GetMapping("/student-sessions")
+    @GetMapping("/student/exam-session/all")
     fun getStudentExamSessions(
         @RequestHeader("Authorization") @NotBlank auth: String?
     ): ResponseEntity<List<ExamSessionResponse>> =
-        ResponseEntity.ok(examSessionService.getStudentExamSessionResponses(auth!!))
+        ResponseEntity.ok(examSessionService.getAllStudentExamSessionResponses(auth!!))
+
+    @PreAuthorize("hasRole('STUDENT')")
+    @GetMapping("/student/exam-session/by-state")
+    fun getAllStudentExamSessionsByStatus(
+        @RequestHeader("Authorization") @NotBlank auth: String?,
+        @RequestParam @NotNull state: ExamSessionState?
+    ): ResponseEntity<List<ExamSessionResponse>> =
+        ResponseEntity.ok(examSessionService.getAllStudentExamSessionResponsesByState(auth!!, state!!))
 
     @PreAuthorize("hasRole('PROFESSOR')")
-    @GetMapping("/professor/{examSessionId}")
+    @GetMapping("/professor/exam-session/{examSessionId}")
     fun getProfessorExamSession(
         @RequestHeader("Authorization") @NotBlank auth: String?,
         @PathVariable @NotBlank examSessionId: String?
@@ -50,14 +58,14 @@ class ExamSessionController(
         ResponseEntity.ok(examSessionService.getProfessorExamSession(auth!!, examSessionId!!))
 
     @PreAuthorize("hasRole('PROFESSOR')")
-    @GetMapping("/professor-sessions")
-    fun getProfessorExamSessions(
+    @GetMapping("/professor/exam-session/all")
+    fun getAllProfessorExamSessions(
         @RequestHeader("Authorization") @NotBlank auth: String?
     ): ResponseEntity<List<ExamSession>> =
-        ResponseEntity.ok(examSessionService.getProfessorExamSessions(auth!!))
+        ResponseEntity.ok(examSessionService.getAllProfessorExamSessions(auth!!))
 
     @PreAuthorize("hasRole('STUDENT')")
-    @PostMapping("/section")
+    @PostMapping("/student/exam-session/section")
     fun getExamSection(
         @RequestHeader("Authorization") @NotBlank auth: String?,
         @RequestParam @NotBlank examSessionId: String?,
@@ -66,7 +74,7 @@ class ExamSessionController(
         ResponseEntity.ok(examSessionService.getExamSection(auth!!, examSessionId!!, sectionOrder!!))
 
     @PreAuthorize("hasRole('STUDENT')")
-    @PostMapping("/finish")
+    @PostMapping("/student/exam-session/finish")
     fun finishExamSession(
         @RequestHeader("Authorization") @NotBlank auth: String?,
         @RequestParam @NotBlank examSessionId: String?
