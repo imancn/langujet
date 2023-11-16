@@ -11,5 +11,5 @@ data class Exam(
     var description: String,
     var sectionsNumber: Int,
     var questionNumber: Int,
-    var examDuration: Long, // Milliseconds
+    var examDuration: Long, // Seconds
 )

@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.*
 import kotlin.jvm.optionals.getOrElse
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @Validated
 class AuthController(
     val authenticationManager: AuthenticationManager,
@@ -72,7 +72,7 @@ class AuthController(
         )
     }
 
-    @PostMapping("/signup/student")
+    @PostMapping("/student/signup")
     fun registerStudent(
         @RequestParam @NotBlank fullName: String?,
         @RequestParam @NotBlank @Size(max = 50) @Email email: String?,
@@ -86,7 +86,7 @@ class AuthController(
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/signup/professor")
+    @PostMapping("/professor/signup")
     fun registerProfessor(
         @NotBlank fullName: String?,
         @NotBlank @Size(max = 50) @Email email: String?,

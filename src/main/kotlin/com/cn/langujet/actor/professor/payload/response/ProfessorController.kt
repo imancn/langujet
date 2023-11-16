@@ -8,7 +8,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/professor")
+@RequestMapping("/api/v1/professor")
 @Validated
 class ProfessorController(
     val professorService: ProfessorService,
@@ -21,7 +21,7 @@ class ProfessorController(
     ): ResponseEntity<ProfessorProfileResponse> =
         toOkResponseEntity(ProfessorProfileResponse(professorService.getProfessorByAuthToken(auth)))
 
-    @PutMapping("/profile")
+    @PostMapping("/profile")
     @PreAuthorize("hasRole('PROFESSOR')")
     fun editProfile(
         @RequestHeader("Authorization") auth: String?,

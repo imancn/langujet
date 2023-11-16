@@ -9,7 +9,7 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/student")
+@RequestMapping("/api/v1/student")
 @Validated
 class StudentController(
     val studentService: StudentService,
@@ -22,7 +22,7 @@ class StudentController(
     ): ResponseEntity<StudentProfileResponse> =
         toOkResponseEntity(StudentProfileResponse(studentService.getStudentByAuthToken(auth)))
 
-    @PutMapping("/profile")
+    @PostMapping("/profile")
     @PreAuthorize("hasRole('STUDENT')")
     fun editProfile(
         @RequestHeader("Authorization") auth: String?,

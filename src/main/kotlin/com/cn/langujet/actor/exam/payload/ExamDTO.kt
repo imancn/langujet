@@ -12,7 +12,7 @@ data class ExamDTO(
     @field:NotBlank var description: String? = null,
     @field:NotNull var sectionsNumber: Int? = null,
     @field:NotNull var questionNumber: Int? = null,
-    @field:NotNull var examDuration: Long? = null, // Milliseconds
+    @field:NotNull var examDuration: Long? = null, // Seconds
 ) {
     constructor(exam: Exam): this(
         exam.id,
