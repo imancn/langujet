@@ -13,7 +13,7 @@ data class Result(
     var sectionResults: List<SectionResult>
 ) {
     constructor(resultDto: ResultDto) : this(
-        resultDto.id,
+        null,
         resultDto.examSessionId,
         resultDto.score,
         resultDto.recommendation,

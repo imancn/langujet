@@ -5,14 +5,12 @@ import com.cn.langujet.domain.exam.model.SectionResult
 import com.cn.langujet.domain.exam.model.SectionType
 
 data class ResultDto(
-    var id: String?,
     var examSessionId: String,
     var score: Int,
     var recommendation: String,
     var sectionResults: List<SectionResultDto>
 ) {
     constructor(result: Result) : this(
-        result.id,
         result.examSessionId,
         result.score,
         result.recommendation,

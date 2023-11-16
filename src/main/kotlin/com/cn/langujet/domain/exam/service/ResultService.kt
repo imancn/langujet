@@ -61,12 +61,13 @@ class ResultService(
 
     fun updateResult(
         auth: String,
-        result: ResultDto
+        result: ResultDto,
+        id: String
     ): ResultDto {
         val examSession = examSessionService.getExamSessionById(result.examSessionId)
         return doWithPreAuth(auth, examSession) {
             resultRepository.save(
-                getResultById(result.id!!).also { existingResult ->
+                getResultById(id).also { existingResult ->
                     result.recommendation.let { existingResult.recommendation = it }
                     result.score.let { existingResult.score = it }
                     result.sectionResults.let {
