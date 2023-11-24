@@ -1,6 +1,7 @@
 package com.cn.langujet.actor.answer.payload.request
 
 import com.cn.langujet.domain.answer.model.Answer
+import com.cn.langujet.domain.answer.model.TrueFalseAnswerType
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 
@@ -10,7 +11,7 @@ sealed class AnswerBulkRequest(
 ) {
     inline fun <reified T : Answer> convertToAnswer(examSessionId: String, sectionOrder: Int): T {
         val answer: Answer = when (this) {
-            is TextBulkAnswerRequest -> Answer.Text(
+            is TextBulkAnswerRequest -> Answer.TextAnswer(
                 examSessionId,
                 sectionOrder,
                 partIndex!!,
@@ -18,7 +19,7 @@ sealed class AnswerBulkRequest(
                 this.text!!
             )
 
-            is TextIssuesBulkAnswerRequest -> Answer.TextIssues(
+            is TextIssuesBulkAnswerRequest -> Answer.TextIssuesAnswer(
                 examSessionId,
                 sectionOrder,
                 partIndex!!,
@@ -26,12 +27,12 @@ sealed class AnswerBulkRequest(
                 this.textList!!
             )
 
-            is TrueFalseBulkAnswerRequest -> Answer.TrueFalse(
+            is TrueFalseBulkAnswerRequest -> Answer.TrueFalseAnswer(
                 examSessionId,
                 sectionOrder,
                 partIndex!!,
                 questionIndex!!,
-                booleanList!!
+                answers!!
             )
 
             else -> throw IllegalArgumentException("Unsupported answer request type")
@@ -58,5 +59,5 @@ data class TextIssuesBulkAnswerRequest(
 data class TrueFalseBulkAnswerRequest(
     @field:NotNull override val partIndex: Int? = null,
     @field:NotNull override val questionIndex: Int? = null,
-    @field:NotNull val booleanList: List<Boolean?>? = null,
+    @field:NotNull val answers: List<TrueFalseAnswerType?>? = null,
 ) : AnswerBulkRequest(partIndex, questionIndex)

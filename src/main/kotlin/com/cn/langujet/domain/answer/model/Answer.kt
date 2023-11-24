@@ -15,7 +15,7 @@ sealed class Answer(
 ) {
     @Document(collection = "answers")
     @TypeAlias("text_answers")
-    class Text(
+    class TextAnswer(
         examSessionId: String,
         sectionOrder: Int,
         partIndex: Int,
@@ -25,7 +25,7 @@ sealed class Answer(
 
     @Document(collection = "answers")
     @TypeAlias("text_parts_answers")
-    class TextIssues(
+    class TextIssuesAnswer(
         examSessionId: String,
         sectionOrder: Int,
         partIndex: Int,
@@ -35,17 +35,17 @@ sealed class Answer(
 
     @Document(collection = "answers")
     @TypeAlias("true_false_answers")
-    class TrueFalse(
+    class TrueFalseAnswer(
         examSessionId: String,
         sectionOrder: Int,
         partIndex: Int,
         questionIndex: Int,
-        var booleanList: List<Boolean?>
+        var answers: List<TrueFalseAnswerType?>
     ): Answer(null, examSessionId, sectionOrder, AnswerType.TRUE_FALSE, partIndex, questionIndex)
 
     @Document(collection = "answers")
     @TypeAlias("voice_answers")
-    class Voice(
+    class VoiceAnswer(
         examSessionId: String,
         sectionOrder: Int,
         partIndex: Int,

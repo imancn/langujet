@@ -43,11 +43,11 @@ class AnswerService(
         partIndex: Int,
         questionIndex: Int,
         voice: MultipartFile
-    ): Answer.Voice {
+    ): Answer.VoiceAnswer {
         examSessionPreCheck(examSessionId, sectionOrder, token)
         val fileEntity = fileService.uploadFile(voice, FileBucket.ANSWERS)
         return answerRepository.save(
-            Answer.Voice(
+            Answer.VoiceAnswer(
                 examSessionId,
                 sectionOrder,
                 partIndex,
