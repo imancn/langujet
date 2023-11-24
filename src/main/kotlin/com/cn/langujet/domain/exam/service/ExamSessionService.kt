@@ -8,8 +8,6 @@ import com.cn.langujet.application.advice.MethodNotAllowedException
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.exam.model.ExamSession
 import com.cn.langujet.domain.exam.model.ExamSessionState
-import com.cn.langujet.domain.exam.model.ExamType
-import com.cn.langujet.domain.exam.model.SectionType
 import com.cn.langujet.domain.exam.repository.ExamSessionRepository
 import com.cn.langujet.domain.professor.ProfessorService
 import com.cn.langujet.domain.student.service.StudentService
@@ -21,11 +19,12 @@ import java.util.*
 class ExamSessionService(
     private val examSessionRepository: ExamSessionRepository,
     private val examService: ExamService,
+    private val examTypeService: ExamTypeService,
     private val sectionService: SectionService,
     private val studentService: StudentService,
     private val professorService: ProfessorService,
 ) {
-    fun enrollExamSession(auth: String, examType: ExamType, sectionType: SectionType?): ExamSessionEnrollResponse {
+    fun enrollExamSession(auth: String, examTypeId: String): ExamSessionEnrollResponse {
         val studentId = studentService.getStudentByAuthToken(auth).id!!
 
         val existsByStudentIdAndStateContaining = examSessionRepository.existsByStudentIdAndStateContaining(
@@ -39,10 +38,16 @@ class ExamSessionService(
             throw MethodNotAllowedException("Finish current enrolled exam")
         }
 
+
         /**
          * Todo: Should check user has not another enrolled exam!
          * Todo: Payment should be implemented here later!
          */
+
+        val examTypeEntity = examTypeService.getExamTypeById(examTypeId)
+
+        val examType = examTypeEntity.examType
+        val sectionType = examTypeEntity.sectionType
 
         val examId = examService.getRandomExamIdByType(examType)
         val sections = sectionService.getSectionsByExamId(examId)
