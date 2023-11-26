@@ -218,7 +218,6 @@ data class ReadingMultipleChoiceDTO(
     AnswerType.TEXT_ISSUES
 ) {
 
-    constructor() : this(index = null)
     constructor(question: ReadingMultipleChoice) : this(
         question.index,
         question.header,
@@ -302,11 +301,7 @@ data class MultipleChoiceIssueDTO(
     val header: String? = null,
     val description: String? = null,
     val options: List<String>? = null
-) {
-    constructor() : this(
-        header = null
-    )
-}
+)
 
 data class ListeningTextCompletionDTO(
     override val index: Int? = null,
