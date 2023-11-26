@@ -151,7 +151,7 @@ class ExamSessionService(
                 it.state = ExamSessionState.STARTED
             })
         }
-        return SectionDTO(section.also { it.id = null })
+        return SectionDTO(section).also { it.id = null ; it.examId = null }
     }
 
     fun finishExamSession(

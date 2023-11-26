@@ -2,9 +2,12 @@ package com.cn.langujet.actor.exam.payload
 
 import com.cn.langujet.domain.exam.model.Section
 import com.cn.langujet.domain.exam.model.SectionType
+import com.fasterxml.jackson.annotation.JsonInclude
 
 data class SectionDTO(
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
     var id: String? = null,
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
     var examId: String? = null,
     var header: String? = null,
     var order: Int? = null,
@@ -30,7 +33,7 @@ data class SectionDTO(
         section.header,
         section.order,
         section.sectionType,
-        section.parts?.map { PartDTO.from(it) },
+        section.parts.map { PartDTO.from(it) },
         section.time
     )
 }
