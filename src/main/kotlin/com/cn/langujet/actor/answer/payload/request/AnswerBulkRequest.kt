@@ -40,7 +40,7 @@ sealed class AnswerBulkRequest(
                 sectionOrder,
                 partIndex!!,
                 questionIndex!!,
-                this.issues!!.map { it!!.toMultipleChoiceIssueAnswer() }
+                this.issues!!.mapNotNull { it?.toMultipleChoiceIssueAnswer() }
             )
 
             else -> throw IllegalArgumentException("Unsupported answer request type")
