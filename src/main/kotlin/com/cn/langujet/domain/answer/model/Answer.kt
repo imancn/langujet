@@ -52,4 +52,19 @@ sealed class Answer(
         questionIndex: Int,
         var audioId: String
     ): Answer(null, examSessionId, sectionOrder, AnswerType.VOICE, partIndex, questionIndex)
+
+    @Document(collection = "answers")
+    @TypeAlias("multiple_choice_answers")
+    class MultipleChoiceAnswer(
+        examSessionId: String,
+        sectionOrder: Int,
+        partIndex: Int,
+        questionIndex: Int,
+        var issues: List<MultipleChoiceIssueAnswer>
+    ): Answer(null, examSessionId, sectionOrder, AnswerType.MULTIPLE_CHOICE, partIndex, questionIndex)
+
+    class MultipleChoiceIssueAnswer(
+        var index: Int,
+        var options: List<String?>
+    )
 }

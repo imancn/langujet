@@ -27,7 +27,7 @@ class ListeningMultipleChoice(
 ) : Question(
     index, header,
     QuestionType.LISTENING_MULTIPLE_CHOICES,
-    run { if (selectNum > 1) AnswerType.TEXT else AnswerType.TEXT_ISSUES }
+    AnswerType.MULTIPLE_CHOICE
 )
 
 class ListeningMatchingFeatures(

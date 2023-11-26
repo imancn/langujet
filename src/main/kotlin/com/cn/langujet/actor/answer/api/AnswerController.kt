@@ -40,6 +40,13 @@ class AnswerController(
         return toOkResponseEntity(answerService.submitAnswer(request, auth!!))
     }
 
+    @PostMapping("/student/answer/multiple-choice")
+    fun submitMultipleChoiceAnswer(
+        @RequestBody @Valid request: MultipleChoiceAnswerRequest, @RequestHeader("Authorization") @NotBlank auth: String?
+    ): ResponseEntity<Boolean> {
+        return toOkResponseEntity(answerService.submitAnswer(request, auth!!))
+    }
+
     @PostMapping("/student/answer/voice")
     fun submitVoiceAnswer(
         @RequestHeader("Authorization") @NotBlank auth: String?,
@@ -85,6 +92,16 @@ class AnswerController(
         @RequestParam @NotBlank examSessionId: String?,
         @RequestParam @NotNull sectionOrder: Int?,
         @RequestBody @Valid request: List<TrueFalseBulkAnswerRequest>,
+        @RequestHeader("Authorization") @NotBlank auth: String?
+    ): ResponseEntity<Boolean> {
+        return toOkResponseEntity(answerService.submitBulkAnswers(examSessionId, sectionOrder, request, auth!!))
+    }
+
+    @PostMapping("/student/answer/bulk/multiple-choice")
+    fun submitBulkMultipleChoiceAnswer(
+        @RequestParam @NotBlank examSessionId: String?,
+        @RequestParam @NotNull sectionOrder: Int?,
+        @RequestBody @Valid request: List<MultipleChoiceBulkAnswerRequest>,
         @RequestHeader("Authorization") @NotBlank auth: String?
     ): ResponseEntity<Boolean> {
         return toOkResponseEntity(answerService.submitBulkAnswers(examSessionId, sectionOrder, request, auth!!))

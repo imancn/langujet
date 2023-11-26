@@ -26,7 +26,7 @@ class ReadingMultipleChoice(
 ) : Question(
     index, header,
     QuestionType.READING_MULTIPLE_CHOICES,
-    run { if (selectNum > 1) AnswerType.TEXT else AnswerType.TEXT_ISSUES }
+    AnswerType.MULTIPLE_CHOICE
 )
 
 class ReadingMatchingFeatures(

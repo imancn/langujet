@@ -5,5 +5,5 @@ enum class AnswerType {
     TEXT_ISSUES,
     TRUE_FALSE,
     VOICE,
-    MULTIPLE_ISSUES,
+    MULTIPLE_CHOICE,
 }

@@ -64,7 +64,7 @@ sealed class QuestionDTO(
                 this.index!!,
                 this.header!!,
                 this.selectNum!!,
-                this.issues?.map { MultipleChoiceIssue(it.header!!, it.description, it.options!!) }!!
+                this.issues?.map { MultipleChoiceIssue(it.index!!, it.header!!, it.description, it.options!!) }!!
             )
 
             is ReadingMatchingFeaturesDTO -> ReadingMatchingFeatures(
@@ -104,7 +104,7 @@ sealed class QuestionDTO(
                 this.index!!,
                 this.header!!,
                 this.selectNum!!,
-                this.issues!!.map { MultipleChoiceIssue(it.header!!, it.description, it.options!!) })
+                this.issues!!.map { MultipleChoiceIssue(it.index!!, it.header!!, it.description, it.options!!) })
 
             is ListeningMatchingFeaturesDTO -> ListeningMatchingFeatures(
                 this.index!!,
@@ -223,7 +223,7 @@ data class ReadingMultipleChoiceDTO(
         question.index,
         question.header,
         question.selectNum,
-        question.issues.map { MultipleChoiceIssueDTO(it.header, it.description, it.options) }
+        question.issues.map { MultipleChoiceIssueDTO(it.index, it.header, it.description, it.options) }
     )
 }
 
@@ -298,6 +298,7 @@ data class ReadingSelectiveTextCompletionDTO(
 }
 
 data class MultipleChoiceIssueDTO(
+    val index: Int? = null,
     val header: String? = null,
     val description: String? = null,
     val options: List<String>? = null
@@ -348,7 +349,7 @@ data class ListeningMultipleChoiceDTO(
         question.index,
         question.header,
         question.selectNum,
-        question.issues.map { MultipleChoiceIssueDTO(it.header, it.description, it.options) }
+        question.issues.map { MultipleChoiceIssueDTO(it.index, it.header, it.description, it.options) }
     )
 }
 

@@ -32,7 +32,15 @@ sealed class AnswerBulkRequest(
                 sectionOrder,
                 partIndex!!,
                 questionIndex!!,
-                answers!!
+                this.answers!!
+            )
+
+            is MultipleChoiceBulkAnswerRequest -> Answer.MultipleChoiceAnswer(
+                examSessionId,
+                sectionOrder,
+                partIndex!!,
+                questionIndex!!,
+                this.issues!!.map { it!!.toMultipleChoiceIssueAnswer() }
             )
 
             else -> throw IllegalArgumentException("Unsupported answer request type")
@@ -60,4 +68,10 @@ data class TrueFalseBulkAnswerRequest(
     @field:NotNull override val partIndex: Int? = null,
     @field:NotNull override val questionIndex: Int? = null,
     @field:NotNull val answers: List<TrueFalseAnswerType?>? = null,
+) : AnswerBulkRequest(partIndex, questionIndex)
+
+data class MultipleChoiceBulkAnswerRequest(
+    @field:NotNull override val partIndex: Int? = null,
+    @field:NotNull override val questionIndex: Int? = null,
+    @field:NotNull val issues: List<MultipleChoiceIssueAnswerRequest?>? = null,
 ) : AnswerBulkRequest(partIndex, questionIndex)
