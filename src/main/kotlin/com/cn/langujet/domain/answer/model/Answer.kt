@@ -24,7 +24,7 @@ sealed class Answer(
     ): Answer(null, examSessionId, sectionOrder, AnswerType.TEXT, partIndex, questionIndex)
 
     @Document(collection = "answers")
-    @TypeAlias("text_parts_answers")
+    @TypeAlias("text_issues_answers")
     class TextIssuesAnswer(
         examSessionId: String,
         sectionOrder: Int,
