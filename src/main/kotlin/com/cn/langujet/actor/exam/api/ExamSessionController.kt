@@ -85,7 +85,7 @@ class ExamSessionController(
     fun getExamSection(
         @RequestHeader("Authorization") @NotBlank auth: String?,
         @RequestParam @NotBlank examSessionId: String?,
-        @RequestParam @NotBlank sectionOrder: Int?
+        @RequestParam @NotNull sectionOrder: Int?
     ): ResponseEntity<SectionDTO> =
         ResponseEntity.ok(examSessionService.getExamSection(auth!!, examSessionId!!, sectionOrder!!))
 
