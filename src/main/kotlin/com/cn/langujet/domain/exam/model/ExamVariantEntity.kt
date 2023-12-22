@@ -4,7 +4,7 @@ import com.cn.langujet.domain.correction.model.CorrectionType
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
-@Document(collation = "exam_variants")
+@Document(collection = "exam_variants")
 class ExamVariantEntity (
     @Id
     var id: String?,
