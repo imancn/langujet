@@ -3,7 +3,7 @@ package com.cn.langujet.application.service.file.domain.data.model
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
-@Document
+@Document(collection = "file")
 data class FileEntity(
     @Id
     var id: String?,
