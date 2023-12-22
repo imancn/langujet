@@ -19,12 +19,12 @@ import java.util.*
 class ExamSessionService(
     private val examSessionRepository: ExamSessionRepository,
     private val examService: ExamService,
-    private val examTypeService: ExamTypeService,
+    private val examVariantService: ExamVariantService,
     private val sectionService: SectionService,
     private val studentService: StudentService,
     private val professorService: ProfessorService,
 ) {
-    fun enrollExamSession(auth: String, examTypeId: String): ExamSessionEnrollResponse {
+    fun enrollExamSession(auth: String, examVariantId: String): ExamSessionEnrollResponse {
         val studentId = studentService.getStudentByAuthToken(auth).id!!
 
         val existsByStudentIdAndStateContaining = examSessionRepository.existsByStudentIdAndStateContaining(
@@ -38,34 +38,17 @@ class ExamSessionService(
             throw MethodNotAllowedException("Finish current enrolled exam")
         }
 
+        val examVariant = examVariantService.getExamVariantById(examVariantId)
 
-        /**
-         * Todo: Should check user has not another enrolled exam!
-         * Todo: Payment should be implemented here later!
-         */
-
-        val examTypeEntity = examTypeService.getExamTypeById(examTypeId)
-
-        val examType = examTypeEntity.examType
-        val sectionType = examTypeEntity.sectionType
-
-        val examId = examService.getRandomExamIdByType(examType)
+        val examId = examService.getRandomExamIdByType(examVariant.examType)
         val sections = sectionService.getSectionsByExamId(examId)
-        val specifiedSection = sections.find { it.sectionType == sectionType }
 
-        val sectionOrders = if (sectionType == null) {
-            sections.map { it.order }.sorted()
-        } else {
-            listOf(
-                specifiedSection?.order
-                    ?: throw NotFoundException("There is no section with $sectionType in Exam with id: $examId")
-            )
-        }
+        val sectionOrders = sections.filter { examVariant.sectionTypes.contains(it.sectionType) }.map { it.order }.sorted()
 
         val examSession = examSessionRepository.save(
             ExamSession(
                 studentId, null, // this is immediately null, and it means exam professor is AI
-                examId, specifiedSection?.id, sectionOrders, Date(System.currentTimeMillis())
+                examId, examVariant.id ?: "", sectionOrders, Date(System.currentTimeMillis())
             )
         )
 

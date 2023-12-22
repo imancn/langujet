@@ -10,13 +10,10 @@ data class ExamSession(
 
     var studentId: String,
     var professorId: String?,
-
     var examId: String,
-    var sectionId: String?,
-
+    val examVariantId: String,
     val sectionOrders: List<Int>,
     var state: ExamSessionState,
-
     var enrollDate: Date,
     var startDate: Date?,
     var endDate: Date?,
@@ -26,7 +23,7 @@ data class ExamSession(
         studentId: String,
         professorId: String?,
         examId: String,
-        sectionId: String?,
+        examVariantId: String,
         sectionOrders: List<Int>,
         requestDate: Date
     ) : this(
@@ -34,7 +31,7 @@ data class ExamSession(
         studentId,
         professorId,
         examId,
-        sectionId,
+        examVariantId,
         sectionOrders,
         ExamSessionState.ENROLLED,
         requestDate,
