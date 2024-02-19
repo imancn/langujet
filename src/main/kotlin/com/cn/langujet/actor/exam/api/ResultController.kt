@@ -24,8 +24,8 @@ class ResultController(
     ): ResponseEntity<ResultDto> {
         return toOkResponseEntity(service.createResult(auth!!, examSessionId, result))
     }
-    @GetMapping("/result/exam-session/{id}")
-    fun getResultsByExamSessionId(
+    @GetMapping("student/result/exam-session/{id}")
+    fun getStudentResultsByExamSessionId(
         @RequestHeader("Authorization") auth: String?,
         @PathVariable @NotBlank id: String?
     ): ResponseEntity<ResultDto> = toOkResponseEntity(service.getResultsByExamSessionId(auth!!, id!!))

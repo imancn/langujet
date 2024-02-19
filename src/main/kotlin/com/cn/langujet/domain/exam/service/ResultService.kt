@@ -52,7 +52,7 @@ class ResultService(
         examSessionId: String
     ): ResultDto {
         val studentId = examSessionService.getExamSessionById(examSessionId).studentId
-        if (studentService.doesStudentOwnAuthToken(authToken, studentId))
+        if (!studentService.doesStudentOwnAuthToken(authToken, studentId))
             throw InvalidTokenException("Exam Session with id: $examSessionId is not belong to your token")
         return resultRepository.findByExamSessionId(examSessionId).orElseThrow {
             NotFoundException("Suggestions for ExamSession with ID: $examSessionId not found")
