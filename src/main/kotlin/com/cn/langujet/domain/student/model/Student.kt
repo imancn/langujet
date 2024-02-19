@@ -13,15 +13,11 @@ data class Student(
     var user: User,
     var fullName: String,
     var biography: String?,
-    var credit: Double = 0.0,
 ) {
-    constructor(user: User, fullName: String, biography: String?) : this(null, user, fullName, biography, 0.0)
-
     constructor(user: User, fullName: String?) : this(
         null,
         user,
         fullName ?: user.email,
-        null,
-        0.0
+        null
     )
 }
