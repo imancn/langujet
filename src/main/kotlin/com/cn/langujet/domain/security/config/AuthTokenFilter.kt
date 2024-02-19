@@ -34,7 +34,7 @@ class AuthTokenFilter(
             authentication.details = WebAuthenticationDetailsSource().buildDetails(request)
             SecurityContextHolder.getContext().authentication = authentication
         } catch (e: Exception) {
-            logger.warn("Cannot set user authentication: ${e.message}")
+            SecurityContextHolder.getContext().authentication = null
         }
         filterChain.doFilter(request, response)
     }
