@@ -67,6 +67,16 @@ class AnswerController(
         return toOkResponseEntity(true)
     }
 
+    @PostMapping("/student/answer/bulk")
+    fun submitBulkAnswer(
+        @RequestParam @NotBlank examSessionId: String?,
+        @RequestParam @NotNull sectionOrder: Int?,
+        @RequestBody @Valid request: List<AnswerBulkRequest>,
+        @RequestHeader("Authorization") @NotBlank auth: String?
+    ): ResponseEntity<Boolean> {
+        return toOkResponseEntity(answerService.submitBulkAnswers(examSessionId, sectionOrder, request, auth!!))
+    }
+
     @PostMapping("/student/answer/bulk/text")
     fun submitBulkTextAnswer(
         @RequestParam @NotBlank examSessionId: String?,
