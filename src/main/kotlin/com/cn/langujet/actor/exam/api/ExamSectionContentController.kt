@@ -29,11 +29,11 @@ class ExamSectionContentController(
     @GetMapping("/admin/exam/section/content/download-links")
     @PreAuthorize("hasAnyRole('ADMIN')")
     fun getAdminExamSectionContentDownloadLink(
-        @RequestParam examSessionId: @NotBlank String?,
+        @RequestParam examId: @NotBlank String?,
         @RequestParam sectionOrder: @NotNull Int?
     ): List<ExamSectionContentDownloadLink> {
         return examSectionContentService.getAdminExamSectionContentDownloadLink(
-            examSessionId!!, sectionOrder!!
+            examId!!, sectionOrder!!
         )
     }
 

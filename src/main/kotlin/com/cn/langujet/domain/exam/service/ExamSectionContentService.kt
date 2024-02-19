@@ -39,11 +39,10 @@ class ExamSectionContentService(
     }
 
     fun getAdminExamSectionContentDownloadLink(
-        examSessionId: String,
+        examId: String,
         sectionOrder: Int
     ): List<ExamSectionContentDownloadLink> {
-        val examSession = examSessionService.getExamSessionById(examSessionId)
-        val exam = examService.getExamById(examSession.examId)
+        val exam = examService.getExamById(examId)
         val examSectionContents = examSectionContentRepository.findAllByExamIdAndSectionOrder(exam.id ?: "", sectionOrder)
 
         return examSectionContents.map {
