@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
+import java.util.*
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -31,6 +32,7 @@ sealed class AnswerBulkRequest(
                 sectionOrder,
                 partIndex!!,
                 questionIndex!!,
+                Date(System.currentTimeMillis()),
                 this.text!!
             )
 
@@ -39,6 +41,7 @@ sealed class AnswerBulkRequest(
                 sectionOrder,
                 partIndex!!,
                 questionIndex!!,
+                Date(System.currentTimeMillis()),
                 this.textList!!
             )
 
@@ -47,6 +50,7 @@ sealed class AnswerBulkRequest(
                 sectionOrder,
                 partIndex!!,
                 questionIndex!!,
+                Date(System.currentTimeMillis()),
                 this.answers!!
             )
 
@@ -55,6 +59,7 @@ sealed class AnswerBulkRequest(
                 sectionOrder,
                 partIndex!!,
                 questionIndex!!,
+                Date(System.currentTimeMillis()),
                 this.issues!!.mapNotNull { it?.toMultipleChoiceIssueAnswer() }
             )
 

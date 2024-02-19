@@ -8,6 +8,7 @@ import com.cn.langujet.domain.answer.model.Answer
 import com.cn.langujet.domain.exam.service.ExamSessionService
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
+import java.util.*
 
 @Service
 class AnswerService(
@@ -52,6 +53,7 @@ class AnswerService(
                 sectionOrder,
                 partIndex,
                 questionIndex,
+                Date(System.currentTimeMillis()),
                 fileEntity.id!!
             )
         )

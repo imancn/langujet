@@ -4,6 +4,7 @@ import com.cn.langujet.domain.answer.model.Answer
 import com.cn.langujet.domain.answer.model.TrueFalseAnswerType
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
+import java.util.*
 
 sealed class AnswerRequest(
     open val examSessionId: String?,
@@ -18,6 +19,7 @@ sealed class AnswerRequest(
                 sectionOrder!!,
                 partIndex!!,
                 questionIndex!!,
+                Date(System.currentTimeMillis()),
                 this.text!!
             )
 
@@ -26,6 +28,7 @@ sealed class AnswerRequest(
                 sectionOrder!!,
                 partIndex!!,
                 questionIndex!!,
+                Date(System.currentTimeMillis()),
                 this.textList!!
             )
 
@@ -34,6 +37,7 @@ sealed class AnswerRequest(
                 sectionOrder!!,
                 partIndex!!,
                 questionIndex!!,
+                Date(System.currentTimeMillis()),
                 this.answers!!
             )
 
@@ -42,6 +46,7 @@ sealed class AnswerRequest(
                 sectionOrder!!,
                 partIndex!!,
                 questionIndex!!,
+                Date(System.currentTimeMillis()),
                 this.issues!!.mapNotNull { it?.toMultipleChoiceIssueAnswer() }
             )
 
