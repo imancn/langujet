@@ -9,4 +9,5 @@ import java.util.*
 interface SectionRepository : MongoRepository<Section, String> {
     fun findAllByExamId(examId: String): List<Section>
     fun findByExamIdAndOrder(examId: String, order: Int): Optional<Section>
+    fun existsByExamIdAndOrder(examId: String, order: Int): Boolean
 }
