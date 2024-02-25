@@ -14,7 +14,7 @@ class ListeningTableCompletion(
     index: Int,
     header: String,
     var tableHeader: String,
-    var table: List<List<String?>>,
+    var table: String,
 ) : Question(
     index, header, QuestionType.LISTENING_TABLE_COMPLETION, AnswerType.TEXT_ISSUES
 )

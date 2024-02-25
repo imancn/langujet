@@ -11,9 +11,14 @@ sealed class Part(
 
 class ReadingPart(
     index: Int,
-    var passage: String,
+    var passage: List<Passage>,
     var questionList: List<Question>
 ) : Part(index, SectionType.READING)
+
+class Passage(
+    var indicator: String?,
+    var paragraph: String
+)
 
 class ListeningPart(
     index: Int,
@@ -28,5 +33,6 @@ class WritingPart(
 
 class SpeakingPart(
     index: Int,
-    var questionList: List<SpeakingQuestion>
+    var questionList: List<SpeakingQuestion>,
+    var focus: String?
 ) : Part(index, SectionType.SPEAKING)

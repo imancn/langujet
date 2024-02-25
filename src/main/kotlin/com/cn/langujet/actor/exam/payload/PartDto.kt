@@ -20,23 +20,31 @@ import io.swagger.v3.oas.annotations.media.Schema
     JsonSubTypes.Type(value = SpeakingPartDTO::class, name = "SPEAKING")
 )
 sealed class PartDTO(
-    open val index: Int? = null,
+    open val partIndex: Int? = null,
     open val type: SectionType? = null
 ) {
     inline fun <reified T : Part> toPart(): T {
         val part = when (this) {
-            is ReadingPartDTO -> ReadingPart(this.index!!, this.passage!!, this.questionList?.map { it.toQuestion() }!!)
+            is ReadingPartDTO -> ReadingPart(
+                this.partIndex!!,
+                this.passage!!.map {
+                    Passage(
+                        it.indicator,
+                        it.paragraph!!
+                    )
+                },
+                this.questionList?.map { it.toQuestion() }!!)
 
             is ListeningPartDTO -> ListeningPart(
-                this.index!!,
+                this.partIndex!!,
                 this.audioId!!,
                 this.questionList?.map { it.toQuestion() }!!
             )
 
             is WritingPartDTO -> WritingPart(
-                this.index!!,
+                this.partIndex!!,
                 WritingQuestion(
-                    this.question?.index!!,
+                    this.question?.questionTypeIndex!!,
                     this.question.header!!,
                     this.question.time!!,
                     this.question.content
@@ -44,8 +52,10 @@ sealed class PartDTO(
             )
 
             is SpeakingPartDTO -> SpeakingPart(
-                this.index!!,
-                this.questionList!!.map { SpeakingQuestion(it.index!!, it.header!!, it.time!!) })
+                this.partIndex!!,
+                this.questionList!!.map { SpeakingQuestion(it.questionTypeIndex!!, it.header!!, it.time!!) },
+                this.focus
+            )
 
             else -> throw IllegalArgumentException("Unknown PartDTO type")
         }
@@ -69,22 +79,32 @@ sealed class PartDTO(
 }
 
 data class ReadingPartDTO(
-    override val index: Int? = null,
-    val passage: String? = null,
+    override val partIndex: Int? = null,
+    val passage: List<PassageDTO>? = null,
     val questionList: List<QuestionDTO>? = null
-) : PartDTO(index, SectionType.READING) {
+) : PartDTO(partIndex, SectionType.READING) {
     constructor(part: ReadingPart) : this(
         part.index,
-        part.passage,
+        part.passage.map { PassageDTO(it) },
         part.questionList.map { QuestionDTO.from(it) }
     )
 }
 
+data class PassageDTO(
+    var indicator: String? = null,
+    var paragraph: String? = null
+) {
+    constructor(passage: Passage) : this(
+        passage.indicator,
+        passage.paragraph
+    )
+}
+
 data class ListeningPartDTO(
-    override val index: Int? = null,
+    override val partIndex: Int? = null,
     val audioId: String? = null,
     val questionList: List<QuestionDTO>? = null
-) : PartDTO(index, SectionType.LISTENING) {
+) : PartDTO(partIndex, SectionType.LISTENING) {
     constructor(part: ListeningPart) : this(
         part.index,
         part.audioId,
@@ -93,9 +113,9 @@ data class ListeningPartDTO(
 }
 
 data class WritingPartDTO(
-    override val index: Int? = null,
+    override val partIndex: Int? = null,
     val question: WritingQuestionDTO? = null
-) : PartDTO(index, SectionType.WRITING) {
+) : PartDTO(partIndex, SectionType.WRITING) {
     constructor(part: WritingPart) : this(
         part.index,
         WritingQuestionDTO(part.question.index, part.question.header, part.question.time, part.question.content)
@@ -103,11 +123,13 @@ data class WritingPartDTO(
 }
 
 data class SpeakingPartDTO(
-    override val index: Int? = null,
-    val questionList: List<SpeakingQuestionDTO>? = null
-) : PartDTO(index, SectionType.SPEAKING) {
+    override val partIndex: Int? = null,
+    val questionList: List<SpeakingQuestionDTO>? = null,
+    val focus: String? = null
+) : PartDTO(partIndex, SectionType.SPEAKING) {
     constructor(part: SpeakingPart) : this(
         part.index,
-        part.questionList.map { SpeakingQuestionDTO(it.index, it.header, it.time) }
+        part.questionList.map { SpeakingQuestionDTO(it.index, it.header, it.time) },
+        part.focus
     )
 }

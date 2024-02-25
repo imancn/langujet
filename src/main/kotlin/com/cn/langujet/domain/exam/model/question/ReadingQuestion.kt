@@ -13,7 +13,7 @@ class ReadingTextCompletion(
 class ReadingTableCompletion(
     index: Int,
     header: String,
-    var table: List<List<String?>>,
+    var table: String,
 ) : Question(
     index, header, QuestionType.READING_TABLE_COMPLETION, AnswerType.TEXT_ISSUES
 )
@@ -71,3 +71,10 @@ class ReadingSelectiveTextCompletion(
     var text: String,
     var items: List<String>
 ) : Question(index, header, QuestionType.READING_SELECTIVE_TEXT_COMPLETION, AnswerType.TEXT_ISSUES)
+
+class ReadingFlowChartCompletion(
+    index: Int,
+    header: String,
+    var content: String,
+    var issues: List<String>,
+) : Question(index, header, QuestionType.READING_FLOWCHART_COMPLETION, AnswerType.TEXT_ISSUES)

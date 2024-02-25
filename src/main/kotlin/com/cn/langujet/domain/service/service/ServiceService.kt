@@ -3,13 +3,12 @@ package com.cn.langujet.domain.service.service
 import com.cn.langujet.actor.service.payload.AvailableExamServicesResponse
 import com.cn.langujet.actor.service.payload.ExamVariantResponse.Companion.toExamTypeResponse
 import com.cn.langujet.actor.service.payload.ServiceRequest
+import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.exam.service.ExamVariantService
 import com.cn.langujet.domain.service.model.ServiceEntity
 import com.cn.langujet.domain.service.model.ServiceType
 import com.cn.langujet.domain.service.repository.ServiceRepository
 import org.springframework.stereotype.Service
-
-import org.springframework.transaction.annotation.Transactional
 
 @Service
 class ServiceService(
@@ -52,5 +51,9 @@ class ServiceService(
                 examVariantService.getExamVariantById(examService.examVariantId).toExamTypeResponse()
             )
         }
+    }
+
+    fun getByIds(serviceId: String): ServiceEntity {
+        return serviceRepository.findById(serviceId).orElseThrow { NotFoundException("Service with id $serviceId not found") }
     }
 }

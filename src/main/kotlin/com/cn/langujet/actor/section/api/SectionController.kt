@@ -39,7 +39,7 @@ class SectionController(private val sectionService: SectionService) {
     ): SectionDTO = SectionDTO(sectionService.updateSection(id, section.toSection()))
 
     @DeleteMapping("/{id}")
-     @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     fun deleteSection(
         @PathVariable id: String
     ): ResponseEntity<String> =
