@@ -20,13 +20,13 @@ class ExamSessionController(
     private val examSessionService: ExamSessionService
 ){
 
-    @PreAuthorize("hasRole('STUDENT')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/student/exam-session/enroll")
     fun enrollExamSession(
-        @RequestHeader("Authorization") @NotBlank auth: String?,
+        @NotBlank studentId: String?,
         @RequestParam @NotNull examTypeId: String?,
     ): ResponseEntity<ExamSessionEnrollResponse> =
-        ResponseEntity.ok(examSessionService.enrollExamSession(auth!!, examTypeId!!))
+        ResponseEntity.ok(examSessionService.enrollExamSession(studentId!!, examTypeId!!))
 
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/student/exam-session/{examSessionId}")

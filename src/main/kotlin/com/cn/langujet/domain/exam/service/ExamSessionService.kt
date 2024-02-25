@@ -24,9 +24,7 @@ class ExamSessionService(
     private val studentService: StudentService,
     private val professorService: ProfessorService,
 ) {
-    fun enrollExamSession(auth: String, examVariantId: String): ExamSessionEnrollResponse {
-        val studentId = studentService.getStudentByAuthToken(auth).id!!
-
+    fun enrollExamSession(studentId: String, examVariantId: String): ExamSessionEnrollResponse {
         val existsByStudentIdAndStateContaining = examSessionRepository.existsByStudentIdAndStateContaining(
             studentId,
             listOf(
