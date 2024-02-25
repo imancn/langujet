@@ -23,7 +23,8 @@ import io.swagger.v3.oas.annotations.media.Schema
         ListeningTableCompletionDTO::class,
         ListeningMultipleChoiceDTO::class,
         ListeningMatchingFeaturesDTO::class,
-        ListeningLabellingDTO::class
+        ListeningLabellingDTO::class,
+        ListeningMapCompletionDTO::class
     ]
 )
 @JsonTypeInfo(
@@ -47,7 +48,8 @@ import io.swagger.v3.oas.annotations.media.Schema
     JsonSubTypes.Type(value = ListeningTableCompletionDTO::class, name = "LISTENING_TABLE_COMPLETION"),
     JsonSubTypes.Type(value = ListeningMultipleChoiceDTO::class, name = "LISTENING_MULTIPLE_CHOICES"),
     JsonSubTypes.Type(value = ListeningMatchingFeaturesDTO::class, name = "LISTENING_MATCHING_FEATURES"),
-    JsonSubTypes.Type(value = ListeningLabellingDTO::class, name = "LISTENING_LABELLING")
+    JsonSubTypes.Type(value = ListeningLabellingDTO::class, name = "LISTENING_LABELLING"),
+    JsonSubTypes.Type(value = ListeningMapCompletionDTO::class, name = "LISTENING_MAP_COMPLETION")
 )
 sealed class QuestionDTO(
     open val questionTypeIndex: Int? = null,
@@ -126,6 +128,13 @@ sealed class QuestionDTO(
                 this.labels!!,
                 this.issues!!
             )
+
+            is ListeningMapCompletionDTO -> ListeningMapCompletion(
+                this.questionTypeIndex!!,
+                this.header!!,
+                this.content!!,
+                this.issues!!
+            )
         }
         if (question !is T) throw TypeCastException("The type of question does not match the reified type.")
         return question
@@ -153,6 +162,7 @@ sealed class QuestionDTO(
                 is ListeningMultipleChoice -> ListeningMultipleChoiceDTO(question)
                 is ListeningMatchingFeatures -> ListeningMatchingFeaturesDTO(question)
                 is ListeningLabelling -> ListeningLabellingDTO(question)
+                is ListeningMapCompletion -> ListeningMapCompletionDTO(question)
             }
             if (questionDTO !is T) throw TypeCastException("The type of question does not match the reified type.")
             return questionDTO
@@ -397,6 +407,20 @@ data class ListeningLabellingDTO(
         question.header,
         question.content,
         question.labels,
+        question.issues
+    )
+}
+
+class ListeningMapCompletionDTO(
+    override val questionTypeIndex: Int? = null,
+    override val header: String? = null,
+    val content: String? = null,
+    val issues: List<String>? = null
+) : QuestionDTO(questionTypeIndex, header, QuestionType.LISTENING_MAP_COMPLETION, AnswerType.TEXT_ISSUES) {
+    constructor(question: ListeningMapCompletion) : this(
+        question.index,
+        question.header,
+        question.content,
         question.issues
     )
 }

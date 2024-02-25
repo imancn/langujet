@@ -50,3 +50,12 @@ class ListeningLabelling(
 ) : Question(
     index, header, QuestionType.LISTENING_LABELLING, AnswerType.TEXT_ISSUES
 )
+
+class ListeningMapCompletion(
+    index: Int,
+    header: String,
+    var content: String,
+    var issues: List<String>,
+) : Question(
+    index, header, QuestionType.LISTENING_MAP_COMPLETION, AnswerType.TEXT_ISSUES
+)
