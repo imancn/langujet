@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
 
-@Document(collection = "email_verification_token")
+@Document(collection = "email_verification_tokens")
 data class EmailVerificationToken(
     @Id var id: String?,
     @DBRef var user: User,
