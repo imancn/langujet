@@ -212,7 +212,7 @@ data class ReadingTextCompletionDTO(
 data class ReadingTableCompletionDTO(
     override val questionTypeIndex: Int? = null,
     override val header: String? = null,
-    val table: String? = null
+    val table: List<List<String?>>? = null
 ) : QuestionDTO(questionTypeIndex, header, QuestionType.READING_TABLE_COMPLETION, AnswerType.TEXT_ISSUES) {
     constructor(question: ReadingTableCompletion) : this(
         question.index,
@@ -348,7 +348,7 @@ data class ListeningTableCompletionDTO(
     override val questionTypeIndex: Int? = null,
     override val header: String? = null,
     val tableHeader: String? = null,
-    val table: String? = null
+    val table: List<List<String?>>? = null
 ) : QuestionDTO(questionTypeIndex, header, QuestionType.LISTENING_TABLE_COMPLETION, AnswerType.TEXT_ISSUES) {
     constructor(question: ListeningTableCompletion) : this(
         question.index,

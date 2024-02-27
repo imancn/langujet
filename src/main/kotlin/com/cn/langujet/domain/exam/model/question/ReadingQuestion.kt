@@ -13,7 +13,7 @@ class ReadingTextCompletion(
 class ReadingTableCompletion(
     index: Int,
     header: String,
-    var table: String,
+    var table: List<List<String?>>,
 ) : Question(
     index, header, QuestionType.READING_TABLE_COMPLETION, AnswerType.TEXT_ISSUES
 )
