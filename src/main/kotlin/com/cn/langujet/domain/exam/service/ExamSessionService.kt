@@ -71,13 +71,14 @@ class ExamSessionService(
     ): ExamSessionResponse {
         val examSession = getStudentExamSession(authToken, examSessionId)
         val exam = examService.getExamById(examSession.examId)
-        return ExamSessionResponse(examSession, exam)
+        val examVariant = examVariantService.getExamVariantById(examSession.examVariantId)
+        return ExamSessionResponse(examSession, exam, examVariant.correctionType)
     }
 
     fun getAllStudentExamSessionResponses(authToken: String, pageRequest: PageRequest): List<ExamSessionResponse> {
         val studentId = studentService.getStudentByAuthToken(authToken).id ?: ""
         return examSessionRepository.findAllByStudentId(studentId, pageRequest).map {
-            ExamSessionResponse(it, null)
+            ExamSessionResponse(it, null, examVariantService.getExamVariantById(it.examVariantId).correctionType)
         }
     }
 
@@ -88,7 +89,7 @@ class ExamSessionService(
     ): List<ExamSessionResponse> {
         val studentId = studentService.getStudentByAuthToken(authToken).id ?: ""
         return examSessionRepository.findAllByStudentIdAndState(studentId, state, pageRequest).map {
-            ExamSessionResponse(it, null)
+            ExamSessionResponse(it, null, examVariantService.getExamVariantById(it.examVariantId).correctionType)
         }
     }
 
@@ -138,19 +139,20 @@ class ExamSessionService(
     fun finishExamSession(
         authToken: String, examSessionId: String
     ): ExamSessionResponse {
+        val examSession = getStudentExamSession(authToken, examSessionId).also {
+            if (it.state == ExamSessionState.ENROLLED)
+                throw MethodNotAllowedException("The exam session has not been started")
+            else if (it.state.order >= ExamSessionState.FINISHED.order)
+                throw MethodNotAllowedException("The exam session has been finished")
+            else {
+                examSessionRepository.save(it.also {
+                    it.state = ExamSessionState.FINISHED
+                })
+            }
+        }
         return ExamSessionResponse(
-            getStudentExamSession(authToken, examSessionId).also { examSession ->
-                if (examSession.state == ExamSessionState.ENROLLED)
-                    throw MethodNotAllowedException("The exam session has not been started")
-                else if (examSession.state.order >= ExamSessionState.FINISHED.order)
-                    throw MethodNotAllowedException("The exam session has been finished")
-                else {
-                    examSessionRepository.save(examSession.also {
-                        it.state = ExamSessionState.FINISHED
-                    })
-                }
-            },
-            null
+            examSession, null,
+            examVariantService.getExamVariantById(examSession.examVariantId).correctionType
         )
     }
 
