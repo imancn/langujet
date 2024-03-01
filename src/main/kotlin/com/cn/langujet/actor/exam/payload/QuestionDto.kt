@@ -24,7 +24,8 @@ import io.swagger.v3.oas.annotations.media.Schema
         ListeningMultipleChoiceDTO::class,
         ListeningMatchingFeaturesDTO::class,
         ListeningLabellingDTO::class,
-        ListeningMapCompletionDTO::class
+        ListeningMapCompletionDTO::class,
+        ListeningSelectivePhotoCompletionDTO::class
     ]
 )
 @JsonTypeInfo(
@@ -49,7 +50,8 @@ import io.swagger.v3.oas.annotations.media.Schema
     JsonSubTypes.Type(value = ListeningMultipleChoiceDTO::class, name = "LISTENING_MULTIPLE_CHOICES"),
     JsonSubTypes.Type(value = ListeningMatchingFeaturesDTO::class, name = "LISTENING_MATCHING_FEATURES"),
     JsonSubTypes.Type(value = ListeningLabellingDTO::class, name = "LISTENING_LABELLING"),
-    JsonSubTypes.Type(value = ListeningMapCompletionDTO::class, name = "LISTENING_MAP_COMPLETION")
+    JsonSubTypes.Type(value = ListeningMapCompletionDTO::class, name = "LISTENING_MAP_COMPLETION"),
+    JsonSubTypes.Type(value = ListeningSelectivePhotoCompletionDTO::class, name = "LISTENING_SELECTIVE_MAP_COMPLETION")
 )
 sealed class QuestionDTO(
     open val questionId: Int? = null,
@@ -136,6 +138,14 @@ sealed class QuestionDTO(
                 this.content!!,
                 this.issues!!
             )
+            
+            is ListeningSelectivePhotoCompletionDTO -> ListeningSelectivePhotoCompletion(
+                this.questionId!!,
+                this.header!!,
+                this.content,
+                this.items!!,
+                this.issues!!
+            )
         }
         if (question !is T) throw TypeCastException("The type of question does not match the reified type.")
         return question
@@ -164,6 +174,7 @@ sealed class QuestionDTO(
                 is ListeningMatchingFeatures -> ListeningMatchingFeaturesDTO(question)
                 is ListeningLabelling -> ListeningLabellingDTO(question)
                 is ListeningMapCompletion -> ListeningMapCompletionDTO(question)
+                is ListeningSelectivePhotoCompletion -> ListeningSelectivePhotoCompletionDTO(question)
             }
             if (questionDTO !is T) throw TypeCastException("The type of question does not match the reified type.")
             return questionDTO
@@ -426,6 +437,22 @@ class ListeningMapCompletionDTO(
         question.id,
         question.header,
         question.content,
+        question.issues
+    )
+}
+
+data class ListeningSelectivePhotoCompletionDTO(
+    override val questionId: Int? = null,
+    override val header: String? = null,
+    val content: String? = null,
+    val items: List<String>? = null,
+    val issues: List<String>? = null
+) : QuestionDTO(questionId, header, QuestionType.LISTENING_SELECTIVE_PHOTO_COMPLETION, AnswerType.TEXT_ISSUES) {
+    constructor(question: ListeningSelectivePhotoCompletion) : this(
+        question.id,
+        question.header,
+        question.content,
+        question.items,
         question.issues
     )
 }

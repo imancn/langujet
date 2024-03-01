@@ -59,3 +59,13 @@ class ListeningMapCompletion(
 ) : Question(
     id, header, QuestionType.LISTENING_MAP_COMPLETION, AnswerType.TEXT_ISSUES
 )
+
+class ListeningSelectivePhotoCompletion(
+    id: Int,
+    header: String,
+    var content: String?,
+    var items: List<String>,
+    var issues: List<String>,
+) : Question(
+    id, header, QuestionType.LISTENING_SELECTIVE_PHOTO_COMPLETION, AnswerType.TEXT_ISSUES
+)
