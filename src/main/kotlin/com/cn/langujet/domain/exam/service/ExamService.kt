@@ -28,6 +28,7 @@ class ExamService(
         exam.sectionsNumber?.let { existingExam.sectionsNumber = it }
         exam.questionNumber?.let { existingExam.questionNumber = it }
         exam.examDuration?.let { existingExam.examDuration = it }
+        exam.active?.let { existingExam.active = it }
         return ExamDTO(
             examRepository.save(existingExam.toExam())
         )
@@ -53,7 +54,7 @@ class ExamService(
         ).map { ExamDTO(it) }
     }
 
-    fun getRandomExamIdByType(examType: ExamType): String {
-        return examRepository.findAll().mapNotNull { it.id }.random()
+    fun getRandomActiveExamIdByType(examType: ExamType): String {
+        return examRepository.findAllByTypeAndActive(examType, true).mapNotNull { it.id }.random()
     }
 }

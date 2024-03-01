@@ -27,7 +27,7 @@ class ExamSessionService(
     fun enrollExamSession(studentId: String, examVariantId: String): ExamSessionEnrollResponse {
         val examVariant = examVariantService.getExamVariantById(examVariantId)
 
-        val examId = examService.getRandomExamIdByType(examVariant.examType)
+        val examId = examService.getRandomActiveExamIdByType(examVariant.examType)
         val sections = sectionService.getSectionsByExamId(examId)
 
         val sectionOrders = sections.filter { examVariant.sectionTypes.contains(it.sectionType) }.map { it.order }.sorted()

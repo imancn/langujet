@@ -13,15 +13,17 @@ data class ExamDTO(
     @field:NotNull var sectionsNumber: Int? = null,
     @field:NotNull var questionNumber: Int? = null,
     @field:NotNull var examDuration: Long? = null, // Seconds
+    @field:NotNull var active: Boolean? = null, // Seconds
 ) {
     constructor(exam: Exam): this(
         exam.id,
-        exam.examType,
+        exam.type,
         exam.name,
         exam.description,
         exam.sectionsNumber,
         exam.questionNumber,
-        exam.examDuration
+        exam.examDuration,
+        exam.active
     )
 
     fun toExam(): Exam {
@@ -32,7 +34,8 @@ data class ExamDTO(
             this.description!!,
             this.sectionsNumber!!,
             this.questionNumber!!,
-            this.examDuration!!
+            this.examDuration!!,
+            this.active!!
         )
     }
 }

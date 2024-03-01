@@ -6,10 +6,11 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document(collection = "exams")
 data class Exam(
     @Id var id: String?,
-    var examType: ExamType,
+    var type: ExamType,
     var name: String,
     var description: String,
     var sectionsNumber: Int,
     var questionNumber: Int,
     var examDuration: Long, // Seconds
+    var active: Boolean
 )
