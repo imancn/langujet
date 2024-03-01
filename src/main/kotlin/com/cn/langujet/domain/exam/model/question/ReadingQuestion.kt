@@ -69,6 +69,7 @@ class ReadingSelectiveTextCompletion(
     id: Int,
     header: String,
     var text: String,
+    var content: String?,
     var items: List<String>
 ) : Question(id, header, QuestionType.READING_SELECTIVE_TEXT_COMPLETION, AnswerType.TEXT_ISSUES)
 

@@ -19,5 +19,6 @@ class WritingQuestion(
     id: Int,
     header: String,
     var time: Long,
-    var content: String?
+    var content: String?,
+    var tip: String?
 ) : Question(id, header, QuestionType.WRITING, AnswerType.TEXT)

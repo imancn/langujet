@@ -61,7 +61,7 @@ sealed class QuestionDTO(
     inline fun <reified T : Question> toQuestion(): T {
         val question = when (this) {
             is SpeakingQuestionDTO -> SpeakingQuestion(this.questionId!!, this.header!!, this.time!!)
-            is WritingQuestionDTO -> WritingQuestion(this.questionId!!, this.header!!, this.time!!, this.content)
+            is WritingQuestionDTO -> WritingQuestion(this.questionId!!, this.header!!, this.time!!, this.content, this.tip)
             is ReadingTextCompletionDTO -> ReadingTextCompletion(this.questionId!!, this.header!!, this.text!!)
             is ReadingTableCompletionDTO -> ReadingTableCompletion(this.questionId!!, this.header!!, this.table!!)
             is ReadingMultipleChoiceDTO -> ReadingMultipleChoice(
@@ -93,6 +93,7 @@ sealed class QuestionDTO(
                 this.questionId!!,
                 this.header!!,
                 this.text!!,
+                this.content,
                 this.items!!
             )
             
@@ -187,13 +188,15 @@ data class WritingQuestionDTO(
     override val questionId: Int? = null,
     override val header: String? = null,
     val time: Long? = null,
-    val content: String? = null
+    val content: String? = null,
+    val tip: String? = null
 ) : QuestionDTO(questionId, header, QuestionType.WRITING, AnswerType.TEXT) {
     constructor(question: WritingQuestion) : this(
         question.id,
         question.header,
         question.time,
-        question.content
+        question.content,
+        question.tip
     )
 }
 
@@ -301,12 +304,14 @@ data class ReadingSelectiveTextCompletionDTO(
     override val questionId: Int? = null,
     override val header: String? = null,
     val text: String? = null,
+    val content: String? = null,
     val items: List<String>? = null
 ) : QuestionDTO(questionId, header, QuestionType.READING_SELECTIVE_TEXT_COMPLETION, AnswerType.TEXT_ISSUES) {
     constructor(question: ReadingSelectiveTextCompletion) : this(
         question.id,
         question.header,
         question.text,
+        question.content,
         question.items
     )
 }
