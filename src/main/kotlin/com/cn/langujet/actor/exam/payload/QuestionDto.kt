@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.media.Schema
         ListeningMultipleChoiceDTO::class,
         ListeningMatchingFeaturesDTO::class,
         ListeningLabellingDTO::class,
-        ListeningMapCompletionDTO::class,
+        ListeningPhotoCompletionDTO::class,
         ListeningSelectivePhotoCompletionDTO::class
     ]
 )
@@ -50,7 +50,7 @@ import io.swagger.v3.oas.annotations.media.Schema
     JsonSubTypes.Type(value = ListeningMultipleChoiceDTO::class, name = "LISTENING_MULTIPLE_CHOICES"),
     JsonSubTypes.Type(value = ListeningMatchingFeaturesDTO::class, name = "LISTENING_MATCHING_FEATURES"),
     JsonSubTypes.Type(value = ListeningLabellingDTO::class, name = "LISTENING_LABELLING"),
-    JsonSubTypes.Type(value = ListeningMapCompletionDTO::class, name = "LISTENING_MAP_COMPLETION"),
+    JsonSubTypes.Type(value = ListeningPhotoCompletionDTO::class, name = "LISTENING_PHOTO_COMPLETION"),
     JsonSubTypes.Type(value = ListeningSelectivePhotoCompletionDTO::class, name = "LISTENING_SELECTIVE_MAP_COMPLETION")
 )
 sealed class QuestionDTO(
@@ -132,7 +132,7 @@ sealed class QuestionDTO(
                 this.issues!!
             )
             
-            is ListeningMapCompletionDTO -> ListeningMapCompletion(
+            is ListeningPhotoCompletionDTO -> ListeningPhotoCompletion(
                 this.questionId!!,
                 this.header!!,
                 this.content!!,
@@ -173,7 +173,7 @@ sealed class QuestionDTO(
                 is ListeningMultipleChoice -> ListeningMultipleChoiceDTO(question)
                 is ListeningMatchingFeatures -> ListeningMatchingFeaturesDTO(question)
                 is ListeningLabelling -> ListeningLabellingDTO(question)
-                is ListeningMapCompletion -> ListeningMapCompletionDTO(question)
+                is ListeningPhotoCompletion -> ListeningPhotoCompletionDTO(question)
                 is ListeningSelectivePhotoCompletion -> ListeningSelectivePhotoCompletionDTO(question)
             }
             if (questionDTO !is T) throw TypeCastException("The type of question does not match the reified type.")
@@ -427,13 +427,13 @@ data class ListeningLabellingDTO(
     )
 }
 
-class ListeningMapCompletionDTO(
+class ListeningPhotoCompletionDTO(
     override val questionId: Int? = null,
     override val header: String? = null,
     val content: String? = null,
     val issues: List<String>? = null
-) : QuestionDTO(questionId, header, QuestionType.LISTENING_MAP_COMPLETION, AnswerType.TEXT_ISSUES) {
-    constructor(question: ListeningMapCompletion) : this(
+) : QuestionDTO(questionId, header, QuestionType.LISTENING_PHOTO_COMPLETION, AnswerType.TEXT_ISSUES) {
+    constructor(question: ListeningPhotoCompletion) : this(
         question.id,
         question.header,
         question.content,

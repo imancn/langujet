@@ -51,13 +51,13 @@ class ListeningLabelling(
     id, header, QuestionType.LISTENING_LABELLING, AnswerType.TEXT_ISSUES
 )
 
-class ListeningMapCompletion(
+class ListeningPhotoCompletion(
     id: Int,
     header: String,
     var content: String,
     var issues: List<String>,
 ) : Question(
-    id, header, QuestionType.LISTENING_MAP_COMPLETION, AnswerType.TEXT_ISSUES
+    id, header, QuestionType.LISTENING_PHOTO_COMPLETION, AnswerType.TEXT_ISSUES
 )
 
 class ListeningSelectivePhotoCompletion(
