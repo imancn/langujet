@@ -52,16 +52,16 @@ class AnswerController(
         @RequestHeader("Authorization") @NotBlank auth: String?,
         @RequestParam @NotBlank examSessionId: String?,
         @RequestParam @NotNull sectionOrder: Int?,
-        @RequestParam @NotNull partIndex: Int?,
-        @RequestParam @NotNull questionIndex: Int?,
+        @RequestParam @NotNull partId: Int?,
+        @RequestParam @NotNull questionId: Int?,
         @RequestParam("voice") voice: MultipartFile
     ): ResponseEntity<Boolean> {
         answerService.submitVoiceAnswer(
             auth!!,
             examSessionId!!,
             sectionOrder!!,
-            partIndex!!,
-            questionIndex!!,
+            partId!!,
+            questionId!!,
             voice,
         )
         return toOkResponseEntity(true)
