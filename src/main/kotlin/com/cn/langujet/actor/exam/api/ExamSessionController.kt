@@ -23,10 +23,10 @@ class ExamSessionController(
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/student/exam-session/enroll")
     fun enrollExamSession(
-        @NotBlank studentId: String?,
-        @RequestParam @NotNull examTypeId: String?,
+        @RequestParam @NotBlank studentId: String?,
+        @RequestParam @NotNull examVariantId: String?,
     ): ResponseEntity<ExamSessionEnrollResponse> =
-        ResponseEntity.ok(examSessionService.enrollExamSession(studentId!!, examTypeId!!))
+        ResponseEntity.ok(examSessionService.enrollExamSession(studentId!!, examVariantId!!))
 
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/student/exam-session/{examSessionId}")

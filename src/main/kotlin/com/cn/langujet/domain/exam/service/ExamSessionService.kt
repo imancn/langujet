@@ -25,17 +25,6 @@ class ExamSessionService(
     private val professorService: ProfessorService,
 ) {
     fun enrollExamSession(studentId: String, examVariantId: String): ExamSessionEnrollResponse {
-        val existsByStudentIdAndStateContaining = examSessionRepository.existsByStudentIdAndStateContaining(
-            studentId,
-            listOf(
-                ExamSessionState.ENROLLED,
-                ExamSessionState.STARTED,
-            )
-        )
-        if (existsByStudentIdAndStateContaining) {
-            throw MethodNotAllowedException("Finish current enrolled exam")
-        }
-
         val examVariant = examVariantService.getExamVariantById(examVariantId)
 
         val examId = examService.getRandomExamIdByType(examVariant.examType)
