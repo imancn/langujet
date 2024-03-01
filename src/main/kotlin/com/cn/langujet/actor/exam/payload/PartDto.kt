@@ -1,8 +1,6 @@
 package com.cn.langujet.actor.exam.payload
 
 import com.cn.langujet.domain.exam.model.*
-import com.cn.langujet.domain.exam.model.question.SpeakingQuestion
-import com.cn.langujet.domain.exam.model.question.WritingQuestion
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.swagger.v3.oas.annotations.media.Schema
@@ -43,17 +41,12 @@ sealed class PartDTO(
 
             is WritingPartDTO -> WritingPart(
                 this.partId!!,
-                WritingQuestion(
-                    this.question?.questionId!!,
-                    this.question.header!!,
-                    this.question.time!!,
-                    this.question.content
-                )
+                this.question!!.toQuestion(),
             )
 
             is SpeakingPartDTO -> SpeakingPart(
                 this.partId!!,
-                this.questionList!!.map { SpeakingQuestion(it.questionId!!, it.header!!, it.time!!) },
+                this.questionList!!.map { it.toQuestion() },
                 this.focus
             )
 
