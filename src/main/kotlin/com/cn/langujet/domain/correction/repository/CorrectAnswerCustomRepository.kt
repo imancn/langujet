@@ -13,14 +13,14 @@ class CorrectAnswerCustomRepository(
     fun findCorrectAnswersByOptionalCriteria(
         examId: String,
         sectionOrder: Int,
-        partId: Int?,
-        questionId: Int?
+        partOrder: Int?,
+        questionOrder: Int?
     ): List<CorrectAnswer> {
         val query = Query()
         query.addCriteria(Criteria.where("examId").`is`(examId))
         query.addCriteria(Criteria.where("sectionOrder").`is`(sectionOrder))
-        partId?.let { query.addCriteria(Criteria.where("partId").`is`(it)) }
-        questionId?.let { query.addCriteria(Criteria.where("questionId").`is`(it)) }
+        partOrder?.let { query.addCriteria(Criteria.where("partOrder").`is`(it)) }
+        questionOrder?.let { query.addCriteria(Criteria.where("questionOrder").`is`(it)) }
         return mongo.find(query, CorrectAnswer::class.java)
     }
 }

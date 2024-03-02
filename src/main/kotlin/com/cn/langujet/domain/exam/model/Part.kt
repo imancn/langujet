@@ -5,15 +5,15 @@ import com.cn.langujet.domain.exam.model.question.SpeakingQuestion
 import com.cn.langujet.domain.exam.model.question.WritingQuestion
 
 sealed class Part(
-    var id: Int,
+    var order: Int,
     var type: SectionType,
 )
 
 class ReadingPart(
-    id: Int,
+    order: Int,
     var passage: List<Passage>,
     var questionList: List<Question>
-) : Part(id, SectionType.READING)
+) : Part(order, SectionType.READING)
 
 class Passage(
     var indicator: String?,
@@ -21,18 +21,18 @@ class Passage(
 )
 
 class ListeningPart(
-    id: Int,
+    order: Int,
     var audioId: String,
     var questionList: List<Question>
-) : Part(id, SectionType.LISTENING)
+) : Part(order, SectionType.LISTENING)
 
 class WritingPart(
-    id: Int,
+    order: Int,
     var question: WritingQuestion
-) : Part(id, SectionType.WRITING)
+) : Part(order, SectionType.WRITING)
 
 class SpeakingPart(
-    id: Int,
+    order: Int,
     var questionList: List<SpeakingQuestion>,
     var focus: String?
-) : Part(id, SectionType.SPEAKING)
+) : Part(order, SectionType.SPEAKING)

@@ -41,8 +41,8 @@ class AnswerService(
         token: String,
         examSessionId: String,
         sectionOrder: Int,
-        partId: Int,
-        questionId: Int,
+        partOrder: Int,
+        questionOrder: Int,
         voice: MultipartFile
     ): Answer.VoiceAnswer {
         examSessionPreCheck(examSessionId, sectionOrder, token)
@@ -51,8 +51,8 @@ class AnswerService(
             Answer.VoiceAnswer(
                 examSessionId,
                 sectionOrder,
-                partId,
-                questionId,
+                partOrder,
+                questionOrder,
                 Date(System.currentTimeMillis()),
                 fileEntity.id!!
             )

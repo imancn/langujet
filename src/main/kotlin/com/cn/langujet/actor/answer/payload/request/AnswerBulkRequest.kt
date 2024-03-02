@@ -21,8 +21,8 @@ import java.util.*
     JsonSubTypes.Type(value = MultipleChoiceBulkAnswerRequest::class, name = "MULTIPLE_CHOICE"),
 )
 sealed class AnswerBulkRequest(
-    open val partId: Int?,
-    open val questionId: Int?,
+    open val partOrder: Int?,
+    open val questionOrder: Int?,
     val answerType: AnswerType?
 ) {
     inline fun <reified T : Answer> convertToAnswer(examSessionId: String, sectionOrder: Int): T {
@@ -30,8 +30,8 @@ sealed class AnswerBulkRequest(
             is TextBulkAnswerRequest -> Answer.TextAnswer(
                 examSessionId,
                 sectionOrder,
-                partId!!,
-                questionId!!,
+                partOrder!!,
+                questionOrder!!,
                 Date(System.currentTimeMillis()),
                 this.text!!
             )
@@ -39,8 +39,8 @@ sealed class AnswerBulkRequest(
             is TextIssuesBulkAnswerRequest -> Answer.TextIssuesAnswer(
                 examSessionId,
                 sectionOrder,
-                partId!!,
-                questionId!!,
+                partOrder!!,
+                questionOrder!!,
                 Date(System.currentTimeMillis()),
                 this.textList!!
             )
@@ -48,8 +48,8 @@ sealed class AnswerBulkRequest(
             is TrueFalseBulkAnswerRequest -> Answer.TrueFalseAnswer(
                 examSessionId,
                 sectionOrder,
-                partId!!,
-                questionId!!,
+                partOrder!!,
+                questionOrder!!,
                 Date(System.currentTimeMillis()),
                 this.answers!!
             )
@@ -57,8 +57,8 @@ sealed class AnswerBulkRequest(
             is MultipleChoiceBulkAnswerRequest -> Answer.MultipleChoiceAnswer(
                 examSessionId,
                 sectionOrder,
-                partId!!,
-                questionId!!,
+                partOrder!!,
+                questionOrder!!,
                 Date(System.currentTimeMillis()),
                 this.issues!!.mapNotNull { it?.toMultipleChoiceIssueAnswer() }
             )
@@ -73,25 +73,25 @@ sealed class AnswerBulkRequest(
 }
 
 data class TextBulkAnswerRequest(
-    @field:NotNull override val partId: Int? = null,
-    @field:NotNull override val questionId: Int? = null,
+    @field:NotNull override val partOrder: Int? = null,
+    @field:NotNull override val questionOrder: Int? = null,
     @field:NotBlank val text: String? = null,
-) : AnswerBulkRequest(partId, questionId, AnswerType.TEXT)
+) : AnswerBulkRequest(partOrder, questionOrder, AnswerType.TEXT)
 
 data class TextIssuesBulkAnswerRequest(
-    @field:NotNull override val partId: Int? = null,
-    @field:NotNull override val questionId: Int? = null,
+    @field:NotNull override val partOrder: Int? = null,
+    @field:NotNull override val questionOrder: Int? = null,
     @field:NotNull val textList: List<String?>? = null,
-) : AnswerBulkRequest(partId, questionId, AnswerType.TEXT_ISSUES)
+) : AnswerBulkRequest(partOrder, questionOrder, AnswerType.TEXT_ISSUES)
 
 data class TrueFalseBulkAnswerRequest(
-    @field:NotNull override val partId: Int? = null,
-    @field:NotNull override val questionId: Int? = null,
+    @field:NotNull override val partOrder: Int? = null,
+    @field:NotNull override val questionOrder: Int? = null,
     @field:NotNull val answers: List<TrueFalseAnswerType?>? = null,
-) : AnswerBulkRequest(partId, questionId, AnswerType.TRUE_FALSE)
+) : AnswerBulkRequest(partOrder, questionOrder, AnswerType.TRUE_FALSE)
 
 data class MultipleChoiceBulkAnswerRequest(
-    @field:NotNull override val partId: Int? = null,
-    @field:NotNull override val questionId: Int? = null,
+    @field:NotNull override val partOrder: Int? = null,
+    @field:NotNull override val questionOrder: Int? = null,
     @field:NotNull val issues: List<MultipleChoiceIssueAnswerRequest?>? = null,
-) : AnswerBulkRequest(partId, questionId, AnswerType.MULTIPLE_CHOICE)
+) : AnswerBulkRequest(partOrder, questionOrder, AnswerType.MULTIPLE_CHOICE)

@@ -34,11 +34,11 @@ class CorrectAnswerService(
     fun getCorrectAnswer(
         examId: String,
         sectionOrder: Int,
-        partId: Int?,
-        questionId: Int?
+        partOrder: Int?,
+        questionOrder: Int?
     ): CorrectAnswerListDTO {
         return CorrectAnswerListDTO.fromCorrectAnswer(
-            customRepository.findCorrectAnswersByOptionalCriteria(examId, sectionOrder, partId, questionId)
+            customRepository.findCorrectAnswersByOptionalCriteria(examId, sectionOrder, partOrder, questionOrder)
         ).first()
     }
 

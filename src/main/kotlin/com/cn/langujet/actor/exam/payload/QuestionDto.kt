@@ -54,7 +54,7 @@ import io.swagger.v3.oas.annotations.media.Schema
     JsonSubTypes.Type(value = ListeningSelectivePhotoCompletionDTO::class, name = "LISTENING_SELECTIVE_MAP_COMPLETION")
 )
 sealed class QuestionDTO(
-    open val questionId: Int? = null,
+    open val questionOrder: Int? = null,
     open val header: String? = null,
     val questionType: QuestionType? = null,
     val answerType: AnswerType? = null
@@ -62,19 +62,19 @@ sealed class QuestionDTO(
     
     inline fun <reified T : Question> toQuestion(): T {
         val question = when (this) {
-            is SpeakingQuestionDTO -> SpeakingQuestion(this.questionId!!, this.header!!, this.time!!)
-            is WritingQuestionDTO -> WritingQuestion(this.questionId!!, this.header!!, this.time!!, this.content, this.tip)
-            is ReadingTextCompletionDTO -> ReadingTextCompletion(this.questionId!!, this.header!!, this.text!!)
-            is ReadingTableCompletionDTO -> ReadingTableCompletion(this.questionId!!, this.header!!, this.table!!)
+            is SpeakingQuestionDTO -> SpeakingQuestion(this.questionOrder!!, this.header!!, this.time!!)
+            is WritingQuestionDTO -> WritingQuestion(this.questionOrder!!, this.header!!, this.time!!, this.content, this.tip)
+            is ReadingTextCompletionDTO -> ReadingTextCompletion(this.questionOrder!!, this.header!!, this.text!!)
+            is ReadingTableCompletionDTO -> ReadingTableCompletion(this.questionOrder!!, this.header!!, this.table!!)
             is ReadingMultipleChoiceDTO -> ReadingMultipleChoice(
-                this.questionId!!,
+                this.questionOrder!!,
                 this.header!!,
                 this.selectNum!!,
-                this.issues?.map { MultipleChoiceIssue(it.id!!, it.header!!, it.description, it.options!!) }!!
+                this.issues?.map { MultipleChoiceIssue(it.issueOrder!!, it.header!!, it.description, it.options!!) }!!
             )
             
             is ReadingMatchingFeaturesDTO -> ReadingMatchingFeatures(
-                this.questionId!!,
+                this.questionOrder!!,
                 this.header!!,
                 this.itemsHeader,
                 this.items!!,
@@ -83,40 +83,40 @@ sealed class QuestionDTO(
             )
             
             is ReadingMatchingEndingsDTO -> ReadingMatchingEndings(
-                this.questionId!!,
+                this.questionOrder!!,
                 this.header!!,
                 this.startingPhrases!!,
                 this.endingPhrases!!
             )
             
-            is ReadingMatchingHeadingsDTO -> ReadingMatchingHeadings(this.questionId!!, this.header!!, this.headings!!)
-            is ReadingTrueFalseDTO -> ReadingTrueFalse(this.questionId!!, this.header!!, this.issues!!)
+            is ReadingMatchingHeadingsDTO -> ReadingMatchingHeadings(this.questionOrder!!, this.header!!, this.headings!!)
+            is ReadingTrueFalseDTO -> ReadingTrueFalse(this.questionOrder!!, this.header!!, this.issues!!)
             is ReadingSelectiveTextCompletionDTO -> ReadingSelectiveTextCompletion(
-                this.questionId!!,
+                this.questionOrder!!,
                 this.header!!,
                 this.text!!,
                 this.content,
                 this.items!!
             )
             
-            is ReadingFlowChartCompletionDTO -> ReadingFlowChartCompletion(this.questionId!!, this.header!!, this.content!!, this.issues!!)
+            is ReadingFlowChartCompletionDTO -> ReadingFlowChartCompletion(this.questionOrder!!, this.header!!, this.content!!, this.issues!!)
             
-            is ListeningTextCompletionDTO -> ListeningTextCompletion(this.questionId!!, this.header!!, this.text!!)
+            is ListeningTextCompletionDTO -> ListeningTextCompletion(this.questionOrder!!, this.header!!, this.text!!)
             is ListeningTableCompletionDTO -> ListeningTableCompletion(
-                this.questionId!!,
+                this.questionOrder!!,
                 this.header!!,
                 this.tableHeader!!,
                 this.table!!
             )
             
             is ListeningMultipleChoiceDTO -> ListeningMultipleChoice(
-                this.questionId!!,
+                this.questionOrder!!,
                 this.header!!,
                 this.selectNum!!,
-                this.issues!!.map { MultipleChoiceIssue(it.id!!, it.header!!, it.description, it.options!!) })
+                this.issues!!.map { MultipleChoiceIssue(it.issueOrder!!, it.header!!, it.description, it.options!!) })
             
             is ListeningMatchingFeaturesDTO -> ListeningMatchingFeatures(
-                this.questionId!!,
+                this.questionOrder!!,
                 this.header!!,
                 this.itemsHeader,
                 this.items!!,
@@ -125,7 +125,7 @@ sealed class QuestionDTO(
             )
             
             is ListeningLabellingDTO -> ListeningLabelling(
-                this.questionId!!,
+                this.questionOrder!!,
                 this.header!!,
                 this.content!!,
                 this.labels!!,
@@ -133,14 +133,14 @@ sealed class QuestionDTO(
             )
             
             is ListeningPhotoCompletionDTO -> ListeningPhotoCompletion(
-                this.questionId!!,
+                this.questionOrder!!,
                 this.header!!,
                 this.content!!,
                 this.issues!!
             )
             
             is ListeningSelectivePhotoCompletionDTO -> ListeningSelectivePhotoCompletion(
-                this.questionId!!,
+                this.questionOrder!!,
                 this.header!!,
                 this.content,
                 this.items!!,
@@ -184,26 +184,26 @@ sealed class QuestionDTO(
 }
 
 data class SpeakingQuestionDTO(
-    override val questionId: Int? = null,
+    override val questionOrder: Int? = null,
     override val header: String? = null,
     val time: Long? = null
-) : QuestionDTO(questionId, header, QuestionType.SPEAKING, AnswerType.VOICE) {
+) : QuestionDTO(questionOrder, header, QuestionType.SPEAKING, AnswerType.VOICE) {
     constructor(question: SpeakingQuestion) : this(
-        question.id,
+        question.order,
         question.header,
         question.time
     )
 }
 
 data class WritingQuestionDTO(
-    override val questionId: Int? = null,
+    override val questionOrder: Int? = null,
     override val header: String? = null,
     val time: Long? = null,
     val content: String? = null,
     val tip: String? = null
-) : QuestionDTO(questionId, header, QuestionType.WRITING, AnswerType.TEXT) {
+) : QuestionDTO(questionOrder, header, QuestionType.WRITING, AnswerType.TEXT) {
     constructor(question: WritingQuestion) : this(
-        question.id,
+        question.order,
         question.header,
         question.time,
         question.content,
@@ -212,59 +212,59 @@ data class WritingQuestionDTO(
 }
 
 data class ReadingTextCompletionDTO(
-    override val questionId: Int? = null,
+    override val questionOrder: Int? = null,
     override val header: String? = null,
     val text: String? = null
-) : QuestionDTO(questionId, header, QuestionType.READING_TEXT_COMPLETION, AnswerType.TEXT_ISSUES) {
+) : QuestionDTO(questionOrder, header, QuestionType.READING_TEXT_COMPLETION, AnswerType.TEXT_ISSUES) {
     constructor(question: ReadingTextCompletion) : this(
-        question.id,
+        question.order,
         question.header,
         question.text
     )
 }
 
 data class ReadingTableCompletionDTO(
-    override val questionId: Int? = null,
+    override val questionOrder: Int? = null,
     override val header: String? = null,
     val table: List<List<String?>>? = null
-) : QuestionDTO(questionId, header, QuestionType.READING_TABLE_COMPLETION, AnswerType.TEXT_ISSUES) {
+) : QuestionDTO(questionOrder, header, QuestionType.READING_TABLE_COMPLETION, AnswerType.TEXT_ISSUES) {
     constructor(question: ReadingTableCompletion) : this(
-        question.id,
+        question.order,
         question.header,
         question.table
     )
 }
 
 data class ReadingMultipleChoiceDTO(
-    override val questionId: Int? = null,
+    override val questionOrder: Int? = null,
     override val header: String? = null,
     val selectNum: Int? = null,
     val issues: List<MultipleChoiceIssueDTO>? = null
 ) : QuestionDTO(
-    questionId,
+    questionOrder,
     header,
     QuestionType.READING_MULTIPLE_CHOICES,
     AnswerType.TEXT_ISSUES
 ) {
     
     constructor(question: ReadingMultipleChoice) : this(
-        question.id,
+        question.order,
         question.header,
         question.selectNum,
-        question.issues.map { MultipleChoiceIssueDTO(it.id, it.header, it.description, it.options) }
+        question.issues.map { MultipleChoiceIssueDTO(it.order, it.header, it.description, it.options) }
     )
 }
 
 data class ReadingMatchingFeaturesDTO(
-    override val questionId: Int? = null,
+    override val questionOrder: Int? = null,
     override val header: String? = null,
     val itemsHeader: String? = null,
     val items: List<String>? = null,
     val featuresHeader: String? = null,
     val features: List<String>? = null
-) : QuestionDTO(questionId, header, QuestionType.READING_MATCHING_FEATURES, AnswerType.TEXT_ISSUES) {
+) : QuestionDTO(questionOrder, header, QuestionType.READING_MATCHING_FEATURES, AnswerType.TEXT_ISSUES) {
     constructor(question: ReadingMatchingFeatures) : this(
-        question.id,
+        question.order,
         question.header,
         question.itemsHeader,
         question.items,
@@ -274,13 +274,13 @@ data class ReadingMatchingFeaturesDTO(
 }
 
 data class ReadingMatchingEndingsDTO(
-    override val questionId: Int? = null,
+    override val questionOrder: Int? = null,
     override val header: String? = null,
     val startingPhrases: List<String>? = null,
     val endingPhrases: List<String>? = null
-) : QuestionDTO(questionId, header, QuestionType.READING_MATCHING_ENDINGS, AnswerType.TEXT_ISSUES) {
+) : QuestionDTO(questionOrder, header, QuestionType.READING_MATCHING_ENDINGS, AnswerType.TEXT_ISSUES) {
     constructor(question: ReadingMatchingEndings) : this(
-        question.id,
+        question.order,
         question.header,
         question.startingPhrases,
         question.endingPhrases
@@ -288,38 +288,38 @@ data class ReadingMatchingEndingsDTO(
 }
 
 data class ReadingMatchingHeadingsDTO(
-    override val questionId: Int? = null,
+    override val questionOrder: Int? = null,
     override val header: String? = null,
     val headings: List<String>? = null
-) : QuestionDTO(questionId, header, QuestionType.READING_MATCHING_HEADINGS, AnswerType.TEXT_ISSUES) {
+) : QuestionDTO(questionOrder, header, QuestionType.READING_MATCHING_HEADINGS, AnswerType.TEXT_ISSUES) {
     constructor(question: ReadingMatchingHeadings) : this(
-        question.id,
+        question.order,
         question.header,
         question.headings
     )
 }
 
 data class ReadingTrueFalseDTO(
-    override val questionId: Int? = null,
+    override val questionOrder: Int? = null,
     override val header: String? = null,
     val issues: List<String>? = null
-) : QuestionDTO(questionId, header, QuestionType.READING_TRUE_FALSE, AnswerType.TRUE_FALSE) {
+) : QuestionDTO(questionOrder, header, QuestionType.READING_TRUE_FALSE, AnswerType.TRUE_FALSE) {
     constructor(question: ReadingTrueFalse) : this(
-        question.id,
+        question.order,
         question.header,
         question.issues
     )
 }
 
 data class ReadingSelectiveTextCompletionDTO(
-    override val questionId: Int? = null,
+    override val questionOrder: Int? = null,
     override val header: String? = null,
     val text: String? = null,
     val content: String? = null,
     val items: List<String>? = null
-) : QuestionDTO(questionId, header, QuestionType.READING_SELECTIVE_TEXT_COMPLETION, AnswerType.TEXT_ISSUES) {
+) : QuestionDTO(questionOrder, header, QuestionType.READING_SELECTIVE_TEXT_COMPLETION, AnswerType.TEXT_ISSUES) {
     constructor(question: ReadingSelectiveTextCompletion) : this(
-        question.id,
+        question.order,
         question.header,
         question.text,
         question.content,
@@ -328,13 +328,13 @@ data class ReadingSelectiveTextCompletionDTO(
 }
 
 class ReadingFlowChartCompletionDTO(
-    override val questionId: Int? = null,
+    override val questionOrder: Int? = null,
     override val header: String? = null,
     val content: String? = null,
     val issues: List<String>? = null,
-) : QuestionDTO(questionId, header, QuestionType.READING_FLOWCHART_COMPLETION, AnswerType.TEXT_ISSUES) {
+) : QuestionDTO(questionOrder, header, QuestionType.READING_FLOWCHART_COMPLETION, AnswerType.TEXT_ISSUES) {
     constructor(question: ReadingFlowChartCompletion) : this(
-        question.id,
+        question.order,
         question.header,
         question.content,
         question.issues,
@@ -342,32 +342,32 @@ class ReadingFlowChartCompletionDTO(
 }
 
 data class MultipleChoiceIssueDTO(
-    val id: Int? = null,
+    val issueOrder: Int? = null,
     val header: String? = null,
     val description: String? = null,
     val options: List<String>? = null
 )
 
 data class ListeningTextCompletionDTO(
-    override val questionId: Int? = null,
+    override val questionOrder: Int? = null,
     override val header: String? = null,
     val text: String? = null
-) : QuestionDTO(questionId, header, QuestionType.LISTENING_TEXT_COMPLETION, AnswerType.TEXT_ISSUES) {
+) : QuestionDTO(questionOrder, header, QuestionType.LISTENING_TEXT_COMPLETION, AnswerType.TEXT_ISSUES) {
     constructor(question: ListeningTextCompletion) : this(
-        question.id,
+        question.order,
         question.header,
         question.text
     )
 }
 
 data class ListeningTableCompletionDTO(
-    override val questionId: Int? = null,
+    override val questionOrder: Int? = null,
     override val header: String? = null,
     val tableHeader: String? = null,
     val table: List<List<String?>>? = null
-) : QuestionDTO(questionId, header, QuestionType.LISTENING_TABLE_COMPLETION, AnswerType.TEXT_ISSUES) {
+) : QuestionDTO(questionOrder, header, QuestionType.LISTENING_TABLE_COMPLETION, AnswerType.TEXT_ISSUES) {
     constructor(question: ListeningTableCompletion) : this(
-        question.id,
+        question.order,
         question.header,
         question.tableHeader,
         question.table
@@ -375,34 +375,34 @@ data class ListeningTableCompletionDTO(
 }
 
 data class ListeningMultipleChoiceDTO(
-    override val questionId: Int? = null,
+    override val questionOrder: Int? = null,
     override val header: String? = null,
     val selectNum: Int? = null,
     val issues: List<MultipleChoiceIssueDTO>? = null
 ) : QuestionDTO(
-    questionId,
+    questionOrder,
     header,
     QuestionType.LISTENING_MULTIPLE_CHOICES,
     AnswerType.TEXT
 ) {
     constructor(question: ListeningMultipleChoice) : this(
-        question.id,
+        question.order,
         question.header,
         question.selectNum,
-        question.issues.map { MultipleChoiceIssueDTO(it.id, it.header, it.description, it.options) }
+        question.issues.map { MultipleChoiceIssueDTO(it.order, it.header, it.description, it.options) }
     )
 }
 
 data class ListeningMatchingFeaturesDTO(
-    override val questionId: Int? = null,
+    override val questionOrder: Int? = null,
     override val header: String? = null,
     val itemsHeader: String? = null,
     val items: List<String>? = null,
     val featuresHeader: String? = null,
     val features: List<String>? = null
-) : QuestionDTO(questionId, header, QuestionType.LISTENING_MATCHING_FEATURES, AnswerType.TEXT_ISSUES) {
+) : QuestionDTO(questionOrder, header, QuestionType.LISTENING_MATCHING_FEATURES, AnswerType.TEXT_ISSUES) {
     constructor(question: ListeningMatchingFeatures) : this(
-        question.id,
+        question.order,
         question.header,
         question.itemsHeader,
         question.items,
@@ -412,14 +412,14 @@ data class ListeningMatchingFeaturesDTO(
 }
 
 data class ListeningLabellingDTO(
-    override val questionId: Int? = null,
+    override val questionOrder: Int? = null,
     override val header: String? = null,
     val content: String? = null,
     val labels: List<String>? = null,
     val issues: List<String>? = null
-) : QuestionDTO(questionId, header, QuestionType.LISTENING_LABELLING, AnswerType.TEXT_ISSUES) {
+) : QuestionDTO(questionOrder, header, QuestionType.LISTENING_LABELLING, AnswerType.TEXT_ISSUES) {
     constructor(question: ListeningLabelling) : this(
-        question.id,
+        question.order,
         question.header,
         question.content,
         question.labels,
@@ -428,13 +428,13 @@ data class ListeningLabellingDTO(
 }
 
 class ListeningPhotoCompletionDTO(
-    override val questionId: Int? = null,
+    override val questionOrder: Int? = null,
     override val header: String? = null,
     val content: String? = null,
     val issues: List<String>? = null
-) : QuestionDTO(questionId, header, QuestionType.LISTENING_PHOTO_COMPLETION, AnswerType.TEXT_ISSUES) {
+) : QuestionDTO(questionOrder, header, QuestionType.LISTENING_PHOTO_COMPLETION, AnswerType.TEXT_ISSUES) {
     constructor(question: ListeningPhotoCompletion) : this(
-        question.id,
+        question.order,
         question.header,
         question.content,
         question.issues
@@ -442,14 +442,14 @@ class ListeningPhotoCompletionDTO(
 }
 
 data class ListeningSelectivePhotoCompletionDTO(
-    override val questionId: Int? = null,
+    override val questionOrder: Int? = null,
     override val header: String? = null,
     val content: String? = null,
     val items: List<String>? = null,
     val issues: List<String>? = null
-) : QuestionDTO(questionId, header, QuestionType.LISTENING_SELECTIVE_PHOTO_COMPLETION, AnswerType.TEXT_ISSUES) {
+) : QuestionDTO(questionOrder, header, QuestionType.LISTENING_SELECTIVE_PHOTO_COMPLETION, AnswerType.TEXT_ISSUES) {
     constructor(question: ListeningSelectivePhotoCompletion) : this(
-        question.id,
+        question.order,
         question.header,
         question.content,
         question.items,

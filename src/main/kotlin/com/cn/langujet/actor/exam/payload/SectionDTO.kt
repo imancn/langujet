@@ -10,7 +10,7 @@ data class SectionDTO(
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     var examId: String? = null,
     var header: String? = null,
-    var order: Int? = null,
+    var sectionOrder: Int? = null,
     var sectionType: SectionType? = null,
     var parts: List<PartDTO>? = null,
     var time: Long? = null
@@ -20,7 +20,7 @@ data class SectionDTO(
             this.id,
             this.examId!!,
             this.header!!,
-            this.order!!,
+            this.sectionOrder!!,
             this.sectionType!!,
             this.parts?.map { it.toPart() }!!,
             this.time!!

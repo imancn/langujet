@@ -19,10 +19,10 @@ class CorrectAnswerController(
     fun getCorrectAnswers(
         @RequestParam @NotBlank examId: String?,
         @RequestParam @NotNull sectionOrder: Int?,
-        @RequestParam partId: Int?,
-        @RequestParam questionId: Int?
+        @RequestParam partOrder: Int?,
+        @RequestParam questionOrder: Int?
     ): CorrectAnswerListDTO {
-        return correctAnswerService.getCorrectAnswer(examId!!, sectionOrder!!, partId, questionId)
+        return correctAnswerService.getCorrectAnswer(examId!!, sectionOrder!!, partOrder, questionOrder)
     }
 
     @PostMapping("admin/correct-answers")

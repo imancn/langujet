@@ -30,8 +30,8 @@ import jakarta.validation.constraints.NotNull
 )
 sealed class CorrectAnswerDTO(
     open val id: String?,
-    open val partId: Int?,
-    open val questionId: Int?,
+    open val partOrder: Int?,
+    open val questionOrder: Int?,
     val type: AnswerType,
 ) {
     inline fun <reified T : CorrectAnswer> toCorrectAnswer(examId: String, sectionOrder: Int): T {
@@ -39,32 +39,32 @@ sealed class CorrectAnswerDTO(
             is CorrectTextAnswerDTO -> CorrectAnswer.CorrectTextAnswer(
                 examId,
                 sectionOrder,
-                partId!!,
-                questionId!!,
+                partOrder!!,
+                questionOrder!!,
                 this.text!!
             )
 
             is CorrectTextIssuesAnswerDTO -> CorrectAnswer.CorrectTextIssuesAnswer(
                 examId,
                 sectionOrder,
-                partId!!,
-                questionId!!,
+                partOrder!!,
+                questionOrder!!,
                 this.textList!!
             )
 
             is CorrectTrueFalseAnswerDTO -> CorrectAnswer.CorrectTrueFalseAnswer(
                 examId,
                 sectionOrder,
-                partId!!,
-                questionId!!,
+                partOrder!!,
+                questionOrder!!,
                 this.answers!!
             )
 
             is CorrectMultipleChoiceAnswerDTO -> CorrectAnswer.CorrectMultipleChoiceAnswer(
                 examId,
                 sectionOrder,
-                partId!!,
-                questionId!!,
+                partOrder!!,
+                questionOrder!!,
                 this.issues!!.map { it.toMultipleChoiceIssueAnswer() }
             )
 
@@ -93,56 +93,56 @@ sealed class CorrectAnswerDTO(
 
 data class CorrectTextAnswerDTO(
     override val id: String? = null,
-    @field:NotNull override val partId: Int? = null,
-    @field:NotNull override val questionId: Int? = null,
+    @field:NotNull override val partOrder: Int? = null,
+    @field:NotNull override val questionOrder: Int? = null,
     @field:NotBlank val text: String? = null,
-) : CorrectAnswerDTO(id, partId, questionId, AnswerType.TEXT) {
+) : CorrectAnswerDTO(id, partOrder, questionOrder, AnswerType.TEXT) {
     constructor(answer: CorrectAnswer.CorrectTextAnswer) : this(
         id = answer.id,
-        partId = answer.partId,
-        questionId = answer.questionId,
+        partOrder = answer.partOrder,
+        questionOrder = answer.questionOrder,
         text = answer.text
     )
 }
 
 data class CorrectTextIssuesAnswerDTO(
     override val id: String? = null,
-    @field:NotNull override val partId: Int? = null,
-    @field:NotNull override val questionId: Int? = null,
+    @field:NotNull override val partOrder: Int? = null,
+    @field:NotNull override val questionOrder: Int? = null,
     @field:NotNull val textList: List<String>? = null,
-) : CorrectAnswerDTO(id, partId, questionId, AnswerType.TEXT_ISSUES) {
+) : CorrectAnswerDTO(id, partOrder, questionOrder, AnswerType.TEXT_ISSUES) {
     constructor(answer: CorrectAnswer.CorrectTextIssuesAnswer) : this(
         id = answer.id,
-        partId = answer.partId,
-        questionId = answer.questionId,
+        partOrder = answer.partOrder,
+        questionOrder = answer.questionOrder,
         textList = answer.textList
     )
 }
 
 data class CorrectTrueFalseAnswerDTO(
     override val id: String? = null,
-    @field:NotNull override val partId: Int? = null,
-    @field:NotNull override val questionId: Int? = null,
+    @field:NotNull override val partOrder: Int? = null,
+    @field:NotNull override val questionOrder: Int? = null,
     @field:NotNull val answers: List<TrueFalseAnswerType>? = null,
-) : CorrectAnswerDTO(id, partId, questionId, AnswerType.TRUE_FALSE) {
+) : CorrectAnswerDTO(id, partOrder, questionOrder, AnswerType.TRUE_FALSE) {
     constructor(answer: CorrectAnswer.CorrectTrueFalseAnswer) : this(
         id = answer.id,
-        partId = answer.partId,
-        questionId = answer.questionId,
+        partOrder = answer.partOrder,
+        questionOrder = answer.questionOrder,
         answers = answer.answers
     )
 }
 
 data class CorrectMultipleChoiceAnswerDTO(
     override val id: String? = null,
-    @field:NotNull override val partId: Int? = null,
-    @field:NotNull override val questionId: Int? = null,
+    @field:NotNull override val partOrder: Int? = null,
+    @field:NotNull override val questionOrder: Int? = null,
     @field:NotNull val issues: List<CorrectMultipleChoiceIssueAnswerDTO>? = null,
-) : CorrectAnswerDTO(id, partId, questionId, AnswerType.MULTIPLE_CHOICE) {
+) : CorrectAnswerDTO(id, partOrder, questionOrder, AnswerType.MULTIPLE_CHOICE) {
     constructor(answer: CorrectAnswer.CorrectMultipleChoiceAnswer) : this(
         id = answer.id,
-        partId = answer.partId,
-        questionId = answer.questionId,
+        partOrder = answer.partOrder,
+        questionOrder = answer.questionOrder,
         issues = answer.issues.map { issue -> CorrectMultipleChoiceIssueAnswerDTO(issue) }
     )
 }

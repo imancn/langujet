@@ -18,13 +18,13 @@ import io.swagger.v3.oas.annotations.media.Schema
     JsonSubTypes.Type(value = SpeakingPartDTO::class, name = "SPEAKING")
 )
 sealed class PartDTO(
-    open val partId: Int? = null,
+    open val partOrder: Int? = null,
     open val type: SectionType? = null
 ) {
     inline fun <reified T : Part> toPart(): T {
         val part = when (this) {
             is ReadingPartDTO -> ReadingPart(
-                this.partId!!,
+                this.partOrder!!,
                 this.passage!!.map {
                     Passage(
                         it.indicator,
@@ -34,18 +34,18 @@ sealed class PartDTO(
                 this.questionList?.map { it.toQuestion() }!!)
 
             is ListeningPartDTO -> ListeningPart(
-                this.partId!!,
+                this.partOrder!!,
                 this.audioId!!,
                 this.questionList?.map { it.toQuestion() }!!
             )
 
             is WritingPartDTO -> WritingPart(
-                this.partId!!,
+                this.partOrder!!,
                 this.question!!.toQuestion(),
             )
 
             is SpeakingPartDTO -> SpeakingPart(
-                this.partId!!,
+                this.partOrder!!,
                 this.questionList!!.map { it.toQuestion() },
                 this.focus
             )
@@ -72,12 +72,12 @@ sealed class PartDTO(
 }
 
 data class ReadingPartDTO(
-    override val partId: Int? = null,
+    override val partOrder: Int? = null,
     val passage: List<PassageDTO>? = null,
     val questionList: List<QuestionDTO>? = null
-) : PartDTO(partId, SectionType.READING) {
+) : PartDTO(partOrder, SectionType.READING) {
     constructor(part: ReadingPart) : this(
-        part.id,
+        part.order,
         part.passage.map { PassageDTO(it) },
         part.questionList.map { QuestionDTO.from(it) }
     )
@@ -94,35 +94,35 @@ data class PassageDTO(
 }
 
 data class ListeningPartDTO(
-    override val partId: Int? = null,
+    override val partOrder: Int? = null,
     val audioId: String? = null,
     val questionList: List<QuestionDTO>? = null
-) : PartDTO(partId, SectionType.LISTENING) {
+) : PartDTO(partOrder, SectionType.LISTENING) {
     constructor(part: ListeningPart) : this(
-        part.id,
+        part.order,
         part.audioId,
         part.questionList.map { QuestionDTO.from(it) }
     )
 }
 
 data class WritingPartDTO(
-    override val partId: Int? = null,
+    override val partOrder: Int? = null,
     val question: WritingQuestionDTO? = null
-) : PartDTO(partId, SectionType.WRITING) {
+) : PartDTO(partOrder, SectionType.WRITING) {
     constructor(part: WritingPart) : this(
-        part.id,
-        WritingQuestionDTO(part.question.id, part.question.header, part.question.time, part.question.content)
+        part.order,
+        WritingQuestionDTO(part.question.order, part.question.header, part.question.time, part.question.content)
     )
 }
 
 data class SpeakingPartDTO(
-    override val partId: Int? = null,
+    override val partOrder: Int? = null,
     val questionList: List<SpeakingQuestionDTO>? = null,
     val focus: String? = null
-) : PartDTO(partId, SectionType.SPEAKING) {
+) : PartDTO(partOrder, SectionType.SPEAKING) {
     constructor(part: SpeakingPart) : this(
-        part.id,
-        part.questionList.map { SpeakingQuestionDTO(it.id, it.header, it.time) },
+        part.order,
+        part.questionList.map { SpeakingQuestionDTO(it.order, it.header, it.time) },
         part.focus
     )
 }
