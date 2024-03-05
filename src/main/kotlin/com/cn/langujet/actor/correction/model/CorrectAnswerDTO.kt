@@ -148,16 +148,16 @@ data class CorrectMultipleChoiceAnswerDTO(
 }
 
 class CorrectMultipleChoiceIssueAnswerDTO(
-    @field:NotNull var id: Int? = null,
+    @field:NotNull var issueOrder: Int? = null,
     @field:NotNull var options: List<String>? = null
 ) {
     constructor(issue: CorrectAnswer.CorrectMultipleChoiceIssueAnswer) : this(
-        issue.id, issue.options
+        issue.order, issue.options
     )
 
     fun toMultipleChoiceIssueAnswer(): CorrectAnswer.CorrectMultipleChoiceIssueAnswer {
         return CorrectAnswer.CorrectMultipleChoiceIssueAnswer(
-            this.id!!,
+            this.issueOrder!!,
             this.options!!
         )
     }

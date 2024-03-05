@@ -56,7 +56,7 @@ sealed class CorrectAnswer(
     ) : CorrectAnswer(null, examId, sectionOrder, partOrder, questionOrder, AnswerType.MULTIPLE_CHOICE)
 
     class CorrectMultipleChoiceIssueAnswer(
-        var id: Int,
+        var order: Int,
         var options: List<String>
     )
 }
