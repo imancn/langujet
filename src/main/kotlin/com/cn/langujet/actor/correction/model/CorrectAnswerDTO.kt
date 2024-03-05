@@ -109,7 +109,7 @@ data class CorrectTextIssuesAnswerDTO(
     override val id: String? = null,
     @field:NotNull override val partOrder: Int? = null,
     @field:NotNull override val questionOrder: Int? = null,
-    @field:NotNull val textList: List<String>? = null,
+    @field:NotNull val textList: List<List<String>>? = null,
 ) : CorrectAnswerDTO(id, partOrder, questionOrder, AnswerType.TEXT_ISSUES) {
     constructor(answer: CorrectAnswer.CorrectTextIssuesAnswer) : this(
         id = answer.id,

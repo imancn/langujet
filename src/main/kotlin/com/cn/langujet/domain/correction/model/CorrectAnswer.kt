@@ -32,7 +32,7 @@ sealed class CorrectAnswer(
         sectionOrder: Int,
         partOrder: Int,
         questionOrder: Int,
-        var textList: List<String>
+        var textList: List<List<String>>
     ) : CorrectAnswer(null, examId, sectionOrder, partOrder, questionOrder, AnswerType.TEXT_ISSUES)
 
     @Document(collection = "correct_answers")
