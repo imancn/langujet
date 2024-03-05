@@ -383,7 +383,7 @@ data class ListeningMultipleChoiceDTO(
     questionOrder,
     header,
     QuestionType.LISTENING_MULTIPLE_CHOICES,
-    AnswerType.TEXT
+    AnswerType.MULTIPLE_CHOICE
 ) {
     constructor(question: ListeningMultipleChoice) : this(
         question.order,
