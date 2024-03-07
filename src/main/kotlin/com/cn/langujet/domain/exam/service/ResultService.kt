@@ -5,7 +5,7 @@ import com.cn.langujet.application.advice.AccessDeniedException
 import com.cn.langujet.application.advice.InvalidTokenException
 import com.cn.langujet.application.advice.MethodNotAllowedException
 import com.cn.langujet.application.advice.NotFoundException
-import com.cn.langujet.application.security.security.model.Role
+import com.cn.langujet.domain.security.model.Role
 import com.cn.langujet.domain.exam.model.ExamSession
 import com.cn.langujet.domain.exam.model.ExamSessionState
 import com.cn.langujet.domain.exam.model.Result
