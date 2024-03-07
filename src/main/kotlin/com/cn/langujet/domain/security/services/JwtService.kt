@@ -1,7 +1,7 @@
 package com.cn.langujet.domain.security.services
 
 import com.cn.langujet.application.advice.InvalidTokenException
-import com.cn.langujet.application.security.security.model.UserDetailsImpl
+import com.cn.langujet.domain.security.model.UserDetailsImpl
 import io.jsonwebtoken.*
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Value
@@ -23,6 +23,16 @@ class JwtService {
             .setSubject(userPrincipal.username)
             .setIssuedAt(Date())
             .setExpiration(Date(Date().time + jwtExpirationMs))
+            .signWith(SignatureAlgorithm.HS512, jwtSecret)
+            .compact()
+    }
+    
+    fun generateJwtTokenTest(authentication: Authentication): String {
+        val userPrincipal = authentication.principal as UserDetailsImpl
+        return Jwts.builder()
+            .setSubject(userPrincipal.username)
+            .setIssuedAt(Date())
+            .setExpiration(Date(Date().time + (60_000)))
             .signWith(SignatureAlgorithm.HS512, jwtSecret)
             .compact()
     }

@@ -1,5 +1,6 @@
-package com.cn.langujet.application.security.security.model
+package com.cn.langujet.domain.security.model
 
+import com.cn.langujet.application.security.security.model.User
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.Instant

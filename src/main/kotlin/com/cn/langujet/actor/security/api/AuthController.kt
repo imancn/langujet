@@ -13,6 +13,7 @@ import com.cn.langujet.domain.security.services.RefreshTokenService
 import com.cn.langujet.application.service.smtp.MailSenderService
 import com.cn.langujet.domain.professor.Professor
 import com.cn.langujet.domain.professor.ProfessorRepository
+import com.cn.langujet.domain.security.model.*
 import com.cn.langujet.domain.security.services.AuthService
 import com.cn.langujet.domain.student.model.Student
 import com.cn.langujet.domain.student.repository.StudentRepository
@@ -65,6 +66,31 @@ class AuthController(
 
         val refreshToken = refreshTokenService.createRefreshToken(userDetails.id)
 
+        return toOkResponseEntity(
+            JwtResponse(
+                jwt, refreshToken.token, userDetails.email
+            )
+        )
+    }
+    
+    @PostMapping("/sign-in")
+    fun authenticateUserTest(
+        @RequestParam @NotBlank @Email email: String?,
+        @RequestParam @NotBlank password: String?,
+    ): ResponseEntity<JwtResponse> {
+        val user = userRepository.findByEmail(email).orElseThrow {
+            InvalidTokenException("Bad credentials")
+        }
+        val authentication = authenticationManager.authenticate(
+            UsernamePasswordAuthenticationToken(user?.id, password)
+        )
+        SecurityContextHolder.getContext().authentication = authentication
+        val jwt = jwtService.generateJwtTokenTest(authentication)
+        val userDetails = authentication.principal as UserDetailsImpl
+        if (!userDetails.emailVerified) throw MethodNotAllowedException("User is not enabled ${userDetails.email}")
+        
+        val refreshToken = refreshTokenService.createRefreshToken(userDetails.id)
+        
         return toOkResponseEntity(
             JwtResponse(
                 jwt, refreshToken.token, userDetails.email

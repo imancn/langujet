@@ -2,7 +2,7 @@ package com.cn.langujet.domain.security.services
 
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.application.advice.RefreshTokenException
-import com.cn.langujet.application.security.security.model.RefreshToken
+import com.cn.langujet.domain.security.model.RefreshToken
 import com.cn.langujet.domain.security.repository.RefreshTokenRepository
 import com.cn.langujet.domain.security.repository.UserRepository
 import org.springframework.beans.factory.annotation.Value

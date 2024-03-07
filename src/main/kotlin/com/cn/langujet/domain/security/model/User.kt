@@ -1,5 +1,6 @@
 package com.cn.langujet.application.security.security.model
 
+import com.cn.langujet.domain.security.model.Role
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
