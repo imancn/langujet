@@ -122,7 +122,7 @@ data class SpeakingPartDTO(
 ) : PartDTO(partOrder, SectionType.SPEAKING) {
     constructor(part: SpeakingPart) : this(
         part.order,
-        part.questionList.map { SpeakingQuestionDTO(it.order, it.header, it.time) },
+        part.questionList.map { QuestionDTO.from(it) },
         part.focus
     )
 }
