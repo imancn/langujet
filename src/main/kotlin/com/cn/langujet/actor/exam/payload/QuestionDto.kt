@@ -62,7 +62,7 @@ sealed class QuestionDTO(
     
     inline fun <reified T : Question> toQuestion(): T {
         val question = when (this) {
-            is SpeakingQuestionDTO -> SpeakingQuestion(this.questionOrder!!, this.header!!, this.time!!)
+            is SpeakingQuestionDTO -> SpeakingQuestion(this.questionOrder!!, this.header!!, this.audioId, this.time!!)
             is WritingQuestionDTO -> WritingQuestion(this.questionOrder!!, this.header!!, this.time!!, this.content, this.tip)
             is ReadingTextCompletionDTO -> ReadingTextCompletion(this.questionOrder!!, this.header!!, this.text!!)
             is ReadingTableCompletionDTO -> ReadingTableCompletion(this.questionOrder!!, this.header!!, this.table!!)
@@ -186,11 +186,13 @@ sealed class QuestionDTO(
 data class SpeakingQuestionDTO(
     override val questionOrder: Int? = null,
     override val header: String? = null,
+    val audioId: String? = null,
     val time: Long? = null
 ) : QuestionDTO(questionOrder, header, QuestionType.SPEAKING, AnswerType.VOICE) {
     constructor(question: SpeakingQuestion) : this(
         question.order,
         question.header,
+        question.audioId,
         question.time
     )
 }

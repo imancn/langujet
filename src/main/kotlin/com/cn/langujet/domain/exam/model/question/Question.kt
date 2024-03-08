@@ -12,6 +12,7 @@ sealed class Question(
 class SpeakingQuestion(
     order: Int,
     header: String,
+    var audioId: String?,
     var time: Long,
 ) : Question(order, header, QuestionType.SPEAKING, AnswerType.VOICE)
 
