@@ -27,6 +27,7 @@ class JwtService {
             .compact()
     }
     
+    // Todo: remove after test
     fun generateJwtTokenTest(authentication: Authentication): String {
         val userPrincipal = authentication.principal as UserDetailsImpl
         return Jwts.builder()
