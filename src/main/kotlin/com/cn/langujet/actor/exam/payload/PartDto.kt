@@ -111,7 +111,7 @@ data class WritingPartDTO(
 ) : PartDTO(partOrder, SectionType.WRITING) {
     constructor(part: WritingPart) : this(
         part.order,
-        WritingQuestionDTO(part.question.order, part.question.header, part.question.time, part.question.content)
+        QuestionDTO.from(part.question)
     )
 }
 
