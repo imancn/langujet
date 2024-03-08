@@ -29,7 +29,7 @@ sealed class AnswerRequest(
                 partOrder!!,
                 questionOrder!!,
                 Date(System.currentTimeMillis()),
-                this.textList!!
+                this.issues!!
             )
 
             is TrueFalseAnswerRequest -> Answer.TrueFalseAnswer(
@@ -38,7 +38,7 @@ sealed class AnswerRequest(
                 partOrder!!,
                 questionOrder!!,
                 Date(System.currentTimeMillis()),
-                this.answers!!
+                this.issues!!
             )
 
             is MultipleChoiceAnswerRequest -> Answer.MultipleChoiceAnswer(
@@ -68,19 +68,19 @@ data class TextAnswerRequest(
 ) : AnswerRequest(examSessionId, sectionOrder, partOrder, questionOrder)
 
 data class TextIssuesAnswerRequest(
-        @field:NotBlank override val examSessionId: String? = null,
-        @field:NotNull override val sectionOrder: Int? = null,
-        @field:NotNull override val partOrder: Int? = null,
-        @field:NotNull override val questionOrder: Int? = null,
-        @field:NotNull val textList: List<String?>? = null,
+    @field:NotBlank override val examSessionId: String? = null,
+    @field:NotNull override val sectionOrder: Int? = null,
+    @field:NotNull override val partOrder: Int? = null,
+    @field:NotNull override val questionOrder: Int? = null,
+    @field:NotNull val issues: List<String?>? = null,
 ) : AnswerRequest(examSessionId, sectionOrder, partOrder, questionOrder)
 
 data class TrueFalseAnswerRequest(
-        @field:NotBlank override val examSessionId: String? = null,
-        @field:NotNull override val sectionOrder: Int? = null,
-        @field:NotNull override val partOrder: Int? = null,
-        @field:NotNull override val questionOrder: Int? = null,
-        @field:NotNull val answers: List<TrueFalseAnswerType?>? = null,
+    @field:NotBlank override val examSessionId: String? = null,
+    @field:NotNull override val sectionOrder: Int? = null,
+    @field:NotNull override val partOrder: Int? = null,
+    @field:NotNull override val questionOrder: Int? = null,
+    @field:NotNull val issues: List<TrueFalseAnswerType?>? = null,
 ) : AnswerRequest(examSessionId, sectionOrder, partOrder, questionOrder)
 
 data class MultipleChoiceAnswerRequest(

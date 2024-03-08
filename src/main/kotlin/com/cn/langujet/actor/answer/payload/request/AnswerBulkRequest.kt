@@ -42,7 +42,7 @@ sealed class AnswerBulkRequest(
                 partOrder!!,
                 questionOrder!!,
                 Date(System.currentTimeMillis()),
-                this.textList!!
+                this.issues!!
             )
 
             is TrueFalseBulkAnswerRequest -> Answer.TrueFalseAnswer(
@@ -51,7 +51,7 @@ sealed class AnswerBulkRequest(
                 partOrder!!,
                 questionOrder!!,
                 Date(System.currentTimeMillis()),
-                this.answers!!
+                this.issues!!
             )
 
             is MultipleChoiceBulkAnswerRequest -> Answer.MultipleChoiceAnswer(
@@ -81,13 +81,13 @@ data class TextBulkAnswerRequest(
 data class TextIssuesBulkAnswerRequest(
     @field:NotNull override val partOrder: Int? = null,
     @field:NotNull override val questionOrder: Int? = null,
-    @field:NotNull val textList: List<String?>? = null,
+    @field:NotNull val issues: List<String?>? = null,
 ) : AnswerBulkRequest(partOrder, questionOrder, AnswerType.TEXT_ISSUES)
 
 data class TrueFalseBulkAnswerRequest(
     @field:NotNull override val partOrder: Int? = null,
     @field:NotNull override val questionOrder: Int? = null,
-    @field:NotNull val answers: List<TrueFalseAnswerType?>? = null,
+    @field:NotNull val issues: List<TrueFalseAnswerType?>? = null,
 ) : AnswerBulkRequest(partOrder, questionOrder, AnswerType.TRUE_FALSE)
 
 data class MultipleChoiceBulkAnswerRequest(

@@ -34,7 +34,7 @@ sealed class Answer(
         partOrder: Int,
         questionOrder: Int,
         date: Date,
-        var textList: List<String?>
+        var issues: List<String?>
     ): Answer(null, examSessionId, sectionOrder, AnswerType.TEXT_ISSUES, partOrder, questionOrder, date)
 
     @Document(collection = "answers")
@@ -45,7 +45,7 @@ sealed class Answer(
         partOrder: Int,
         questionOrder: Int,
         date: Date,
-        var answers: List<TrueFalseAnswerType?>
+        var issues: List<TrueFalseAnswerType?>
     ): Answer(null, examSessionId, sectionOrder, AnswerType.TRUE_FALSE, partOrder, questionOrder, date)
 
     @Document(collection = "answers")
