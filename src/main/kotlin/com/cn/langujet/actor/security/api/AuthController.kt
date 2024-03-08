@@ -68,12 +68,13 @@ class AuthController(
 
         return toOkResponseEntity(
             JwtResponse(
-                jwt, refreshToken.token, userDetails.email
+                jwt, refreshToken.id ?: "", userDetails.email
             )
         )
     }
     
-    @PostMapping("/sign-in")
+    // Todo: remove after test
+    @PostMapping("/sign-in/test")
     fun authenticateUserTest(
         @RequestParam @NotBlank @Email email: String?,
         @RequestParam @NotBlank password: String?,
@@ -93,7 +94,7 @@ class AuthController(
         
         return toOkResponseEntity(
             JwtResponse(
-                jwt, refreshToken.token, userDetails.email
+                jwt, refreshToken.id ?: "", userDetails.email
             )
         )
     }
@@ -173,13 +174,21 @@ class AuthController(
     }
 
     @PostMapping("/refresh-token")
-    fun refreshToken(@RequestParam @NotBlank refreshToken: String?): ResponseEntity<RefreshTokenResponse> {
+    fun refreshToken(
+        @RequestParam @NotBlank refreshToken: String?,
+        @RequestHeader("Authorization") auth: String?,
+    ): ResponseEntity<RefreshTokenResponse> {
         return toOkResponseEntity(
-            refreshTokenService.findByToken(refreshToken)
-                .map(refreshTokenService::verifyExpiration)
-                .map(RefreshToken::user).map { user ->
-                    val token = jwtService.generateTokenFromUserId(user.id)
-                    RefreshTokenResponse(token, refreshToken!!)
+            refreshTokenService.findByToken(refreshToken!!)
+//                .map(RefreshToken::userId)
+                .map {
+                    if (authService.getUserIdFromAuthorizationHeader(auth) != it.userId) {
+                        throw RefreshTokenException("Refresh token is not belong to you!")
+                    }
+                    val token = jwtService.generateTokenFromUserId(it.userId)
+                    refreshTokenService.deleteByUserId(it.userId)
+                    val newRefreshToken = refreshTokenService.createRefreshToken(it.userId)
+                    RefreshTokenResponse(token, newRefreshToken.id ?: "")
                 }.orElseThrow {
                     RefreshTokenException("Refresh token [${refreshToken}] is not in database!")
                 }
