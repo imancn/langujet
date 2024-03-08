@@ -32,7 +32,7 @@ sealed class CorrectAnswer(
         sectionOrder: Int,
         partOrder: Int,
         questionOrder: Int,
-        var textList: List<List<String>>
+        var issues: List<List<String>>
     ) : CorrectAnswer(null, examId, sectionOrder, partOrder, questionOrder, AnswerType.TEXT_ISSUES)
 
     @Document(collection = "correct_answers")
@@ -42,7 +42,7 @@ sealed class CorrectAnswer(
         sectionOrder: Int,
         partOrder: Int,
         questionOrder: Int,
-        var answers: List<TrueFalseAnswerType>
+        var issues: List<TrueFalseAnswerType>
     ) : CorrectAnswer(null, examId, sectionOrder, partOrder, questionOrder, AnswerType.TRUE_FALSE)
 
     @Document(collection = "correct_answers")

@@ -49,7 +49,7 @@ sealed class CorrectAnswerDTO(
                 sectionOrder,
                 partOrder!!,
                 questionOrder!!,
-                this.textList!!
+                this.issues!!
             )
 
             is CorrectTrueFalseAnswerDTO -> CorrectAnswer.CorrectTrueFalseAnswer(
@@ -57,7 +57,7 @@ sealed class CorrectAnswerDTO(
                 sectionOrder,
                 partOrder!!,
                 questionOrder!!,
-                this.answers!!
+                this.issues!!
             )
 
             is CorrectMultipleChoiceAnswerDTO -> CorrectAnswer.CorrectMultipleChoiceAnswer(
@@ -109,13 +109,13 @@ data class CorrectTextIssuesAnswerDTO(
     override val id: String? = null,
     @field:NotNull override val partOrder: Int? = null,
     @field:NotNull override val questionOrder: Int? = null,
-    @field:NotNull val textList: List<List<String>>? = null,
+    @field:NotNull val issues: List<List<String>>? = null,
 ) : CorrectAnswerDTO(id, partOrder, questionOrder, AnswerType.TEXT_ISSUES) {
     constructor(answer: CorrectAnswer.CorrectTextIssuesAnswer) : this(
         id = answer.id,
         partOrder = answer.partOrder,
         questionOrder = answer.questionOrder,
-        textList = answer.textList
+        issues = answer.issues
     )
 }
 
@@ -123,13 +123,13 @@ data class CorrectTrueFalseAnswerDTO(
     override val id: String? = null,
     @field:NotNull override val partOrder: Int? = null,
     @field:NotNull override val questionOrder: Int? = null,
-    @field:NotNull val answers: List<TrueFalseAnswerType>? = null,
+    @field:NotNull val issues: List<TrueFalseAnswerType>? = null,
 ) : CorrectAnswerDTO(id, partOrder, questionOrder, AnswerType.TRUE_FALSE) {
     constructor(answer: CorrectAnswer.CorrectTrueFalseAnswer) : this(
         id = answer.id,
         partOrder = answer.partOrder,
         questionOrder = answer.questionOrder,
-        answers = answer.answers
+        issues = answer.issues
     )
 }
 
