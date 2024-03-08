@@ -180,13 +180,11 @@ class AuthController(
     ): ResponseEntity<RefreshTokenResponse> {
         return toOkResponseEntity(
             refreshTokenService.findByToken(refreshToken!!)
-//                .map(RefreshToken::userId)
                 .map {
                     if (authService.getUserIdFromAuthorizationHeader(auth) != it.userId) {
                         throw RefreshTokenException("Refresh token is not belong to you!")
                     }
                     val token = jwtService.generateTokenFromUserId(it.userId)
-                    refreshTokenService.deleteByUserId(it.userId)
                     val newRefreshToken = refreshTokenService.createRefreshToken(it.userId)
                     RefreshTokenResponse(token, newRefreshToken.id ?: "")
                 }.orElseThrow {
