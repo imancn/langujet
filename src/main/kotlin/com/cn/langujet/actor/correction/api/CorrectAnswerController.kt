@@ -1,7 +1,7 @@
 package com.cn.langujet.actor.correction.api
 
 import com.cn.langujet.actor.correction.model.CorrectAnswerListDTO
-import com.cn.langujet.domain.correction.CorrectAnswerService
+import com.cn.langujet.domain.correction.service.CorrectAnswerService
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import org.springframework.security.access.prepost.PreAuthorize

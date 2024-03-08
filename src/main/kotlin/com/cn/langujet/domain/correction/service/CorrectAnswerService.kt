@@ -1,4 +1,4 @@
-package com.cn.langujet.domain.correction
+package com.cn.langujet.domain.correction.service
 
 import com.cn.langujet.actor.correction.model.CorrectAnswerListDTO
 import com.cn.langujet.application.advice.NotFoundException
