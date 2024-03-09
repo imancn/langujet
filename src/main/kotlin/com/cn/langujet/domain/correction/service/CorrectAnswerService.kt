@@ -1,6 +1,7 @@
 package com.cn.langujet.domain.correction.service
 
 import com.cn.langujet.actor.correction.model.CorrectAnswerListDTO
+import com.cn.langujet.application.advice.InvalidInputException
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.correction.model.CorrectAnswer
 import com.cn.langujet.domain.correction.repository.CorrectAnswerCustomRepository
@@ -15,7 +16,7 @@ class CorrectAnswerService(
     fun createCorrectAnswer(request: CorrectAnswerListDTO): CorrectAnswerListDTO {
         return CorrectAnswerListDTO.fromCorrectAnswer(
             repository.saveAll(request.toCorrectAnswer())
-        ).first()
+        ).firstOrNull() ?: throw InvalidInputException("Correct Answer list is empty")
     }
 
     fun updateCorrectAnswer(request: CorrectAnswerListDTO): CorrectAnswerListDTO {
@@ -28,7 +29,7 @@ class CorrectAnswerService(
             repository.saveAll(
                 request.toCorrectAnswer<CorrectAnswer>()
             )
-        ).first()
+        ).firstOrNull() ?: throw InvalidInputException("Correct Answer list is empty")
     }
 
     fun getCorrectAnswer(
@@ -39,7 +40,7 @@ class CorrectAnswerService(
     ): CorrectAnswerListDTO {
         return CorrectAnswerListDTO.fromCorrectAnswer(
             customRepository.findCorrectAnswersByOptionalCriteria(examId, sectionOrder, partOrder, questionOrder)
-        ).first()
+        ).firstOrNull() ?: throw NotFoundException("Correct Answer not found")
     }
 
     fun deleteCorrectAnswer(id: String) {
