@@ -1,5 +1,6 @@
 package com.cn.langujet.domain.exam.service
 
+import com.cn.langujet.application.advice.InvalidInputException
 import com.cn.langujet.application.advice.MethodNotAllowedException
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.exam.model.Section
@@ -41,8 +42,9 @@ class SectionService(
         )
     }
 
-    fun updateSection(id: String, section: Section): Section {
-        val existingSection = getSectionById(id)
+    fun updateSection(section: Section): Section {
+        if (section.id.isNullOrBlank()) throw InvalidInputException("Section Id is empty")
+        val existingSection = getSectionById(section.id ?: "")
         section.examId.let { existingSection.examId = it }
         section.header.let { existingSection.header = it }
         section.order.let { existingSection.order = it }

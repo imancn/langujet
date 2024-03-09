@@ -31,12 +31,11 @@ class SectionController(private val sectionService: SectionService) {
         @RequestBody section: SectionDTO
     ): SectionDTO = SectionDTO(sectionService.createSection(section.toSection()))
 
-    @PutMapping("/{id}")
+    @PutMapping
     @PreAuthorize("hasRole('ADMIN')")
     fun updateSection(
-        @PathVariable id: String,
         @RequestBody section: SectionDTO
-    ): SectionDTO = SectionDTO(sectionService.updateSection(id, section.toSection()))
+    ): SectionDTO = SectionDTO(sectionService.updateSection(section.toSection()))
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
