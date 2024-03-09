@@ -1,6 +1,7 @@
 package com.cn.langujet.domain.exam.service
 
 import com.cn.langujet.actor.exam.payload.ExamDTO
+import com.cn.langujet.application.advice.InvalidInputException
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.exam.model.ExamType
 import com.cn.langujet.domain.exam.repository.ExamRepository
@@ -20,8 +21,9 @@ class ExamService(
         )
     }
 
-    fun updateExam(id: String, exam: ExamDTO): ExamDTO {
-        val existingExam = getExamById(id)
+    fun updateExam(exam: ExamDTO): ExamDTO {
+        if (exam.id.isNullOrBlank()) throw InvalidInputException("Exam Id is empty")
+        val existingExam = getExamById(exam.id ?: "")
         exam.name?.let { existingExam.name = it }
         exam.examType?.let { existingExam.examType = it }
         exam.description?.let { existingExam.description = it }

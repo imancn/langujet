@@ -25,16 +25,12 @@ class ExamController(private val examService: ExamService) {
         examService.createExam(exam)
     )
 
-    @PutMapping("/admin/exam/{id}")
+    @PutMapping("/admin/exam")
     @PreAuthorize("hasRole('ADMIN')")
     fun updateExam(
-        @PathVariable @NotBlank id: String?,
         @RequestBody exam: ExamDTO
     ): ResponseEntity<ExamDTO> = toOkResponseEntity(
-        examService.updateExam(
-            id!!,
-            exam
-        )
+        examService.updateExam(exam)
     )
 
     @GetMapping("/admin/exam/{id}")
