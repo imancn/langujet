@@ -176,19 +176,15 @@ class AuthController(
     @PostMapping("/refresh-token")
     fun refreshToken(
         @RequestParam @NotBlank refreshToken: String?,
-        @RequestHeader("Authorization") auth: String?,
     ): ResponseEntity<RefreshTokenResponse> {
         return toOkResponseEntity(
             refreshTokenService.findByToken(refreshToken!!)
                 .map {
-                    if (authService.getUserIdFromAuthorizationHeader(auth) != it.userId) {
-                        throw RefreshTokenException("Refresh token is not belong to you!")
-                    }
                     val token = jwtService.generateTokenFromUserId(it.userId)
                     val newRefreshToken = refreshTokenService.createRefreshToken(it.userId)
                     RefreshTokenResponse(token, newRefreshToken.id ?: "")
                 }.orElseThrow {
-                    RefreshTokenException("Refresh token [${refreshToken}] is not in database!")
+                    RefreshTokenException("Refresh token [${refreshToken}] is not available")
                 }
         )
     }
