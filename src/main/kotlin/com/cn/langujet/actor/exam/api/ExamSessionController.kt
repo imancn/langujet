@@ -64,22 +64,7 @@ class ExamSessionController(
                 state!!,
                 PageRequest.of(pageNumber, pageSize))
         )
-
-    @PreAuthorize("hasRole('PROFESSOR')")
-    @GetMapping("/professor/exam-session/{examSessionId}")
-    fun getProfessorExamSession(
-        @RequestHeader("Authorization") @NotBlank auth: String?,
-        @PathVariable @NotBlank examSessionId: String?
-    ): ResponseEntity<ExamSession> =
-        ResponseEntity.ok(examSessionService.getProfessorExamSession(auth!!, examSessionId!!))
-
-    @PreAuthorize("hasRole('PROFESSOR')")
-    @GetMapping("/professor/exam-session/all")
-    fun getAllProfessorExamSessions(
-        @RequestHeader("Authorization") @NotBlank auth: String?
-    ): ResponseEntity<List<ExamSession>> =
-        ResponseEntity.ok(examSessionService.getAllProfessorExamSessions(auth!!))
-
+    
     @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/student/exam-session/section")
     fun getExamSection(

@@ -82,23 +82,6 @@ class ExamSessionService(
         }
     }
 
-    fun getProfessorExamSession(
-        authToken: String,
-        examSessionId: String,
-    ): ExamSession {
-        val examSession = getExamSessionById(examSessionId)
-        if (!professorService.doesProfessorOwnAuthToken(
-                authToken, examSession.professorId ?: ""
-            )
-        ) throw InvalidTokenException("Exam Session with id: $examSessionId is not belong to your token")
-        return examSession
-    }
-
-    fun getAllProfessorExamSessions(authToken: String): List<ExamSession> {
-        val professorId = professorService.getProfessorByAuthToken(authToken).id ?: ""
-        return examSessionRepository.findAllByProfessorId(professorId)
-    }
-
     fun getExamSection(
         authToken: String, examSessionId: String, sectionOrder: Int
     ): SectionDTO {
