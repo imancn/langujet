@@ -34,8 +34,7 @@ class ExamSessionService(
 
         val examSession = examSessionRepository.save(
             ExamSession(
-                studentId, null, // this is immediately null, and it means exam professor is AI
-                examId, examVariant.id ?: "", sectionOrders, Date(System.currentTimeMillis())
+                studentId, examId, examVariant.id ?: "", sectionOrders, Date(System.currentTimeMillis())
             )
         )
 

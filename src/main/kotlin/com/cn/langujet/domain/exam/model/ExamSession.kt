@@ -9,7 +9,6 @@ data class ExamSession(
     @Id var id: String?,
 
     var studentId: String,
-    var professorId: String?,
     var examId: String,
     val examVariantId: String,
     val sectionOrders: List<Int>,
@@ -21,7 +20,6 @@ data class ExamSession(
 ) {
     constructor(
         studentId: String,
-        professorId: String?,
         examId: String,
         examVariantId: String,
         sectionOrders: List<Int>,
@@ -29,7 +27,6 @@ data class ExamSession(
     ) : this(
         null,
         studentId,
-        professorId,
         examId,
         examVariantId,
         sectionOrders,

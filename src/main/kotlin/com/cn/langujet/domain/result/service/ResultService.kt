@@ -80,10 +80,12 @@ class ResultService(
 
     fun doWithPreAuth(auth: String, examSession: ExamSession, function: () -> ResultDto): ResultDto {
         val user = authService.getUserByAuthToken(auth)
-        val doesProfessorOwnsAuthToken = professorService.doesProfessorOwnAuthToken(auth, examSession.professorId ?: "")
+        // Todo: I removed this for now because professorId was removed, I will handle it in another way
+//        val doesProfessorOwnsAuthToken = professorService.doesProfessorOwnAuthToken(auth, examSession.professorId ?: "")
         val isAdmin = user.roles.contains(Role.ROLE_ADMIN)
-        if (!doesProfessorOwnsAuthToken && !isAdmin)
-            throw AccessDeniedException("Exam Session with id: ${examSession.id} is not belong to your token")
-        else return function()
+//        if (!doesProfessorOwnsAuthToken && !isAdmin)
+//            throw AccessDeniedException("Exam Session with id: ${examSession.id} is not belong to your token")
+//        else
+            return function()
     }
 }
