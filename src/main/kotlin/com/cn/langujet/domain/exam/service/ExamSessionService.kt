@@ -141,9 +141,9 @@ class ExamSessionService(
             throw MethodNotAllowedException("The exam session time is over")
         }
     }
-
-    fun getExamSessionById(id: String?): ExamSession {
-        return examSessionRepository.findById(id!!).orElseThrow {
+    
+    fun getExamSessionById(id: String): ExamSession {
+        return examSessionRepository.findById(id).orElseThrow {
             NotFoundException("ExamSession with id: $id not found")
         }
     }
