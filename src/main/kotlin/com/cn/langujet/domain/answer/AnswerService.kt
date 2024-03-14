@@ -1,7 +1,6 @@
 package com.cn.langujet.domain.answer
 
 import com.cn.langujet.actor.answer.payload.request.AnswerBulkRequest
-import com.cn.langujet.actor.answer.payload.request.AnswerRequest
 import com.cn.langujet.application.service.file.domain.data.model.FileBucket
 import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.answer.model.Answer
@@ -16,11 +15,6 @@ class AnswerService(
     private val examSessionService: ExamSessionService,
     private val fileService: FileService
 ) {
-    fun submitAnswer(request: AnswerRequest, token: String): Boolean {
-        examSessionPreCheck(request.examSessionId ?: "", request.sectionOrder!!, token)
-        answerRepository.save(request.convertToAnswer())
-        return true
-    }
 
     fun submitBulkAnswers(
         examSessionId: String?,
