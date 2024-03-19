@@ -23,7 +23,7 @@ data class ExamSession(
         examId: String,
         examVariantId: String,
         sectionOrders: List<Int>,
-        requestDate: Date
+        enrollDate: Date
     ) : this(
         null,
         studentId,
@@ -31,7 +31,7 @@ data class ExamSession(
         examVariantId,
         sectionOrders,
         ExamSessionState.ENROLLED,
-        requestDate,
+        enrollDate,
         null,
         null,
         null,
