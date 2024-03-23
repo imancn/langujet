@@ -19,3 +19,5 @@ class MethodNotAllowedException(message: String?) : HttpException(HttpStatus.MET
 class EmailNotSentException(message: String?) : HttpException(HttpStatus.INTERNAL_SERVER_ERROR, message)
 
 class FileException(message: String?) : HttpException(HttpStatus.INTERNAL_SERVER_ERROR, message)
+
+class LogicalException(message: String?): RuntimeException(message)

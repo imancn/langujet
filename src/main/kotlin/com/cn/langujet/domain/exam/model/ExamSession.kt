@@ -7,7 +7,7 @@ import java.util.*
 @Document(collection = "exam_sessions")
 data class ExamSession(
     @Id var id: String?,
-
+    
     var studentId: String,
     var examId: String,
     val examVariantId: String,
@@ -16,7 +16,7 @@ data class ExamSession(
     var enrollDate: Date,
     var startDate: Date?,
     var endDate: Date?,
-    var rateDate: Date?,
+    var correctionDate: Date?,
 ) {
     constructor(
         studentId: String,

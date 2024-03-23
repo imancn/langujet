@@ -1,15 +1,17 @@
 package com.cn.langujet.domain.exam.service
 
+import com.cn.langujet.actor.exam.payload.ExamDTO
 import com.cn.langujet.actor.exam.payload.ExamSessionEnrollResponse
 import com.cn.langujet.actor.exam.payload.ExamSessionResponse
 import com.cn.langujet.actor.exam.payload.SectionDTO
 import com.cn.langujet.application.advice.InvalidTokenException
 import com.cn.langujet.application.advice.MethodNotAllowedException
 import com.cn.langujet.application.advice.NotFoundException
+import com.cn.langujet.domain.correction.service.CorrectionService
 import com.cn.langujet.domain.exam.model.ExamSession
 import com.cn.langujet.domain.exam.model.ExamSessionState
 import com.cn.langujet.domain.exam.repository.ExamSessionRepository
-import com.cn.langujet.domain.professor.ProfessorService
+import com.cn.langujet.domain.result.service.ResultService
 import com.cn.langujet.domain.student.service.StudentService
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -22,7 +24,8 @@ class ExamSessionService(
     private val examVariantService: ExamVariantService,
     private val sectionService: SectionService,
     private val studentService: StudentService,
-    private val professorService: ProfessorService,
+    private val correctionService: CorrectionService,
+    private val resultService: ResultService
 ) {
     fun enrollExamSession(studentId: String, examVariantId: String): ExamSessionEnrollResponse {
         val examVariant = examVariantService.getExamVariantById(examVariantId)
@@ -58,7 +61,7 @@ class ExamSessionService(
         examSessionId: String,
     ): ExamSessionResponse {
         val examSession = getStudentExamSession(authToken, examSessionId)
-        val exam = examService.getExamById(examSession.examId)
+        val exam = ExamDTO(examService.getExamById(examSession.examId))
         val examVariant = examVariantService.getExamVariantById(examSession.examVariantId)
         return ExamSessionResponse(examSession, exam, examVariant.correctionType)
     }
@@ -98,7 +101,7 @@ class ExamSessionService(
             examSessionRepository.save(examSession.also {
                 val loadingDelay = 30_000L
                 val now = Date(System.currentTimeMillis())
-                val examDuration = (examService.getExamById(examSession.examId).examDuration ?: 0L) * 1000
+                val examDuration = (examService.getExamById(examSession.examId).examDuration) * 1000
                 it.startDate = now
                 it.endDate = Date(now.time + examDuration + loadingDelay)
                 it.state = ExamSessionState.STARTED
@@ -116,15 +119,21 @@ class ExamSessionService(
             else if (it.state.order >= ExamSessionState.FINISHED.order)
                 throw MethodNotAllowedException("The exam session has been finished")
             else {
-                examSessionRepository.save(it.also {
-                    it.state = ExamSessionState.FINISHED
-                })
+                finishExamSession(it)
             }
         }
         return ExamSessionResponse(
             examSession, null,
             examVariantService.getExamVariantById(examSession.examVariantId).correctionType
         )
+    }
+    
+    private fun finishExamSession(examSession: ExamSession): ExamSession {
+        examSession.state = ExamSessionState.FINISHED
+        correctionService.makeExamSessionCorrection(examSession)
+        val exam = examService.getExamById(examSession.examId)
+        resultService.initiateResult(examSession.id ?: "", exam.type)
+        return examSessionRepository.save(examSession)
     }
 
     fun checkExamSessionAndSectionAvailability(examSession: ExamSession, sectionOrder: Int) {
@@ -135,9 +144,7 @@ class ExamSessionService(
             throw MethodNotAllowedException("The exam session has been finished")
 
         if ((examSession.endDate?.time ?: (Long.MAX_VALUE)) < System.currentTimeMillis()) {
-            examSessionRepository.save(examSession.also {
-                it.state = ExamSessionState.FINISHED
-            })
+            finishExamSession(examSession)
             throw MethodNotAllowedException("The exam session time is over")
         }
     }
@@ -145,6 +152,17 @@ class ExamSessionService(
     fun getExamSessionById(id: String): ExamSession {
         return examSessionRepository.findById(id).orElseThrow {
             NotFoundException("ExamSession with id: $id not found")
+        }
+    }
+    
+    fun determineCorrectionStatus(examSessionId: String) {
+        if (correctionService.areAllSectionCorrectionProcessed(examSessionId)) {
+            examSessionRepository.save(
+                getExamSessionById(examSessionId).also {
+                    it.state = ExamSessionState.CORRECTED
+                    it.correctionDate = Date(System.currentTimeMillis())
+                }
+            )
         }
     }
 }

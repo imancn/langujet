@@ -2,5 +2,6 @@ package com.cn.langujet.domain.correction.model
 
 enum class CorrectionType {
     AI,
-    PROFESSOR
+    PROFESSOR,
+    AUTO_CORRECTION
 }

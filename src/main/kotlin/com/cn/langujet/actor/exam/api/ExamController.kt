@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1")
 @Validated
 class ExamController(private val examService: ExamService) {
-
+    
     @PostMapping("/admin/exam")
     @PreAuthorize("hasRole('ADMIN')")
     fun createExam(
@@ -24,7 +24,7 @@ class ExamController(private val examService: ExamService) {
     ): ResponseEntity<ExamDTO> = toOkResponseEntity(
         examService.createExam(exam)
     )
-
+    
     @PutMapping("/admin/exam")
     @PreAuthorize("hasRole('ADMIN')")
     fun updateExam(
@@ -32,17 +32,16 @@ class ExamController(private val examService: ExamService) {
     ): ResponseEntity<ExamDTO> = toOkResponseEntity(
         examService.updateExam(exam)
     )
-
+    
     @GetMapping("/admin/exam/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     fun getExamById(@PathVariable id: String): ResponseEntity<ExamDTO> =
-        toOkResponseEntity(examService.getExamById(id))
-
+        toOkResponseEntity(ExamDTO(examService.getExamById(id)))
+    
     @GetMapping("/admin/exam/all")
     @PreAuthorize("hasRole('ADMIN')")
-    fun getAllExams(): ResponseEntity<List<ExamDTO>> =
-        toOkResponseEntity(examService.getAllExams())
-
+    fun getAllExams(): ResponseEntity<List<ExamDTO>> = toOkResponseEntity(examService.getAllExams())
+    
     @GetMapping("/admin/exam/name")
     @PreAuthorize("hasRole('ADMIN')")
     fun getAllExamsByName(
@@ -51,8 +50,7 @@ class ExamController(private val examService: ExamService) {
         @RequestParam(defaultValue = "0") pageNumber: Int,
     ): ResponseEntity<Page<ExamDTO>> = toOkResponseEntity(
         examService.getAllExamsByName(
-            name!!,
-            PageRequest.of(pageNumber, pageSize)
+            name!!, PageRequest.of(pageNumber, pageSize)
         )
     )
 }

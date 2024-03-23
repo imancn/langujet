@@ -1,91 +1,79 @@
-package com.cn.langujet.domain.exam.service
+package com.cn.langujet.domain.result.service
 
-import com.cn.langujet.actor.exam.payload.ResultDto
-import com.cn.langujet.application.advice.AccessDeniedException
+import com.cn.langujet.actor.result.payload.ResultDto
 import com.cn.langujet.application.advice.InvalidTokenException
 import com.cn.langujet.application.advice.MethodNotAllowedException
 import com.cn.langujet.application.advice.NotFoundException
-import com.cn.langujet.domain.security.model.Role
-import com.cn.langujet.domain.exam.model.ExamSession
-import com.cn.langujet.domain.exam.model.ExamSessionState
-import com.cn.langujet.domain.exam.model.Result
-import com.cn.langujet.domain.exam.model.SectionResult
-import com.cn.langujet.domain.exam.repository.ResultRepository
-import com.cn.langujet.domain.professor.ProfessorService
-import com.cn.langujet.domain.security.services.AuthService
+import com.cn.langujet.domain.correction.model.CorrectionStatus
+import com.cn.langujet.domain.correction.service.CorrectionService
+import com.cn.langujet.domain.exam.model.ExamType
+import com.cn.langujet.domain.exam.service.ExamSessionService
+import com.cn.langujet.domain.result.model.Result
+import com.cn.langujet.domain.result.model.SectionResult
+import com.cn.langujet.domain.result.repository.ResultRepository
 import com.cn.langujet.domain.student.service.StudentService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
 @Service
 class ResultService(
     private val resultRepository: ResultRepository,
-    private val examSessionService: ExamSessionService,
-    private val authService: AuthService,
     private val studentService: StudentService,
-    private val professorService: ProfessorService
+    private val correctionService: CorrectionService,
+    private val sectionResultService: SectionResultService
 ) {
-    fun createResult(
-        authToken: String,
-        examSessionId: String,
-        result: ResultDto,
-    ): ResultDto {
-        val examSession = examSessionService.getExamSessionById(examSessionId)
-        return doWithPreAuth(authToken, examSession) {
-            if (examSession.state.order < ExamSessionState.FINISHED.order)
-                throw MethodNotAllowedException("The exam session is not ready to evaluate")
-            else if (examSession.state.order == ExamSessionState.EVALUATED.order)
-                throw MethodNotAllowedException("The exam session is already evaluated")
-            else
-                ResultDto(resultRepository.save(Result(result)))
-        }
+    @Autowired
+    @Lazy
+    private lateinit var examSessionService: ExamSessionService
+    
+    fun initiateResult(examSessionId: String, examType: ExamType) {
+        resultRepository.save(
+            Result(
+                id = null,
+                examSessionId = examSessionId,
+                examType = examType,
+                score = null,
+                recommendation = null,
+            )
+        )
     }
-
-    private fun getResultById(
-        id: String
-    ): Result {
+    
+    fun getResultById(id: String): Result {
         return resultRepository.findById(id)
             .orElseThrow { throw NotFoundException("Suggestion with ID: $id not found") }
     }
-
-    fun getResultsByExamSessionId(
-        authToken: String,
-        examSessionId: String
+    
+    fun getResultByExamSessionId(
+        authToken: String, examSessionId: String
     ): ResultDto {
         val studentId = examSessionService.getExamSessionById(examSessionId).studentId
-        if (!studentService.doesStudentOwnAuthToken(authToken, studentId))
-            throw InvalidTokenException("Exam Session with id: $examSessionId is not belong to your token")
+        if (!studentService.doesStudentOwnAuthToken(
+                authToken,
+                studentId
+            )
+        ) throw InvalidTokenException("Exam Session with id: $examSessionId is not belong to your token")
         return resultRepository.findByExamSessionId(examSessionId).orElseThrow {
             NotFoundException("Suggestions for ExamSession with ID: $examSessionId not found")
         }.let { ResultDto(it) }
     }
-
-    fun updateResult(
-        auth: String,
-        result: ResultDto,
-        id: String
-    ): ResultDto {
-        val examSession = examSessionService.getExamSessionById(result.examSessionId)
-        return doWithPreAuth(auth, examSession) {
-            resultRepository.save(
-                getResultById(id).also { existingResult ->
-                    result.recommendation.let { existingResult.recommendation = it }
-                    result.score.let { existingResult.score = it }
-                    result.sectionResults.let {
-                        existingResult.sectionResults = it.map { sectionResultDto -> SectionResult(sectionResultDto) }
-                    }
-                }
-            ).let { ResultDto(it) }
+    
+    fun getResultByExamSessionId(examSessionId: String): Result {
+        return resultRepository.findByExamSessionId(examSessionId).orElseThrow {
+            NotFoundException("Suggestions for ExamSession with ID: $examSessionId not found")
         }
     }
-
-    fun doWithPreAuth(auth: String, examSession: ExamSession, function: () -> ResultDto): ResultDto {
-        val user = authService.getUserByAuthToken(auth)
-        // Todo: I removed this for now because professorId was removed, I will handle it in another way
-//        val doesProfessorOwnsAuthToken = professorService.doesProfessorOwnAuthToken(auth, examSession.professorId ?: "")
-        val isAdmin = user.roles.contains(Role.ROLE_ADMIN)
-//        if (!doesProfessorOwnsAuthToken && !isAdmin)
-//            throw AccessDeniedException("Exam Session with id: ${examSession.id} is not belong to your token")
-//        else
-            return function()
+    
+    fun addSectionResult(sectionResult: SectionResult) {
+        val result = getResultById(sectionResult.resultId)
+        val correction = correctionService.getCorrectionsByExamSessionIdAndSectionOrder(
+            result.examSessionId,
+            sectionResult.sectionOrder
+        )
+        if (correction.status == CorrectionStatus.PROCESSED)
+            throw MethodNotAllowedException("Section with ExamSessionId: ${result.examSessionId} and SectionOrder: ${sectionResult.sectionOrder} has been processed")
+        sectionResultService.createSectionResult(sectionResult)
+        correctionService.changeStatus(correction, CorrectionStatus.PROCESSED)
+        examSessionService.determineCorrectionStatus(result.examSessionId)
     }
 }

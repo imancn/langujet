@@ -4,5 +4,5 @@ enum class ExamSessionState(val order: Int) {
     ENROLLED(1),
     STARTED(2),
     FINISHED(3),
-    EVALUATED(4)
+    CORRECTED(4)
 }

@@ -14,7 +14,7 @@ class ExamSessionResponse (
     val enrollDate: Date,
     val startDate: Date?,
     val endDate: Date?,
-    val rateDate: Date?
+    val correctionDate: Date?
 ) {
     constructor(
         examSession: ExamSession,
@@ -29,6 +29,6 @@ class ExamSessionResponse (
         examSession.enrollDate,
         examSession.startDate,
         examSession.endDate,
-        examSession.rateDate
+        examSession.correctionDate
     )
 }
