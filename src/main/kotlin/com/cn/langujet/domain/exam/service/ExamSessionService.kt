@@ -113,7 +113,7 @@ class ExamSessionService(
     fun finishExamSession(
         authToken: String, examSessionId: String
     ): ExamSessionResponse {
-        val examSession = getStudentExamSession(authToken, examSessionId).also {
+        val examSession = getStudentExamSession(authToken, examSessionId).let {
             if (it.state == ExamSessionState.ENROLLED)
                 throw MethodNotAllowedException("The exam session has not been started")
             else if (it.state.order >= ExamSessionState.FINISHED.order)
@@ -130,10 +130,11 @@ class ExamSessionService(
     
     private fun finishExamSession(examSession: ExamSession): ExamSession {
         examSession.state = ExamSessionState.FINISHED
-        correctionService.makeExamSessionCorrection(examSession)
+        examSessionRepository.save(examSession)
         val exam = examService.getExamById(examSession.examId)
         resultService.initiateResult(examSession.id ?: "", exam.type)
-        return examSessionRepository.save(examSession)
+        correctionService.makeExamSessionCorrection(examSession)
+        return getExamSessionById(examSession.id ?: "")
     }
 
     fun checkExamSessionAndSectionAvailability(examSession: ExamSession, sectionOrder: Int) {

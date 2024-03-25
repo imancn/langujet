@@ -64,9 +64,8 @@ class ResultService(
         }
     }
     
-    fun addSectionResult(sectionResult: SectionResult) {
-        val result = getResultById(sectionResult.resultId)
-        val correction = correctionService.getCorrectionsByExamSessionIdAndSectionOrder(
+    fun addSectionResult(result: Result, sectionResult: SectionResult) {
+        val correction = correctionService.getCorrectionByExamSessionIdAndSectionOrder(
             result.examSessionId,
             sectionResult.sectionOrder
         )

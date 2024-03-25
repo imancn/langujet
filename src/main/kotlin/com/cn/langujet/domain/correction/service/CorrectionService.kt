@@ -6,10 +6,9 @@ import com.cn.langujet.domain.correction.model.CorrectionStatus
 import com.cn.langujet.domain.correction.model.CorrectionType
 import com.cn.langujet.domain.correction.repository.CorrectAnswerRepository
 import com.cn.langujet.domain.correction.repository.CorrectionRepository
+import com.cn.langujet.domain.correction.service.corrector.AutoCorrectorService
 import com.cn.langujet.domain.exam.model.ExamSession
 import com.cn.langujet.domain.exam.service.ExamVariantService
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 
 @Service
@@ -17,6 +16,7 @@ class CorrectionService(
     private val correctionRepository: CorrectionRepository,
     private val examVariantService: ExamVariantService,
     private val correctAnswerRepository: CorrectAnswerRepository,
+    private val autoCorrectorService: AutoCorrectorService
 ) {
     fun makeExamSessionCorrection(examSession: ExamSession) {
         val examVariant = examVariantService.getExamVariantById(examSession.examVariantId)
@@ -27,13 +27,10 @@ class CorrectionService(
                 CorrectionEntity(examVariant.correctionType, CorrectionStatus.PENDING, examSession.id ?: "", sectionOrder)
             }
         }
-        correctionRepository.saveAll(corrections)
-    }
-    
-    fun getAutoCorrectionPendingCorrections(pageRequest: PageRequest): Page<CorrectionEntity> {
-        return correctionRepository.findByTypeAndStatusOrderByCreatedDateAsc(
-            CorrectionType.AUTO_CORRECTION, CorrectionStatus.PENDING, pageRequest
-        )
+        correctionRepository.saveAll(corrections).forEach {
+            if (it.type == CorrectionType.AUTO_CORRECTION)
+                autoCorrectorService.correctExamSection(examSession, it.sectionOrder)
+        }
     }
     
     fun changeStatus(correctionEntity: CorrectionEntity, status: CorrectionStatus) {
@@ -46,7 +43,7 @@ class CorrectionService(
         return correctionRepository.findAllByExamSessionId(examSessionId)
     }
     
-    fun getCorrectionsByExamSessionIdAndSectionOrder(examSessionId: String, sectionOrder: Int): CorrectionEntity {
+    fun getCorrectionByExamSessionIdAndSectionOrder(examSessionId: String, sectionOrder: Int): CorrectionEntity {
         return correctionRepository.findAllByExamSessionIdAndSectionOrder(examSessionId, sectionOrder).orElseThrow {
             NotFoundException("Correction with examSessionId: $examSessionId and sectionOrder: $sectionOrder not found")
         }

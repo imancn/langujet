@@ -6,31 +6,32 @@ import com.cn.langujet.domain.answer.AnswerRepository
 import com.cn.langujet.domain.answer.model.Answer
 import com.cn.langujet.domain.correction.model.CorrectAnswer
 import com.cn.langujet.domain.correction.repository.CorrectAnswerRepository
+import com.cn.langujet.domain.exam.model.ExamSession
 import com.cn.langujet.domain.exam.model.ExamType
 import com.cn.langujet.domain.exam.model.SectionType
 import com.cn.langujet.domain.exam.service.ExamService
-import com.cn.langujet.domain.exam.service.ExamSessionService
 import com.cn.langujet.domain.exam.service.SectionService
 import com.cn.langujet.domain.result.model.SectionResult
 import com.cn.langujet.domain.result.service.ResultService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 
 @Service
 class AutoCorrectorService(
     private val correctAnswerRepository: CorrectAnswerRepository,
     private val answerRepository: AnswerRepository,
-    private val examSessionService: ExamSessionService,
     private val examService: ExamService,
     private val sectionService: SectionService,
-    private val resultService: ResultService,
 ) {
-    fun correctExamSection(examSessionId: String, sectionOrder: Int) {
-        val examSession = examSessionService.getExamSessionById(examSessionId)
-        val result = resultService.getResultByExamSessionId(examSessionId)
+    @Autowired @Lazy private lateinit var resultService: ResultService
+    
+    fun correctExamSection(examSession: ExamSession, sectionOrder: Int) {
+        val result = resultService.getResultByExamSessionId(examSession.id ?: "")
         val exam = examService.getExamById(examSession.examId)
         val section = sectionService.getSectionByExamIdAndOrder(examSession.examId, sectionOrder)
         val correctAnswers = correctAnswerRepository.findAllByExamIdAndSectionOrder(examSession.examId, sectionOrder)
-        val answers = answerRepository.findAllByExamSessionIdAndSectionOrder(examSessionId, sectionOrder)
+        val answers = answerRepository.findAllByExamSessionIdAndSectionOrder(examSession.id ?: "", sectionOrder)
         val correctIssuesCount = calculateCorrectIssuesCount(answers, correctAnswers)
         val sectionResult = SectionResult(
             id = null,
@@ -41,7 +42,7 @@ class AutoCorrectorService(
             score = calculateScore(correctIssuesCount, section.sectionType, exam.type),
             recommendation = null
         )
-        resultService.addSectionResult(sectionResult)
+        resultService.addSectionResult(result, sectionResult)
     }
     
     private fun calculateCorrectIssuesCount(answers: List<Answer>, correctAnswers: List<CorrectAnswer>): Int {
@@ -142,7 +143,10 @@ class AutoCorrectorService(
         correctIssuesCount: Int, sectionType: SectionType, examType: ExamType
     ): Double {
         return when (examType) {
-            ExamType.IELTS -> ScoreCalculator.calculateAcademicIELTSScore(correctIssuesCount, sectionType) // Todo: Remove after migration
+            ExamType.IELTS -> ScoreCalculator.calculateAcademicIELTSScore(
+                correctIssuesCount,
+                sectionType
+            ) // Todo: Remove after migration
             ExamType.IELTS_ACADEMIC -> ScoreCalculator.calculateAcademicIELTSScore(correctIssuesCount, sectionType)
             ExamType.IELTS_GENERAL -> TODO()
         }
