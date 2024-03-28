@@ -1,25 +1,24 @@
 package com.cn.langujet.domain.exam.service
 
-import com.cn.langujet.actor.exam.payload.ExamDTO
-import com.cn.langujet.actor.exam.payload.ExamSessionEnrollResponse
-import com.cn.langujet.actor.exam.payload.ExamSessionResponse
-import com.cn.langujet.actor.exam.payload.SectionDTO
+import com.cn.langujet.actor.exam.payload.*
 import com.cn.langujet.application.advice.InvalidTokenException
 import com.cn.langujet.application.advice.MethodNotAllowedException
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.correction.service.CorrectionService
 import com.cn.langujet.domain.exam.model.ExamSession
 import com.cn.langujet.domain.exam.model.ExamSessionState
+import com.cn.langujet.domain.exam.repository.ExamSessionCustomRepository
 import com.cn.langujet.domain.exam.repository.ExamSessionRepository
 import com.cn.langujet.domain.result.service.ResultService
 import com.cn.langujet.domain.student.service.StudentService
-import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
 class ExamSessionService(
     private val examSessionRepository: ExamSessionRepository,
+    private val examSessionCustomRepository: ExamSessionCustomRepository,
     private val examService: ExamService,
     private val examVariantService: ExamVariantService,
     private val sectionService: SectionService,
@@ -65,23 +64,11 @@ class ExamSessionService(
         val examVariant = examVariantService.getExamVariantById(examSession.examVariantId)
         return ExamSessionResponse(examSession, exam, examVariant.correctionType)
     }
-
-    fun getAllStudentExamSessionResponses(authToken: String, pageRequest: PageRequest): List<ExamSessionResponse> {
-        val studentId = studentService.getStudentByAuthToken(authToken).id ?: ""
-        return examSessionRepository.findAllByStudentId(studentId, pageRequest).map {
-            ExamSessionResponse(it, null, examVariantService.getExamVariantById(it.examVariantId).correctionType)
-        }
-    }
-
-    fun getAllStudentExamSessionResponsesByState(
-        authToken: String,
-        state: ExamSessionState,
-        pageRequest: PageRequest
-    ): List<ExamSessionResponse> {
-        val studentId = studentService.getStudentByAuthToken(authToken).id ?: ""
-        return examSessionRepository.findAllByStudentIdAndState(studentId, state, pageRequest).map {
-            ExamSessionResponse(it, null, examVariantService.getExamVariantById(it.examVariantId).correctionType)
-        }
+    
+    fun searchExamSessions(auth: String, request: ExamSessionSearchRequest): Page<ExamSessionResponse> {
+        return examSessionCustomRepository.searchExamSessions(
+            request, studentService.getStudentByAuthToken(auth).id ?: ""
+        )
     }
 
     fun getExamSection(

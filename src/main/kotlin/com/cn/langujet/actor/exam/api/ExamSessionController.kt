@@ -2,12 +2,13 @@ package com.cn.langujet.actor.exam.api
 
 import com.cn.langujet.actor.exam.payload.ExamSessionEnrollResponse
 import com.cn.langujet.actor.exam.payload.ExamSessionResponse
+import com.cn.langujet.actor.exam.payload.ExamSessionSearchRequest
 import com.cn.langujet.actor.exam.payload.SectionDTO
-import com.cn.langujet.domain.exam.model.*
 import com.cn.langujet.domain.exam.service.ExamSessionService
+import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
-import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Page
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
@@ -37,32 +38,13 @@ class ExamSessionController(
         ResponseEntity.ok(examSessionService.getStudentExamSessionResponse(auth!!, examSessionId!!))
 
     @PreAuthorize("hasRole('STUDENT')")
-    @GetMapping("/student/exam-session/all")
-    fun getStudentExamSessions(
+    @PostMapping("/student/exam-session")
+    fun searchStudentExamSessions(
         @RequestHeader("Authorization") @NotBlank auth: String?,
-        @RequestParam(defaultValue = "10") pageSize: Int,
-        @RequestParam(defaultValue = "0") pageNumber: Int,
-    ): ResponseEntity<List<ExamSessionResponse>> =
+        @RequestBody @Valid request: ExamSessionSearchRequest
+    ): ResponseEntity<Page<ExamSessionResponse>> =
         ResponseEntity.ok(
-            examSessionService.getAllStudentExamSessionResponses(
-                auth!!,
-                PageRequest.of(pageNumber, pageSize)
-            )
-        )
-
-    @PreAuthorize("hasRole('STUDENT')")
-    @GetMapping("/student/exam-session/by-state")
-    fun getAllStudentExamSessionsByStatus(
-        @RequestHeader("Authorization") @NotBlank auth: String?,
-        @RequestParam @NotNull state: ExamSessionState?,
-        @RequestParam(defaultValue = "10") pageSize: Int,
-        @RequestParam(defaultValue = "0") pageNumber: Int,
-    ): ResponseEntity<List<ExamSessionResponse>> =
-        ResponseEntity.ok(
-            examSessionService.getAllStudentExamSessionResponsesByState(
-                auth!!,
-                state!!,
-                PageRequest.of(pageNumber, pageSize))
+            examSessionService.searchExamSessions(auth!!, request)
         )
     
     @PreAuthorize("hasRole('STUDENT')")

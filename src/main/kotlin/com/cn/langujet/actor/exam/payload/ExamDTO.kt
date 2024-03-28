@@ -2,10 +2,12 @@ package com.cn.langujet.actor.exam.payload
 
 import com.cn.langujet.domain.exam.model.Exam
 import com.cn.langujet.domain.exam.model.ExamType
+import com.fasterxml.jackson.annotation.JsonInclude
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 
 data class ExamDTO(
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
     var id: String? = null,
     @field:NotNull var examType: ExamType? = null,
     @field:NotBlank var name: String? = null,
