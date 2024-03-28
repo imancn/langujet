@@ -1,11 +1,11 @@
 package com.cn.langujet.actor.exam.api
 
 import com.cn.langujet.actor.exam.payload.ExamDTO
+import com.cn.langujet.actor.util.models.CustomPage
 import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.domain.exam.service.ExamService
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -48,7 +48,7 @@ class ExamController(private val examService: ExamService) {
         @RequestParam @NotBlank name: String?,
         @RequestParam(defaultValue = "10") pageSize: Int,
         @RequestParam(defaultValue = "0") pageNumber: Int,
-    ): ResponseEntity<Page<ExamDTO>> = toOkResponseEntity(
+    ): ResponseEntity<CustomPage<ExamDTO>> = toOkResponseEntity(
         examService.getAllExamsByName(
             name!!, PageRequest.of(pageNumber, pageSize)
         )
