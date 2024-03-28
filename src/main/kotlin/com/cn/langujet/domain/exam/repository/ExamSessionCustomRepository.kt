@@ -6,9 +6,6 @@ import com.cn.langujet.actor.exam.payload.ExamSessionSearchRequest
 import com.cn.langujet.domain.exam.model.Exam
 import com.cn.langujet.domain.exam.model.ExamSession
 import com.cn.langujet.domain.exam.model.ExamVariantEntity
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageImpl
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.core.query.Criteria
@@ -20,7 +17,7 @@ import java.util.*
 class ExamSessionCustomRepository(
     private val mongoOperations: MongoOperations
 ) {
-    fun searchExamSessions(searchRequest: ExamSessionSearchRequest, userId: String): Page<ExamSessionResponse> {
+    fun searchExamSessions(searchRequest: ExamSessionSearchRequest, userId: String): List<ExamSessionResponse> {
         val foundExamIdsByName = if (!searchRequest.examName.isNullOrEmpty()) {
             mongoOperations.find(
                 Query(Criteria.where("name").regex(".*" + searchRequest.examName + ".*", "i")), Exam::class.java
@@ -49,7 +46,7 @@ class ExamSessionCustomRepository(
             Query(Criteria.where("id").`in`(examVariantIds)), ExamVariantEntity::class.java
         ).associateBy { it.id }
         
-        val examSessions = sessions.mapNotNull { session ->
+        return sessions.mapNotNull { session ->
             val exam = exams[session.examId]
             val examVariant = examVariants[session.examVariantId]
             val correctionTypeCriteria = searchRequest.correctionTypes.isNullOrEmpty() || examVariant?.correctionType in searchRequest.correctionTypes
@@ -58,9 +55,5 @@ class ExamSessionCustomRepository(
                 ExamSessionResponse(session, exam?.let { ExamDTO(it) }, examVariant?.correctionType)
             } else null
         }
-        
-        val total = examSessions.size.toLong()
-        val pageRequest = PageRequest.of(searchRequest.pageNumber, searchRequest.pageSize)
-        return PageImpl(examSessions, pageRequest, total)
     }
 }

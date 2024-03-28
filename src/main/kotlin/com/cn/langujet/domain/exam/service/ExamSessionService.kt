@@ -1,6 +1,8 @@
 package com.cn.langujet.domain.exam.service
 
 import com.cn.langujet.actor.exam.payload.*
+import com.cn.langujet.actor.util.models.CustomPage
+import com.cn.langujet.actor.util.models.paginate
 import com.cn.langujet.application.advice.InvalidTokenException
 import com.cn.langujet.application.advice.MethodNotAllowedException
 import com.cn.langujet.application.advice.NotFoundException
@@ -11,7 +13,6 @@ import com.cn.langujet.domain.exam.repository.ExamSessionCustomRepository
 import com.cn.langujet.domain.exam.repository.ExamSessionRepository
 import com.cn.langujet.domain.result.service.ResultService
 import com.cn.langujet.domain.student.service.StudentService
-import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -65,10 +66,10 @@ class ExamSessionService(
         return ExamSessionResponse(examSession, exam, examVariant.correctionType)
     }
     
-    fun searchExamSessions(auth: String, request: ExamSessionSearchRequest): Page<ExamSessionResponse> {
+    fun searchExamSessions(auth: String, request: ExamSessionSearchRequest): CustomPage<ExamSessionResponse> {
         return examSessionCustomRepository.searchExamSessions(
             request, studentService.getStudentByAuthToken(auth).id ?: ""
-        )
+        ).paginate(request.pageSize, request.pageNumber)
     }
 
     fun getExamSection(
