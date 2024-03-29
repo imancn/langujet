@@ -7,6 +7,7 @@ import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.correction.model.CorrectionStatus
 import com.cn.langujet.domain.correction.service.CorrectionService
 import com.cn.langujet.domain.exam.model.ExamType
+import com.cn.langujet.domain.exam.model.SectionType
 import com.cn.langujet.domain.exam.service.ExamSessionService
 import com.cn.langujet.domain.result.model.Result
 import com.cn.langujet.domain.result.model.SectionResult
@@ -64,15 +65,50 @@ class ResultService(
         }
     }
     
-    fun addSectionResult(result: Result, sectionResult: SectionResult) {
+    fun addSectionResult(
+        examSessionId: String,
+        sectionOrder: Int,
+        sectionType: SectionType,
+        correctIssuesCount: Int,
+        score: Double,
+        recommendation: String? = null
+    ) {
+        val result = getResultByExamSessionId(examSessionId)
         val correction = correctionService.getCorrectionByExamSessionIdAndSectionOrder(
             result.examSessionId,
-            sectionResult.sectionOrder
+            sectionOrder
         )
+        
         if (correction.status == CorrectionStatus.PROCESSED)
-            throw MethodNotAllowedException("Section with ExamSessionId: ${result.examSessionId} and SectionOrder: ${sectionResult.sectionOrder} has been processed")
-        sectionResultService.createSectionResult(sectionResult)
+            throw MethodNotAllowedException("Section with ExamSessionId: ${result.examSessionId} and SectionOrder: $sectionOrder has been processed")
+        
+        sectionResultService.createSectionResult(
+            SectionResult(
+                id = null,
+                resultId = result.id ?: "",
+                sectionOrder = sectionOrder,
+                sectionType = sectionType,
+                correctIssuesCount = correctIssuesCount,
+                score = score,
+                recommendation = recommendation
+            )
+        )
         correctionService.changeStatus(correction, CorrectionStatus.PROCESSED)
-        examSessionService.determineCorrectionStatus(result.examSessionId)
+        if (correctionService.areAllSectionCorrectionProcessed(result.examSessionId)) {
+            examSessionService.finalizeCorrection(result.examSessionId)
+            val sectionResults = sectionResultService.getSectionResultsByResultId(result.id ?: "")
+            val overAllScore = calculateOverAllScore(sectionResults.map { it.score }, result.examType)
+            resultRepository.save(result.also { it.score = overAllScore })
+        }
+    }
+    
+    private fun calculateOverAllScore(scores: List<Double>, examType: ExamType): Double {
+        return when(examType) {
+            ExamType.IELTS,
+            ExamType.IELTS_GENERAL,
+            ExamType.IELTS_ACADEMIC -> {
+                scores.sumOf { it } / scores.count()
+            }
+        }
     }
 }

@@ -144,14 +144,12 @@ class ExamSessionService(
         }
     }
     
-    fun determineCorrectionStatus(examSessionId: String) {
-        if (correctionService.areAllSectionCorrectionProcessed(examSessionId)) {
-            examSessionRepository.save(
-                getExamSessionById(examSessionId).also {
-                    it.state = ExamSessionState.CORRECTED
-                    it.correctionDate = Date(System.currentTimeMillis())
-                }
-            )
-        }
+    fun finalizeCorrection(examSessionId: String) {
+        examSessionRepository.save(
+            getExamSessionById(examSessionId).also {
+                it.state = ExamSessionState.CORRECTED
+                it.correctionDate = Date(System.currentTimeMillis())
+            }
+        )
     }
 }

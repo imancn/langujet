@@ -27,22 +27,18 @@ class AutoCorrectorService(
     @Autowired @Lazy private lateinit var resultService: ResultService
     
     fun correctExamSection(examSession: ExamSession, sectionOrder: Int) {
-        val result = resultService.getResultByExamSessionId(examSession.id ?: "")
         val exam = examService.getExamById(examSession.examId)
         val section = sectionService.getSectionByExamIdAndOrder(examSession.examId, sectionOrder)
         val correctAnswers = correctAnswerRepository.findAllByExamIdAndSectionOrder(examSession.examId, sectionOrder)
         val answers = answerRepository.findAllByExamSessionIdAndSectionOrder(examSession.id ?: "", sectionOrder)
         val correctIssuesCount = calculateCorrectIssuesCount(answers, correctAnswers)
-        val sectionResult = SectionResult(
-            id = null,
-            resultId = result.id ?: "N/A",
+        resultService.addSectionResult(
+            examSessionId = examSession.id ?: "",
             sectionOrder = sectionOrder,
             sectionType = section.sectionType,
             correctIssuesCount = correctIssuesCount,
             score = calculateScore(correctIssuesCount, section.sectionType, exam.type),
-            recommendation = null
         )
-        resultService.addSectionResult(result, sectionResult)
     }
     
     private fun calculateCorrectIssuesCount(answers: List<Answer>, correctAnswers: List<CorrectAnswer>): Int {
