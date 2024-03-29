@@ -5,7 +5,7 @@ import com.cn.langujet.domain.exam.model.SectionType
 import nonapi.io.github.classgraph.json.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
-@Document(collation = "section_results")
+@Document(collection = "section_results")
 class SectionResult(
     @Id
     var id: String?,
@@ -17,7 +17,7 @@ class SectionResult(
     var recommendation: String?,
 ) {
     constructor(sectionResultDto: SectionResultDto) : this(
-        sectionResultDto.id,
+        null,
         sectionResultDto.resultId,
         sectionResultDto.sectionOrder,
         sectionResultDto.sectionType,
