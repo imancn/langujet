@@ -97,7 +97,7 @@ class ResultService(
     
     private fun calculateOverAllScore(scores: List<Double>, examType: ExamType): Double {
         return when (examType) {
-            ExamType.IELTS, ExamType.IELTS_GENERAL, ExamType.IELTS_ACADEMIC -> {
+            ExamType.IELTS_GENERAL, ExamType.IELTS_ACADEMIC -> {
                 scores.sumOf { it } / scores.count()
             }
         }

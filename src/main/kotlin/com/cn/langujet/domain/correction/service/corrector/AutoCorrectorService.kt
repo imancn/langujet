@@ -11,7 +11,6 @@ import com.cn.langujet.domain.exam.model.ExamType
 import com.cn.langujet.domain.exam.model.SectionType
 import com.cn.langujet.domain.exam.service.ExamService
 import com.cn.langujet.domain.exam.service.SectionService
-import com.cn.langujet.domain.result.model.SectionResult
 import com.cn.langujet.domain.result.service.ResultService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
@@ -139,10 +138,6 @@ class AutoCorrectorService(
         correctIssuesCount: Int, sectionType: SectionType, examType: ExamType
     ): Double {
         return when (examType) {
-            ExamType.IELTS -> ScoreCalculator.calculateAcademicIELTSScore(
-                correctIssuesCount,
-                sectionType
-            ) // Todo: Remove after migration
             ExamType.IELTS_ACADEMIC -> ScoreCalculator.calculateAcademicIELTSScore(correctIssuesCount, sectionType)
             ExamType.IELTS_GENERAL -> TODO()
         }
