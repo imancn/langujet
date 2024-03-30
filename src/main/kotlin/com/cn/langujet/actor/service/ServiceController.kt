@@ -33,8 +33,8 @@ class ServiceController(
         return serviceService.getAllServices()
     }
 
-    @GetMapping("/student/service/available/exam")
-    fun getAvailableServices(): List<AvailableExamServicesResponse> {
+    @GetMapping("/student/service/exam/available")
+    fun getAvailableExamServices(): List<AvailableExamServicesResponse> {
         return serviceService.getAvailableExamServices()
     }
 }
