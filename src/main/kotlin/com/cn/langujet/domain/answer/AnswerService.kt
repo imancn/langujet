@@ -5,6 +5,7 @@ import com.cn.langujet.application.advice.MethodNotAllowedException
 import com.cn.langujet.application.service.file.domain.data.model.FileBucket
 import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.answer.model.Answer
+import com.cn.langujet.domain.exam.model.ExamSessionState
 import com.cn.langujet.domain.exam.service.ExamSessionService
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -67,8 +68,12 @@ class AnswerService(
     }
     
     private fun examSessionPreCheck(examSessionId: String, sectionOrder: Int, token: String) {
-        examSessionService.checkExamSessionAndSectionAvailability(
-            examSessionService.getStudentExamSession(token, examSessionId), sectionOrder
-        )
+        val examSession = examSessionService.getStudentExamSession(token, examSessionId)
+        if (!examSession.sectionOrders.contains(sectionOrder))
+            throw MethodNotAllowedException("You don't have permission to this section")
+        if (examSession.state.order == ExamSessionState.ENROLLED.order)
+            throw MethodNotAllowedException("The exam session has been not started yet")
+        if (examSession.state.order >= ExamSessionState.FINISHED.order)
+            throw MethodNotAllowedException("The exam session has been finished")
     }
 }

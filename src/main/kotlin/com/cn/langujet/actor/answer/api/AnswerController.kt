@@ -40,7 +40,7 @@ class AnswerController(
     }
 
     @PostMapping("/student/answer/bulk")
-    fun submitBulkAnswer(
+    fun submitBulkAnswers(
         @RequestParam @NotBlank examSessionId: String?,
         @RequestParam @NotNull sectionOrder: Int?,
         @RequestBody @Valid request: List<AnswerBulkRequest>,
