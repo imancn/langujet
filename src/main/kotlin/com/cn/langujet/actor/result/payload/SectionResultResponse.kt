@@ -3,9 +3,7 @@ package com.cn.langujet.actor.result.payload
 import com.cn.langujet.domain.exam.model.SectionType
 import com.cn.langujet.domain.result.model.SectionResult
 
-data class SectionResultDto(
-    var id: String,
-    var resultId: String,
+data class SectionResultResponse(
     var sectionOrder: Int,
     var sectionType: SectionType,
     var correctIssuesCount: Int,
@@ -13,8 +11,6 @@ data class SectionResultDto(
     var recommendation: String?
 ) {
     constructor(sectionResult: SectionResult) : this(
-        sectionResult.id ?: "",
-        sectionResult.resultId,
         sectionResult.sectionOrder,
         sectionResult.sectionType,
         sectionResult.correctIssuesCount,

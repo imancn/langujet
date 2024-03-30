@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.result.service
 
-import com.cn.langujet.actor.result.payload.ResultDto
+import com.cn.langujet.actor.result.payload.DetailedResultResponse
 import com.cn.langujet.application.advice.InvalidTokenException
 import com.cn.langujet.application.advice.MethodNotAllowedException
 import com.cn.langujet.application.advice.NotFoundException
@@ -41,27 +41,22 @@ class ResultService(
     }
     
     fun getResultById(id: String): Result {
-        return resultRepository.findById(id)
-            .orElseThrow { throw NotFoundException("Suggestion with ID: $id not found") }
+        return resultRepository.findById(id).orElseThrow { throw NotFoundException("Result with ID: $id not found") }
     }
     
-    fun getResultByExamSessionId(
-        authToken: String, examSessionId: String
-    ): ResultDto {
+    fun getDetailedResultByExamSessionId(authToken: String, examSessionId: String): DetailedResultResponse {
         val studentId = examSessionService.getExamSessionById(examSessionId).studentId
-        if (!studentService.doesStudentOwnAuthToken(
-                authToken,
-                studentId
-            )
-        ) throw InvalidTokenException("Exam Session with id: $examSessionId is not belong to your token")
-        return resultRepository.findByExamSessionId(examSessionId).orElseThrow {
-            NotFoundException("Suggestions for ExamSession with ID: $examSessionId not found")
-        }.let { ResultDto(it) }
+        if (!studentService.doesStudentOwnAuthToken(authToken, studentId)) {
+            throw InvalidTokenException("Exam Session with id: $examSessionId is not belong to you")
+        }
+        val result = getResultByExamSessionId(examSessionId)
+        val sectionResult = sectionResultService.getSectionResultsByResultId(result.id ?: "")
+        return DetailedResultResponse(result, sectionResult)
     }
     
     fun getResultByExamSessionId(examSessionId: String): Result {
         return resultRepository.findByExamSessionId(examSessionId).orElseThrow {
-            NotFoundException("Suggestions for ExamSession with ID: $examSessionId not found")
+            NotFoundException("Result not found")
         }
     }
     
@@ -75,13 +70,11 @@ class ResultService(
     ) {
         val result = getResultByExamSessionId(examSessionId)
         val correction = correctionService.getCorrectionByExamSessionIdAndSectionOrder(
-            result.examSessionId,
-            sectionOrder
+            result.examSessionId, sectionOrder
         )
-        
-        if (correction.status == CorrectionStatus.PROCESSED)
+        if (correction.status == CorrectionStatus.PROCESSED) {
             throw MethodNotAllowedException("Section with ExamSessionId: ${result.examSessionId} and SectionOrder: $sectionOrder has been processed")
-        
+        }
         sectionResultService.createSectionResult(
             SectionResult(
                 id = null,
@@ -103,10 +96,8 @@ class ResultService(
     }
     
     private fun calculateOverAllScore(scores: List<Double>, examType: ExamType): Double {
-        return when(examType) {
-            ExamType.IELTS,
-            ExamType.IELTS_GENERAL,
-            ExamType.IELTS_ACADEMIC -> {
+        return when (examType) {
+            ExamType.IELTS, ExamType.IELTS_GENERAL, ExamType.IELTS_ACADEMIC -> {
                 scores.sumOf { it } / scores.count()
             }
         }
