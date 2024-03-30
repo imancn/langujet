@@ -71,7 +71,7 @@ class ExamSectionContentService(
         return examSectionContents.map {
             ExamSectionContentDownloadLink(
                 fileId = it.fileId,
-                link = fileService.generatePublicDownloadLink(it.fileId, exam.examDuration?.toInt() ?: 21600)
+                link = fileService.generatePublicDownloadLink(it.fileId, exam.examDuration.toInt())
             )
         }
     }
