@@ -15,6 +15,7 @@ import com.cn.langujet.domain.result.service.ResultService
 import com.cn.langujet.domain.student.service.StudentService
 import org.springframework.stereotype.Service
 import java.util.*
+import kotlin.jvm.optionals.getOrElse
 
 @Service
 class ExamSessionService(
@@ -27,23 +28,12 @@ class ExamSessionService(
     private val correctionService: CorrectionService,
     private val resultService: ResultService
 ) {
-    fun enrollExamSession(studentId: String, examVariantId: String): ExamSessionEnrollResponse {
-        val examVariant = examVariantService.getExamVariantById(examVariantId)
-
-        val examId = examService.getRandomActiveExamIdByType(examVariant.examType)
-        val sections = sectionService.getSectionsByExamId(examId)
-
-        val sectionOrders = sections.filter { examVariant.sectionTypes.contains(it.sectionType) }.map { it.order }.sorted()
-
-        val examSession = examSessionRepository.save(
-            ExamSession(
-                studentId, examId, examVariant.id ?: "", sectionOrders, Date(System.currentTimeMillis())
-            )
-        )
-
-        return ExamSessionEnrollResponse(examSession)
+    fun getExamSessionById(id: String): ExamSession {
+        return examSessionRepository.findById(id).orElseThrow {
+            NotFoundException("ExamSession with id: $id not found")
+        }
     }
-
+    
     fun getStudentExamSession(
         authToken: String,
         examSessionId: String,
@@ -55,7 +45,7 @@ class ExamSessionService(
         ) throw InvalidTokenException("Exam Session with id: $examSessionId is not belong to your token")
         return examSession
     }
-
+    
     fun getStudentExamSessionResponse(
         authToken: String,
         examSessionId: String,
@@ -71,7 +61,22 @@ class ExamSessionService(
             request, studentService.getStudentByAuthToken(auth).id ?: ""
         ).paginate(request.pageSize, request.pageNumber)
     }
-
+    
+    fun enrollExamSession(studentId: String, examVariantId: String): ExamSessionEnrollResponse {
+        val examVariant = examVariantService.getExamVariantById(examVariantId)
+        val examId = examService.getRandomActiveExamIdByType(examVariant.examType)
+        val sections = sectionService.getSectionsByExamId(examId)
+        val sectionOrders = sections.filter {
+            examVariant.sectionTypes.contains(it.sectionType)
+        }.map { it.order }.sorted()
+        val examSession = examSessionRepository.save(
+            ExamSession(
+                studentId, examId, examVariant.id ?: "", sectionOrders, Date(System.currentTimeMillis())
+            )
+        )
+        return ExamSessionEnrollResponse(examSession)
+    }
+    
     fun getExamSection(
         authToken: String, examSessionId: String, sectionOrder: Int
     ): SectionDTO {
@@ -100,43 +105,34 @@ class ExamSessionService(
                 it.state = ExamSessionState.STARTED
             })
         }
-        return SectionDTO(section).also { it.id = null ; it.examId = null }
+        return SectionDTO(section).also { it.id = null; it.examId = null }
     }
     
     fun finishExamSession(authToken: String, examSessionId: String): ExamSessionResponse {
-        val examSession = getStudentExamSession(authToken, examSessionId).let { examSession ->
-            if (examSession.state == ExamSessionState.ENROLLED) {
-                throw MethodNotAllowedException("The exam session has not been started")
-            }
-            if (examSession.state.order >= ExamSessionState.FINISHED.order) {
-                throw MethodNotAllowedException("The exam session has been finished")
-            }
-            examSessionRepository.save(examSession.also {
-                it.state = ExamSessionState.FINISHED
-                it.endDate = Date(System.currentTimeMillis())
-            })
-            val exam = examService.getExamById(examSession.examId)
-            resultService.initiateResult(examSession.id ?: "", exam.type)
-            correctionService.makeExamSessionCorrection(examSession)
-            getExamSessionById(examSession.id ?: "")
+        var examSession = getStudentExamSession(authToken, examSessionId)
+        if (examSession.state == ExamSessionState.ENROLLED) {
+            throw MethodNotAllowedException("The exam session has not been started")
         }
+        if (examSession.state.order >= ExamSessionState.FINISHED.order) {
+            throw MethodNotAllowedException("The exam session has been finished")
+        }
+        examSession = examSessionRepository.save(examSession.also {
+            it.state = ExamSessionState.FINISHED
+            it.endDate = Date(System.currentTimeMillis())
+        })
+        val exam = examService.getExamById(examSession.examId)
+        resultService.initiateResult(examSession.id ?: "", exam.type)
+        correctionService.makeExamSessionCorrection(examSession)
+        examSession = getExamSessionById(examSession.id ?: "")
         return ExamSessionResponse(
             examSession, null, examVariantService.getExamVariantById(examSession.examVariantId).correctionType
         )
     }
     
-    fun getExamSessionById(id: String): ExamSession {
-        return examSessionRepository.findById(id).orElseThrow {
-            NotFoundException("ExamSession with id: $id not found")
-        }
-    }
-    
     fun finalizeCorrection(examSessionId: String) {
-        examSessionRepository.save(
-            getExamSessionById(examSessionId).also {
-                it.state = ExamSessionState.CORRECTED
-                it.correctionDate = Date(System.currentTimeMillis())
-            }
-        )
+        examSessionRepository.save(getExamSessionById(examSessionId).also {
+            it.state = ExamSessionState.CORRECTED
+            it.correctionDate = Date(System.currentTimeMillis())
+        })
     }
 }
