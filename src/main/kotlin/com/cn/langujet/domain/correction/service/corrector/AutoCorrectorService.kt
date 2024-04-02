@@ -85,15 +85,13 @@ class AutoCorrectorService(
     ): Int {
         var correctIssuesCount = 0
         correctAnswer.issues.forEachIndexed { index, correctIssue ->
-            var isCorrect = false
             answer.issues.getOrNull(index)?.let { answerIssue ->
                 correctIssue.firstOrNull {
                     it.pureEqual(answerIssue)
-                }?.let {
-                    isCorrect = true
+                }?.run {
+                    correctIssuesCount++
                 }
             }
-            if (isCorrect) correctIssuesCount++
         }
         return correctIssuesCount
     }
