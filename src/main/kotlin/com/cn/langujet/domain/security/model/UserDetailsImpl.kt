@@ -48,9 +48,17 @@ class UserDetailsImpl(
         val user = other as UserDetailsImpl
         return id == user.id
     }
-
+    
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + email.hashCode()
+        result = 31 * result + emailVerified.hashCode()
+        result = 31 * result + password.hashCode()
+        result = 31 * result + authorities.sumOf { it.authority.hashCode() }
+        return result
+    }
+    
     companion object {
-        private const val serialVersionUID = 1L
         fun build(user: User): UserDetailsImpl {
             val authorities: List<GrantedAuthority> = user.roles.map { role ->
                 SimpleGrantedAuthority(
