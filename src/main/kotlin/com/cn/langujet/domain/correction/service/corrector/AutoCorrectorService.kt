@@ -77,20 +77,20 @@ class AutoCorrectorService(
     private fun calculateCorrectIssuesCountForTextAnswer(
         answer: Answer.TextAnswer, correctAnswer: CorrectAnswer.CorrectTextAnswer
     ): Int {
-        return if (answer.text.pureEqual(correctAnswer.text)) 1 else 0
+        return if (correctAnswer.text.pureEqual(answer.text)) 1 else 0
     }
     
     private fun calculateCorrectIssuesCountForTextIssuesAnswer(
         answer: Answer.TextIssuesAnswer, correctAnswer: CorrectAnswer.CorrectTextIssuesAnswer
     ): Int {
         var correctIssuesCount = 0
-        answer.issues.forEachIndexed { index, issue ->
+        correctAnswer.issues.forEachIndexed { index, correctIssue ->
             var isCorrect = false
-            if (!issue.isNullOrBlank()) {
-                correctAnswer.issues[index].forEach { correctIssue ->
-                    if (issue.pureEqual(correctIssue)) {
-                        isCorrect = true
-                    }
+            answer.issues.getOrNull(index)?.let { answerIssue ->
+                correctIssue.firstOrNull {
+                    it.pureEqual(answerIssue)
+                }?.let {
+                    isCorrect = true
                 }
             }
             if (isCorrect) correctIssuesCount++
@@ -102,8 +102,8 @@ class AutoCorrectorService(
         answer: Answer.TrueFalseAnswer, correctAnswer: CorrectAnswer.CorrectTrueFalseAnswer
     ): Int {
         var correctIssuesCount = 0
-        answer.issues.forEachIndexed { index, issue ->
-            if (issue != null && issue == correctAnswer.issues.getOrNull(index)) {
+        correctAnswer.issues.forEachIndexed { index, issue ->
+            if (issue == answer.issues.getOrNull(index)) {
                 correctIssuesCount++
             }
         }
@@ -114,12 +114,12 @@ class AutoCorrectorService(
         answer: Answer.MultipleChoiceAnswer, correctAnswer: CorrectAnswer.CorrectMultipleChoiceAnswer
     ): Int {
         var correctIssuesCount = 0
-        answer.issues.forEach { issue ->
-            correctAnswer.issues.find {
-                it.order == issue.order
-            }?.let { correctIssue ->
-                issue.options.forEach { option ->
-                    if (!option.isNullOrBlank() && correctIssue.options.contains(option)) {
+        correctAnswer.issues.forEach { correctIssue ->
+            answer.issues.find {
+                it.order == correctIssue.order
+            }?.let { answerIssue ->
+                correctIssue.options.forEach { option ->
+                    if (answerIssue.options.contains(option)) {
                         correctIssuesCount++
                     }
                 }
