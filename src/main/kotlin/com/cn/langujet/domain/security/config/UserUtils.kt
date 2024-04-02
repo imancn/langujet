@@ -16,7 +16,7 @@ object UserUtils {
         return userDetails?.email
     }
     
-    fun isAdmin() = hasAuthority("ROLE_PROFESSOR")
+    fun isAdmin() = hasAuthority("ROLE_ADMIN")
     
     fun isProfessor() = hasAuthority("ROLE_PROFESSOR")
     
