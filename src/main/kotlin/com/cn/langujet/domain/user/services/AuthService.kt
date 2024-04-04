@@ -1,6 +1,6 @@
-package com.cn.langujet.domain.security.services
+package com.cn.langujet.domain.user.services
 
-import com.cn.langujet.application.security.security.model.User
+import com.cn.langujet.domain.user.model.User
 
 interface AuthService {
 

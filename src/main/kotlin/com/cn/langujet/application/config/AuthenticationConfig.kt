@@ -1,6 +1,6 @@
-package com.cn.langujet.domain.security.config
+package com.cn.langujet.application.config
 
-import com.cn.langujet.domain.security.services.UserDetailsServiceImpl
+import com.cn.langujet.domain.user.services.UserDetailsServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

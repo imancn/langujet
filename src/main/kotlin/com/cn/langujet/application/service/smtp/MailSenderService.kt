@@ -1,8 +1,8 @@
 package com.cn.langujet.application.service.smtp
 
 import com.cn.langujet.application.advice.EmailNotSentException
-import com.cn.langujet.domain.security.model.EmailVerificationToken
-import com.cn.langujet.domain.security.model.ResetPasswordToken
+import com.cn.langujet.domain.user.model.EmailVerificationToken
+import com.cn.langujet.domain.user.model.ResetPasswordToken
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import javax.mail.Message

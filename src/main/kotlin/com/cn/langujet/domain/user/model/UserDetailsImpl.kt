@@ -1,6 +1,5 @@
-package com.cn.langujet.domain.security.model
+package com.cn.langujet.domain.user.model
 
-import com.cn.langujet.application.security.security.model.User
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority

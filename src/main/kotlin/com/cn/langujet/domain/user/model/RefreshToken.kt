@@ -1,4 +1,4 @@
-package com.cn.langujet.domain.security.model
+package com.cn.langujet.domain.user.model
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed

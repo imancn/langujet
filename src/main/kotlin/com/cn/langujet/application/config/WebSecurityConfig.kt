@@ -1,8 +1,7 @@
-package com.cn.langujet.domain.security.config
+package com.cn.langujet.application.config
 
 import com.cn.langujet.application.advice.CustomAccessDeniedHandler
-import com.cn.langujet.domain.security.services.JwtService
-import com.cn.langujet.domain.security.services.UserDetailsServiceImpl
+import com.cn.langujet.domain.user.services.JwtService
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -22,7 +21,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @EnableMethodSecurity(prePostEnabled = true)
 class WebSecurityConfig(
     private val jwtService: JwtService,
-    private val userDetailsService: UserDetailsServiceImpl,
     private val unauthorizedHandler: AuthEntryPointJwt,
     private val modelMapper: ObjectMapper
 ) {
@@ -43,7 +41,7 @@ class WebSecurityConfig(
             .exceptionHandling().accessDeniedHandler(accessDeniedHandler()).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
             .addFilterBefore(
-                AuthTokenFilter(jwtService, userDetailsService),
+                AuthTokenFilter(jwtService),
                 UsernamePasswordAuthenticationFilter::class.java
             )
             .build()

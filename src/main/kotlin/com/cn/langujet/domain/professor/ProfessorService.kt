@@ -2,7 +2,7 @@ package com.cn.langujet.domain.professor
 
 import com.cn.langujet.actor.professor.payload.response.ProfessorProfileResponse
 import com.cn.langujet.application.advice.NotFoundException
-import com.cn.langujet.domain.security.services.AuthService
+import com.cn.langujet.domain.user.services.AuthService
 import org.springframework.stereotype.Service
 
 @Service

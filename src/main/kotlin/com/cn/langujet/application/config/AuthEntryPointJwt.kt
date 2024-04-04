@@ -1,8 +1,8 @@
-package com.cn.langujet.domain.security.config
+package com.cn.langujet.application.config
 
 import com.cn.langujet.application.advice.InvalidTokenException
-import com.cn.langujet.domain.security.services.JwtService
-import com.cn.langujet.domain.security.services.UserDetailsServiceImpl
+import com.cn.langujet.domain.user.services.JwtService
+import com.cn.langujet.domain.user.services.UserDetailsServiceImpl
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest

@@ -1,6 +1,6 @@
-package com.cn.langujet.domain.security.repository
+package com.cn.langujet.domain.user.repository
 
-import com.cn.langujet.application.security.security.model.User
+import com.cn.langujet.domain.user.model.User
 import org.springframework.data.mongodb.repository.MongoRepository
 import java.util.*
 

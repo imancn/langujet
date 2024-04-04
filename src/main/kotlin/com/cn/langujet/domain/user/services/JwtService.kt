@@ -1,7 +1,7 @@
-package com.cn.langujet.domain.security.services
+package com.cn.langujet.domain.user.services
 
 import com.cn.langujet.application.advice.InvalidTokenException
-import com.cn.langujet.domain.security.model.UserDetailsImpl
+import com.cn.langujet.domain.user.model.UserDetailsImpl
 import io.jsonwebtoken.*
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Value

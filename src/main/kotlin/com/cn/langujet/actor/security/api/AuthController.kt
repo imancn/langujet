@@ -2,19 +2,18 @@ package com.cn.langujet.actor.security.api
 
 import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.application.advice.*
-import com.cn.langujet.application.security.security.model.*
 import com.cn.langujet.application.security.security.payload.response.JwtResponse
 import com.cn.langujet.application.security.security.payload.response.RefreshTokenResponse
-import com.cn.langujet.domain.security.repository.EmailVerificationTokenRepository
-import com.cn.langujet.domain.security.repository.ResetPasswordTokenRepository
-import com.cn.langujet.domain.security.repository.UserRepository
-import com.cn.langujet.domain.security.services.JwtService
-import com.cn.langujet.domain.security.services.RefreshTokenService
+import com.cn.langujet.domain.user.repository.EmailVerificationTokenRepository
+import com.cn.langujet.domain.user.repository.ResetPasswordTokenRepository
+import com.cn.langujet.domain.user.repository.UserRepository
+import com.cn.langujet.domain.user.services.JwtService
+import com.cn.langujet.domain.user.services.RefreshTokenService
 import com.cn.langujet.application.service.smtp.MailSenderService
 import com.cn.langujet.domain.professor.Professor
 import com.cn.langujet.domain.professor.ProfessorRepository
-import com.cn.langujet.domain.security.model.*
-import com.cn.langujet.domain.security.services.AuthService
+import com.cn.langujet.domain.user.model.*
+import com.cn.langujet.domain.user.services.AuthService
 import com.cn.langujet.domain.student.model.Student
 import com.cn.langujet.domain.student.repository.StudentRepository
 import jakarta.validation.constraints.Email

@@ -1,4 +1,4 @@
-package com.cn.langujet.domain.security.config
+package com.cn.langujet.actor.util
 
 import io.jsonwebtoken.Claims
 import org.springframework.security.core.Authentication

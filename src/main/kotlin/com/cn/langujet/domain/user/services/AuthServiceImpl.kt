@@ -1,8 +1,8 @@
-package com.cn.langujet.domain.security.services
+package com.cn.langujet.domain.user.services
 
 import com.cn.langujet.application.advice.NotFoundException
-import com.cn.langujet.application.security.security.model.User
-import com.cn.langujet.domain.security.repository.UserRepository
+import com.cn.langujet.domain.user.model.User
+import com.cn.langujet.domain.user.repository.UserRepository
 import org.springframework.stereotype.Service
 
 @Service

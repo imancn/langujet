@@ -1,8 +1,8 @@
-package com.cn.langujet.domain.security.services
+package com.cn.langujet.domain.user.services
 
 import com.cn.langujet.application.advice.InvalidTokenException
-import com.cn.langujet.domain.security.model.UserDetailsImpl
-import com.cn.langujet.domain.security.repository.UserRepository
+import com.cn.langujet.domain.user.model.UserDetailsImpl
+import com.cn.langujet.domain.user.repository.UserRepository
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException

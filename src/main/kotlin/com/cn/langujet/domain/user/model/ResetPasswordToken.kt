@@ -1,22 +1,26 @@
-package com.cn.langujet.domain.security.model
+package com.cn.langujet.domain.user.model
 
-import com.cn.langujet.application.security.security.model.User
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
 
-@Document(collection = "email_verification_tokens")
-data class EmailVerificationToken(
-    @Id var id: String?,
-    @DBRef var user: User,
+@Document(collection = "reset_password_token")
+data class ResetPasswordToken(
+    @Id
+    var id: String?,
+    @DBRef
+    var user: User,
     var token: String,
     @Indexed(name = "expiry_date_ttl", expireAfterSeconds = 0)
     var expiryDate: Date,
 ) {
     constructor(user: User) : this(
-        id = null, user = user, token = makeRandom6DigitsToken(), expiryDate = calculateExpiryDate()
+        id = null,
+        user = user,
+        token = makeRandom6DigitsToken(),
+        expiryDate = calculateExpiryDate()
     )
 
     companion object {

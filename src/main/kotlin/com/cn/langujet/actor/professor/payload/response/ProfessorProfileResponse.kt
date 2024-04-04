@@ -1,6 +1,6 @@
 package com.cn.langujet.actor.professor.payload.response
 
-import com.cn.langujet.application.security.security.model.User
+import com.cn.langujet.domain.user.model.User
 import com.cn.langujet.domain.professor.Professor
 
 data class ProfessorProfileResponse(
