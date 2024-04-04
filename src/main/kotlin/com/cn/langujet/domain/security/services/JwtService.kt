@@ -6,6 +6,7 @@ import io.jsonwebtoken.*
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.stereotype.Component
 import java.util.*
 
@@ -19,8 +20,11 @@ class JwtService {
 
     fun generateJwtToken(authentication: Authentication): String {
         val userPrincipal = authentication.principal as UserDetailsImpl
+        val roles = userPrincipal.authorities.map { it.authority }
         return Jwts.builder()
             .setSubject(userPrincipal.username)
+            .claim("roles", roles)
+            .claim("email", userPrincipal.email)
             .setIssuedAt(Date())
             .setExpiration(Date(Date().time + jwtExpirationMs))
             .signWith(SignatureAlgorithm.HS512, jwtSecret)
@@ -35,12 +39,6 @@ class JwtService {
             .setIssuedAt(Date())
             .setExpiration(Date(Date().time + (60_000)))
             .signWith(SignatureAlgorithm.HS512, jwtSecret)
-            .compact()
-    }
-
-    fun generateTokenFromUserId(userId: String?): String {
-        return Jwts.builder().setSubject(userId).setIssuedAt(Date())
-            .setExpiration(Date(Date().time + jwtExpirationMs)).signWith(SignatureAlgorithm.HS512, jwtSecret)
             .compact()
     }
 
@@ -73,5 +71,16 @@ class JwtService {
             throw InvalidTokenException("Authorization header is invalid")
 
         return authorizationHeader.substring(7, authorizationHeader.length)
+    }
+    
+    fun getClaims(token: String): Claims? {
+        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).body
+    }
+    
+    fun getAuthoritiesFromJwtToken(token: String): List<SimpleGrantedAuthority> {
+        val claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).body
+        return claims.get("roles", List::class.java).map {
+            SimpleGrantedAuthority(it.toString())
+        }
     }
 }

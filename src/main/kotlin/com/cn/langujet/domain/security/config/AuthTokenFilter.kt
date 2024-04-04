@@ -1,7 +1,6 @@
 package com.cn.langujet.domain.security.config
 
 import com.cn.langujet.domain.security.services.JwtService
-import com.cn.langujet.domain.security.services.UserDetailsServiceImpl
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
@@ -12,10 +11,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter
 import java.io.IOException
 
-class AuthTokenFilter(
-    private val jwtService: JwtService,
-    private val userDetailsService: UserDetailsServiceImpl
-) : OncePerRequestFilter() {
+class AuthTokenFilter(private val jwtService: JwtService) : OncePerRequestFilter() {
 
     @Throws(ServletException::class, IOException::class)
     override fun doFilterInternal(
@@ -26,10 +22,10 @@ class AuthTokenFilter(
         try {
             val jwt = jwtService.parseJwt(request)
             val userId = jwtService.getUserIdFromJwtToken(jwt)
-            val userDetails = userDetailsService.loadUserByUsername(userId)
             val authentication = UsernamePasswordAuthenticationToken(
-                userDetails, null,
-                userDetails.authorities
+                userId,
+                jwtService.getClaims(jwt),
+                jwtService.getAuthoritiesFromJwtToken(jwt)
             )
             authentication.details = WebAuthenticationDetailsSource().buildDetails(request)
             SecurityContextHolder.getContext().authentication = authentication
