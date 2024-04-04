@@ -40,12 +40,11 @@ class ExamSectionContentController(
     @GetMapping("/student/exam/section/content/download-links")
     @PreAuthorize("hasAnyRole('STUDENT')")
     fun getStudentExamSectionContentDownloadLink(
-        @RequestHeader("Authorization") @NotBlank auth: String?,
         @RequestParam examSessionId: @NotBlank String?,
         @RequestParam sectionOrder: @NotNull Int?
     ): List<ExamSectionContentDownloadLink> {
         return examSectionContentService.getStudentExamSectionContentDownloadLink(
-            auth!!, examSessionId!!, sectionOrder!!
+            examSessionId!!, sectionOrder!!
         )
     }
 }

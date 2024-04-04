@@ -1,5 +1,6 @@
 package com.cn.langujet.actor.professor.payload.response
 
+import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.domain.professor.ProfessorService
 import org.springframework.http.ResponseEntity
@@ -16,19 +17,16 @@ class ProfessorController(
 
     @GetMapping("/profile")
     @PreAuthorize("hasRole('PROFESSOR')")
-    fun getProfile(
-        @RequestHeader("Authorization") auth: String?
-    ): ResponseEntity<ProfessorProfileResponse> =
-        toOkResponseEntity(ProfessorProfileResponse(professorService.getProfessorByAuthToken(auth)))
+    fun getProfile(): ResponseEntity<ProfessorProfileResponse> =
+        toOkResponseEntity(ProfessorProfileResponse(professorService.getProfessorByUserId(Auth.userId())))
 
     @PostMapping("/profile")
     @PreAuthorize("hasRole('PROFESSOR')")
     fun editProfile(
-        @RequestHeader("Authorization") auth: String?,
         @RequestParam fullName: String?,
         @RequestParam biography: String?,
         @RequestParam ieltsScore: Double?,
         @RequestParam credit: Double?
     ): ResponseEntity<ProfessorProfileResponse> =
-        toOkResponseEntity(professorService.editProfile(auth, fullName, biography, ieltsScore, credit))
+        toOkResponseEntity(professorService.editProfile(fullName, biography, ieltsScore, credit))
 }

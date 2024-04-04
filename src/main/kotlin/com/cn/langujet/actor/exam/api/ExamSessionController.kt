@@ -32,35 +32,31 @@ class ExamSessionController(
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/student/exam-session/{examSessionId}")
     fun getStudentExamSession(
-        @RequestHeader("Authorization") @NotBlank auth: String?,
         @PathVariable @NotBlank examSessionId: String?
     ): ResponseEntity<ExamSessionResponse> =
-        ResponseEntity.ok(examSessionService.getStudentExamSessionResponse(auth!!, examSessionId!!))
+        ResponseEntity.ok(examSessionService.getStudentExamSessionResponse(examSessionId!!))
 
     @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/student/exam-session")
     fun searchStudentExamSessions(
-        @RequestHeader("Authorization") @NotBlank auth: String?,
         @RequestBody @Valid request: ExamSessionSearchRequest
     ): ResponseEntity<CustomPage<ExamSessionResponse>> =
         ResponseEntity.ok(
-            examSessionService.searchExamSessions(auth!!, request)
+            examSessionService.searchExamSessions(request)
         )
     
     @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/student/exam-session/section")
     fun getExamSection(
-        @RequestHeader("Authorization") @NotBlank auth: String?,
         @RequestParam @NotBlank examSessionId: String?,
         @RequestParam @NotNull sectionOrder: Int?
     ): ResponseEntity<SectionDTO> =
-        ResponseEntity.ok(examSessionService.getExamSection(auth!!, examSessionId!!, sectionOrder!!))
+        ResponseEntity.ok(examSessionService.getExamSection(examSessionId!!, sectionOrder!!))
 
     @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/student/exam-session/finish")
     fun finishExamSession(
-        @RequestHeader("Authorization") @NotBlank auth: String?,
         @RequestParam @NotBlank examSessionId: String?
     ): ResponseEntity<ExamSessionResponse> =
-        ResponseEntity.ok(examSessionService.finishExamSession(auth!!, examSessionId!!))
+        ResponseEntity.ok(examSessionService.finishExamSession(examSessionId!!))
 }

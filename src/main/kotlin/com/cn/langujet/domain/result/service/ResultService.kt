@@ -1,6 +1,7 @@
 package com.cn.langujet.domain.result.service
 
 import com.cn.langujet.actor.result.payload.DetailedResultResponse
+import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.advice.InvalidTokenException
 import com.cn.langujet.application.advice.MethodNotAllowedException
 import com.cn.langujet.application.advice.NotFoundException
@@ -44,9 +45,9 @@ class ResultService(
         return resultRepository.findById(id).orElseThrow { throw NotFoundException("Result with ID: $id not found") }
     }
     
-    fun getDetailedResultByExamSessionId(authToken: String, examSessionId: String): DetailedResultResponse {
+    fun getDetailedResultByExamSessionId(examSessionId: String): DetailedResultResponse {
         val studentId = examSessionService.getExamSessionById(examSessionId).studentId
-        if (!studentService.doesStudentOwnAuthToken(authToken, studentId)) {
+        if (studentService.getStudentByUserId(Auth.userId()).id != studentId) {
             throw InvalidTokenException("Exam Session with id: $examSessionId is not belong to you")
         }
         val result = getResultByExamSessionId(examSessionId)

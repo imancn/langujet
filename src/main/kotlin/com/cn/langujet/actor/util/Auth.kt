@@ -6,12 +6,14 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 
 object Auth {
-    fun userId(): String? {
-        return getAuthentication()?.principal as String?
+    fun userId(): String {
+        return getAuthentication()?.principal?.let {
+            if (it is String) it else null
+        } ?: ""
     }
     
-    fun userEmail(): String? {
-        return getClaims()?.get("email", String::class.java)
+    fun userEmail(): String {
+        return getClaims()?.get("email", String::class.java) ?: ""
     }
     
     fun isAdmin() = hasAuthority("ROLE_ADMIN")
@@ -25,7 +27,9 @@ object Auth {
     }
     
     private fun getClaims(): Claims? {
-        return getAuthentication()?.credentials as Claims?
+        return getAuthentication()?.credentials?.let {
+            if (it is Claims) return it else null
+        }
     }
     
     private fun getAuthentication(): Authentication? = SecurityContextHolder.getContext().authentication

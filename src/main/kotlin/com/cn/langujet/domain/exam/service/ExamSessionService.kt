@@ -1,6 +1,7 @@
 package com.cn.langujet.domain.exam.service
 
 import com.cn.langujet.actor.exam.payload.*
+import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.actor.util.models.CustomPage
 import com.cn.langujet.actor.util.models.paginate
 import com.cn.langujet.application.advice.InvalidTokenException
@@ -35,30 +36,27 @@ class ExamSessionService(
     }
     
     fun getStudentExamSession(
-        authToken: String,
         examSessionId: String,
     ): ExamSession {
         val examSession = getExamSessionById(examSessionId)
-        if (!studentService.doesStudentOwnAuthToken(
-                authToken, examSession.studentId
-            )
-        ) throw InvalidTokenException("Exam Session with id: $examSessionId is not belong to your token")
+        if (examSession.studentId != studentService.getStudentByUserId(Auth.userId()).id) {
+            throw InvalidTokenException("Exam Session with id: $examSessionId is not belong to your token")
+        }
         return examSession
     }
     
     fun getStudentExamSessionResponse(
-        authToken: String,
         examSessionId: String,
     ): ExamSessionResponse {
-        val examSession = getStudentExamSession(authToken, examSessionId)
+        val examSession = getStudentExamSession(examSessionId)
         val exam = ExamDTO(examService.getExamById(examSession.examId))
         val examVariant = examVariantService.getExamVariantById(examSession.examVariantId)
         return ExamSessionResponse(examSession, exam, examVariant.correctionType)
     }
     
-    fun searchExamSessions(auth: String, request: ExamSessionSearchRequest): CustomPage<ExamSessionResponse> {
+    fun searchExamSessions(request: ExamSessionSearchRequest): CustomPage<ExamSessionResponse> {
         return examSessionCustomRepository.searchExamSessions(
-            request, studentService.getStudentByAuthToken(auth).id ?: ""
+            request, studentService.getStudentByUserId(Auth.userId()).id ?: ""
         ).paginate(request.pageSize, request.pageNumber)
     }
     
@@ -78,12 +76,12 @@ class ExamSessionService(
     }
     
     fun getExamSection(
-        authToken: String, examSessionId: String, sectionOrder: Int
+        examSessionId: String, sectionOrder: Int
     ): SectionDTO {
         val examSession = examSessionRepository.findByStudentIdAndState(
-            studentService.getStudentByAuthToken(authToken).id ?: "", ExamSessionState.STARTED
+            studentService.getStudentByUserId(Auth.userId()).id ?: "", ExamSessionState.STARTED
         ).getOrElse {
-            getStudentExamSession(authToken, examSessionId)
+            getStudentExamSession(examSessionId)
         }
         if (examSessionId != examSession.id) {
             throw MethodNotAllowedException("You should finish your started exam session")
@@ -108,8 +106,8 @@ class ExamSessionService(
         return SectionDTO(section).also { it.id = null; it.examId = null }
     }
     
-    fun finishExamSession(authToken: String, examSessionId: String): ExamSessionResponse {
-        var examSession = getStudentExamSession(authToken, examSessionId)
+    fun finishExamSession(examSessionId: String): ExamSessionResponse {
+        var examSession = getStudentExamSession(examSessionId)
         if (examSession.state == ExamSessionState.ENROLLED) {
             throw MethodNotAllowedException("The exam session has not been started")
         }

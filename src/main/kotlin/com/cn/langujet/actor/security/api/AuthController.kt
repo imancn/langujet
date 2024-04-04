@@ -1,5 +1,6 @@
 package com.cn.langujet.actor.security.api
 
+import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.application.advice.*
 import com.cn.langujet.application.security.security.payload.response.JwtResponse
@@ -221,12 +222,10 @@ class AuthController(
     @PostMapping("/change-password")
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     fun changePassword(
-        @RequestHeader("Authorization") auth: String?,
         @RequestParam @Size(min = 6, max = 40) @NotBlank oldPassword: String?,
         @RequestParam @Size(min = 6, max = 40) @NotBlank newPassword: String?
     ): ResponseEntity<String> {
-        val userId = authService.getUserIdFromAuthorizationHeader(auth)
-        val user = userRepository.findById(userId).orElseThrow { NotFoundException("User Not Found") }
+        val user = userRepository.findById(Auth.userId()).orElseThrow { NotFoundException("User Not Found") }
 
         if (user.password == encoder.encode(oldPassword)) user.password = encoder.encode(newPassword)
         else throw InvalidInputException("Old Password is not correct.")
@@ -235,8 +234,8 @@ class AuthController(
     }
 
     @PostMapping("/sign-out")
-    fun signOutUser(@RequestHeader("Authorization") auth: String?): ResponseEntity<String> {
-        refreshTokenService.deleteByUserId(authService.getUserIdFromAuthorizationHeader(auth))
+    fun signOutUser(): ResponseEntity<String> {
+        refreshTokenService.deleteByUserId(Auth.userId())
         return toOkResponseEntity("User signed out successfully")
     }
 }

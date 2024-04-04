@@ -1,6 +1,7 @@
 package com.cn.langujet.domain.student.service
 
 import com.cn.langujet.actor.student.payload.response.StudentProfileResponse
+import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.user.services.AuthService
 import com.cn.langujet.domain.student.model.Student
@@ -12,10 +13,8 @@ class StudentService(
     private val authService: AuthService,
     private val studentRepository: StudentRepository,
 ) {
-    fun editProfile(
-        auth: String?, fullName: String?, biography: String?
-    ): StudentProfileResponse {
-        val student = this.getStudentByAuthToken(auth)
+    fun editProfile(fullName: String?, biography: String?): StudentProfileResponse {
+        val student = getStudentByUserId(Auth.userId())
 
         if (!fullName.isNullOrBlank()) student.fullName = fullName
         if (!biography.isNullOrBlank()) student.biography = biography
@@ -25,19 +24,9 @@ class StudentService(
         )
     }
 
-    fun getStudentByAuthToken(auth: String?): Student {
-        return studentRepository.findByUser_Id(
-            authService.getUserByAuthToken(auth).id!!
-        ).orElseThrow { NotFoundException("Student Not found") }
-    }
-
     fun getStudentByUserId(userId: String): Student {
-        return studentRepository.findByUser_Id(authService.getUserById(userId).id!!).orElseThrow {
+        return studentRepository.findByUser_Id(userId).orElseThrow {
             NotFoundException("Student not found")
         }
-    }
-
-    fun doesStudentOwnAuthToken(token: String, studentId: String): Boolean {
-        return getStudentByAuthToken(token).id == studentId
     }
 }

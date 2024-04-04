@@ -21,7 +21,6 @@ class AnswerController(
     
     @PostMapping("/student/answer/voice")
     fun submitVoiceAnswer(
-        @RequestHeader("Authorization") @NotBlank auth: String?,
         @RequestParam @NotBlank examSessionId: String?,
         @RequestParam @NotNull sectionOrder: Int?,
         @RequestParam @NotNull partOrder: Int?,
@@ -29,7 +28,6 @@ class AnswerController(
         @RequestParam("voice") voice: MultipartFile
     ): ResponseEntity<Boolean> {
         answerService.submitVoiceAnswer(
-            auth!!,
             examSessionId!!,
             sectionOrder!!,
             partOrder!!,
@@ -44,8 +42,7 @@ class AnswerController(
         @RequestParam @NotBlank examSessionId: String?,
         @RequestParam @NotNull sectionOrder: Int?,
         @RequestBody @Valid request: List<AnswerBulkRequest>,
-        @RequestHeader("Authorization") @NotBlank auth: String?
     ): ResponseEntity<Boolean> {
-        return toOkResponseEntity(answerService.submitBulkAnswers(examSessionId, sectionOrder, request, auth!!))
+        return toOkResponseEntity(answerService.submitBulkAnswers(examSessionId, sectionOrder, request))
     }
 }

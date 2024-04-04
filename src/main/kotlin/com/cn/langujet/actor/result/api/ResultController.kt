@@ -13,11 +13,10 @@ class ResultController(
     private var service: ResultService
 ) {
     
-    @GetMapping("student/result/exam-session/{id}")
+    @GetMapping("student/result/exam-session/{examSessionId}")
     fun getStudentResultsByExamSessionId(
-        @RequestHeader("Authorization") auth: String,
-        @PathVariable @NotBlank id: String
+        @PathVariable @NotBlank examSessionId: String
     ): DetailedResultResponse {
-        return service.getDetailedResultByExamSessionId(auth, id)
+        return service.getDetailedResultByExamSessionId(examSessionId)
     }
 }

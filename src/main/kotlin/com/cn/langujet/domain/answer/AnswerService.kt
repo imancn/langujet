@@ -22,9 +22,8 @@ class AnswerService(
         examSessionId: String?,
         sectionOrder: Int?,
         answerRequestList: List<AnswerBulkRequest>,
-        auth: String
     ): Boolean {
-        examSessionPreCheck(examSessionId!!, sectionOrder!!, auth)
+        examSessionPreCheck(examSessionId!!, sectionOrder!!)
         val existingAnswers = answerRepository.findAllByExamSessionIdAndSectionOrder(examSessionId, sectionOrder)
         answerRepository.saveAll(
             answerRequestList.map<AnswerBulkRequest, Answer> {
@@ -39,14 +38,13 @@ class AnswerService(
     }
     
     fun submitVoiceAnswer(
-        token: String,
         examSessionId: String,
         sectionOrder: Int,
         partOrder: Int,
         questionOrder: Int,
         voice: MultipartFile
     ): Answer.VoiceAnswer {
-        examSessionPreCheck(examSessionId, sectionOrder, token)
+        examSessionPreCheck(examSessionId, sectionOrder)
         val fileEntity = fileService.uploadFile(voice, FileBucket.ANSWERS)
         
         if (answerRepository.existsByExamSessionIdAndSectionOrderAndPartOrderAndQuestionOrder(
@@ -67,8 +65,8 @@ class AnswerService(
         )
     }
     
-    private fun examSessionPreCheck(examSessionId: String, sectionOrder: Int, token: String) {
-        val examSession = examSessionService.getStudentExamSession(token, examSessionId)
+    private fun examSessionPreCheck(examSessionId: String, sectionOrder: Int) {
+        val examSession = examSessionService.getStudentExamSession(examSessionId)
         if (!examSession.sectionOrders.contains(sectionOrder))
             throw MethodNotAllowedException("You don't have permission to this section")
         if (examSession.state.order == ExamSessionState.ENROLLED.order)

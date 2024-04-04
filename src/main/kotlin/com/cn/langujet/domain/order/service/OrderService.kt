@@ -2,6 +2,7 @@ package com.cn.langujet.domain.order.service
 
 import com.cn.langujet.actor.order.payload.SubmitOrderRequest
 import com.cn.langujet.actor.order.payload.SubmitOrderResponse
+import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.domain.exam.service.ExamSessionService
 import com.cn.langujet.domain.order.model.OrderEntity
 import com.cn.langujet.domain.order.model.OrderStatus
@@ -24,10 +25,10 @@ class OrderService(
     private val examSessionService: ExamSessionService
 ) {
     private val logger = LoggerFactory.getLogger(javaClass.simpleName)
-    fun submitOrder(auth: String, submitOrderRequest: SubmitOrderRequest): SubmitOrderResponse {
+    fun submitOrder(submitOrderRequest: SubmitOrderRequest): SubmitOrderResponse {
         val services = submitOrderRequest.serviceIds?.map { serviceService.getByIds(it) } ?: emptyList()
 
-        val studentId = studentService.getStudentByAuthToken(auth).id ?: ""
+        val studentId = studentService.getStudentByUserId(Auth.userId()).id ?: ""
         val totalPrice = services.sumOf { it.price - it.discount }
 
         if (totalPrice == 0.0) {

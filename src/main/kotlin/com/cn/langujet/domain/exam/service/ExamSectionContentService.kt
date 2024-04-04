@@ -1,6 +1,7 @@
 package com.cn.langujet.domain.exam.service
 
 import com.cn.langujet.actor.exam.payload.ExamSectionContentDownloadLink
+import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.advice.FileException
 import com.cn.langujet.application.advice.InvalidTokenException
 import com.cn.langujet.application.advice.NotFoundException
@@ -54,17 +55,13 @@ class ExamSectionContentService(
     }
 
     fun getStudentExamSectionContentDownloadLink(
-        authToken: String,
         examSessionId: String,
         sectionOrder: Int
     ): List<ExamSectionContentDownloadLink> {
         val examSession = examSessionService.getExamSessionById(examSessionId)
-        if (!studentService.doesStudentOwnAuthToken(
-                authToken,
-                examSession.studentId
-            )
-        ) throw InvalidTokenException("Exam Session with id: $examSessionId is not belong to your token")
-
+        if (studentService.getStudentByUserId(Auth.userId()).id != examSession.studentId) {
+            throw InvalidTokenException("Exam Session with id: $examSessionId is not belong to your token")
+        }
         val exam = examService.getExamById(examSession.examId)
         val examSectionContents = examSectionContentRepository.findAllByExamIdAndSectionOrder(exam.id ?: "", sectionOrder)
 
