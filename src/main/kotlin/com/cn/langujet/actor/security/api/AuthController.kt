@@ -180,7 +180,7 @@ class AuthController(
         return toOkResponseEntity(
             refreshTokenService.findByToken(refreshToken!!)
                 .map {
-                    val token = jwtService.generateTokenFromUserId(it.userId)
+                    val token = jwtService.generateJwtToken(SecurityContextHolder.getContext().authentication)
                     val newRefreshToken = refreshTokenService.createRefreshToken(it.userId)
                     RefreshTokenResponse(token, newRefreshToken.id ?: "")
                 }.orElseThrow {
