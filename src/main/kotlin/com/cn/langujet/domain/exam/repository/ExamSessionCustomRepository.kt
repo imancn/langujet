@@ -24,7 +24,7 @@ class ExamSessionCustomRepository(
             ).map { it.id ?: "" }
         } else null
         
-        val criteria = Criteria.where("studentId").`is`(userId)
+        val criteria = Criteria.where("studentUserId").`is`(userId)
         val sessionCriteria = criteria.apply {
             foundExamIdsByName?.let { and("examId").`in`(foundExamIdsByName) }
             searchRequest.states?.let { and("state").`in`(it) }

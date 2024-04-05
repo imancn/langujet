@@ -8,7 +8,7 @@ import java.util.*
 data class ExamSession(
     @Id var id: String?,
     
-    var studentId: String,
+    var studentUserId: String,
     var examId: String,
     val examVariantId: String,
     val sectionOrders: List<Int>,
@@ -19,14 +19,14 @@ data class ExamSession(
     var correctionDate: Date?,
 ) {
     constructor(
-        studentId: String,
+        studentUserId: String,
         examId: String,
         examVariantId: String,
         sectionOrders: List<Int>,
         enrollDate: Date
     ) : this(
         null,
-        studentId,
+        studentUserId,
         examId,
         examVariantId,
         sectionOrders,

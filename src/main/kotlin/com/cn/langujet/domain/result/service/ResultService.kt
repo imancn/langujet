@@ -13,7 +13,6 @@ import com.cn.langujet.domain.exam.service.ExamSessionService
 import com.cn.langujet.domain.result.model.Result
 import com.cn.langujet.domain.result.model.SectionResult
 import com.cn.langujet.domain.result.repository.ResultRepository
-import com.cn.langujet.domain.student.service.StudentService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Service
 @Service
 class ResultService(
     private val resultRepository: ResultRepository,
-    private val studentService: StudentService,
     private val correctionService: CorrectionService,
     private val sectionResultService: SectionResultService
 ) {
@@ -46,8 +44,8 @@ class ResultService(
     }
     
     fun getDetailedResultByExamSessionId(examSessionId: String): DetailedResultResponse {
-        val studentId = examSessionService.getExamSessionById(examSessionId).studentId
-        if (studentService.getStudentByUserId(Auth.userId()).id != studentId) {
+        val examSession = examSessionService.getExamSessionById(examSessionId)
+        if (Auth.userId() != examSession.studentUserId) {
             throw InvalidTokenException("Exam Session with id: $examSessionId is not belong to you")
         }
         val result = getResultByExamSessionId(examSessionId)

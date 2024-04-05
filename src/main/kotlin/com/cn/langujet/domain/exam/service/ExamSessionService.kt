@@ -13,7 +13,6 @@ import com.cn.langujet.domain.exam.model.ExamSessionState
 import com.cn.langujet.domain.exam.repository.ExamSessionCustomRepository
 import com.cn.langujet.domain.exam.repository.ExamSessionRepository
 import com.cn.langujet.domain.result.service.ResultService
-import com.cn.langujet.domain.student.service.StudentService
 import org.springframework.stereotype.Service
 import java.util.*
 import kotlin.jvm.optionals.getOrElse
@@ -25,7 +24,6 @@ class ExamSessionService(
     private val examService: ExamService,
     private val examVariantService: ExamVariantService,
     private val sectionService: SectionService,
-    private val studentService: StudentService,
     private val correctionService: CorrectionService,
     private val resultService: ResultService
 ) {
@@ -39,7 +37,7 @@ class ExamSessionService(
         examSessionId: String,
     ): ExamSession {
         val examSession = getExamSessionById(examSessionId)
-        if (examSession.studentId != studentService.getStudentByUserId(Auth.userId()).id) {
+        if (Auth.userId() != examSession.studentUserId) {
             throw InvalidTokenException("Exam Session with id: $examSessionId is not belong to your token")
         }
         return examSession
@@ -56,11 +54,11 @@ class ExamSessionService(
     
     fun searchExamSessions(request: ExamSessionSearchRequest): CustomPage<ExamSessionResponse> {
         return examSessionCustomRepository.searchExamSessions(
-            request, studentService.getStudentByUserId(Auth.userId()).id ?: ""
+            request, Auth.userId()
         ).paginate(request.pageSize, request.pageNumber)
     }
     
-    fun enrollExamSession(studentId: String, examVariantId: String): ExamSessionEnrollResponse {
+    fun enrollExamSession(userId: String, examVariantId: String): ExamSessionEnrollResponse {
         val examVariant = examVariantService.getExamVariantById(examVariantId)
         val examId = examService.getRandomActiveExamIdByType(examVariant.examType)
         val sections = sectionService.getSectionsByExamId(examId)
@@ -69,7 +67,7 @@ class ExamSessionService(
         }.map { it.order }.sorted()
         val examSession = examSessionRepository.save(
             ExamSession(
-                studentId, examId, examVariant.id ?: "", sectionOrders, Date(System.currentTimeMillis())
+                userId, examId, examVariant.id ?: "", sectionOrders, Date(System.currentTimeMillis())
             )
         )
         return ExamSessionEnrollResponse(examSession)
@@ -78,8 +76,8 @@ class ExamSessionService(
     fun getExamSection(
         examSessionId: String, sectionOrder: Int
     ): SectionDTO {
-        val examSession = examSessionRepository.findByStudentIdAndState(
-            studentService.getStudentByUserId(Auth.userId()).id ?: "", ExamSessionState.STARTED
+        val examSession = examSessionRepository.findByStudentUserIdAndState(
+            Auth.userId(), ExamSessionState.STARTED
         ).getOrElse {
             getStudentExamSession(examSessionId)
         }

@@ -11,7 +11,6 @@ import com.cn.langujet.domain.payment.PaymentService
 import com.cn.langujet.domain.service.model.ServiceEntity
 import com.cn.langujet.domain.service.model.ServiceType
 import com.cn.langujet.domain.service.service.ServiceService
-import com.cn.langujet.domain.student.service.StudentService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.*
@@ -21,20 +20,19 @@ class OrderService(
     private val orderRepository: OrderRepository,
     private val serviceService: ServiceService,
     private val paymentService: PaymentService,
-    private val studentService: StudentService,
     private val examSessionService: ExamSessionService
 ) {
     private val logger = LoggerFactory.getLogger(javaClass.simpleName)
+    
     fun submitOrder(submitOrderRequest: SubmitOrderRequest): SubmitOrderResponse {
         val services = submitOrderRequest.serviceIds?.map { serviceService.getByIds(it) } ?: emptyList()
-
-        val studentId = studentService.getStudentByUserId(Auth.userId()).id ?: ""
+        
         val totalPrice = services.sumOf { it.price - it.discount }
-
+        
         if (totalPrice == 0.0) {
             val order = OrderEntity(
                 id = null,
-                studentId = studentId,
+                studentUserId = Auth.userId(),
                 status = OrderStatus.PAID,
                 services = services,
                 stripeSessionId = null,
@@ -42,13 +40,13 @@ class OrderService(
                 date = Date(System.currentTimeMillis())
             )
             orderRepository.save(order)
-            processServices(studentId, services)
+            processServices(Auth.userId(), services)
             return SubmitOrderResponse(null)
         } else {
             val session = paymentService.createPaymentSession(services)
             val order = OrderEntity(
                 id = null,
-                studentId = studentId,
+                studentUserId = Auth.userId(),
                 services = services,
                 status = OrderStatus.PENDING,
                 stripeSessionId = session.id,
@@ -59,11 +57,11 @@ class OrderService(
             return SubmitOrderResponse(session.url)
         }
     }
-
+    
     fun processOrder(stripeSessionId: String) {
         val order = orderRepository.findByStripeSessionId(stripeSessionId)
         if (order != null) {
-            processServices(order.studentId, order.services)
+            processServices(order.studentUserId, order.services)
             orderRepository.save(
                 order.also {
                     it.status = OrderStatus.PAID
@@ -73,7 +71,7 @@ class OrderService(
             logger.error("Order with Stripe Session Id $stripeSessionId not found")
         }
     }
-
+    
     fun rejectOrder(stripeSessionId: String) {
         val order = orderRepository.findByStripeSessionId(stripeSessionId)
         if (order != null) {
@@ -86,16 +84,16 @@ class OrderService(
             logger.error("Order with Stripe Session Id $stripeSessionId not found")
         }
     }
-
+    
     private fun processServices(
-        studentId: String,
+        userId: String,
         services: List<ServiceEntity>
     ) {
         services.forEach {
-            when(it.type) {
+            when (it.type) {
                 ServiceType.EXAM -> {
                     val examService = it as ServiceEntity.ExamServiceEntity
-                    examSessionService.enrollExamSession(studentId, examService.examVariantId)
+                    examSessionService.enrollExamSession(userId, examService.examVariantId)
                 }
             }
         }

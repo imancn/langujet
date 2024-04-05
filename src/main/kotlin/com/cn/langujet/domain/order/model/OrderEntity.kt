@@ -9,7 +9,7 @@ import java.util.Date
 class OrderEntity(
     @Id
     var id: String? = null,
-    val studentId: String,
+    var studentUserId: String,
     var status: OrderStatus,
     var services: List<ServiceEntity>,
     var stripeSessionId: String?,

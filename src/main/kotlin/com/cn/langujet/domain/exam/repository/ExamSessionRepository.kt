@@ -6,5 +6,5 @@ import org.springframework.data.mongodb.repository.MongoRepository
 import java.util.Optional
 
 interface ExamSessionRepository : MongoRepository<ExamSession, String> {
-    fun findByStudentIdAndState(s: String, started: ExamSessionState): Optional<ExamSession>
+    fun findByStudentUserIdAndState(userId: String, started: ExamSessionState): Optional<ExamSession>
 }
