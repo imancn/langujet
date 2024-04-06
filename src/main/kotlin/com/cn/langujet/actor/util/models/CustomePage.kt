@@ -8,7 +8,20 @@ data class CustomPage<T>(
     val pageNumber: Int,
     val totalPages: Int,
     val totalElements: Long
-)
+) {
+    constructor(
+        content: List<T>,
+        pageSize: Int,
+        pageNumber: Int,
+        totalElements: Long
+    ): this(
+        content = content,
+        pageSize = pageSize,
+        pageNumber = pageNumber,
+        totalPages = ((totalElements + pageSize - 1) / pageSize).toInt(),
+        totalElements = totalElements
+    )
+}
 
 fun <T> List<T>.paginate(pageSize: Int, pageNumber: Int): CustomPage<T> {
     val total = this.size

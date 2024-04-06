@@ -3,7 +3,6 @@ package com.cn.langujet.domain.exam.service
 import com.cn.langujet.actor.exam.payload.*
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.actor.util.models.CustomPage
-import com.cn.langujet.actor.util.models.paginate
 import com.cn.langujet.application.advice.InvalidTokenException
 import com.cn.langujet.application.advice.MethodNotAllowedException
 import com.cn.langujet.application.advice.NotFoundException
@@ -55,7 +54,7 @@ class ExamSessionService(
     fun searchExamSessions(request: ExamSessionSearchRequest): CustomPage<ExamSessionResponse> {
         return examSessionCustomRepository.searchExamSessions(
             request, Auth.userId()
-        ).paginate(request.pageSize, request.pageNumber)
+        )
     }
     
     fun enrollExamSession(userId: String, examVariantId: String): ExamSessionEnrollResponse {
