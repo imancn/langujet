@@ -14,7 +14,6 @@ import com.cn.langujet.domain.exam.repository.ExamSessionRepository
 import com.cn.langujet.domain.result.service.ResultService
 import org.springframework.stereotype.Service
 import java.util.*
-import kotlin.jvm.optionals.getOrElse
 
 @Service
 class ExamSessionService(
@@ -24,7 +23,8 @@ class ExamSessionService(
     private val examVariantService: ExamVariantService,
     private val sectionService: SectionService,
     private val correctionService: CorrectionService,
-    private val resultService: ResultService
+    private val resultService: ResultService,
+    private val examGeneratorService: ExamGeneratorService
 ) {
     fun getExamSessionById(id: String): ExamSession {
         return examSessionRepository.findById(id).orElseThrow {
@@ -59,14 +59,11 @@ class ExamSessionService(
     
     fun enrollExamSession(userId: String, examVariantId: String): ExamSessionEnrollResponse {
         val examVariant = examVariantService.getExamVariantById(examVariantId)
-        val examId = examService.getRandomActiveExamIdByType(examVariant.examType)
-        val sections = sectionService.getSectionsByExamId(examId)
-        val sectionOrders = sections.filter {
-            examVariant.sectionTypes.contains(it.sectionType)
-        }.map { it.order }.sorted()
+        val exam = examGeneratorService.getRandomStudentAvailableExam(userId, examVariantId)
+        val sectionOrders = (1..exam.sectionsNumber).toList()
         val examSession = examSessionRepository.save(
             ExamSession(
-                userId, examId, examVariant.id ?: "", sectionOrders, Date(System.currentTimeMillis())
+                userId, exam.id ?: "", examVariant.id ?: "", sectionOrders, Date(System.currentTimeMillis())
             )
         )
         return ExamSessionEnrollResponse(examSession)
@@ -77,7 +74,7 @@ class ExamSessionService(
     ): SectionDTO {
         val examSession = examSessionRepository.findByStudentUserIdAndState(
             Auth.userId(), ExamSessionState.STARTED
-        ).getOrElse {
+        ).getOrElse(0) {
             getStudentExamSession(examSessionId)
         }
         if (examSessionId != examSession.id) {

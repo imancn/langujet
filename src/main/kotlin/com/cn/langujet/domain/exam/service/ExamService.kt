@@ -6,7 +6,6 @@ import com.cn.langujet.actor.util.models.toCustomPage
 import com.cn.langujet.application.advice.InvalidInputException
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.exam.model.Exam
-import com.cn.langujet.domain.exam.model.ExamType
 import com.cn.langujet.domain.exam.repository.ExamRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -52,9 +51,5 @@ class ExamService(
         return examRepository.findAllByNameContainingIgnoreCaseOrderByNameAsc(
             name, pageRequest
         ).map { ExamDTO(it) }.toCustomPage()
-    }
-    
-    fun getRandomActiveExamIdByType(examType: ExamType): String {
-        return examRepository.findAllByTypeAndActive(examType, true).mapNotNull { it.id }.random()
     }
 }
