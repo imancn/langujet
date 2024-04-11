@@ -9,5 +9,7 @@ import org.springframework.data.mongodb.repository.MongoRepository
 interface ExamRepository : MongoRepository<Exam, String> {
     fun findAllByNameContainingIgnoreCaseOrderByNameAsc(name: String, pageRequest: PageRequest): Page<Exam>
     fun findAllByTypeAndActive(type: ExamType, active: Boolean): List<Exam>
-    fun findAllByTypeAndActiveAndSectionsNumberAndIdNotIn(type: ExamType, active: Boolean, sectionNumber: Int, id: List<String>): List<Exam>
+    fun findAllByTypeAndActiveAndSectionsNumberAndIdNotIn(
+        type: ExamType, active: Boolean, sectionNumber: Int, id: List<String>
+    ): List<Exam>
 }

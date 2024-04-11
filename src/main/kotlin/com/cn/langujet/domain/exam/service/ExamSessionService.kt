@@ -59,7 +59,7 @@ class ExamSessionService(
     
     fun enrollExamSession(userId: String, examVariantId: String): ExamSessionEnrollResponse {
         val examVariant = examVariantService.getExamVariantById(examVariantId)
-        val exam = examGeneratorService.getRandomStudentAvailableExam(userId, examVariantId)
+        val exam = examGeneratorService.getRandomStudentAvailableExam(userId, examVariant)
         val sectionOrders = (1..exam.sectionsNumber).toList()
         val examSession = examSessionRepository.save(
             ExamSession(

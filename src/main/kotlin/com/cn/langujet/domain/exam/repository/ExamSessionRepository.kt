@@ -6,5 +6,5 @@ import org.springframework.data.mongodb.repository.MongoRepository
 
 interface ExamSessionRepository : MongoRepository<ExamSession, String> {
     fun findByStudentUserIdAndState(userId: String, started: ExamSessionState): List<ExamSession>
-    fun findByStudentUserId(userId: String, examVariantId: String): List<ExamSession>
+    fun findByStudentUserId(userId: String): List<ExamSession>
 }

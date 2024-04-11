@@ -5,5 +5,6 @@ class AvailableExamServicesResponse(
     val name: String,
     val price: Double,
     val discount: Double,
-    var examVariant: ExamVariantResponse
+    val examVariant: ExamVariantResponse?,
+    val count: Int
 )

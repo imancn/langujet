@@ -25,4 +25,8 @@ class ExamVariantService(
             throw NotFoundException("Exam Type does not exist")
         }
     }
+    
+    fun getExamVariantByIds(ids: List<String>): List<ExamVariantEntity> {
+        return examVariantRepository.findAllByIdIn(ids)
+    }
 }

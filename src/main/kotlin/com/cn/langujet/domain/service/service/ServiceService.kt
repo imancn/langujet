@@ -3,7 +3,9 @@ package com.cn.langujet.domain.service.service
 import com.cn.langujet.actor.service.payload.AvailableExamServicesResponse
 import com.cn.langujet.actor.service.payload.ExamVariantResponse.Companion.toExamTypeResponse
 import com.cn.langujet.actor.service.payload.ServiceRequest
+import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.advice.NotFoundException
+import com.cn.langujet.domain.exam.service.ExamGeneratorService
 import com.cn.langujet.domain.exam.service.ExamVariantService
 import com.cn.langujet.domain.service.model.ServiceEntity
 import com.cn.langujet.domain.service.model.ServiceType
@@ -13,18 +15,19 @@ import org.springframework.stereotype.Service
 @Service
 class ServiceService(
     private val serviceRepository: ServiceRepository,
-    private val examVariantService: ExamVariantService
+    private val examVariantService: ExamVariantService,
+    private val examGeneratorService: ExamGeneratorService
 ) {
-
+    
     fun createService(request: ServiceRequest): ServiceEntity {
         val serviceEntity = request.convertToServiceEntity<ServiceEntity>()
         return serviceRepository.save(serviceEntity)
     }
-
+    
     fun updateService(id: String, request: ServiceRequest): ServiceEntity {
-        val existingService = serviceRepository.findById(id)
-            .orElseThrow { NoSuchElementException("Service with ID: $id not found") }
-
+        val existingService =
+            serviceRepository.findById(id).orElseThrow { NoSuchElementException("Service with ID: $id not found") }
+        
         existingService.apply {
             name = request.name ?: name
             price = request.price ?: price
@@ -32,28 +35,36 @@ class ServiceService(
             order = request.order ?: order
             active = request.active ?: active
         }
-
+        
         return serviceRepository.save(existingService)
     }
-
+    
     fun getAllServices(): List<ServiceEntity> {
         return serviceRepository.findAll()
     }
-
+    
     fun getAvailableExamServices(): List<AvailableExamServicesResponse> {
-        return serviceRepository.findByTypeAndActiveOrderByOrder(ServiceType.EXAM, true).map {
-            val examService = it as ServiceEntity.ExamServiceEntity
+        val examServices = serviceRepository.findByTypeAndActiveOrderByOrder(ServiceType.EXAM, true)
+            .filterIsInstance<ServiceEntity.ExamServiceEntity>()
+        val examVariants = examVariantService.getExamVariantByIds(examServices.map { it.examVariantId })
+        val availableServiceCount = examGeneratorService.countAvailableExamsForVariants(
+            Auth.userId(), examVariants.mapNotNull { it.id }
+        )
+        return examServices.map { examService ->
+            val examVariant = examVariants.find { it.id == examService.examVariantId }
             AvailableExamServicesResponse(
                 examService.id ?: "N/A",
                 examService.name,
                 examService.price,
                 examService.discount,
-                examVariantService.getExamVariantById(examService.examVariantId).toExamTypeResponse()
+                examVariant?.toExamTypeResponse(),
+                availableServiceCount[examVariant?.id ?: ""] ?: 0
             )
         }
     }
-
+    
     fun getByIds(serviceId: String): ServiceEntity {
-        return serviceRepository.findById(serviceId).orElseThrow { NotFoundException("Service with id $serviceId not found") }
+        return serviceRepository.findById(serviceId)
+            .orElseThrow { NotFoundException("Service with id $serviceId not found") }
     }
 }
