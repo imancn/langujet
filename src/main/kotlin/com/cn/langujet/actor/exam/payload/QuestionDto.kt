@@ -246,7 +246,7 @@ data class ReadingMultipleChoiceDTO(
     questionOrder,
     header,
     QuestionType.READING_MULTIPLE_CHOICES,
-    AnswerType.TEXT_ISSUES
+    AnswerType.MULTIPLE_CHOICE
 ) {
     
     constructor(question: ReadingMultipleChoice) : this(
