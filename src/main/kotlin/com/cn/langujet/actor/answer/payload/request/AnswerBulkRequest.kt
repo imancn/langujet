@@ -5,7 +5,6 @@ import com.cn.langujet.domain.answer.model.AnswerType
 import com.cn.langujet.domain.answer.model.TrueFalseAnswerType
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import java.util.*
 
@@ -75,7 +74,7 @@ sealed class AnswerBulkRequest(
 data class TextBulkAnswerRequest(
     @field:NotNull override val partOrder: Int? = null,
     @field:NotNull override val questionOrder: Int? = null,
-    @field:NotBlank val text: String? = null,
+    @field:NotNull val text: String? = null,
 ) : AnswerBulkRequest(partOrder, questionOrder, AnswerType.TEXT)
 
 data class TextIssuesBulkAnswerRequest(
