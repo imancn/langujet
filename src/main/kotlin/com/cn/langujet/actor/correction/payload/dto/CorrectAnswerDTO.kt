@@ -1,4 +1,4 @@
-package com.cn.langujet.actor.correction.model
+package com.cn.langujet.actor.correction.payload.dto
 
 import com.cn.langujet.domain.answer.model.AnswerType
 import com.cn.langujet.domain.answer.model.TrueFalseAnswerType

@@ -4,17 +4,16 @@ import com.cn.langujet.application.advice.InvalidInputException
 import com.cn.langujet.application.advice.MethodNotAllowedException
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.exam.model.Section
+import com.cn.langujet.domain.exam.repository.SectionCustomRepository
 import com.cn.langujet.domain.exam.repository.SectionRepository
+import com.cn.langujet.domain.exam.repository.dto.SectionMetaDTO
 import org.springframework.stereotype.Service
 
 @Service
 class SectionService(
-    private val sectionRepository: SectionRepository
+    private val sectionRepository: SectionRepository,
+    private val sectionCustomRepository: SectionCustomRepository
 ) {
-    fun getSectionByExamId(examId: String): List<Section> {
-        return sectionRepository.findAllByExamId(examId)
-    }
-
     fun getSectionById(id: String): Section {
         return sectionRepository.findById(id).orElseThrow {
             NotFoundException("Section with id $id not found")
@@ -61,5 +60,9 @@ class SectionService(
         } else {
             false
         }
+    }
+    
+    fun getSectionsMetaData(examId: String): List<SectionMetaDTO> {
+        return sectionCustomRepository.findSectionsMetaDataByExamId(examId)
     }
 }

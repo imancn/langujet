@@ -1,4 +1,4 @@
-package com.cn.langujet.actor.correction.model
+package com.cn.langujet.actor.correction.payload.dto
 
 import com.cn.langujet.domain.correction.model.CorrectAnswer
 

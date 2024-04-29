@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.correction.service
 
-import com.cn.langujet.actor.correction.model.CorrectAnswerListDTO
+import com.cn.langujet.actor.correction.payload.dto.CorrectAnswerListDTO
 import com.cn.langujet.application.advice.InvalidInputException
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.correction.model.CorrectAnswer

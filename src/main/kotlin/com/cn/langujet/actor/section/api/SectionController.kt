@@ -23,7 +23,7 @@ class SectionController(private val sectionService: SectionService) {
     fun getSectionByExamId(
         @PathVariable examId: String
     ): List<SectionDTO> =
-        sectionService.getSectionByExamId(examId).map { SectionDTO(it) }
+        sectionService.getSectionsByExamId(examId).map { SectionDTO(it) }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
