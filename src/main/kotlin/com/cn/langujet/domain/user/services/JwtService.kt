@@ -30,17 +30,6 @@ class JwtService {
             .signWith(SignatureAlgorithm.HS512, jwtSecret)
             .compact()
     }
-    
-    // Todo: remove after test
-    fun generateJwtTokenTest(authentication: Authentication): String {
-        val userPrincipal = authentication.principal as UserDetailsImpl
-        return Jwts.builder()
-            .setSubject(userPrincipal.username)
-            .setIssuedAt(Date())
-            .setExpiration(Date(Date().time + (60_000)))
-            .signWith(SignatureAlgorithm.HS512, jwtSecret)
-            .compact()
-    }
 
     fun getUserIdFromJwtToken(token: String?): String {
         return try {

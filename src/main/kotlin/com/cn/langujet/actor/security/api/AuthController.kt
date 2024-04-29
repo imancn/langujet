@@ -71,32 +71,6 @@ class AuthController(
         )
     }
     
-    // Todo: remove after test
-    @PostMapping("/sign-in/test")
-    fun authenticateUserTest(
-        @RequestParam @NotBlank @Email email: String?,
-        @RequestParam @NotBlank password: String?,
-    ): ResponseEntity<JwtResponse> {
-        val user = userRepository.findByEmail(email).orElseThrow {
-            InvalidTokenException("Bad credentials")
-        }
-        val authentication = authenticationManager.authenticate(
-            UsernamePasswordAuthenticationToken(user?.id, password)
-        )
-        SecurityContextHolder.getContext().authentication = authentication
-        val jwt = jwtService.generateJwtTokenTest(authentication)
-        val userDetails = authentication.principal as UserDetailsImpl
-        if (!userDetails.emailVerified) throw MethodNotAllowedException("User is not enabled ${userDetails.email}")
-        
-        val refreshToken = refreshTokenService.createRefreshToken(userDetails.id)
-        
-        return toOkResponseEntity(
-            JwtResponse(
-                jwt, refreshToken.id ?: "", userDetails.email
-            )
-        )
-    }
-    
     @PostMapping("/student/signup")
     fun registerStudent(
         @RequestParam @NotBlank fullName: String?,
