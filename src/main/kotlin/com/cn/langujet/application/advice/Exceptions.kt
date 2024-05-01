@@ -19,3 +19,5 @@ class EmailNotSentException(message: String?) : HttpException(HttpStatus.INTERNA
 class FileException(message: String?) : HttpException(HttpStatus.INTERNAL_SERVER_ERROR, message)
 
 class LogicalException(message: String?): RuntimeException(message)
+
+class UnprocessableException(message: String?): HttpException(HttpStatus.UNPROCESSABLE_ENTITY, message)

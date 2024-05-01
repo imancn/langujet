@@ -24,6 +24,11 @@ class ControllerAdvice {
         )
     }
     
+    @ExceptionHandler(value = [UnprocessableException::class])
+    fun handleHttpException(ex: UnprocessableException, request: WebRequest): ResponseEntity<ErrorMessageResponse> {
+        return ResponseEntity(ErrorMessageResponse("${ex.message}"), ex.httpStatus)
+    }
+    
     @ExceptionHandler(value = [MethodArgumentNotValidException::class])
     fun handleValidationException(ex: MethodArgumentNotValidException, request: WebRequest): ResponseEntity<String> {
         logger.error(ex.stackTraceToString())
