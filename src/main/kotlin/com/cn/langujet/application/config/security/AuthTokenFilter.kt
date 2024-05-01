@@ -1,4 +1,4 @@
-package com.cn.langujet.application.config
+package com.cn.langujet.application.config.security
 
 import com.cn.langujet.domain.user.services.JwtService
 import jakarta.servlet.FilterChain
@@ -12,20 +12,16 @@ import org.springframework.web.filter.OncePerRequestFilter
 import java.io.IOException
 
 class AuthTokenFilter(private val jwtService: JwtService) : OncePerRequestFilter() {
-
+    
     @Throws(ServletException::class, IOException::class)
     override fun doFilterInternal(
-        request: HttpServletRequest,
-        response: HttpServletResponse,
-        filterChain: FilterChain
+        request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain
     ) {
         try {
             val jwt = jwtService.parseJwt(request)
             val userId = jwtService.getUserIdFromJwtToken(jwt)
             val authentication = UsernamePasswordAuthenticationToken(
-                userId,
-                jwtService.getClaims(jwt),
-                jwtService.getAuthoritiesFromJwtToken(jwt)
+                userId, jwtService.getClaims(jwt), jwtService.getAuthoritiesFromJwtToken(jwt)
             )
             authentication.details = WebAuthenticationDetailsSource().buildDetails(request)
             SecurityContextHolder.getContext().authentication = authentication

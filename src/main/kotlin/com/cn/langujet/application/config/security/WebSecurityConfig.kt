@@ -1,14 +1,13 @@
-package com.cn.langujet.application.config
+package com.cn.langujet.application.config.security
 
-import com.cn.langujet.application.advice.CustomAccessDeniedHandler
 import com.cn.langujet.domain.user.services.JwtService
-import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
@@ -21,32 +20,21 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @EnableMethodSecurity(prePostEnabled = true)
 class WebSecurityConfig(
     private val jwtService: JwtService,
-    private val unauthorizedHandler: AuthEntryPointJwt,
-    private val modelMapper: ObjectMapper
+    private val unauthorizedHandler: AuthenticationEntryPoint,
+    private val accessDeniedHandler: AccessDeniedHandler,
 ) {
-
-    @Bean
-    fun accessDeniedHandler(): AccessDeniedHandler {
-        return CustomAccessDeniedHandler(modelMapper)
-    }
-
     @Bean
     @Throws(Exception::class)
     fun filterChain(http: HttpSecurity): SecurityFilterChain? {
-        return http
-            .cors().and()
-            .csrf().disable()
+        return http.cors().and().csrf().disable()
             .authorizeHttpRequests().anyRequest().permitAll().and()
             .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-            .exceptionHandling().accessDeniedHandler(accessDeniedHandler()).and()
+            .exceptionHandling().accessDeniedHandler(accessDeniedHandler).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-            .addFilterBefore(
-                AuthTokenFilter(jwtService),
-                UsernamePasswordAuthenticationFilter::class.java
-            )
+            .addFilterBefore(AuthTokenFilter(jwtService), UsernamePasswordAuthenticationFilter::class.java)
             .build()
     }
-
+    
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource = UrlBasedCorsConfigurationSource().also { cors ->
         CorsConfiguration().apply {

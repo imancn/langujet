@@ -1,4 +1,4 @@
-package com.cn.langujet.application.config
+package com.cn.langujet.application.config.security
 
 import com.cn.langujet.domain.user.services.UserDetailsServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
@@ -18,13 +18,13 @@ class AuthenticationConfig(
     fun registerProvider(auth: AuthenticationManagerBuilder) {
         auth.userDetailsService(userDetailsService).passwordEncoder(BCryptPasswordEncoder())
     }
-
+    
     @Bean
     @Throws(java.lang.Exception::class)
     fun authenticationManager(authenticationConfiguration: AuthenticationConfiguration): AuthenticationManager? {
         return authenticationConfiguration.authenticationManager
     }
-
+    
     @Bean
     fun passwordEncoder(): PasswordEncoder {
         return BCryptPasswordEncoder()
