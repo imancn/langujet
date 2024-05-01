@@ -8,8 +8,6 @@ class RefreshTokenException(message: String?) : HttpException(HttpStatus.UNAUTHO
 
 class InvalidTokenException(message: String?) : HttpException(HttpStatus.UNAUTHORIZED, message)
 
-class AccessDeniedException(message: String?) : HttpException(HttpStatus.FORBIDDEN, message)
-
 class InvalidInputException(message: String?) : HttpException(HttpStatus.NOT_ACCEPTABLE, message)
 
 class NotFoundException(message: String?) : HttpException(HttpStatus.NOT_FOUND, message)
