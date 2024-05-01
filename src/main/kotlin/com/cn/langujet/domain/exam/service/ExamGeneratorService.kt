@@ -29,7 +29,9 @@ class ExamGeneratorService(
         return if (exams.isNotEmpty()) {
             exams.random(Random(System.currentTimeMillis()))
         } else {
-            examRepository.findAllByTypeAndActive(examVariant.examType, true).random(Random(System.currentTimeMillis()))
+            examRepository.findAllByTypeAndActiveAndSectionsNumber(
+                examVariant.examType, true, examVariant.sectionTypes.count()
+            ).random(Random(System.currentTimeMillis()))
         }
     }
     
