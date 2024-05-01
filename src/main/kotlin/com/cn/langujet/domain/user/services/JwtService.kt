@@ -50,15 +50,12 @@ class JwtService {
     }
 
     fun parseJwt(request: HttpServletRequest): String {
-        return parseAuthorizationHeader(request.getHeader("Authorization"))
-    }
-
-    fun parseAuthorizationHeader(authorizationHeader: String?): String {
-        if (authorizationHeader.isNullOrEmpty())
+        val authorizationHeader = request.getHeader("Authorization")
+        if (authorizationHeader.isEmpty())
             throw InvalidTokenException("Authorization header is missing")
         if (!authorizationHeader.startsWith("Bearer "))
             throw InvalidTokenException("Authorization header is invalid")
-
+        
         return authorizationHeader.substring(7, authorizationHeader.length)
     }
     
