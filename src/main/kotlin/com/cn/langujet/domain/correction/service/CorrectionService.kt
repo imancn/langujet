@@ -1,7 +1,12 @@
 package com.cn.langujet.domain.correction.service
 
+import com.cn.langujet.actor.correction.payload.request.AssignCorrectionRequest
+import com.cn.langujet.actor.correction.payload.request.AssignCorrectionToCorrectorRequest
+import com.cn.langujet.actor.correction.payload.response.CorrectionResponse
 import com.cn.langujet.actor.correction.payload.response.CorrectorAvailableCorrectionResponse
+import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.advice.NotFoundException
+import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.domain.correction.model.CorrectionEntity
 import com.cn.langujet.domain.correction.model.CorrectionStatus
 import com.cn.langujet.domain.correction.model.CorrectionType
@@ -68,13 +73,17 @@ class CorrectionService(
         return true
     }
     
-    fun getCorrectorPendingCorrections(): List<CorrectorAvailableCorrectionResponse> {
-        val responses = mutableListOf<CorrectorAvailableCorrectionResponse>()
-        correctionRepository.findByTypeAndStatusOrderByCreatedDateAsc(
+    private fun getCorrectorPendingCorrectionsPerExamSessionId(): Map<String, List<CorrectionEntity>> {
+        return correctionRepository.findByTypeAndStatusOrderByCreatedDateAsc(
             CorrectionType.PROFESSOR, CorrectionStatus.PENDING
         ).groupBy {
             it.examSessionId
-        }.forEach { (examSessionId, corrections) ->
+        }
+    }
+    
+    fun getCorrectorPendingCorrections(): List<CorrectorAvailableCorrectionResponse> {
+        val responses = mutableListOf<CorrectorAvailableCorrectionResponse>()
+        getCorrectorPendingCorrectionsPerExamSessionId().forEach { (examSessionId, corrections) ->
             val sectionTypes = corrections.map { it.sectionType }
             val response = responses.find {
                 it.examType == corrections[0].examType &&
@@ -91,5 +100,48 @@ class CorrectionService(
             }
         }
         return responses
+    }
+    
+    fun assignCorrection(
+        assignCorrectionRequest: AssignCorrectionRequest,
+        correctorId: String = Auth.userId()
+    ): CorrectionResponse {
+        // TODO: validate corrector has not processing correction
+        return try {
+            val foundedCorrections = getCorrectorPendingCorrectionsPerExamSessionId().filter {
+                val sectionTypesCondition = it.value.map {
+                    correction -> correction.sectionType
+                }.sorted() == assignCorrectionRequest.sectionTypes.sorted()
+                val examTypeCondition = it.value.first().examType == assignCorrectionRequest.examType
+                sectionTypesCondition && examTypeCondition
+            }.firstNotNullOf {
+                it.value
+            }
+            correctionRepository.saveAll(
+                foundedCorrections.onEach {
+                    it.professorUserId = correctorId
+                    it.status = CorrectionStatus.PROCESSING
+                }
+            )
+            CorrectionResponse(
+                foundedCorrections.first().examType,
+                foundedCorrections.map { correction -> correction.sectionType }
+            )
+        } catch (ex: NoSuchElementException) {
+            throw UnprocessableException("There is no exam of this type left for correction")
+        }
+    }
+    
+    fun assignCorrectionToCorrector(
+        assignCorrectionToCorrectorRequest: AssignCorrectionToCorrectorRequest
+    ): CorrectionResponse {
+        // TODO: validate corrector exists and has corrector
+        return assignCorrection(
+            AssignCorrectionRequest(
+                assignCorrectionToCorrectorRequest.examType,
+                assignCorrectionToCorrectorRequest.sectionTypes
+            ),
+            assignCorrectionToCorrectorRequest.correctorId
+        )
     }
 }
