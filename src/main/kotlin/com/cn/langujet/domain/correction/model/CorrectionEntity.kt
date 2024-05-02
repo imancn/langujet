@@ -15,7 +15,7 @@ class CorrectionEntity(
     var examType: ExamType,
     var sectionOrder: Int,
     var sectionType: SectionType,
-    var professorUserId: String?,
+    var correctorUserId: String?,
     var createdDate: Date,
     var updatedDate: Date
 ) {
@@ -34,7 +34,7 @@ class CorrectionEntity(
         examType = examType,
         sectionOrder = sectionOrder,
         sectionType = sectionType,
-        professorUserId = null,
+        correctorUserId = null,
         createdDate = Date(System.currentTimeMillis()),
         updatedDate = Date(System.currentTimeMillis()),
     )

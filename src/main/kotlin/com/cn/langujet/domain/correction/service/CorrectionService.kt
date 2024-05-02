@@ -119,7 +119,7 @@ class CorrectionService(
             }
             correctionRepository.saveAll(
                 foundedCorrections.onEach {
-                    it.professorUserId = correctorId
+                    it.correctorUserId = correctorId
                     it.status = CorrectionStatus.PROCESSING
                 }
             )

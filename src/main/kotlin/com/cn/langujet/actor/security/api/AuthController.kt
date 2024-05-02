@@ -6,8 +6,8 @@ import com.cn.langujet.application.advice.*
 import com.cn.langujet.application.security.security.payload.response.JwtResponse
 import com.cn.langujet.application.security.security.payload.response.RefreshTokenResponse
 import com.cn.langujet.application.service.smtp.MailSenderService
-import com.cn.langujet.domain.professor.Professor
-import com.cn.langujet.domain.professor.ProfessorRepository
+import com.cn.langujet.domain.corrector.Corrector
+import com.cn.langujet.domain.corrector.CorrectorRepository
 import com.cn.langujet.domain.student.model.Student
 import com.cn.langujet.domain.student.repository.StudentRepository
 import com.cn.langujet.domain.user.model.*
@@ -36,7 +36,7 @@ class AuthController(
     val authenticationManager: AuthenticationManager,
     val userRepository: UserRepository,
     val studentRepository: StudentRepository,
-    val professorRepository: ProfessorRepository,
+    val correctorRepository: CorrectorRepository,
     val refreshTokenService: RefreshTokenService,
     val emailVerificationTokenRepository: EmailVerificationTokenRepository,
     val resetPasswordTokenRepository: ResetPasswordTokenRepository,
@@ -85,15 +85,15 @@ class AuthController(
     }
     
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/professor/signup")
-    fun registerProfessor(
+    @PostMapping("/corrector/signup")
+    fun registerCorrector(
         @NotBlank fullName: String?,
         @NotBlank @Size(max = 50) @Email email: String?,
         @NotBlank @Size(min = 6, max = 40) password: String?,
     ): ResponseEntity<String> {
-        val user = registerUser(email!!, password!!, mutableSetOf(Role.ROLE_PROFESSOR))
+        val user = registerUser(email!!, password!!, mutableSetOf(Role.ROLE_CORRECTOR))
         sendVerificationMail(email)
-        professorRepository.save(Professor(user, fullName))
+        correctorRepository.save(Corrector(user, fullName))
         
         return toOkResponseEntity("User registered successfully!")
     }

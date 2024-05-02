@@ -1,13 +1,12 @@
-package com.cn.langujet.domain.professor
+package com.cn.langujet.domain.corrector
 
-import com.cn.langujet.actor.professor.payload.response.ProfessorProfileResponse
 import com.cn.langujet.domain.user.model.User
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
 
-@Document(collection = "professors")
-data class Professor(
+@Document(collection = "correctors")
+data class Corrector(
     @Id
     var id: String?,
     @DBRef
@@ -38,14 +37,5 @@ data class Professor(
         null,
         null,
         0.0
-    )
-
-    constructor(professor: ProfessorProfileResponse) : this(
-        professor.id,
-        professor.user,
-        professor.fullName,
-        professor.biography,
-        professor.ieltsScore,
-        professor.credit
     )
 }

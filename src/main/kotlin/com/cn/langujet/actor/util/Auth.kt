@@ -18,7 +18,7 @@ object Auth {
     
     fun isAdmin() = hasAuthority("ROLE_ADMIN")
     
-    fun isProfessor() = hasAuthority("ROLE_PROFESSOR")
+    fun isCorrector() = hasAuthority("ROLE_CORRECTOR")
     
     fun isStudent() = hasAuthority("ROLE_STUDENT")
     

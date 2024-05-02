@@ -20,13 +20,13 @@ class CorrectionController(
     private val correctionService: CorrectionService
 ) {
     @GetMapping("/corrector/corrections/pending")
-    @PreAuthorize("hasAnyRole('PROFESSOR', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('CORRECTOR', 'ADMIN')")
     fun getCorrectorPendingCorrections(): List<CorrectorAvailableCorrectionResponse> {
         return correctionService.getCorrectorPendingCorrections()
     }
     
     @PostMapping("/corrector/corrections/assign")
-    @PreAuthorize("hasRole('PROFESSOR')")
+    @PreAuthorize("hasRole('CORRECTOR')")
     fun assignCorrection(
         @RequestBody assignCorrectionRequest: AssignCorrectionRequest
     ): CorrectionResponse {
