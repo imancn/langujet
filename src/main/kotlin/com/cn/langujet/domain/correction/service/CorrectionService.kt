@@ -3,6 +3,7 @@ package com.cn.langujet.domain.correction.service
 import com.cn.langujet.actor.correction.payload.request.AssignCorrectionRequest
 import com.cn.langujet.actor.correction.payload.request.AssignCorrectionToCorrectorRequest
 import com.cn.langujet.actor.correction.payload.response.CorrectionResponse
+import com.cn.langujet.actor.correction.payload.response.CorrectionSectionResponse
 import com.cn.langujet.actor.correction.payload.response.CorrectorAvailableCorrectionResponse
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.advice.NotFoundException
@@ -128,7 +129,9 @@ class CorrectionService(
             )
             CorrectionResponse(
                 foundedCorrections.first().examType,
-                foundedCorrections.map { correction -> correction.sectionType }
+                foundedCorrections.map {
+                    correction -> CorrectionSectionResponse(correction.sectionType, correction.sectionOrder)
+                }
             )
         } catch (ex: NoSuchElementException) {
             throw UnprocessableException("There is no exam of this type left for correction")

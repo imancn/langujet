@@ -5,5 +5,7 @@ import com.cn.langujet.domain.exam.model.SectionType
 
 data class CorrectionResponse(
     val examType: ExamType,
-    val sectionTypes: List<SectionType>,
+    val sections: List<CorrectionSectionResponse>,
 )
+
+data class CorrectionSectionResponse(val sectionType: SectionType, val sectionOrder: Int)
