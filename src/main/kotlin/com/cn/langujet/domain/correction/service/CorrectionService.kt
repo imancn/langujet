@@ -9,7 +9,7 @@ import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.domain.correction.model.CorrectionEntity
 import com.cn.langujet.domain.correction.model.CorrectionStatus
-import com.cn.langujet.domain.correction.model.CorrectionType
+import com.cn.langujet.domain.correction.model.CorrectorType
 import com.cn.langujet.domain.correction.repository.CorrectAnswerRepository
 import com.cn.langujet.domain.correction.repository.CorrectionRepository
 import com.cn.langujet.domain.correction.service.corrector.AutoCorrectorService
@@ -30,13 +30,13 @@ class CorrectionService(
         val examVariant = examVariantService.getExamVariantById(examSession.examVariantId)
         val sections = sectionService.getSectionsMetaData(examSession.examId)
         val corrections = sections.map { section ->
-            val correctionType = if (correctAnswerRepository.existsByExamIdAndSectionOrder(examSession.examId, section.order)) {
-                CorrectionType.AUTO_CORRECTION
+            val correctorType = if (correctAnswerRepository.existsByExamIdAndSectionOrder(examSession.examId, section.order)) {
+                CorrectorType.AUTO_CORRECTION
             } else {
-                examVariant.correctionType
+                examVariant.correctorType
             }
             CorrectionEntity(
-                correctionType,
+                correctorType,
                 CorrectionStatus.PENDING,
                 examSession.id ?: "",
                 examVariant.examType,
@@ -45,7 +45,7 @@ class CorrectionService(
             )
         }
         correctionRepository.saveAll(corrections).forEach {
-            if (it.type == CorrectionType.AUTO_CORRECTION)
+            if (it.correctorType == CorrectorType.AUTO_CORRECTION)
                 autoCorrectorService.correctExamSection(examSession, it)
         }
     }
@@ -74,8 +74,8 @@ class CorrectionService(
     }
     
     private fun getCorrectorPendingCorrectionsPerExamSessionId(): Map<String, List<CorrectionEntity>> {
-        return correctionRepository.findByTypeAndStatusOrderByCreatedDateAsc(
-            CorrectionType.PROFESSOR, CorrectionStatus.PENDING
+        return correctionRepository.findByCorrectorTypeAndStatusOrderByCreatedDateAsc(
+            CorrectorType.HUMAN, CorrectionStatus.PENDING
         ).groupBy {
             it.examSessionId
         }

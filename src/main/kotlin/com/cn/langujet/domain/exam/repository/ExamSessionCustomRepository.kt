@@ -27,18 +27,18 @@ class ExamSessionCustomRepository(
         } else null
         
         val examVariantQuery =
-            if (!searchRequest.correctionTypes.isNullOrEmpty() && !searchRequest.examTypes.isNullOrEmpty()) {
+            if (!searchRequest.correctorTypes.isNullOrEmpty() && !searchRequest.examTypes.isNullOrEmpty()) {
                 Query(
-                    Criteria.where("examType").`in`(searchRequest.examTypes).and("correctionType")
-                        .`in`(searchRequest.correctionTypes)
+                    Criteria.where("examType").`in`(searchRequest.examTypes).and("correctorType")
+                        .`in`(searchRequest.correctorTypes)
                 )
             } else if (!searchRequest.examTypes.isNullOrEmpty()) {
                 Query(
                     Criteria.where("examType").`in`(searchRequest.examTypes)
                 )
-            } else if (!searchRequest.correctionTypes.isNullOrEmpty()) {
+            } else if (!searchRequest.correctorTypes.isNullOrEmpty()) {
                 Query(
-                    Criteria.where("correctionType").`in`(searchRequest.correctionTypes)
+                    Criteria.where("correctorType").`in`(searchRequest.correctorTypes)
                 )
             } else null
         
@@ -80,7 +80,7 @@ class ExamSessionCustomRepository(
         val sessionResponses = sessions.map { session ->
             val exam = foundExams.find { it.id == session.examId }
             val examVariant = foundExamVariants.find { it.id == session.examVariantId }
-            ExamSessionResponse(session, exam?.let { ExamDTO(it) }, examVariant?.correctionType)
+            ExamSessionResponse(session, exam?.let { ExamDTO(it) }, examVariant?.correctorType)
         }
         return CustomPage<ExamSessionResponse>(
             sessionResponses,

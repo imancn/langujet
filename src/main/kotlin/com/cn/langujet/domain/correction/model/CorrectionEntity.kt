@@ -9,7 +9,7 @@ import java.util.*
 @Document(collection = "corrections")
 class CorrectionEntity(
     @Id var id: String?,
-    var type: CorrectionType,
+    var correctorType: CorrectorType,
     var status: CorrectionStatus,
     var examSessionId: String,
     var examType: ExamType,
@@ -20,7 +20,7 @@ class CorrectionEntity(
     var updatedDate: Date
 ) {
     constructor(
-        type: CorrectionType,
+        correctorType: CorrectorType,
         status: CorrectionStatus,
         examSessionId: String,
         examType: ExamType,
@@ -28,7 +28,7 @@ class CorrectionEntity(
         sectionType: SectionType
     ) : this(
         id = null,
-        type = type,
+        correctorType = correctorType,
         status = status,
         examSessionId = examSessionId,
         examType = examType,

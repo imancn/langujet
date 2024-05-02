@@ -48,7 +48,7 @@ class ExamSessionService(
         val examSession = getStudentExamSession(examSessionId)
         val exam = ExamDTO(examService.getExamById(examSession.examId))
         val examVariant = examVariantService.getExamVariantById(examSession.examVariantId)
-        return ExamSessionResponse(examSession, exam, examVariant.correctionType)
+        return ExamSessionResponse(examSession, exam, examVariant.correctorType)
     }
     
     fun searchExamSessions(request: ExamSessionSearchRequest): CustomPage<ExamSessionResponse> {
@@ -117,7 +117,7 @@ class ExamSessionService(
         correctionService.makeExamSessionCorrection(examSession)
         examSession = getExamSessionById(examSession.id ?: "")
         return ExamSessionResponse(
-            examSession, null, examVariantService.getExamVariantById(examSession.examVariantId).correctionType
+            examSession, null, examVariantService.getExamVariantById(examSession.examVariantId).correctorType
         )
     }
     

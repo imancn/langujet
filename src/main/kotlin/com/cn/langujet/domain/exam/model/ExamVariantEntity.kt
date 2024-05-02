@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.exam.model
 
-import com.cn.langujet.domain.correction.model.CorrectionType
+import com.cn.langujet.domain.correction.model.CorrectorType
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
@@ -10,5 +10,5 @@ class ExamVariantEntity (
     var id: String?,
     var examType: ExamType,
     var sectionTypes: List<SectionType>,
-    var correctionType: CorrectionType,
+    var correctorType: CorrectorType,
 )

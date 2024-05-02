@@ -1,6 +1,6 @@
 package com.cn.langujet.actor.service.payload
 
-import com.cn.langujet.domain.correction.model.CorrectionType
+import com.cn.langujet.domain.correction.model.CorrectorType
 import com.cn.langujet.domain.exam.model.ExamType
 import com.cn.langujet.domain.exam.model.ExamVariantEntity
 import com.cn.langujet.domain.exam.model.SectionType
@@ -8,7 +8,7 @@ import com.cn.langujet.domain.exam.model.SectionType
 class ExamVariantResponse (
     var examType: ExamType,
     var sectionTypes: List<SectionType>,
-    var correctionType: CorrectionType,
+    var correctorType: CorrectorType,
 ) {
 
     companion object {
@@ -16,7 +16,7 @@ class ExamVariantResponse (
             return ExamVariantResponse(
                 examType,
                 sectionTypes,
-                correctionType
+                correctorType
             )
         }
     }
