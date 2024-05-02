@@ -35,4 +35,8 @@ class CorrectorService(
             NotFoundException("Corrector not found")
         }
     }
+    
+    fun correctorExistsByUserId(userId: String): Boolean {
+        return correctorRepository.existsByUser_Id(userId)
+    }
 }

@@ -10,4 +10,5 @@ interface CorrectionRepository: MongoRepository<CorrectionEntity, String> {
     fun findByCorrectorTypeAndStatusOrderByCreatedDateAsc(correctorType: CorrectorType, status: CorrectionStatus): List<CorrectionEntity>
     fun findAllByExamSessionId(examSessionId: String): List<CorrectionEntity>
     fun findAllByExamSessionIdAndSectionOrder(examSessionId: String, sectionOrder: Int): Optional<CorrectionEntity>
+    fun findByStatusAndCorrectorUserId(status: CorrectionStatus, userId: String): List<CorrectionEntity>
 }

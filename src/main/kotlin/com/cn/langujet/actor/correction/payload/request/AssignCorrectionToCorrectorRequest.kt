@@ -6,5 +6,5 @@ import com.cn.langujet.domain.exam.model.SectionType
 data class AssignCorrectionToCorrectorRequest(
     val examType: ExamType,
     val sectionTypes: List<SectionType>,
-    val correctorId: String
+    val correctorUserId: String
 )

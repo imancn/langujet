@@ -13,6 +13,7 @@ import com.cn.langujet.domain.correction.model.CorrectorType
 import com.cn.langujet.domain.correction.repository.CorrectAnswerRepository
 import com.cn.langujet.domain.correction.repository.CorrectionRepository
 import com.cn.langujet.domain.correction.service.corrector.AutoCorrectorService
+import com.cn.langujet.domain.corrector.CorrectorService
 import com.cn.langujet.domain.exam.model.ExamSession
 import com.cn.langujet.domain.exam.service.ExamVariantService
 import com.cn.langujet.domain.exam.service.SectionService
@@ -25,6 +26,7 @@ class CorrectionService(
     private val correctAnswerRepository: CorrectAnswerRepository,
     private val autoCorrectorService: AutoCorrectorService,
     private val sectionService: SectionService,
+    private val correctorService: CorrectorService,
 ) {
     fun makeExamSessionCorrection(examSession: ExamSession) {
         val examVariant = examVariantService.getExamVariantById(examSession.examVariantId)
@@ -104,9 +106,10 @@ class CorrectionService(
     
     fun assignCorrection(
         assignCorrectionRequest: AssignCorrectionRequest,
-        correctorId: String = Auth.userId()
+        correctorUserId: String = Auth.userId()
     ): CorrectionResponse {
-        // TODO: validate corrector has not processing correction
+        if (correctionRepository.findByStatusAndCorrectorUserId(CorrectionStatus.PROCESSING, correctorUserId).isNotEmpty())
+            throw UnprocessableException("Finish in-progress exam correction first")
         return try {
             val foundedCorrections = getCorrectorPendingCorrectionsPerExamSessionId().filter {
                 val sectionTypesCondition = it.value.map {
@@ -119,7 +122,7 @@ class CorrectionService(
             }
             correctionRepository.saveAll(
                 foundedCorrections.onEach {
-                    it.correctorUserId = correctorId
+                    it.correctorUserId = correctorUserId
                     it.status = CorrectionStatus.PROCESSING
                 }
             )
@@ -135,13 +138,14 @@ class CorrectionService(
     fun assignCorrectionToCorrector(
         assignCorrectionToCorrectorRequest: AssignCorrectionToCorrectorRequest
     ): CorrectionResponse {
-        // TODO: validate corrector exists and has corrector
+        if (!correctorService.correctorExistsByUserId(assignCorrectionToCorrectorRequest.correctorUserId))
+            throw UnprocessableException("The user isn't a Corrector")
         return assignCorrection(
             AssignCorrectionRequest(
                 assignCorrectionToCorrectorRequest.examType,
                 assignCorrectionToCorrectorRequest.sectionTypes
             ),
-            assignCorrectionToCorrectorRequest.correctorId
+            assignCorrectionToCorrectorRequest.correctorUserId
         )
     }
 }
