@@ -109,7 +109,7 @@ class CorrectionService(
         assignCorrectionRequest: AssignCorrectionRequest,
         correctorUserId: String = Auth.userId()
     ): CorrectionResponse {
-        if (correctionRepository.findByStatusAndCorrectorUserId(CorrectionStatus.PROCESSING, correctorUserId).isNotEmpty())
+        if (getCorrectorProcessingCorrection(correctorUserId).isNotEmpty())
             throw UnprocessableException("Finish in-progress exam correction first")
         return try {
             val foundedCorrections = getCorrectorPendingCorrectionsPerExamSessionId().filter {
@@ -136,6 +136,10 @@ class CorrectionService(
         } catch (ex: NoSuchElementException) {
             throw UnprocessableException("There is no exam of this type left for correction")
         }
+    }
+    
+    fun getCorrectorProcessingCorrection(correctorUserId: String): List<CorrectionEntity> {
+        return correctionRepository.findByStatusAndCorrectorUserId(CorrectionStatus.PROCESSING, correctorUserId)
     }
     
     fun assignCorrectionToCorrector(
