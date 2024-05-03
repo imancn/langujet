@@ -56,7 +56,7 @@ sealed class Answer(
         partOrder: Int,
         questionOrder: Int,
         date: Date,
-        var audioId: String
+        var voiceFileId: String,
     ): Answer(null, examSessionId, sectionOrder, AnswerType.VOICE, partOrder, questionOrder, date)
 
     @Document(collection = "answers")
