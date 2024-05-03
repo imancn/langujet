@@ -17,26 +17,6 @@ class AnswerService(
     private val examSessionService: ExamSessionService,
     private val fileService: FileService
 ) {
-    
-    fun submitBulkAnswers(
-        examSessionId: String?,
-        sectionOrder: Int?,
-        answerRequestList: List<AnswerBulkRequest>,
-    ): Boolean {
-        examSessionPreCheck(examSessionId!!, sectionOrder!!)
-        val existingAnswers = answerRepository.findAllByExamSessionIdAndSectionOrder(examSessionId, sectionOrder)
-        answerRepository.saveAll(
-            answerRequestList.map<AnswerBulkRequest, Answer> {
-                it.convertToAnswer(examSessionId, sectionOrder)
-            }.onEach { answer ->
-                answer.id = existingAnswers.find {
-                    (answer.partOrder == it.partOrder).and(answer.questionOrder == it.questionOrder)
-                }?.id
-            }
-        )
-        return true
-    }
-    
     fun submitVoiceAnswer(
         examSessionId: String,
         sectionOrder: Int,
@@ -63,6 +43,82 @@ class AnswerService(
                 fileEntity.id!!
             )
         )
+    }
+    
+    fun submitBulkAnswers(
+        examSessionId: String?,
+        sectionOrder: Int?,
+        answerRequestList: List<AnswerBulkRequest>,
+    ): Boolean {
+        examSessionPreCheck(examSessionId!!, sectionOrder!!)
+        val existingAnswers = answerRepository.findAllByExamSessionIdAndSectionOrder(examSessionId, sectionOrder)
+        answerRepository.saveAll(
+            answerRequestList.map<AnswerBulkRequest, Answer> {
+                convertAnswerBulkRequestToAnswer(it, examSessionId, sectionOrder)
+            }.onEach { answer ->
+                answer.id = existingAnswers.find {
+                    (answer.partOrder == it.partOrder).and(answer.questionOrder == it.questionOrder)
+                }?.id
+            }
+        )
+        return true
+    }
+    
+    private inline fun <reified T : Answer> convertAnswerBulkRequestToAnswer(
+        answerRequest: AnswerBulkRequest,
+        examSessionId: String,
+        sectionOrder: Int
+    ): T {
+        val answer: Answer = when (answerRequest) {
+            is TextBulkAnswerRequest -> Answer.TextAnswer(
+                examSessionId,
+                sectionOrder,
+                answerRequest.partOrder!!,
+                answerRequest.questionOrder!!,
+                Date(System.currentTimeMillis()),
+                answerRequest.text!!
+            )
+            
+            is TextIssuesBulkAnswerRequest -> Answer.TextIssuesAnswer(
+                examSessionId,
+                sectionOrder,
+                answerRequest.partOrder!!,
+                answerRequest.questionOrder!!,
+                Date(System.currentTimeMillis()),
+                answerRequest.issues!!
+            )
+            
+            is TrueFalseBulkAnswerRequest -> Answer.TrueFalseAnswer(
+                examSessionId,
+                sectionOrder,
+                answerRequest.partOrder!!,
+                answerRequest.questionOrder!!,
+                Date(System.currentTimeMillis()),
+                answerRequest.issues!!
+            )
+            
+            is MultipleChoiceBulkAnswerRequest -> Answer.MultipleChoiceAnswer(
+                examSessionId,
+                sectionOrder,
+                answerRequest.partOrder!!,
+                answerRequest.questionOrder!!,
+                Date(System.currentTimeMillis()),
+                answerRequest.issues!!.mapNotNull {
+                    it?.let { multipleChoiceIssueAnswerRequest ->
+                        Answer.MultipleChoiceIssueAnswer(
+                            multipleChoiceIssueAnswerRequest.issueOrder!!,
+                            multipleChoiceIssueAnswerRequest.options!!
+                        )
+                    }
+                }
+            )
+            
+            else -> throw IllegalArgumentException("Unsupported answer request type")
+        }
+        if (answer !is T) {
+            throw IllegalArgumentException("The answer type does not match the expected return type.")
+        }
+        return answer
     }
     
     private fun examSessionPreCheck(examSessionId: String, sectionOrder: Int) {
