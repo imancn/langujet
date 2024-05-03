@@ -1,10 +1,14 @@
 package com.cn.langujet.domain.answer
 
-import com.cn.langujet.actor.answer.payload.request.AnswerBulkRequest
+import com.cn.langujet.actor.answer.payload.request.*
+import com.cn.langujet.actor.answer.payload.response.*
+import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.advice.MethodNotAllowedException
+import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.application.service.file.domain.data.model.FileBucket
 import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.answer.model.Answer
+import com.cn.langujet.domain.correction.service.CorrectionService
 import com.cn.langujet.domain.exam.model.ExamSessionState
 import com.cn.langujet.domain.exam.service.ExamSessionService
 import org.springframework.stereotype.Service
@@ -15,7 +19,8 @@ import java.util.*
 class AnswerService(
     private val answerRepository: AnswerRepository,
     private val examSessionService: ExamSessionService,
-    private val fileService: FileService
+    private val fileService: FileService,
+    private val correctionService: CorrectionService
 ) {
     fun submitVoiceAnswer(
         examSessionId: String,
@@ -129,5 +134,60 @@ class AnswerService(
             throw MethodNotAllowedException("The exam session has been not started yet")
         if (examSession.state.order >= ExamSessionState.FINISHED.order)
             throw MethodNotAllowedException("The exam session has been finished")
+    }
+    
+    fun getCorrectorCorrectionAnswers(sectionOrder: Int): CorrectorCorrectionAnswersResponse {
+        val correction = correctionService.getCorrectorProcessingCorrection(Auth.userId()).find {
+            it.sectionOrder == sectionOrder
+        } ?: throw UnprocessableException("You have already corrected this part")
+        val answers = answerRepository.findAllByExamSessionIdAndSectionOrder(correction.examSessionId, correction.sectionOrder)
+        return CorrectorCorrectionAnswersResponse(
+            correction.examSessionId,
+            correction.sectionOrder,
+            answers.map { convertAnswerToCorrectorAnswerResponse(it) }
+        )
+    }
+    
+    private inline fun <reified T : CorrectorAnswerResponse> convertAnswerToCorrectorAnswerResponse(answer: Answer): T {
+        val response: CorrectorAnswerResponse = when (answer) {
+            is Answer.TextAnswer -> TextCorrectorAnswerResponse(
+                answer.partOrder,
+                answer.questionOrder,
+                answer.text
+            )
+            
+            is Answer.TextIssuesAnswer -> TextIssuesCorrectorAnswerResponse(
+                answer.partOrder,
+                answer.questionOrder,
+                answer.issues
+            )
+            
+            is Answer.TrueFalseAnswer -> TrueFalseCorrectorAnswerResponse(
+                answer.partOrder,
+                answer.questionOrder,
+                answer.issues
+            )
+            
+            is Answer.MultipleChoiceAnswer -> MultipleChoiceCorrectorAnswerResponse(
+                answer.partOrder,
+                answer.questionOrder,
+                answer.issues.map {
+                    MultipleChoiceIssueCorrectorAnswerResponse(
+                        it.order,
+                        it.options
+                    )
+                }
+            )
+            
+            is Answer.VoiceAnswer -> VoiceCorrectorAnswerResponse(
+                answer.partOrder,
+                answer.questionOrder,
+                fileService.generatePublicDownloadLink(answer.voiceFileId, (24 * 3600))
+            )
+        }
+        if (response !is T) {
+            throw IllegalArgumentException("The answer type does not match the expected return type.")
+        }
+        return response
     }
 }

@@ -1,6 +1,7 @@
 package com.cn.langujet.actor.answer.api
 
 import com.cn.langujet.actor.answer.payload.request.*
+import com.cn.langujet.actor.answer.payload.response.CorrectorCorrectionAnswersResponse
 import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.domain.answer.AnswerService
 import jakarta.validation.Valid
@@ -18,8 +19,6 @@ import org.springframework.web.multipart.MultipartFile
 class AnswerController(
     private val answerService: AnswerService,
 ) {
-    // TODO: Add get by exam session id and section id
-    
     @PostMapping("/student/answer/voice")
     @PreAuthorize("hasRole('ROLE_STUDENT')")
     fun submitVoiceAnswer(
@@ -47,5 +46,11 @@ class AnswerController(
         @RequestBody @Valid request: List<AnswerBulkRequest>,
     ): ResponseEntity<Boolean> {
         return toOkResponseEntity(answerService.submitBulkAnswers(examSessionId, sectionOrder, request))
+    }
+    
+    @GetMapping("/corrector/answer")
+    @PreAuthorize("hasRole('ROLE_CORRECTOR')")
+    fun getCorrectorCorrectionAnswers(@RequestParam sectionOrder: Int): CorrectorCorrectionAnswersResponse {
+        return answerService.getCorrectorCorrectionAnswers(sectionOrder)
     }
 }
