@@ -140,7 +140,9 @@ class CorrectionService(
             CorrectionResponse(
                 foundedCorrections.first().examType,
                 foundedCorrections.map {
-                    correction -> CorrectionSectionResponse(correction.sectionType, correction.sectionOrder)
+                    correction -> CorrectionSectionResponse(
+                    correction.id, correction.sectionType, correction.sectionOrder
+                    )
                 }
             )
         } catch (ex: NoSuchElementException) {
@@ -158,7 +160,9 @@ class CorrectionService(
             return CorrectionResponse(
                 foundedCorrections.first().examType,
                 foundedCorrections.map {
-                        correction -> CorrectionSectionResponse(correction.sectionType, correction.sectionOrder)
+                    correction -> CorrectionSectionResponse(
+                    correction.id, correction.sectionType, correction.sectionOrder
+                    )
                 }
             )
         } else {
@@ -180,10 +184,15 @@ class CorrectionService(
         )
     }
     
-    fun getCorrectorCorrectionExamSessionContent(sectionOrder: Int): CorrectorCorrectionExamSessionContentResponse {
-        val correction = getCorrectorProcessingCorrectionByUserId(Auth.userId()).find {
-            it.sectionOrder == sectionOrder
-        } ?: throw UnprocessableException("You have already corrected this part")
+    fun getCorrectorCorrectionExamSessionContent(correctionId: String): CorrectorCorrectionExamSessionContentResponse {
+        val correction = correctionRepository.findById(correctionId).orElseThrow {
+            throw UnprocessableException("Exam correction not found")
+        }
+        if (correction.correctorUserId != Auth.userId())
+            throw UnprocessableException("You don't have access to this correction")
+        if (correction.status == CorrectionStatus.PROCESSED)
+            throw UnprocessableException("You have already corrected this part")
+        
         val answers = answerRepository.findAllByExamSessionIdAndSectionOrder(
             correction.examSessionId, correction.sectionOrder
         )

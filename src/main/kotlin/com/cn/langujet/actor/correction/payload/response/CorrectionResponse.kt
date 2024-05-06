@@ -8,4 +8,8 @@ data class CorrectionResponse(
     val sections: List<CorrectionSectionResponse>,
 )
 
-data class CorrectionSectionResponse(val sectionType: SectionType, val sectionOrder: Int)
+data class CorrectionSectionResponse(
+    val correctionId: String?,
+    val sectionType: SectionType,
+    val sectionOrder: Int
+)

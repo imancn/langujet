@@ -39,16 +39,16 @@ class CorrectionController(
     }
     
     @GetMapping("/corrector/corrections/processing")
-    @PreAuthorize("hasRole('ROLE_CORRECTOR')")
+    @PreAuthorize("hasRole('CORRECTOR')")
     fun getCorrectorProcessingCorrection(): CorrectionResponse {
         return correctionService.getCorrectorProcessingCorrection()
     }
     
-    @GetMapping("/corrector/corrections/exam-session-content")
-    @PreAuthorize("hasRole('ROLE_CORRECTOR')")
+    @GetMapping("/corrector/corrections/exam-session-content/{correctionId}")
+    @PreAuthorize("hasRole('CORRECTOR')")
     fun getCorrectorCorrectionExamSessionContent(
-        @RequestParam sectionOrder: Int
+        @PathVariable correctionId: String
     ): CorrectorCorrectionExamSessionContentResponse {
-        return correctionService.getCorrectorCorrectionExamSessionContent(sectionOrder)
+        return correctionService.getCorrectorCorrectionExamSessionContent(correctionId)
     }
 }
