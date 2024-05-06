@@ -38,6 +38,12 @@ class CorrectionController(
         return correctionService.assignCorrectionToCorrector(assignCorrectionToCorrectorRequest)
     }
     
+    @GetMapping("/corrector/corrections/processing")
+    @PreAuthorize("hasRole('ROLE_CORRECTOR')")
+    fun getCorrectorProcessingCorrection(): CorrectionResponse {
+        return correctionService.getCorrectorProcessingCorrection()
+    }
+    
     @GetMapping("/corrector/corrections/exam-session-content")
     @PreAuthorize("hasRole('ROLE_CORRECTOR')")
     fun getCorrectorCorrectionExamSessionContent(

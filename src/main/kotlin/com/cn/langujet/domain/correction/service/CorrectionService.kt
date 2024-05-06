@@ -119,7 +119,7 @@ class CorrectionService(
         assignCorrectionRequest: AssignCorrectionRequest,
         correctorUserId: String = Auth.userId()
     ): CorrectionResponse {
-        if (getCorrectorProcessingCorrection(correctorUserId).isNotEmpty())
+        if (getCorrectorProcessingCorrectionByUserId(correctorUserId).isNotEmpty())
             throw UnprocessableException("Finish in-progress exam correction first")
         return try {
             val foundedCorrections = getCorrectorPendingCorrectionsPerExamSessionId().filter {
@@ -148,8 +148,22 @@ class CorrectionService(
         }
     }
     
-    fun getCorrectorProcessingCorrection(correctorUserId: String): List<CorrectionEntity> {
+    private fun getCorrectorProcessingCorrectionByUserId(correctorUserId: String): List<CorrectionEntity> {
         return correctionRepository.findByStatusAndCorrectorUserId(CorrectionStatus.PROCESSING, correctorUserId)
+    }
+    
+    fun getCorrectorProcessingCorrection(): CorrectionResponse {
+        val foundedCorrections = getCorrectorProcessingCorrectionByUserId(Auth.userId())
+        if (foundedCorrections.isNotEmpty()) {
+            return CorrectionResponse(
+                foundedCorrections.first().examType,
+                foundedCorrections.map {
+                        correction -> CorrectionSectionResponse(correction.sectionType, correction.sectionOrder)
+                }
+            )
+        } else {
+            throw UnprocessableException("You don't have any exam to correct")
+        }
     }
     
     fun assignCorrectionToCorrector(
@@ -167,7 +181,7 @@ class CorrectionService(
     }
     
     fun getCorrectorCorrectionExamSessionContent(sectionOrder: Int): CorrectorCorrectionExamSessionContentResponse {
-        val correction = getCorrectorProcessingCorrection(Auth.userId()).find {
+        val correction = getCorrectorProcessingCorrectionByUserId(Auth.userId()).find {
             it.sectionOrder == sectionOrder
         } ?: throw UnprocessableException("You have already corrected this part")
         val answers = answerRepository.findAllByExamSessionIdAndSectionOrder(
