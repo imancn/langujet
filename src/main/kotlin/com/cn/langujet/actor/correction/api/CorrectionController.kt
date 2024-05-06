@@ -4,14 +4,11 @@ import com.cn.langujet.actor.correction.payload.response.CorrectionResponse
 import com.cn.langujet.actor.correction.payload.request.AssignCorrectionRequest
 import com.cn.langujet.actor.correction.payload.request.AssignCorrectionToCorrectorRequest
 import com.cn.langujet.actor.correction.payload.response.CorrectorAvailableCorrectionResponse
+import com.cn.langujet.actor.correction.payload.response.CorrectorCorrectionExamSessionContentResponse
 import com.cn.langujet.domain.correction.service.CorrectionService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/")
@@ -39,5 +36,13 @@ class CorrectionController(
         @RequestBody assignCorrectionToCorrectorRequest: AssignCorrectionToCorrectorRequest
     ): CorrectionResponse {
         return correctionService.assignCorrectionToCorrector(assignCorrectionToCorrectorRequest)
+    }
+    
+    @GetMapping("/corrector/corrections/exam-session-content")
+    @PreAuthorize("hasRole('ROLE_CORRECTOR')")
+    fun getCorrectorCorrectionExamSessionContent(
+        @RequestParam sectionOrder: Int
+    ): CorrectorCorrectionExamSessionContentResponse {
+        return correctionService.getCorrectorCorrectionExamSessionContent(sectionOrder)
     }
 }

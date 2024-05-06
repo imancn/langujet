@@ -9,13 +9,16 @@ import com.cn.langujet.application.service.file.domain.data.model.FileBucket
 import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.exam.model.ExamSectionContent
 import com.cn.langujet.domain.exam.repository.ExamSectionContentRepository
+import com.cn.langujet.domain.exam.repository.ExamSessionRepository
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
+import java.util.regex.Pattern
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 class ExamSectionContentService(
     private val examSectionContentRepository: ExamSectionContentRepository,
-    private val examSessionService: ExamSessionService,
+    private val examSessionRepository: ExamSessionRepository,
     private val sectionService: SectionService,
     private val examService: ExamService,
     private val fileService: FileService
@@ -56,7 +59,7 @@ class ExamSectionContentService(
         examSessionId: String,
         sectionOrder: Int
     ): List<ExamSectionContentDownloadLink> {
-        val examSession = examSessionService.getExamSessionById(examSessionId)
+        val examSession = examSessionRepository.findById(examSessionId).getOrNull() ?: return emptyList()
         if (Auth.userId() != examSession.studentUserId) {
             throw InvalidTokenException("Exam Session with id: $examSessionId is not belong to your token")
         }
@@ -68,6 +71,15 @@ class ExamSectionContentService(
                 fileId = it.fileId,
                 link = fileService.generatePublicDownloadLink(it.fileId, exam.examDuration.toInt())
             )
+        }
+    }
+    
+    fun replaceFileIdsWithDownloadLink(string: String): String {
+        val pattern = Pattern.compile("<img src=\"([^\"]+)\"/>")
+        val matcher = pattern.matcher(string)
+        return matcher.replaceAll { matchResult ->
+            val imageLink = fileService.generatePublicDownloadLink(matchResult.group(1), 24 * 3600)
+            "<img src=\"$imageLink\"/>"
         }
     }
 }

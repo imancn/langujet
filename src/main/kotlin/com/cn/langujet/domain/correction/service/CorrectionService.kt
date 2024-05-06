@@ -2,12 +2,13 @@ package com.cn.langujet.domain.correction.service
 
 import com.cn.langujet.actor.correction.payload.request.AssignCorrectionRequest
 import com.cn.langujet.actor.correction.payload.request.AssignCorrectionToCorrectorRequest
-import com.cn.langujet.actor.correction.payload.response.CorrectionResponse
-import com.cn.langujet.actor.correction.payload.response.CorrectionSectionResponse
-import com.cn.langujet.actor.correction.payload.response.CorrectorAvailableCorrectionResponse
+import com.cn.langujet.actor.correction.payload.response.*
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.application.service.file.domain.service.FileService
+import com.cn.langujet.domain.answer.AnswerRepository
+import com.cn.langujet.domain.answer.model.Answer
 import com.cn.langujet.domain.correction.model.CorrectionEntity
 import com.cn.langujet.domain.correction.model.CorrectionStatus
 import com.cn.langujet.domain.correction.model.CorrectorType
@@ -16,9 +17,14 @@ import com.cn.langujet.domain.correction.repository.CorrectionRepository
 import com.cn.langujet.domain.correction.service.corrector.AutoCorrectorService
 import com.cn.langujet.domain.corrector.CorrectorService
 import com.cn.langujet.domain.exam.model.ExamSession
+import com.cn.langujet.domain.exam.model.SpeakingPart
+import com.cn.langujet.domain.exam.model.WritingPart
+import com.cn.langujet.domain.exam.repository.ExamSessionRepository
+import com.cn.langujet.domain.exam.service.ExamSectionContentService
 import com.cn.langujet.domain.exam.service.ExamVariantService
 import com.cn.langujet.domain.exam.service.SectionService
 import org.springframework.stereotype.Service
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 class CorrectionService(
@@ -28,6 +34,10 @@ class CorrectionService(
     private val autoCorrectorService: AutoCorrectorService,
     private val sectionService: SectionService,
     private val correctorService: CorrectorService,
+    private val answerRepository: AnswerRepository,
+    private val examSessionRepository: ExamSessionRepository,
+    private val examSectionContentService: ExamSectionContentService,
+    private val fileService: FileService,
 ) {
     fun makeExamSessionCorrection(examSession: ExamSession) {
         val examVariant = examVariantService.getExamVariantById(examSession.examVariantId)
@@ -153,6 +163,73 @@ class CorrectionService(
                 assignCorrectionToCorrectorRequest.sectionTypes
             ),
             assignCorrectionToCorrectorRequest.correctorUserId
+        )
+    }
+    
+    fun getCorrectorCorrectionExamSessionContent(sectionOrder: Int): CorrectorCorrectionExamSessionContentResponse {
+        val correction = getCorrectorProcessingCorrection(Auth.userId()).find {
+            it.sectionOrder == sectionOrder
+        } ?: throw UnprocessableException("You have already corrected this part")
+        val answers = answerRepository.findAllByExamSessionIdAndSectionOrder(
+            correction.examSessionId, correction.sectionOrder
+        )
+        val examSession = examSessionRepository.findById(correction.examSessionId).getOrNull()
+        val section = sectionService.getSectionByExamIdAndOrder(examSession?.examId ?: "", correction.sectionOrder)
+        return CorrectorCorrectionExamSessionContentResponse(
+            examSessionId = correction.examSessionId,
+            section = CorrectorCorrectionSectionResponse(
+                header = section.header,
+                sectionOrder = section.order,
+                sectionType = section.sectionType,
+                parts = section.parts.mapNotNull { part ->
+                    when(part) {
+                        is WritingPart -> WritingCorrectorCorrectionPartResponse(
+                            partOrder = part.order,
+                            question = WritingCorrectorCorrectionQuestionResponse(
+                                header = part.question.header,
+                                content = part.question.content?.let { content ->
+                                    examSectionContentService.replaceFileIdsWithDownloadLink(content)
+                                }
+                            ),
+                            answer = answers.filterIsInstance<Answer.TextAnswer>().find { answer ->
+                                (answer.partOrder == part.order) && (answer.questionOrder == part.question.order)
+                            }?.let { existingAnswer ->
+                                TextCorrectorCorrectionAnswerResponse(
+                                    text = existingAnswer.text
+                                )
+                            }
+                        )
+                        
+                        is SpeakingPart -> SpeakingCorrectorCorrectionPartResponse(
+                            partOrder = part.order,
+                            questionAnswerList = part.questionList.map { question ->
+                                SpeakingCorrectorCorrectionQuestionAnswerResponse(
+                                    questionOrder = question.order,
+                                    question = SpeakingCorrectorCorrectionQuestionResponse(
+                                        header = question.header,
+                                        audioId = question.audioId?.let { audioId ->
+                                            fileService.generatePublicDownloadLink(
+                                                audioId, (24 * 3600)
+                                            )
+                                        }
+                                    ),
+                                    answer = answers.filterIsInstance<Answer.VoiceAnswer>().find { answer ->
+                                        (answer.partOrder == part.order) && (answer.questionOrder == question.order)
+                                    }?.let { existingAnswer ->
+                                        VoiceCorrectorCorrectionAnswerResponse(
+                                            voiceLink = fileService.generatePublicDownloadLink(
+                                                existingAnswer.voiceFileId, (24 * 3600)
+                                            )
+                                        )
+                                    }
+                                )
+                            }
+                        )
+                        
+                        else -> null
+                    }
+                }
+            )
         )
     }
 }
