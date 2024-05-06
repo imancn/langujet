@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.answer
 
-import com.cn.langujet.actor.answer.payload.request.AnswerBulkRequest
+import com.cn.langujet.actor.answer.payload.request.*
 import com.cn.langujet.application.advice.MethodNotAllowedException
 import com.cn.langujet.application.service.file.domain.data.model.FileBucket
 import com.cn.langujet.application.service.file.domain.service.FileService
