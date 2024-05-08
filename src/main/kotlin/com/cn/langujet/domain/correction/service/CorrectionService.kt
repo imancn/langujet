@@ -22,6 +22,7 @@ import com.cn.langujet.domain.exam.repository.ExamSessionRepository
 import com.cn.langujet.domain.exam.service.ExamSectionContentService
 import com.cn.langujet.domain.exam.service.ExamVariantService
 import com.cn.langujet.domain.exam.service.SectionService
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import kotlin.jvm.optionals.getOrNull
 
@@ -38,6 +39,8 @@ class CorrectionService(
     private val examSectionContentService: ExamSectionContentService,
     private val fileService: FileService,
 ) {
+    private val logger = LoggerFactory.getLogger(this::class.java)
+    
     fun makeExamSessionCorrection(examSession: ExamSession) {
         val examVariant = examVariantService.getExamVariantById(examSession.examVariantId)
         val sections = sectionService.getSectionsMetaData(examSession.examId)
@@ -218,9 +221,14 @@ class CorrectionService(
                                     question = SpeakingCorrectorCorrectionQuestionResponse(
                                         header = question.header,
                                         audioId = question.audioId?.let { audioId ->
-                                            fileService.generatePublicDownloadLink(
-                                                audioId, (24 * 3600)
-                                            )
+                                            try {
+                                                fileService.generatePublicDownloadLink(
+                                                    audioId, (24 * 3600)
+                                                )
+                                            } catch (ex: Exception) {
+                                                logger.error("There is an invalid FileId in sectionId = ${section.id} , partOrder = ${part.order} , questionOrder = ${question.order} , audioId = $audioId  ")
+                                                null
+                                            }
                                         }
                                     ),
                                     answer = answers.filterIsInstance<Answer.VoiceAnswer>().find { answer ->
