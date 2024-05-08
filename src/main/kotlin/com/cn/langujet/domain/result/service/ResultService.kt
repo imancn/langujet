@@ -1,14 +1,15 @@
 package com.cn.langujet.domain.result.service
 
-import com.cn.langujet.actor.result.payload.DetailedResultResponse
+import com.cn.langujet.actor.result.payload.request.AddCorrectorSectionResultRequest
+import com.cn.langujet.actor.result.payload.response.DetailedResultResponse
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.advice.InvalidTokenException
-import com.cn.langujet.application.advice.MethodNotAllowedException
+import com.cn.langujet.application.advice.LogicalException
 import com.cn.langujet.application.advice.NotFoundException
+import com.cn.langujet.domain.correction.model.CorrectionEntity
 import com.cn.langujet.domain.correction.model.CorrectionStatus
 import com.cn.langujet.domain.correction.service.CorrectionService
 import com.cn.langujet.domain.exam.model.ExamType
-import com.cn.langujet.domain.exam.model.SectionType
 import com.cn.langujet.domain.exam.service.ExamSessionService
 import com.cn.langujet.domain.result.model.Result
 import com.cn.langujet.domain.result.model.SectionResult
@@ -39,10 +40,6 @@ class ResultService(
         )
     }
     
-    fun getResultById(id: String): Result {
-        return resultRepository.findById(id).orElseThrow { throw NotFoundException("Result with ID: $id not found") }
-    }
-    
     fun getDetailedResultByExamSessionId(examSessionId: String): DetailedResultResponse {
         val examSession = examSessionService.getExamSessionById(examSessionId)
         if (Auth.userId() != examSession.studentUserId) {
@@ -59,27 +56,34 @@ class ResultService(
         }
     }
     
+    fun addCorrectorSectionResult(addCorrectorSectionResultRequest: AddCorrectorSectionResultRequest) {
+        val correction = correctionService.getCorrectorCorrectionEntity(addCorrectorSectionResultRequest.correctionId)
+        addSectionResult(
+            correction = correction,
+            correctIssuesCount = null,
+            score = addCorrectorSectionResultRequest.score,
+            recommendation = addCorrectorSectionResultRequest.recommendation,
+        )
+    }
+    
     fun addSectionResult(
-        examSessionId: String,
-        sectionOrder: Int,
-        sectionType: SectionType,
-        correctIssuesCount: Int,
+        correction: CorrectionEntity,
+        correctIssuesCount: Int?,
         score: Double,
         recommendation: String? = null
     ) {
-        val result = getResultByExamSessionId(examSessionId)
-        val correction = correctionService.getCorrectionByExamSessionIdAndSectionOrder(
-            result.examSessionId, sectionOrder
-        )
+        val result = getResultByExamSessionId(correction.examSessionId)
+        
         if (correction.status == CorrectionStatus.PROCESSED) {
-            throw MethodNotAllowedException("Section with ExamSessionId: ${result.examSessionId} and SectionOrder: $sectionOrder has been processed")
+            throw LogicalException("Section with ExamSessionId: ${result.examSessionId} and SectionOrder: ${correction.sectionOrder} has been processed")
         }
+        
         sectionResultService.createSectionResult(
             SectionResult(
                 id = null,
                 resultId = result.id ?: "",
-                sectionOrder = sectionOrder,
-                sectionType = sectionType,
+                sectionOrder = correction.sectionOrder,
+                sectionType = correction.sectionType,
                 correctIssuesCount = correctIssuesCount,
                 score = score,
                 recommendation = recommendation

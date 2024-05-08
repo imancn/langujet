@@ -11,7 +11,7 @@ class SectionResult(
     var resultId: String,
     var sectionOrder: Int,
     var sectionType: SectionType,
-    var correctIssuesCount: Int,
+    var correctIssuesCount: Int?,
     var score: Double,
     var recommendation: String?,
 )

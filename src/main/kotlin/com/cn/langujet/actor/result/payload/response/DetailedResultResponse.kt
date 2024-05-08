@@ -1,4 +1,4 @@
-package com.cn.langujet.actor.result.payload
+package com.cn.langujet.actor.result.payload.response
 
 import com.cn.langujet.domain.exam.model.ExamType
 import com.cn.langujet.domain.result.model.Result

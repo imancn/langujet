@@ -4,7 +4,6 @@ import com.cn.langujet.actor.correction.payload.request.AssignCorrectionRequest
 import com.cn.langujet.actor.correction.payload.request.AssignCorrectionToCorrectorRequest
 import com.cn.langujet.actor.correction.payload.response.*
 import com.cn.langujet.actor.util.Auth
-import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.answer.AnswerRepository
@@ -71,12 +70,6 @@ class CorrectionService(
     
     fun getCorrectionsByExamSessionId(examSessionId: String): List<CorrectionEntity> {
         return correctionRepository.findAllByExamSessionId(examSessionId)
-    }
-    
-    fun getCorrectionByExamSessionIdAndSectionOrder(examSessionId: String, sectionOrder: Int): CorrectionEntity {
-        return correctionRepository.findAllByExamSessionIdAndSectionOrder(examSessionId, sectionOrder).orElseThrow {
-            NotFoundException("Correction with examSessionId: $examSessionId and sectionOrder: $sectionOrder not found")
-        }
     }
     
     fun areAllSectionCorrectionProcessed(examSessionId: String): Boolean {
@@ -185,13 +178,7 @@ class CorrectionService(
     }
     
     fun getCorrectorCorrectionExamSessionContent(correctionId: String): CorrectorCorrectionExamSessionContentResponse {
-        val correction = correctionRepository.findById(correctionId).orElseThrow {
-            throw UnprocessableException("Exam correction not found")
-        }
-        if (correction.correctorUserId != Auth.userId())
-            throw UnprocessableException("You don't have access to this correction")
-        if (correction.status == CorrectionStatus.PROCESSED)
-            throw UnprocessableException("You have already corrected this part")
+        val correction = getCorrectorCorrectionEntity(correctionId)
         
         val answers = answerRepository.findAllByExamSessionIdAndSectionOrder(
             correction.examSessionId, correction.sectionOrder
@@ -254,5 +241,16 @@ class CorrectionService(
                 }
             )
         )
+    }
+    
+    fun getCorrectorCorrectionEntity(correctionId: String): CorrectionEntity {
+        val correction = correctionRepository.findById(correctionId).orElseThrow {
+            throw UnprocessableException("Exam correction not found")
+        }
+        if (correction.correctorUserId != Auth.userId())
+            throw UnprocessableException("You don't have access to this correction")
+        if (correction.status == CorrectionStatus.PROCESSED)
+            throw UnprocessableException("You have already corrected this part")
+        return correction
     }
 }

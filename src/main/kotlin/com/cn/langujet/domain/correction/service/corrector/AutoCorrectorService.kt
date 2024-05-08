@@ -30,9 +30,7 @@ class AutoCorrectorService(
         val answers = answerRepository.findAllByExamSessionIdAndSectionOrder(examSession.id ?: "", correction.sectionOrder)
         val correctIssuesCount = calculateCorrectIssuesCount(answers, correctAnswers)
         resultService.addSectionResult(
-            examSessionId = examSession.id ?: "",
-            sectionOrder = correction.sectionOrder,
-            sectionType = correction.sectionType,
+            correction = correction,
             correctIssuesCount = correctIssuesCount,
             score = calculateScore(correctIssuesCount, correction.sectionType, exam.type),
         )
