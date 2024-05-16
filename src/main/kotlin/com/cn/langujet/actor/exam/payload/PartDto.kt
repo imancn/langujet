@@ -36,7 +36,8 @@ sealed class PartDTO(
             is ListeningPartDTO -> ListeningPart(
                 this.partOrder!!,
                 this.audioId!!,
-                this.questionList?.map { it.toQuestion() }!!
+                this.questionList?.map { it.toQuestion() }!!,
+                this.time!!
             )
 
             is WritingPartDTO -> WritingPart(
@@ -96,12 +97,14 @@ data class PassageDTO(
 data class ListeningPartDTO(
     override val partOrder: Int? = null,
     val audioId: String? = null,
-    val questionList: List<QuestionDTO>? = null
+    val questionList: List<QuestionDTO>? = null,
+    val time: Long? = null
 ) : PartDTO(partOrder, SectionType.LISTENING) {
     constructor(part: ListeningPart) : this(
         part.order,
         part.audioId,
-        part.questionList.map { QuestionDTO.from(it) }
+        part.questionList.map { QuestionDTO.from(it) },
+        part.time
     )
 }
 

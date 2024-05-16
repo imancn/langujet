@@ -23,7 +23,8 @@ class Passage(
 class ListeningPart(
     order: Int,
     var audioId: String,
-    var questionList: List<Question>
+    var questionList: List<Question>,
+    var time: Long
 ) : Part(order, SectionType.LISTENING)
 
 class WritingPart(
