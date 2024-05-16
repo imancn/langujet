@@ -1,7 +1,7 @@
 package com.cn.langujet.domain.exam.repository
 
 import com.cn.langujet.actor.exam.payload.ExamDTO
-import com.cn.langujet.actor.exam.payload.ExamSessionResponse
+import com.cn.langujet.actor.exam.payload.ExamSessionSearchResponse
 import com.cn.langujet.actor.exam.payload.ExamSessionSearchRequest
 import com.cn.langujet.actor.util.models.CustomPage
 import com.cn.langujet.domain.exam.model.Exam
@@ -19,7 +19,7 @@ import java.util.*
 class ExamSessionCustomRepository(
     private val mongoOperations: MongoOperations
 ) {
-    fun searchExamSessions(searchRequest: ExamSessionSearchRequest, userId: String): CustomPage<ExamSessionResponse> {
+    fun searchExamSessions(searchRequest: ExamSessionSearchRequest, userId: String): CustomPage<ExamSessionSearchResponse> {
         var foundExams = if (!searchRequest.examName.isNullOrEmpty()) {
             mongoOperations.find(
                 Query(Criteria.where("name").regex(".*" + searchRequest.examName + ".*", "i")), Exam::class.java
@@ -80,9 +80,9 @@ class ExamSessionCustomRepository(
         val sessionResponses = sessions.map { session ->
             val exam = foundExams.find { it.id == session.examId }
             val examVariant = foundExamVariants.find { it.id == session.examVariantId }
-            ExamSessionResponse(session, exam?.let { ExamDTO(it) }, examVariant?.correctorType)
+            ExamSessionSearchResponse(session, exam?.let { ExamDTO(it) }, examVariant?.correctorType)
         }
-        return CustomPage<ExamSessionResponse>(
+        return CustomPage<ExamSessionSearchResponse>(
             sessionResponses,
             searchRequest.pageSize,
             searchRequest.pageNumber,

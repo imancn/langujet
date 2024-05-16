@@ -42,16 +42,13 @@ class ExamSessionService(
         return examSession
     }
     
-    fun getStudentExamSessionResponse(
-        examSessionId: String,
-    ): ExamSessionResponse {
+    fun getStudentExamSessionDetailsResponse(examSessionId: String): ExamSessionDetailsResponse {
         val examSession = getStudentExamSession(examSessionId)
-        val exam = ExamDTO(examService.getExamById(examSession.examId))
-        val examVariant = examVariantService.getExamVariantById(examSession.examVariantId)
-        return ExamSessionResponse(examSession, exam, examVariant.correctorType)
+        val sections = sectionService.getSectionsMetaData(examSession.examId)
+        return ExamSessionDetailsResponse(sections)
     }
     
-    fun searchExamSessions(request: ExamSessionSearchRequest): CustomPage<ExamSessionResponse> {
+    fun searchExamSessions(request: ExamSessionSearchRequest): CustomPage<ExamSessionSearchResponse> {
         return examSessionCustomRepository.searchExamSessions(
             request, Auth.userId()
         )
@@ -100,7 +97,7 @@ class ExamSessionService(
         return SectionDTO(section).also { it.id = null; it.examId = null }
     }
     
-    fun finishExamSession(examSessionId: String): ExamSessionResponse {
+    fun finishExamSession(examSessionId: String): ExamSessionFinishResponse {
         var examSession = getStudentExamSession(examSessionId)
         if (examSession.state == ExamSessionState.ENROLLED) {
             throw MethodNotAllowedException("The exam session has not been started")
@@ -116,9 +113,7 @@ class ExamSessionService(
         resultService.initiateResult(examSession.id ?: "", exam.type)
         correctionService.makeExamSessionCorrection(examSession)
         examSession = getExamSessionById(examSession.id ?: "")
-        return ExamSessionResponse(
-            examSession, null, examVariantService.getExamVariantById(examSession.examVariantId).correctorType
-        )
+        return ExamSessionFinishResponse(examSession.state)
     }
     
     fun finalizeCorrection(examSessionId: String) {

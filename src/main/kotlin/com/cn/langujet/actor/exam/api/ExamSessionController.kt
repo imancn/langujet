@@ -1,15 +1,11 @@
 package com.cn.langujet.actor.exam.api
 
-import com.cn.langujet.actor.exam.payload.ExamSessionEnrollResponse
-import com.cn.langujet.actor.exam.payload.ExamSessionResponse
-import com.cn.langujet.actor.exam.payload.ExamSessionSearchRequest
-import com.cn.langujet.actor.exam.payload.SectionDTO
+import com.cn.langujet.actor.exam.payload.*
 import com.cn.langujet.actor.util.models.CustomPage
 import com.cn.langujet.domain.exam.service.ExamSessionService
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
-import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
@@ -26,38 +22,30 @@ class ExamSessionController(
     fun enrollExamSession(
         @RequestParam @NotBlank userId: String?,
         @RequestParam @NotNull examVariantId: String?,
-    ): ResponseEntity<ExamSessionEnrollResponse> {
-        return ResponseEntity.ok(examSessionService.enrollExamSession(userId!!, examVariantId!!))
-    }
+    ): ExamSessionEnrollResponse = examSessionService.enrollExamSession(userId!!, examVariantId!!)
     
     @PreAuthorize("hasRole('STUDENT')")
-    @GetMapping("/student/exam-session/{examSessionId}")
+    @GetMapping("/student/exam-session/details")
     fun getStudentExamSession(
-        @PathVariable @NotBlank examSessionId: String?
-    ): ResponseEntity<ExamSessionResponse> =
-        ResponseEntity.ok(examSessionService.getStudentExamSessionResponse(examSessionId!!))
+        @RequestParam @NotBlank examSessionId: String?
+    ): ExamSessionDetailsResponse = examSessionService.getStudentExamSessionDetailsResponse(examSessionId!!)
 
     @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/student/exam-session")
     fun searchStudentExamSessions(
         @RequestBody @Valid request: ExamSessionSearchRequest
-    ): ResponseEntity<CustomPage<ExamSessionResponse>> =
-        ResponseEntity.ok(
-            examSessionService.searchExamSessions(request)
-        )
+    ): CustomPage<ExamSessionSearchResponse> = examSessionService.searchExamSessions(request)
     
     @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/student/exam-session/section")
     fun getExamSection(
         @RequestParam @NotBlank examSessionId: String?,
         @RequestParam @NotNull sectionOrder: Int?
-    ): ResponseEntity<SectionDTO> =
-        ResponseEntity.ok(examSessionService.getExamSection(examSessionId!!, sectionOrder!!))
+    ): SectionDTO = examSessionService.getExamSection(examSessionId!!, sectionOrder!!)
 
     @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/student/exam-session/finish")
     fun finishExamSession(
         @RequestParam @NotBlank examSessionId: String?
-    ): ResponseEntity<ExamSessionResponse> =
-        ResponseEntity.ok(examSessionService.finishExamSession(examSessionId!!))
+    ): ExamSessionFinishResponse = examSessionService.finishExamSession(examSessionId!!)
 }
