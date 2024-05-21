@@ -1,6 +1,7 @@
 package com.cn.langujet.actor.order
 
 import com.cn.langujet.actor.order.payload.PaymentDetailsResponse
+import com.cn.langujet.actor.order.payload.PaymentMethodResponse
 import com.cn.langujet.actor.order.payload.SubmitOrderRequest
 import com.cn.langujet.actor.order.payload.SubmitOrderResponse
 import com.cn.langujet.domain.order.service.OrderService
@@ -26,6 +27,14 @@ class OrderController(
     @GetMapping("/student/orders/payment/")
     @PreAuthorize("hasRole('STUDENT')")
     fun getPaymentDetails(): PaymentDetailsResponse {
-        return PaymentDetailsResponse(listOf("STRIPE")) // Todo: Replace with PaymentMethods.values()
+        return PaymentDetailsResponse(
+            listOf(
+                PaymentMethodResponse(
+                    "STRIPE",
+                    "Stripe",
+                    "https://images.ctfassets.net/fzn2n1nzq965/HTTOloNPhisV9P4hlMPNA/cacf1bb88b9fc492dfad34378d844280/Stripe_icon_-_square.svg"
+                )
+            )
+        ) // Todo: Replace with PaymentMethods.values()
     }
 }
