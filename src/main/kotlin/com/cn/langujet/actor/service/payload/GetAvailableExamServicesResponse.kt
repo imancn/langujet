@@ -1,6 +1,6 @@
 package com.cn.langujet.actor.service.payload
 
-class AvailableExamServicesResponse(
+class GetAvailableExamServicesResponse(
     val id: String,
     val name: String,
     val price: Double,
