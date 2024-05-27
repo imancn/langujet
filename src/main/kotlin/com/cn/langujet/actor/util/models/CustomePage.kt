@@ -1,5 +1,6 @@
 package com.cn.langujet.actor.util.models
 
+import com.cn.langujet.application.advice.UnprocessableException
 import org.springframework.data.domain.Page
 
 data class CustomPage<T>(
@@ -18,12 +19,14 @@ data class CustomPage<T>(
         content = content,
         pageSize = pageSize,
         pageNumber = pageNumber,
-        totalPages = ((totalElements + pageSize - 1) / pageSize).toInt(),
+        totalPages = if (pageSize > 0) ((totalElements + pageSize - 1) / pageSize).toInt() else throw UnprocessableException("pageSize must be bigger that 0"),
         totalElements = totalElements
     )
 }
 
 fun <T> List<T>.paginate(pageSize: Int, pageNumber: Int): CustomPage<T> {
+    if (pageSize <= 0)
+        throw UnprocessableException("pageSize must be bigger that 0")
     val total = this.size
     val start = pageNumber * pageSize
     val end = minOf(start + pageSize, total)
