@@ -1,8 +1,9 @@
 package com.cn.langujet.actor.order.payload
 
-import jakarta.validation.constraints.NotNull
+import com.cn.langujet.domain.payment.model.PaymentType
 
 data class SubmitOrderRequest(
-    @field:NotNull val serviceIds: List<String>? = null,
-    val promotionCode: String? = null
+    val serviceIds: List<String>,
+    val paymentType: PaymentType = PaymentType.STRIPE,
+    val couponCode: String? = null
 )

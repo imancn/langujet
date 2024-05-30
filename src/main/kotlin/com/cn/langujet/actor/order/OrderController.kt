@@ -4,6 +4,7 @@ import com.cn.langujet.actor.order.payload.PaymentDetailsResponse
 import com.cn.langujet.actor.order.payload.PaymentMethodResponse
 import com.cn.langujet.actor.order.payload.SubmitOrderRequest
 import com.cn.langujet.actor.order.payload.SubmitOrderResponse
+import com.cn.langujet.domain.order.UserDeviceType
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.domain.coupon.CouponService
 import com.cn.langujet.domain.order.service.OrderService
@@ -23,6 +24,7 @@ class OrderController(
     @PreAuthorize("hasRole('STUDENT')")
     fun submitOrder(
         @Valid @RequestBody request: SubmitOrderRequest,
+        @RequestHeader("X-User-Device-Type") userDeviceType: UserDeviceType? = UserDeviceType.ANDROID
     ): SubmitOrderResponse {
         return orderService.submitOrder(request)
     }
