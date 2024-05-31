@@ -4,15 +4,12 @@ import com.stripe.Stripe
 import com.stripe.model.checkout.Session
 import com.stripe.param.checkout.SessionCreateParams
 import jakarta.annotation.PostConstruct
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 
 @Service
 class StripePaymentService {
-    private val logger = LoggerFactory.getLogger(javaClass.simpleName)
-    
     @Value("\${stripe.api.secret.key}")
     private lateinit var apiSecretKey: String
     
@@ -34,7 +31,7 @@ class StripePaymentService {
                     .setQuantity(1)
                     .setPriceData(
                         SessionCreateParams.LineItem.PriceData.builder()
-                            .setCurrency("usd")
+                            .setCurrency("eur")
                             .setUnitAmountDecimal(BigDecimal(priceInCent))
                             .setProductData(
                                 SessionCreateParams.LineItem.PriceData.ProductData.builder()
