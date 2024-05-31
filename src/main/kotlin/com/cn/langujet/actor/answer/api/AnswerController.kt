@@ -18,8 +18,6 @@ import org.springframework.web.multipart.MultipartFile
 class AnswerController(
     private val answerService: AnswerService,
 ) {
-    // TODO: Add get by exam session id and section id
-    
     @PostMapping("/student/answer/voice")
     @PreAuthorize("hasRole('ROLE_STUDENT')")
     fun submitVoiceAnswer(
