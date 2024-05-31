@@ -1,13 +1,13 @@
 package com.cn.langujet.actor.order
 
-import com.cn.langujet.actor.order.payload.PaymentDetailsResponse
-import com.cn.langujet.actor.order.payload.PaymentMethodResponse
-import com.cn.langujet.actor.order.payload.SubmitOrderRequest
-import com.cn.langujet.actor.order.payload.SubmitOrderResponse
+import com.cn.langujet.actor.order.payload.*
 import com.cn.langujet.domain.order.UserDeviceType
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.domain.coupon.CouponService
 import com.cn.langujet.domain.order.service.OrderService
+import com.cn.langujet.domain.payment.model.PaymentType
+import com.cn.langujet.domain.region.ClientRegionService
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.validation.Valid
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
@@ -18,7 +18,8 @@ import org.springframework.web.bind.annotation.*
 @Validated
 class OrderController(
     private val orderService: OrderService,
-    private val couponService: CouponService
+    private val couponService: CouponService,
+    private val clientRegionService: ClientRegionService
 ) {
     @PostMapping("/student/orders/submit")
     @PreAuthorize("hasRole('STUDENT')")
@@ -31,16 +32,50 @@ class OrderController(
     
     @GetMapping("/student/orders/payment")
     @PreAuthorize("hasRole('STUDENT')")
-    fun getPaymentDetails(): PaymentDetailsResponse { /// Todo: Modify this function after updating Order and Payment management
+    fun getPaymentDetails(
+        request: HttpServletRequest,
+    ): PaymentDetailsResponse {
         return PaymentDetailsResponse(
-            listOf(
-                PaymentMethodResponse(
-                    "STRIPE",
-                    "Stripe",
-                    "https://images.ctfassets.net/fzn2n1nzq965/HTTOloNPhisV9P4hlMPNA/cacf1bb88b9fc492dfad34378d844280/Stripe_icon_-_square.svg"
-                )
-            ),
+            generatePaymentMethodList(getClientIp(request)),
             couponService.getActiveCouponsByUserId(Auth.userId())
-        ) // Todo: Replace with PaymentMethods.values()
+        )
+    }
+    
+    fun getClientIp(request: HttpServletRequest): String? {
+        try {
+            val header = request.getHeader("X-Forwarded-For")
+            return if (header == null || header.isEmpty()) {
+                request.remoteAddr
+            } else {
+                header.split(",")[0]
+            }
+        } catch (ex: Exception) {
+            return null
+        }
+    }
+    
+    private fun generatePaymentMethodList(clientIp: String?): List<PaymentMethodResponse> {
+        val paymentMethodList = mutableListOf<PaymentMethodResponse>()
+        paymentMethodList.add(
+            PaymentMethodResponse(
+                PaymentType.STRIPE.name,
+                PaymentType.STRIPE.displayName,
+                PaymentType.STRIPE.icon,
+                1.0,
+                Currency.EUR
+            )
+        )
+        if (clientIp != null && clientRegionService.isFromIran(clientIp)) {
+            paymentMethodList.add(
+                PaymentMethodResponse(
+                    PaymentType.ZARIN_PAL.name,
+                    PaymentType.ZARIN_PAL.displayName,
+                    PaymentType.ZARIN_PAL.icon,
+                    60_000.0, // @Todo: it should change to live Bonbast.com ratio
+                    Currency.IRT
+                )
+            )
+        }
+        return paymentMethodList
     }
 }

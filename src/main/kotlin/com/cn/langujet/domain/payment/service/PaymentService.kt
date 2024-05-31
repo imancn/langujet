@@ -16,7 +16,12 @@ class PaymentService(
     fun createPayment(orderId: String, price: Double, paymentType: PaymentType): PaymentEntity {
         return when(paymentType) {
             PaymentType.STRIPE -> createStripePayment(orderId, price, paymentType)
+            PaymentType.ZARIN_PAL -> createZarinPalPayment(orderId, price, paymentType)
         }
+    }
+    
+    private fun createZarinPalPayment(orderId: String, price: Double, paymentType: PaymentType): PaymentEntity {
+        TODO("Not yet implemented")
     }
     
     private fun createStripePayment(orderId: String, price: Double, paymentType: PaymentType): PaymentEntity {
