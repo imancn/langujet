@@ -18,7 +18,7 @@ class StripePaymentService {
         Stripe.apiKey = apiSecretKey
     }
     
-    fun createPaymentSession(priceInCent: Double): Session {
+    fun createPaymentSession(price: Double): Session {
         val sessionParams = SessionCreateParams.builder()
             .addAllPaymentMethodType(
                 listOf(
@@ -32,7 +32,7 @@ class StripePaymentService {
                     .setPriceData(
                         SessionCreateParams.LineItem.PriceData.builder()
                             .setCurrency("eur")
-                            .setUnitAmountDecimal(BigDecimal(priceInCent))
+                            .setUnitAmountDecimal(BigDecimal(price * 100.0))
                             .setProductData(
                                 SessionCreateParams.LineItem.PriceData.ProductData.builder()
                                     .setName("Order price")

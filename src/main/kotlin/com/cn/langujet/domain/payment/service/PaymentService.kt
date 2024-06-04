@@ -25,7 +25,7 @@ class PaymentService(
     }
     
     private fun createStripePayment(orderId: String, price: Double, paymentType: PaymentType): PaymentEntity {
-        val stripeSession = stripePaymentService.createPaymentSession(price * 100.0)
+        val stripeSession = stripePaymentService.createPaymentSession(price)
         return paymentRepository.save(
             StripePaymentEntity(
                 orderId = orderId,
