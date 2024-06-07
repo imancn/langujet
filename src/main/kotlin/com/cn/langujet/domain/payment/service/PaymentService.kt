@@ -21,7 +21,7 @@ class PaymentService(
     
     private fun createZarinPalPayment(orderId: String, amount: Double, paymentType: PaymentType): PaymentEntity {
         val amountInIRR = (amount * 600_000).toInt() /// todo: it should be modified later and use exchange service
-        val zarinPalPayment = zarinPalPaymentService.createPaymentSession(amountInIRR)
+        val zarinPalPayment = zarinPalPaymentService.createPaymentSession(amountInIRR, orderId)
         return paymentRepository.save(
             ZarinPalPaymentEntity(
                 orderId = orderId,

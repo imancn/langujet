@@ -20,13 +20,13 @@ class ZarinPalPaymentService(
     
     private val gateWayUrl: String = "https://www.zarinpal.com/pg/StartPay/"
     
-    fun createPaymentSession(amount: Int): ZarinPalPaymentDetails {
+    fun createPaymentSession(amount: Int, orderId: String): ZarinPalPaymentDetails {
         try {
             val parameters = ZarinPalPaymentRequest(
                 merchantId = merchantId,
                 amount = amount,
                 callbackUrl = webhookCallbackUrl,
-                description = "پرداخت سفارش لنگوجت",
+                description = "OrderId: $orderId",
                 metadata = ZarinPalRequestMetadata("N/A", Auth.userEmail())
             )
             val response = ZarinPalPaymentResponse(zarinPalClient.requestPayment(parameters))
