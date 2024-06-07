@@ -40,3 +40,31 @@ class StripePaymentEntity(
     createdDate,
     lastModifiedDate
 )
+
+@Document("payments")
+@TypeAlias("zarin_pal_payments")
+class ZarinPalPaymentEntity(
+    id: String? = null,
+    orderId: String,
+    status: PaymentStatus,
+    paymentType: PaymentType,
+    amount: Double,
+    link: String,
+    createdDate: Date,
+    lastModifiedDate: Date,
+    var authority: String,
+    var refId: Int?,
+    var amountInIRR: Int,
+    var fee: Int,
+    var cardHash: String?,
+    var cardPan: String?
+): PaymentEntity(
+    id,
+    orderId,
+    status,
+    paymentType,
+    amount,
+    link,
+    createdDate,
+    lastModifiedDate
+)
