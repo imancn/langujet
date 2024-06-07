@@ -10,6 +10,7 @@ import com.cn.langujet.domain.order.model.OrderEntity
 import com.cn.langujet.domain.order.model.OrderStatus
 import com.cn.langujet.domain.order.repository.OrderDetailRepository
 import com.cn.langujet.domain.order.repository.OrderRepository
+import com.cn.langujet.domain.payment.model.PaymentType
 import com.cn.langujet.domain.payment.service.PaymentService
 import com.cn.langujet.domain.service.model.ServiceEntity
 import com.cn.langujet.domain.service.model.ServiceType
@@ -65,7 +66,11 @@ class OrderService(
                     date = Date(System.currentTimeMillis())
                 )
             )
-            val payment = paymentService.createPayment(order.id ?: "", finalPrice, submitOrderRequest.paymentType)
+            val payment = paymentService.createPayment(
+                order.id ?: "",
+                finalPrice,
+                submitOrderRequest.paymentType ?: PaymentType.STRIPE
+            )
             order.paymentId = payment.id ?: ""
             orderRepository.save(order)
             initiateOrderDetails(order, services)
