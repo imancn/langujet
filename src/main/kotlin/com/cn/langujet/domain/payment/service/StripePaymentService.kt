@@ -13,6 +13,9 @@ class StripePaymentService {
     @Value("\${stripe.api.secret.key}")
     private lateinit var apiSecretKey: String
     
+    @Value("\${payment.redirect.url}")
+    private lateinit var paymentRedirectUrl: String
+    
     @PostConstruct
     fun setup() {
         Stripe.apiKey = apiSecretKey
@@ -44,8 +47,8 @@ class StripePaymentService {
                     .build()
             )
             .setMode(SessionCreateParams.Mode.PAYMENT)
-            .setSuccessUrl("https://langujet.com/")
-            .setCancelUrl("https://langujet.com/")
+            .setSuccessUrl("$paymentRedirectUrl?status=success")
+            .setCancelUrl("$paymentRedirectUrl?status=failure")
             .build()
         
         return Session.create(sessionParams)

@@ -12,6 +12,7 @@ sealed class PaymentEntity(
     var orderId: String,
     var status: PaymentStatus,
     var paymentType: PaymentType,
+    var amount: Double,
     var link: String,
     var createdDate: Date,
     var lastModifiedDate: Date
@@ -24,6 +25,7 @@ class StripePaymentEntity(
     orderId: String,
     status: PaymentStatus,
     paymentType: PaymentType,
+    amount: Double,
     link: String,
     createdDate: Date,
     lastModifiedDate: Date,
@@ -33,6 +35,7 @@ class StripePaymentEntity(
     orderId,
     status,
     paymentType,
+    amount,
     link,
     createdDate,
     lastModifiedDate

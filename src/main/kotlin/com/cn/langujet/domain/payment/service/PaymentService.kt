@@ -13,10 +13,10 @@ class PaymentService(
     private val stripePaymentService: StripePaymentService,
     private val paymentRepository: PaymentRepository
 ) {
-    fun createPayment(orderId: String, price: Double, paymentType: PaymentType): PaymentEntity {
+    fun createPayment(orderId: String, amount: Double, paymentType: PaymentType): PaymentEntity {
         return when(paymentType) {
-            PaymentType.STRIPE -> createStripePayment(orderId, price, paymentType)
-            PaymentType.ZARIN_PAL -> createZarinPalPayment(orderId, price, paymentType)
+            PaymentType.STRIPE -> createStripePayment(orderId, amount, paymentType)
+            PaymentType.ZARIN_PAL -> createZarinPalPayment(orderId, amount, paymentType)
         }
     }
     
@@ -24,13 +24,14 @@ class PaymentService(
         TODO("Not yet implemented")
     }
     
-    private fun createStripePayment(orderId: String, price: Double, paymentType: PaymentType): PaymentEntity {
-        val stripeSession = stripePaymentService.createPaymentSession(price)
+    private fun createStripePayment(orderId: String, amount: Double, paymentType: PaymentType): PaymentEntity {
+        val stripeSession = stripePaymentService.createPaymentSession(amount)
         return paymentRepository.save(
             StripePaymentEntity(
                 orderId = orderId,
                 status = PaymentStatus.PENDING,
                 paymentType = paymentType,
+                amount = amount,
                 link = stripeSession.url,
                 createdDate = Date(System.currentTimeMillis()),
                 lastModifiedDate = Date(System.currentTimeMillis()),
