@@ -54,6 +54,7 @@ class CouponService(
     
     fun invalidateCoupon(coupon: Coupon) {
         couponRepository.save(coupon.also { it.active = false })
+        /// todo: do roll back when order was canceled or failed ://
     }
     
     fun getActiveCouponsByUserId(userId: String): List<ActiveCouponsResponse> {
@@ -67,12 +68,14 @@ class CouponService(
         }
     }
     
-    fun getCouponByCode(couponCode: String?): Coupon? {
-        return if (!couponCode.isNullOrBlank()) {
-            couponRepository.findByCode(couponCode.uppercase()) ?:
-            throw UnprocessableException("Coupon code $couponCode is invalid")
+    fun getActiveCouponByCode(couponCode: String?): Coupon? {
+        if (!couponCode.isNullOrBlank()) {
+            val coupon = couponRepository.findByCode(couponCode.uppercase())
+            if (coupon == null || !coupon.active)
+                throw UnprocessableException("Coupon code $couponCode is invalid")
+            return coupon
         } else {
-            null
+            return null
         }
     }
 }

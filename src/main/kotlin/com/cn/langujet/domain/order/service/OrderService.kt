@@ -36,7 +36,7 @@ class OrderService(
         val services = submitOrderRequest.serviceIds.map { serviceService.getByIds(it) }
         val totalPrice = services.sumOf { it.price }
         val discountAmount = services.sumOf { it.discount }
-        val coupon = couponService.getCouponByCode(submitOrderRequest.couponCode)
+        val coupon = couponService.getActiveCouponByCode(submitOrderRequest.couponCode)
         var finalPrice = totalPrice - discountAmount - (coupon?.amount ?: 0.0)
         if (finalPrice <= 0.0) { finalPrice = 0.0 }
         
@@ -54,6 +54,7 @@ class OrderService(
             order = orderRepository.save(order)
             initiateOrderDetails(order, services)
             processOrder(order.id ?: "")
+            coupon?.let { couponService.invalidateCoupon(it) }
             return SubmitOrderResponse(null)
         } else {
             val order = orderRepository.save(
