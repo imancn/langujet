@@ -2,7 +2,7 @@ package com.cn.langujet.actor.coupon
 
 import com.cn.langujet.actor.coupon.payload.request.CreateCouponRequest
 import com.cn.langujet.actor.coupon.payload.response.ActiveCouponsResponse
-import com.cn.langujet.actor.coupon.payload.response.ValidateCouponResponse
+import com.cn.langujet.actor.coupon.payload.response.CouponValidationResponse
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.domain.coupon.Coupon
 import com.cn.langujet.domain.coupon.CouponService
@@ -28,9 +28,9 @@ class CouponController(
     }
     
     @PreAuthorize("hasRole('STUDENT')")
-    @GetMapping("/student/coupons/validate")
-    fun validateCoupon(@RequestParam couponCode: String): ValidateCouponResponse {
-        return couponService.validateCoupon(couponCode)
+    @GetMapping("/student/coupons/validate") // todo: Should be changed to /student/coupons/validation
+    fun couponValidation(@RequestParam couponCode: String): CouponValidationResponse {
+        return couponService.couponValidation(couponCode)
     }
     
     @PreAuthorize("hasRole('STUDENT')")

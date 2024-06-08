@@ -4,6 +4,7 @@ import com.cn.langujet.actor.order.payload.SubmitOrderRequest
 import com.cn.langujet.actor.order.payload.SubmitOrderResponse
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.domain.coupon.CouponService
 import com.cn.langujet.domain.exam.service.ExamSessionService
 import com.cn.langujet.domain.order.model.OrderDetailEntity
 import com.cn.langujet.domain.order.model.OrderEntity
@@ -26,7 +27,8 @@ class OrderService(
     private val orderDetailRepository: OrderDetailRepository,
     private val serviceService: ServiceService,
     private val paymentService: PaymentService,
-    private val examSessionService: ExamSessionService
+    private val examSessionService: ExamSessionService,
+    private val couponService: CouponService,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass.simpleName)
     
@@ -34,8 +36,8 @@ class OrderService(
         val services = submitOrderRequest.serviceIds.map { serviceService.getByIds(it) }
         val totalPrice = services.sumOf { it.price }
         val discountAmount = services.sumOf { it.discount }
-        val couponAmount = 0.0
-        var finalPrice = totalPrice - discountAmount - couponAmount
+        val coupon = couponService.getCouponByCode(submitOrderRequest.couponCode)
+        var finalPrice = totalPrice - discountAmount - (coupon?.amount ?: 0.0)
         if (finalPrice <= 0.0) { finalPrice = 0.0 }
         
         if (finalPrice == 0.0) {
@@ -43,7 +45,7 @@ class OrderService(
                 id = null,
                 studentUserId = Auth.userId(),
                 paymentId = null,
-                couponId = null, // Todo: should be filled by coupon id
+                couponId = coupon?.id,
                 status = OrderStatus.COMPLETED,
                 totalPrice = totalPrice,
                 finalPrice = finalPrice,
@@ -59,7 +61,7 @@ class OrderService(
                     id = null,
                     studentUserId = Auth.userId(),
                     paymentId = null,
-                    couponId = null, // Todo: should be filled by coupon id
+                    couponId = coupon?.id,
                     status = OrderStatus.AWAITING_PAYMENT,
                     totalPrice = totalPrice,
                     finalPrice = finalPrice,
@@ -74,6 +76,7 @@ class OrderService(
             order.paymentId = payment.id ?: ""
             orderRepository.save(order)
             initiateOrderDetails(order, services)
+            coupon?.let { couponService.invalidateCoupon(it) }
             return SubmitOrderResponse(payment.link)
         }
     }

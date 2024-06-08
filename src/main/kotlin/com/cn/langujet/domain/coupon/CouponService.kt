@@ -1,7 +1,7 @@
 package com.cn.langujet.domain.coupon
 
 import com.cn.langujet.actor.coupon.payload.response.ActiveCouponsResponse
-import com.cn.langujet.actor.coupon.payload.response.ValidateCouponResponse
+import com.cn.langujet.actor.coupon.payload.response.CouponValidationResponse
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.domain.user.repository.UserRepository
@@ -43,13 +43,17 @@ class CouponService(
         )
     }
     
-    fun validateCoupon(code: String): ValidateCouponResponse {
+    fun couponValidation(code: String): CouponValidationResponse {
         val coupon = couponRepository.findByCode(code.uppercase())
         return if (coupon != null && coupon.userId == Auth.userId() && coupon.active) {
-            ValidateCouponResponse(isValid = true, message = "Coupon is valid")
+            CouponValidationResponse(isValid = true, message = "Coupon is valid")
         } else {
-            ValidateCouponResponse(isValid = false, message = "Coupon is invalid")
+            CouponValidationResponse(isValid = false, message = "Coupon is invalid")
         }
+    }
+    
+    fun invalidateCoupon(coupon: Coupon) {
+        couponRepository.save(coupon.also { it.active = false })
     }
     
     fun getActiveCouponsByUserId(userId: String): List<ActiveCouponsResponse> {
@@ -60,6 +64,15 @@ class CouponService(
                 amount = it.amount,
                 createdDate = it.createdDate,
             )
+        }
+    }
+    
+    fun getCouponByCode(couponCode: String?): Coupon? {
+        return if (!couponCode.isNullOrBlank()) {
+            couponRepository.findByCode(couponCode.uppercase()) ?:
+            throw UnprocessableException("Coupon code $couponCode is invalid")
+        } else {
+            null
         }
     }
 }

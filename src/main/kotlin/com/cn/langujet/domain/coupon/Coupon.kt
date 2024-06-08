@@ -6,13 +6,13 @@ import java.util.Date
 
 @Document(collection = "coupons")
 data class Coupon(
-    @Id val id: String? = null,
-    val name: String,
-    val code: String,
-    val userId: String,
-    val amount: Double,
-    val active: Boolean = true,
-    val tag: String? = null,
-    val description: String? = null,
-    val createdDate: Date = Date(System.currentTimeMillis()),
+    @Id var id: String? = null,
+    var name: String,
+    var code: String,
+    var userId: String,
+    var amount: Double,
+    var active: Boolean = true,
+    var tag: String? = null,
+    var description: String? = null,
+    var createdDate: Date = Date(System.currentTimeMillis()),
 )
