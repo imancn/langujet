@@ -25,13 +25,13 @@ class ExamService(
     fun updateExam(exam: ExamDTO): ExamDTO {
         if (exam.id.isNullOrBlank()) throw InvalidInputException("Exam Id is empty")
         val existingExam = getExamById(exam.id ?: "")
-        exam.name?.let { existingExam.name = it }
-        exam.examType?.let { existingExam.type = it }
-        exam.description?.let { existingExam.description = it }
-        exam.sectionsNumber?.let { existingExam.sectionsNumber = it }
-        exam.questionNumber?.let { existingExam.questionNumber = it }
-        exam.examDuration?.let { existingExam.examDuration = it }
-        exam.active?.let { existingExam.active = it }
+        existingExam.name = exam.name
+        existingExam.type = exam.examType
+        existingExam.description = exam.description
+        existingExam.sectionsNumber = exam.sectionsNumber
+        existingExam.questionNumber = exam.questionNumber
+        existingExam.examDuration = exam.examDuration
+        existingExam.active = exam.active
         return ExamDTO(
             examRepository.save(existingExam)
         )

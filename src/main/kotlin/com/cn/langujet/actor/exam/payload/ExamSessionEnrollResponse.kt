@@ -8,7 +8,6 @@ class ExamSessionEnrollResponse(
     val examSessionId: String?,
     val enrollDate: Date,
     val sessionState: ExamSessionState,
-    val sectionOrders: List<Int>
 ) {
     constructor(
         examSession: ExamSession,
@@ -16,6 +15,5 @@ class ExamSessionEnrollResponse(
         examSession.id,
         examSession.enrollDate,
         examSession.state,
-        examSession.sectionOrders
     )
 }

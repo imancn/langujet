@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 data class Exam(
     @Id var id: String?,
     var type: ExamType,
+    var mode: ExamMode,
     var name: String,
     var description: String,
     var sectionsNumber: Int,

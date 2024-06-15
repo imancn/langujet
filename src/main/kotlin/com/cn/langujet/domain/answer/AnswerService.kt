@@ -24,7 +24,7 @@ class AnswerService(
         questionOrder: Int,
         voice: MultipartFile
     ): Answer.VoiceAnswer {
-        examSessionPreCheck(examSessionId, sectionOrder)
+        examSessionPreCheck(examSessionId)
         val fileEntity = fileService.uploadFile(voice, FileBucket.ANSWERS)
         
         if (answerRepository.existsByExamSessionIdAndSectionOrderAndPartOrderAndQuestionOrder(
@@ -50,8 +50,8 @@ class AnswerService(
         sectionOrder: Int?,
         answerRequestList: List<AnswerBulkRequest>,
     ): Boolean {
-        examSessionPreCheck(examSessionId!!, sectionOrder!!)
-        val existingAnswers = answerRepository.findAllByExamSessionIdAndSectionOrder(examSessionId, sectionOrder)
+        examSessionPreCheck(examSessionId!!)
+        val existingAnswers = answerRepository.findAllByExamSessionIdAndSectionOrder(examSessionId, sectionOrder!!)
         answerRepository.saveAll(
             answerRequestList.map<AnswerBulkRequest, Answer> {
                 convertAnswerBulkRequestToAnswer(it, examSessionId, sectionOrder)
@@ -121,10 +121,8 @@ class AnswerService(
         return answer
     }
     
-    private fun examSessionPreCheck(examSessionId: String, sectionOrder: Int) {
+    private fun examSessionPreCheck(examSessionId: String) {
         val examSession = examSessionService.getStudentExamSession(examSessionId)
-        if (!examSession.sectionOrders.contains(sectionOrder))
-            throw MethodNotAllowedException("You don't have permission to this section")
         if (examSession.state.order == ExamSessionState.ENROLLED.order)
             throw MethodNotAllowedException("The exam session has been not started yet")
         if (examSession.state.order >= ExamSessionState.FINISHED.order)

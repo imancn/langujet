@@ -33,7 +33,7 @@ class OrderService(
     private val logger = LoggerFactory.getLogger(javaClass.simpleName)
     
     fun submitOrder(submitOrderRequest: SubmitOrderRequest): SubmitOrderResponse {
-        val services = submitOrderRequest.serviceIds.map { serviceService.getByIds(it) }
+        val services = submitOrderRequest.serviceIds.map { serviceService.getById(it) }
         val totalPrice = services.sumOf { it.price }
         val discountAmount = services.sumOf { it.discount }
         val coupon = couponService.getActiveCouponByCode(submitOrderRequest.couponCode)
@@ -100,7 +100,7 @@ class OrderService(
             when (orderDetail.service.type) {
                 ServiceType.EXAM -> {
                     val examService = orderDetail.service as ServiceEntity.ExamServiceEntity
-                    val examSession = examSessionService.enrollExamSession(order.studentUserId, examService.examVariantId)
+                    val examSession = examSessionService.enrollExamSession(order.studentUserId, examService.id ?: "")
                     orderDetail.also { it.examSessionId = examSession.examSessionId }
                 }
             }

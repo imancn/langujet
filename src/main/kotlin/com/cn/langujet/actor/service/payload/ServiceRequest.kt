@@ -1,12 +1,14 @@
 package com.cn.langujet.actor.service.payload
 
+import com.cn.langujet.domain.correction.model.CorrectorType
+import com.cn.langujet.domain.exam.model.ExamMode
+import com.cn.langujet.domain.exam.model.ExamType
 import com.cn.langujet.domain.service.model.ServiceEntity
 import com.cn.langujet.domain.service.model.ServiceType
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotNull
 
 @Schema(subTypes = [ExamServiceRequest::class])
 @JsonTypeInfo(
@@ -28,12 +30,14 @@ sealed class ServiceRequest(
     inline fun <reified T : ServiceEntity> convertToServiceEntity(): T {
         val service: ServiceEntity = when (this) {
             is ExamServiceRequest -> ServiceEntity.ExamServiceEntity(
-                name!!,
-                price!!,
-                discount!!,
-                order!!,
-                active!!,
-                this.examVariantId!!
+                name,
+                price,
+                discount,
+                order,
+                active,
+                this.examType,
+                this.examMode,
+                this.correctorType
             )
 
             else -> throw IllegalArgumentException("Unsupported service request type")
@@ -46,12 +50,15 @@ sealed class ServiceRequest(
 }
 
 data class ExamServiceRequest(
-    @field:NotBlank override val name: String? = null,
-    @field:NotNull override val price: Double? = null,
-    @field:NotNull override val discount: Double? = null,
-    @field:NotNull override val order: Int? = null,
-    @field:NotNull override val active: Boolean? = null,
-    @field:NotBlank val examVariantId: String? = null
+    @field:NotBlank
+    override val name: String,
+    override val price: Double,
+    override val discount: Double,
+    override val order: Int,
+    override val active: Boolean,
+    var examType: ExamType,
+    var examMode: ExamMode,
+    var correctorType: CorrectorType,
 ): ServiceRequest(
     name,
     ServiceType.EXAM,

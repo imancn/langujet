@@ -12,6 +12,8 @@ import com.cn.langujet.domain.exam.model.ExamSessionState
 import com.cn.langujet.domain.exam.repository.ExamSessionCustomRepository
 import com.cn.langujet.domain.exam.repository.ExamSessionRepository
 import com.cn.langujet.domain.result.service.ResultService
+import com.cn.langujet.domain.service.model.ServiceEntity
+import com.cn.langujet.domain.service.service.ServiceService
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -20,11 +22,11 @@ class ExamSessionService(
     private val examSessionRepository: ExamSessionRepository,
     private val examSessionCustomRepository: ExamSessionCustomRepository,
     private val examService: ExamService,
-    private val examVariantService: ExamVariantService,
     private val sectionService: SectionService,
     private val correctionService: CorrectionService,
     private val resultService: ResultService,
-    private val examGeneratorService: ExamGeneratorService
+    private val examGeneratorService: ExamGeneratorService,
+    private val serviceService: ServiceService
 ) {
     fun getExamSessionById(id: String): ExamSession {
         return examSessionRepository.findById(id).orElseThrow {
@@ -54,13 +56,12 @@ class ExamSessionService(
         )
     }
     
-    fun enrollExamSession(userId: String, examVariantId: String): ExamSessionEnrollResponse {
-        val examVariant = examVariantService.getExamVariantById(examVariantId)
-        val exam = examGeneratorService.getRandomStudentAvailableExam(userId, examVariant)
-        val sectionOrders = (1..exam.sectionsNumber).toList()
+    fun enrollExamSession(userId: String, examServiceId: String): ExamSessionEnrollResponse {
+        val examService = serviceService.getById(examServiceId) as ServiceEntity.ExamServiceEntity
+        val exam = examGeneratorService.getRandomStudentAvailableExam(userId, examService)
         val examSession = examSessionRepository.save(
             ExamSession(
-                userId, exam.id ?: "", examVariant.id ?: "", sectionOrders, Date(System.currentTimeMillis())
+                userId, exam.id ?: "", exam.type, exam.mode, examService.correctorType, Date(System.currentTimeMillis())
             )
         )
         return ExamSessionEnrollResponse(examSession)
@@ -76,9 +77,6 @@ class ExamSessionService(
         }
         if (examSessionId != examSession.id) {
             throw MethodNotAllowedException("You should finish your started exam session")
-        }
-        if (!examSession.sectionOrders.contains(sectionOrder)) {
-            throw MethodNotAllowedException("You don't have permission to this section")
         }
         if (examSession.state.order >= ExamSessionState.FINISHED.order) {
             throw MethodNotAllowedException("The exam session has been finished")

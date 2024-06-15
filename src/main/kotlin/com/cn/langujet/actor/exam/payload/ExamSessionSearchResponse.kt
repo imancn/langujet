@@ -1,14 +1,12 @@
 package com.cn.langujet.actor.exam.payload
 
 import com.cn.langujet.domain.correction.model.CorrectorType
-import com.cn.langujet.domain.exam.model.ExamSession
-import com.cn.langujet.domain.exam.model.ExamSessionState
+import com.cn.langujet.domain.exam.model.*
 import java.util.*
 
 class ExamSessionSearchResponse (
     val examSessionId: String,
-    val exam: ExamDTO?,
-    val sectionOrders: List<Int>,
+    val exam: ExamSessionExamSearchResponse?,
     val correctorType: CorrectorType?,
     val state: ExamSessionState,
     val enrollDate: Date,
@@ -18,13 +16,18 @@ class ExamSessionSearchResponse (
 ) {
     constructor(
         examSession: ExamSession,
-        exam: ExamDTO?,
-        correctorType: CorrectorType?
+        exam: Exam?,
     ):this (
         examSession.id ?: "",
-        exam.also { it?.id = null },
-        examSession.sectionOrders,
-        correctorType,
+        exam?.let {
+            ExamSessionExamSearchResponse(
+                it.type,
+                it.mode,
+                it.name,
+                it.description,
+            )
+        },
+        examSession.correctorType,
         examSession.state,
         examSession.enrollDate,
         examSession.startDate,
@@ -32,3 +35,10 @@ class ExamSessionSearchResponse (
         examSession.correctionDate
     )
 }
+
+data class ExamSessionExamSearchResponse (
+    val type: ExamType,
+    val mode: ExamMode,
+    val name: String,
+    val description: String,
+)

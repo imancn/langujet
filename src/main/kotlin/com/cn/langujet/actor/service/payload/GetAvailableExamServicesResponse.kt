@@ -1,10 +1,16 @@
 package com.cn.langujet.actor.service.payload
 
+import com.cn.langujet.domain.correction.model.CorrectorType
+import com.cn.langujet.domain.exam.model.ExamMode
+import com.cn.langujet.domain.exam.model.ExamType
+
 class GetAvailableExamServicesResponse(
     val id: String,
     val name: String,
     val price: Double,
     val discount: Double,
-    val examVariant: ExamVariantResponse?,
+    var examType: ExamType,
+    var examMode: ExamMode,
+    var correctorType: CorrectorType,
     val count: Int
 )

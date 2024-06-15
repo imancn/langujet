@@ -1,5 +1,8 @@
 package com.cn.langujet.domain.service.model
 
+import com.cn.langujet.domain.correction.model.CorrectorType
+import com.cn.langujet.domain.exam.model.ExamMode
+import com.cn.langujet.domain.exam.model.ExamType
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
@@ -23,7 +26,9 @@ sealed class ServiceEntity(
         discount: Double,
         order: Int,
         active: Boolean,
-        var examVariantId: String
+        var examType: ExamType,
+        var examMode: ExamMode,
+        var correctorType: CorrectorType,
     ) : ServiceEntity(
         null,
         name,

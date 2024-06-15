@@ -1,5 +1,6 @@
 package com.cn.langujet.domain.exam.model
 
+import com.cn.langujet.domain.correction.model.CorrectorType
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
@@ -10,8 +11,9 @@ data class ExamSession(
     
     var studentUserId: String,
     var examId: String,
-    val examVariantId: String,
-    val sectionOrders: List<Int>,
+    var examType: ExamType,
+    var examMode: ExamMode,
+    var correctorType: CorrectorType,
     var state: ExamSessionState,
     var enrollDate: Date,
     var startDate: Date?,
@@ -21,15 +23,17 @@ data class ExamSession(
     constructor(
         studentUserId: String,
         examId: String,
-        examVariantId: String,
-        sectionOrders: List<Int>,
+        examType: ExamType,
+        examMode: ExamMode,
+        correctorType: CorrectorType,
         enrollDate: Date
     ) : this(
         null,
         studentUserId,
         examId,
-        examVariantId,
-        sectionOrders,
+        examType,
+        examMode,
+        correctorType,
         ExamSessionState.ENROLLED,
         enrollDate,
         null,

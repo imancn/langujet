@@ -20,7 +20,6 @@ import com.cn.langujet.domain.exam.model.SpeakingPart
 import com.cn.langujet.domain.exam.model.WritingPart
 import com.cn.langujet.domain.exam.repository.ExamSessionRepository
 import com.cn.langujet.domain.exam.service.ExamSectionContentService
-import com.cn.langujet.domain.exam.service.ExamVariantService
 import com.cn.langujet.domain.exam.service.SectionService
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -29,7 +28,6 @@ import kotlin.jvm.optionals.getOrNull
 @Service
 class CorrectionService(
     private val correctionRepository: CorrectionRepository,
-    private val examVariantService: ExamVariantService,
     private val correctAnswerRepository: CorrectAnswerRepository,
     private val autoCorrectorService: AutoCorrectorService,
     private val sectionService: SectionService,
@@ -42,19 +40,18 @@ class CorrectionService(
     private val logger = LoggerFactory.getLogger(this::class.java)
     
     fun makeExamSessionCorrection(examSession: ExamSession) {
-        val examVariant = examVariantService.getExamVariantById(examSession.examVariantId)
         val sections = sectionService.getSectionsMetaData(examSession.examId)
         val corrections = sections.map { section ->
             val correctorType = if (correctAnswerRepository.existsByExamIdAndSectionOrder(examSession.examId, section.order)) {
                 CorrectorType.AUTO_CORRECTION
             } else {
-                examVariant.correctorType
+                examSession.correctorType
             }
             CorrectionEntity(
                 correctorType,
                 CorrectionStatus.PENDING,
                 examSession.id ?: "",
-                examVariant.examType,
+                examSession.examType,
                 section.order,
                 section.sectionType
             )
