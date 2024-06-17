@@ -16,7 +16,7 @@ class CouponController(
 ) {
     
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/admin/coupons/create")
+    @PostMapping("/admin/coupons")
     fun createCoupon(@RequestBody request: CreateCouponRequest): Coupon {
         return couponService.createCoupon(
             request.name,
@@ -28,14 +28,16 @@ class CouponController(
     }
     
     @PreAuthorize("hasRole('STUDENT')")
-    @GetMapping("/student/coupons/validate") // todo: Should be changed to /student/coupons/validation
+    @GetMapping("/student/coupons/validation")
     fun couponValidation(@RequestParam couponCode: String): CouponValidationResponse {
         return couponService.couponValidation(couponCode)
     }
     
     @PreAuthorize("hasRole('STUDENT')")
-    @GetMapping("/student/coupons/active")
-    fun getActiveCoupons(): List<ActiveCouponsResponse> {
-        return couponService.getActiveCouponsByUserId(Auth.userId())
+    @GetMapping("/student/coupons/")
+    fun getCoupons( /// currently it's not used by any client app
+        @RequestParam active: Boolean?
+    ): List<ActiveCouponsResponse> {
+        return couponService.getCouponsByUserId(Auth.userId(), active)
     }
 }

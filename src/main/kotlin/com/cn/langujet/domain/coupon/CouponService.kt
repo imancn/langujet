@@ -57,8 +57,12 @@ class CouponService(
         /// todo: do roll back when order was canceled or failed ://
     }
     
-    fun getActiveCouponsByUserId(userId: String): List<ActiveCouponsResponse> {
-        return couponRepository.findByUserIdAndActive(userId).map {
+    fun getCouponsByUserId(userId: String, active: Boolean?): List<ActiveCouponsResponse> {
+        val coupons = when(active) {
+            null -> couponRepository.findByUserId(userId)
+            else -> couponRepository.findByUserIdAndActive(userId, active)
+        }
+        return coupons.map {
             ActiveCouponsResponse(
                 name = it.name,
                 code = it.code,

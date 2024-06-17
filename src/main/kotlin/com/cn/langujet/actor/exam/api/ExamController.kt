@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*
 @Validated
 class ExamController(private val examService: ExamService) {
     
-    @PostMapping("/admin/exam")
+    @PostMapping("/admin/exams")
     @PreAuthorize("hasRole('ADMIN')")
     fun createExam(
         @RequestBody @Valid exam: ExamDTO
@@ -25,7 +25,7 @@ class ExamController(private val examService: ExamService) {
         examService.createExam(exam)
     )
     
-    @PutMapping("/admin/exam")
+    @PostMapping("/admin/exams/update")
     @PreAuthorize("hasRole('ADMIN')")
     fun updateExam(
         @RequestBody exam: ExamDTO
@@ -33,16 +33,16 @@ class ExamController(private val examService: ExamService) {
         examService.updateExam(exam)
     )
     
-    @GetMapping("/admin/exam/{id}")
+    @GetMapping("/admin/exams/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     fun getExamById(@PathVariable id: String): ResponseEntity<ExamDTO> =
         toOkResponseEntity(ExamDTO(examService.getExamById(id)))
     
-    @GetMapping("/admin/exam/all")
+    @GetMapping("/admin/exams")
     @PreAuthorize("hasRole('ADMIN')")
     fun getAllExams(): ResponseEntity<List<ExamDTO>> = toOkResponseEntity(examService.getAllExams())
     
-    @GetMapping("/admin/exam/name")
+    @GetMapping("/admin/exams/by-name")
     @PreAuthorize("hasRole('ADMIN')")
     fun getAllExamsByName(
         @RequestParam @NotBlank name: String?,

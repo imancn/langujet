@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile
 class ExamSectionContentController(
     private val examSectionContentService: ExamSectionContentService
 ) {
-    @PostMapping("admin/exam/section/content")
+    @PostMapping("admin/exam-section-contents")
     @PreAuthorize("hasRole('ADMIN')")
     fun uploadExamSectionContent(
         @RequestParam @NotBlank examId: String?,
@@ -26,7 +26,7 @@ class ExamSectionContentController(
         return examSectionContentService.uploadExamSectionContent(examId!!, sectionOrder!!, file)
     }
 
-    @GetMapping("/admin/exam/section/content/download-links")
+    @GetMapping("/admin/exam-section-contents/download-links")
     @PreAuthorize("hasAnyRole('ADMIN')")
     fun getAdminExamSectionContentDownloadLink(
         @RequestParam examId: @NotBlank String?,
@@ -37,7 +37,7 @@ class ExamSectionContentController(
         )
     }
 
-    @GetMapping("/student/exam/section/content/download-links")
+    @GetMapping("/student/exam-section-contents/download-links")
     @PreAuthorize("hasAnyRole('STUDENT')")
     fun getStudentExamSectionContentDownloadLink(
         @RequestParam examSessionId: @NotBlank String?,

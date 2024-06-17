@@ -1,5 +1,6 @@
-package com.cn.langujet.actor.corrector.payload.response
+package com.cn.langujet.actor.corrector.api
 
+import com.cn.langujet.actor.corrector.payload.response.CorrectorProfileResponse
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.domain.corrector.CorrectorService

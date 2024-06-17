@@ -17,25 +17,25 @@ import org.springframework.web.bind.annotation.*
 class ServiceController(
     private val serviceService: ServiceService
 ) {
-    @PostMapping("/admin/service")
+    @PostMapping("/admin/services")
     @PreAuthorize("hasRole('ADMIN')")
     fun createExamService(@Valid @RequestBody request: ServiceRequest): ServiceEntity {
         return serviceService.createService(request)
     }
     
-    @PostMapping("/admin/service/{id}")
+    @PostMapping("/admin/services/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     fun updateExamService(@PathVariable id: String?, @Valid @RequestBody request: ServiceRequest): ServiceEntity {
         return serviceService.updateService(id!!, request)
     }
     
-    @GetMapping("/admin/service/all")
+    @GetMapping("/admin/services/all")
     @PreAuthorize("hasRole('ADMIN')")
     fun getAllServices(): List<ServiceEntity> {
         return serviceService.getAllServices()
     }
 
-    @PostMapping("/student/service/exam/available")
+    @PostMapping("/student/services/exams/search")
     fun getAvailableExamServices(
         @RequestBody request: GetAvailableExamServicesRequest
     ): CustomPage<GetAvailableExamServicesResponse> {

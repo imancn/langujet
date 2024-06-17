@@ -25,23 +25,22 @@ class OrderController(
     private val couponService: CouponService,
     private val clientRegionService: ClientRegionService
 ) {
-    @PostMapping("/student/orders/submit")
+    @PostMapping("/student/orders")
     @PreAuthorize("hasRole('STUDENT')")
     fun submitOrder(
         @Valid @RequestBody request: SubmitOrderRequest,
-        @RequestHeader("X-User-Device-Type") userDeviceType: UserDeviceType? = UserDeviceType.ANDROID
     ): SubmitOrderResponse {
         return orderService.submitOrder(request)
     }
     
-    @GetMapping("/student/orders/payment")
+    @GetMapping("/student/orders/checkout")
     @PreAuthorize("hasRole('STUDENT')")
     fun getPaymentDetails(
         request: HttpServletRequest,
     ): PaymentDetailsResponse {
         return PaymentDetailsResponse(
             generatePaymentMethodList(getClientIp(request)),
-            couponService.getActiveCouponsByUserId(Auth.userId())
+            couponService.getCouponsByUserId(Auth.userId(), true)
         )
     }
     

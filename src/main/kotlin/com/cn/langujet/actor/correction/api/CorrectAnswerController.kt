@@ -31,7 +31,7 @@ class CorrectAnswerController(
         return correctAnswerService.createCorrectAnswer(request!!)
     }
 
-    @PutMapping("admin/correct-answers")
+    @PostMapping("admin/correct-answers/update")
     @PreAuthorize("hasRole('ADMIN')")
     fun updateCorrectAnswer(
         @RequestBody @NotNull request: CorrectAnswerListDTO?
@@ -39,7 +39,7 @@ class CorrectAnswerController(
         return correctAnswerService.updateCorrectAnswer(request!!)
     }
 
-    @DeleteMapping("admin/correct-answers/{id}")
+    @PostMapping("admin/correct-answers/delete/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     fun deleteCorrectAnswer(
         @PathVariable @NotBlank id: String?,

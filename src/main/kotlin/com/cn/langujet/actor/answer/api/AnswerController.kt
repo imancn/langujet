@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile
 class AnswerController(
     private val answerService: AnswerService,
 ) {
-    @PostMapping("/student/answer/voice")
+    @PostMapping("/student/answers/voices")
     @PreAuthorize("hasRole('ROLE_STUDENT')")
     fun submitVoiceAnswer(
         @RequestParam @NotBlank examSessionId: String?,
@@ -37,7 +37,7 @@ class AnswerController(
         return toOkResponseEntity(true)
     }
 
-    @PostMapping("/student/answer/bulk")
+    @PostMapping("/student/answers")
     @PreAuthorize("hasRole('ROLE_STUDENT')")
     fun submitBulkAnswers(
         @RequestParam @NotBlank examSessionId: String?,

@@ -17,33 +17,35 @@ class ExamSessionController(
 ){
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/student/exam-session/enroll")
+    @PostMapping("/student/exam-sessions/enroll")
     fun enrollExamSession(
         @RequestParam @NotBlank userId: String,
         @RequestParam @NotBlank examServiceId: String,
     ): ExamSessionEnrollResponse = examSessionService.enrollExamSession(userId, examServiceId)
     
     @PreAuthorize("hasRole('STUDENT')")
-    @GetMapping("/student/exam-session/details")
+    @GetMapping("/student/exam-sessions/details")
     fun getStudentExamSession(
         @RequestParam @NotBlank examSessionId: String
     ): ExamSessionDetailsResponse = examSessionService.getStudentExamSessionDetailsResponse(examSessionId)
 
     @PreAuthorize("hasRole('STUDENT')")
-    @PostMapping("/student/exam-session")
+    @PostMapping("/student/exam-sessions/search")
     fun searchStudentExamSessions(
         @RequestBody @Valid request: ExamSessionSearchRequest
-    ): CustomPage<ExamSessionSearchResponse> = examSessionService.searchExamSessions(request)
+    ): CustomPage<ExamSessionSearchResponse> {
+        return examSessionService.searchExamSessions(request)
+    }
     
     @PreAuthorize("hasRole('STUDENT')")
-    @PostMapping("/student/exam-session/section")
+    @PostMapping("/student/exam-sessions/section")
     fun getExamSection(
         @RequestParam @NotBlank examSessionId: String,
         @RequestParam sectionOrder: Int
     ): SectionDTO = examSessionService.getExamSection(examSessionId, sectionOrder)
 
     @PreAuthorize("hasRole('STUDENT')")
-    @PostMapping("/student/exam-session/finish")
+    @PostMapping("/student/exam-sessions/finish")
     fun finishExamSession(
         @RequestParam @NotBlank examSessionId: String?
     ): ExamSessionFinishResponse = examSessionService.finishExamSession(examSessionId!!)

@@ -9,7 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("api/v1/admin/section")
+@RequestMapping("api/v1/admin/sections")
 class SectionController(private val sectionService: SectionService) {
 
     @GetMapping("/{id}")
@@ -31,13 +31,13 @@ class SectionController(private val sectionService: SectionService) {
         @RequestBody section: SectionDTO
     ): SectionDTO = SectionDTO(sectionService.createSection(section.toSection()))
 
-    @PutMapping
+    @PostMapping("/update")
     @PreAuthorize("hasRole('ADMIN')")
     fun updateSection(
         @RequestBody section: SectionDTO
     ): SectionDTO = SectionDTO(sectionService.updateSection(section.toSection()))
 
-    @DeleteMapping("/{id}")
+    @PostMapping("delete/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     fun deleteSection(
         @PathVariable id: String

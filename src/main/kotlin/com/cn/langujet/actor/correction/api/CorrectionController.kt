@@ -44,7 +44,7 @@ class CorrectionController(
         return correctionService.getCorrectorProcessingCorrection()
     }
     
-    @GetMapping("/corrector/corrections/exam-session-content/{correctionId}")
+    @GetMapping("/corrector/corrections/exam-session-contents/{correctionId}")
     @PreAuthorize("hasRole('CORRECTOR')")
     fun getCorrectorCorrectionExamSessionContent(
         @PathVariable correctionId: String

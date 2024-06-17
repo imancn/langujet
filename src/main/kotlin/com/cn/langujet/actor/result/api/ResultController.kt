@@ -15,7 +15,7 @@ class ResultController(
     private var service: ResultService
 ) {
     
-    @GetMapping("/student/result/exam-session")
+    @GetMapping("/student/results")
     @PreAuthorize("hasRole('STUDENT')")
     fun getStudentResultsByExamSessionId(
         @RequestParam @NotBlank examSessionId: String
@@ -23,7 +23,7 @@ class ResultController(
         return service.getDetailedResultByExamSessionId(examSessionId)
     }
     
-    @PostMapping("/corrector/result/section")
+    @PostMapping("/corrector/results/sections")
     @PreAuthorize("hasRole('CORRECTOR')")
     fun addCorrectorSectionResult(
         @RequestBody addCorrectorSectionResultRequest: AddCorrectorSectionResultRequest
