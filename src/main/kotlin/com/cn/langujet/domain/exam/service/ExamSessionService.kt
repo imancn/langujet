@@ -46,7 +46,7 @@ class ExamSessionService(
     
     fun getStudentExamSessionDetailsResponse(examSessionId: String): ExamSessionDetailsResponse {
         val examSession = getStudentExamSession(examSessionId)
-        val sections = sectionService.getSectionsMetaData(examSession.examId)
+        val sections = sectionService.getSectionsMetaData(examSession.examId).sortedBy { it.order }
         return ExamSessionDetailsResponse(sections)
     }
     
