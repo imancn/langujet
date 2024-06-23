@@ -21,7 +21,8 @@ class ExamSessionController(
     fun enrollExamSession(
         @RequestParam @NotBlank userId: String,
         @RequestParam @NotBlank examServiceId: String,
-    ): ExamSessionEnrollResponse = examSessionService.enrollExamSession(userId, examServiceId)
+        @RequestParam @NotBlank examId: String?,
+    ): ExamSessionEnrollResponse = examSessionService.enrollExamSession(userId, examServiceId, examId)
     
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/student/exam-sessions/details")

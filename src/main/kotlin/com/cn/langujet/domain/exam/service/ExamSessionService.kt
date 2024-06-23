@@ -6,6 +6,7 @@ import com.cn.langujet.actor.util.models.CustomPage
 import com.cn.langujet.application.advice.InvalidTokenException
 import com.cn.langujet.application.advice.MethodNotAllowedException
 import com.cn.langujet.application.advice.NotFoundException
+import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.domain.correction.service.CorrectionService
 import com.cn.langujet.domain.exam.model.ExamSession
 import com.cn.langujet.domain.exam.model.ExamSessionState
@@ -56,12 +57,22 @@ class ExamSessionService(
         )
     }
     
-    fun enrollExamSession(userId: String, examServiceId: String): ExamSessionEnrollResponse {
-        val examService = serviceService.getById(examServiceId) as ServiceEntity.ExamServiceEntity
-        val exam = examGeneratorService.getRandomStudentAvailableExam(userId, examService)
+    fun enrollExamSession(userId: String, examServiceId: String, examId: String? = null): ExamSessionEnrollResponse {
+        val service = serviceService.getById(examServiceId) as ServiceEntity.ExamServiceEntity
+        val exam = if (examId != null) {
+            examService.getExamById(examId).let {
+                if (service.examMode != it.mode || service.examType != it.type) {
+                    throw UnprocessableException("Exam and Exam Service are not compatible")
+                } else {
+                    it
+                }
+            }
+        } else {
+            examGeneratorService.getRandomStudentAvailableExam(userId, service)
+        }
         val examSession = examSessionRepository.save(
             ExamSession(
-                userId, exam.id ?: "", exam.type, exam.mode, examService.correctorType, Date(System.currentTimeMillis())
+                userId, exam.id ?: "", exam.type, exam.mode, service.correctorType, Date(System.currentTimeMillis())
             )
         )
         return ExamSessionEnrollResponse(examSession)
