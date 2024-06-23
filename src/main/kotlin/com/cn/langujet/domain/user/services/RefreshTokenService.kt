@@ -21,7 +21,6 @@ class RefreshTokenService(
     }
 
     fun createRefreshToken(userId: String): RefreshToken {
-        deleteByUserId(userId)
         var refreshToken = RefreshToken(
             null,
             userId,
