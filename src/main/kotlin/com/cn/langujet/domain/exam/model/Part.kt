@@ -11,6 +11,7 @@ sealed class Part(
 
 class ReadingPart(
     order: Int,
+    var passageHeader: String?,
     var passage: List<Passage>,
     var questionList: List<Question>
 ) : Part(order, SectionType.READING)

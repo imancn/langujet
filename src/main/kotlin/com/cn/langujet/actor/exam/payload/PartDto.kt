@@ -25,6 +25,7 @@ sealed class PartDTO(
         val part = when (this) {
             is ReadingPartDTO -> ReadingPart(
                 this.partOrder!!,
+                this.passageHeader,
                 this.passage!!.map {
                     Passage(
                         it.indicator,
@@ -74,11 +75,13 @@ sealed class PartDTO(
 
 data class ReadingPartDTO(
     override val partOrder: Int? = null,
+    val passageHeader: String? = null,
     val passage: List<PassageDTO>? = null,
     val questionList: List<QuestionDTO>? = null
 ) : PartDTO(partOrder, SectionType.READING) {
     constructor(part: ReadingPart) : this(
         part.order,
+        part.passageHeader,
         part.passage.map { PassageDTO(it) },
         part.questionList.map { QuestionDTO.from(it) }
     )
