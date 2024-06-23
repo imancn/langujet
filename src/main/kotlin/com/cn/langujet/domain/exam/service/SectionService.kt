@@ -1,7 +1,7 @@
 package com.cn.langujet.domain.exam.service
 
 import com.cn.langujet.application.advice.InvalidInputException
-import com.cn.langujet.application.advice.MethodNotAllowedException
+import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.exam.model.Section
 import com.cn.langujet.domain.exam.repository.SectionCustomRepository
@@ -32,7 +32,7 @@ class SectionService(
 
     fun createSection(section: Section): Section {
         if (sectionRepository.existsByExamIdAndOrder(section.examId, section.order)) {
-            throw MethodNotAllowedException("Section with order ${section.order} already exists.")
+            throw UnprocessableException("Section with order ${section.order} already exists.")
         }
         return sectionRepository.save(
             section.also {

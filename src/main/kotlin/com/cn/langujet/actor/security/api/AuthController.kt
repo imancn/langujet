@@ -60,7 +60,7 @@ class AuthController(
         SecurityContextHolder.getContext().authentication = authentication
         val jwt = jwtService.generateJwtToken(authentication)
         val userDetails = authentication.principal as UserDetailsImpl
-        if (!userDetails.emailVerified) throw MethodNotAllowedException("User is not enabled ${userDetails.email}")
+        if (!userDetails.emailVerified) throw UnprocessableException("User is not enabled ${userDetails.email}")
         
         val refreshToken = refreshTokenService.createRefreshToken(userDetails.id)
         
@@ -114,13 +114,13 @@ class AuthController(
     ): ResponseEntity<String> {
         val user = userRepository.findByEmail(email).orElseThrow { NotFoundException("User Not Found") }
         
-        if (user.emailVerified) throw MethodNotAllowedException("Your Email Was Verified")
+        if (user.emailVerified) throw UnprocessableException("Your Email Was Verified")
         
         val verificationToken = emailVerificationTokenRepository.findByUser(user).orElseThrow {
             mailSenderService.sendEmailVerificationMail(
                 emailVerificationTokenRepository.save(EmailVerificationToken(user))
             )
-            MethodNotAllowedException("Your verification code has been expired.\nWe sent a new verification code.")
+            UnprocessableException("Your verification code has been expired.\nWe sent a new verification code.")
         }
         
         if (verificationToken.token == verificationCode) userRepository.save(user.also { it.emailVerified = true })
@@ -133,7 +133,7 @@ class AuthController(
     fun sendVerificationMail(@RequestParam @Email @NotBlank email: String?): ResponseEntity<String> {
         val user = userRepository.findByEmail(email).orElseThrow { NotFoundException("User Not Found") }
         
-        if (user.emailVerified) throw MethodNotAllowedException("Your Email Was Verified")
+        if (user.emailVerified) throw UnprocessableException("Your Email Was Verified")
         
         val emailVerificationToken = emailVerificationTokenRepository.findByUser(user).getOrElse {
             emailVerificationTokenRepository.save(EmailVerificationToken(user))

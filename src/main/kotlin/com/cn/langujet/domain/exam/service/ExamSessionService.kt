@@ -4,9 +4,8 @@ import com.cn.langujet.actor.exam.payload.*
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.actor.util.models.CustomPage
 import com.cn.langujet.application.advice.InvalidTokenException
-import com.cn.langujet.application.advice.MethodNotAllowedException
-import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.correction.service.CorrectionService
 import com.cn.langujet.domain.exam.model.ExamSession
 import com.cn.langujet.domain.exam.model.ExamSessionState
@@ -87,15 +86,15 @@ class ExamSessionService(
             getStudentExamSession(examSessionId)
         }
         if (examSessionId != examSession.id) {
-            throw MethodNotAllowedException("You should finish your started exam session")
+            throw UnprocessableException("You should finish your started exam session")
         }
         if (examSession.state.order >= ExamSessionState.FINISHED.order) {
-            throw MethodNotAllowedException("The exam session has been finished")
+            throw UnprocessableException("The exam session has been finished")
         }
         val section = try {
             sectionService.getSectionByExamIdAndOrder(examSession.examId, sectionOrder)
         } catch (ex: NotFoundException) {
-            throw MethodNotAllowedException("There is no section left")
+            throw UnprocessableException("There is no section left")
         }
         if (examSession.state == ExamSessionState.ENROLLED) {
             examSessionRepository.save(examSession.also {
@@ -109,10 +108,10 @@ class ExamSessionService(
     fun finishExamSession(examSessionId: String): ExamSessionFinishResponse {
         var examSession = getStudentExamSession(examSessionId)
         if (examSession.state == ExamSessionState.ENROLLED) {
-            throw MethodNotAllowedException("The exam session has not been started")
+            throw UnprocessableException("The exam session has not been started")
         }
         if (examSession.state.order >= ExamSessionState.FINISHED.order) {
-            throw MethodNotAllowedException("The exam session has been finished")
+            throw UnprocessableException("The exam session has been finished")
         }
         examSession = examSessionRepository.save(examSession.also {
             it.state = ExamSessionState.FINISHED

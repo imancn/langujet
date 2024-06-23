@@ -1,7 +1,7 @@
 package com.cn.langujet.domain.answer
 
 import com.cn.langujet.actor.answer.payload.request.*
-import com.cn.langujet.application.advice.MethodNotAllowedException
+import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.application.service.file.domain.data.model.FileBucket
 import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.answer.model.Answer
@@ -30,7 +30,7 @@ class AnswerService(
         if (answerRepository.existsByExamSessionIdAndSectionOrderAndPartOrderAndQuestionOrder(
                 examSessionId ,sectionOrder ,partOrder ,questionOrder)
         ) {
-            throw MethodNotAllowedException("You have submitted this answer once")
+            throw UnprocessableException("You have submitted this answer once")
         }
         
         return answerRepository.save(
@@ -124,8 +124,8 @@ class AnswerService(
     private fun examSessionPreCheck(examSessionId: String) {
         val examSession = examSessionService.getStudentExamSession(examSessionId)
         if (examSession.state.order == ExamSessionState.ENROLLED.order)
-            throw MethodNotAllowedException("The exam session has been not started yet")
+            throw UnprocessableException("The exam session has been not started yet")
         if (examSession.state.order >= ExamSessionState.FINISHED.order)
-            throw MethodNotAllowedException("The exam session has been finished")
+            throw UnprocessableException("The exam session has been finished")
     }
 }

@@ -8,11 +8,9 @@ class RefreshTokenException(message: String?) : HttpException(HttpStatus.UNAUTHO
 
 class InvalidTokenException(message: String?) : HttpException(HttpStatus.UNAUTHORIZED, message)
 
-class InvalidInputException(message: String?) : HttpException(HttpStatus.NOT_ACCEPTABLE, message)
+class InvalidInputException(message: String?) : HttpException(HttpStatus.BAD_REQUEST, message)
 
 class NotFoundException(message: String?) : HttpException(HttpStatus.NOT_FOUND, message)
-
-class MethodNotAllowedException(message: String?) : HttpException(HttpStatus.METHOD_NOT_ALLOWED, message)
 
 class EmailNotSentException(message: String?) : HttpException(HttpStatus.INTERNAL_SERVER_ERROR, message)
 
