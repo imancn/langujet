@@ -1,8 +1,10 @@
 package com.cn.langujet.domain.order.service
 
+import com.cn.langujet.actor.order.payload.StudentOrderResponse
 import com.cn.langujet.actor.order.payload.SubmitOrderRequest
 import com.cn.langujet.actor.order.payload.SubmitOrderResponse
 import com.cn.langujet.actor.util.Auth
+import com.cn.langujet.actor.util.models.CustomPage
 import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.domain.coupon.CouponService
 import com.cn.langujet.domain.exam.service.ExamSessionService
@@ -17,6 +19,7 @@ import com.cn.langujet.domain.service.model.ServiceEntity
 import com.cn.langujet.domain.service.model.ServiceType
 import com.cn.langujet.domain.service.service.ServiceService
 import org.slf4j.LoggerFactory
+import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import java.util.*
 import kotlin.jvm.optionals.getOrElse
@@ -45,6 +48,7 @@ class OrderService(
                 id = null,
                 studentUserId = Auth.userId(),
                 paymentId = null,
+                paymentType = null,
                 couponId = coupon?.id,
                 status = OrderStatus.COMPLETED,
                 totalPrice = totalPrice,
@@ -57,11 +61,13 @@ class OrderService(
             coupon?.let { couponService.invalidateCoupon(it) }
             return SubmitOrderResponse(null)
         } else {
+            val paymentType = submitOrderRequest.paymentType ?: PaymentType.STRIPE
             val order = orderRepository.save(
                 OrderEntity(
                     id = null,
                     studentUserId = Auth.userId(),
                     paymentId = null,
+                    paymentType = paymentType,
                     couponId = coupon?.id,
                     status = OrderStatus.AWAITING_PAYMENT,
                     totalPrice = totalPrice,
@@ -72,7 +78,7 @@ class OrderService(
             val payment = paymentService.createPayment(
                 order.id ?: "",
                 finalPrice,
-                submitOrderRequest.paymentType ?: PaymentType.STRIPE
+                paymentType
             )
             order.paymentId = payment.id ?: ""
             orderRepository.save(order)
@@ -127,5 +133,16 @@ class OrderService(
             logger.error("Order with Id $orderId not found")
             throw UnprocessableException("Order with Id $orderId not found")
         }
+    }
+    
+    fun getStudentOrders(orderStatus: OrderStatus?, pageNumber: Int, pageSize: Int): CustomPage<StudentOrderResponse> {
+        val orders = if (orderStatus != null) {
+            orderRepository.findAllByStudentUserIdAndStatusOrderByDateDesc(Auth.userId(), orderStatus, PageRequest.of(pageNumber, pageSize))
+        } else {
+            orderRepository.findAllByStudentUserIdOrderByDateDesc(Auth.userId(), PageRequest.of(pageNumber, pageSize))
+        }
+        val totalOrders = orderRepository.countByStudentUserId(Auth.userId())
+        val orderResponse = orders.map { StudentOrderResponse(it) }
+        return CustomPage(orderResponse.content, pageSize, pageNumber, totalOrders)
     }
 }

@@ -3,7 +3,9 @@ package com.cn.langujet.actor.order
 import com.cn.langujet.actor.order.payload.*
 import com.cn.langujet.actor.order.payload.Currency
 import com.cn.langujet.actor.util.Auth
+import com.cn.langujet.actor.util.models.CustomPage
 import com.cn.langujet.domain.coupon.CouponService
+import com.cn.langujet.domain.order.model.OrderStatus
 import com.cn.langujet.domain.order.service.OrderService
 import com.cn.langujet.domain.payment.model.PaymentType
 import com.cn.langujet.domain.region.ClientRegionService
@@ -29,6 +31,20 @@ class OrderController(
     ): SubmitOrderResponse {
         return orderService.submitOrder(request)
     }
+    
+    @GetMapping("student/orders")
+    @PreAuthorize("hasRole('STUDENT')")
+    fun getOrders(
+        @RequestParam orderStatus: OrderStatus?,
+        @RequestParam pageNumber: Int,
+        @RequestParam pageSize: Int,
+    ) : CustomPage<StudentOrderResponse> {
+        return orderService.getStudentOrders(
+            orderStatus, pageNumber, pageSize
+        )
+    }
+    
+//    @GetMapping("student/orders/details")
     
     @GetMapping("/student/orders/checkout")
     @PreAuthorize("hasRole('STUDENT')")
