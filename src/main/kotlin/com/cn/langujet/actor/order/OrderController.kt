@@ -44,7 +44,12 @@ class OrderController(
         )
     }
     
-//    @GetMapping("student/orders/details")
+    @GetMapping("student/orders/details")
+    fun getOrderDetails(
+        @RequestParam orderId: String
+    ) : StudentOrderDetailsResponse {
+        return orderService.getStudentOrderDetails(orderId)
+    }
     
     @GetMapping("/student/orders/checkout")
     @PreAuthorize("hasRole('STUDENT')")

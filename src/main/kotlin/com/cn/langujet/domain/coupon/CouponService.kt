@@ -82,4 +82,10 @@ class CouponService(
             return null
         }
     }
+    
+    fun getCouponById(id: String): Coupon {
+        return couponRepository.findById(id).orElseThrow {
+            throw UnprocessableException("Payment with Id $id not found")
+        }
+    }
 }

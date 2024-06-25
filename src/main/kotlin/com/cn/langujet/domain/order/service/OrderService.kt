@@ -1,5 +1,6 @@
 package com.cn.langujet.domain.order.service
 
+import com.cn.langujet.actor.order.payload.StudentOrderDetailsResponse
 import com.cn.langujet.actor.order.payload.StudentOrderResponse
 import com.cn.langujet.actor.order.payload.SubmitOrderRequest
 import com.cn.langujet.actor.order.payload.SubmitOrderResponse
@@ -144,5 +145,17 @@ class OrderService(
         val totalOrders = orderRepository.countByStudentUserId(Auth.userId())
         val orderResponse = orders.map { StudentOrderResponse(it) }
         return CustomPage(orderResponse.content, pageSize, pageNumber, totalOrders)
+    }
+    
+    fun getStudentOrderDetails(orderId: String): StudentOrderDetailsResponse {
+        val order = getOrderById(orderId)
+        if (order.studentUserId != Auth.userId()) {
+            throw UnprocessableException("You don't access to this order")
+        }
+        val orderDetails = orderDetailRepository.findByOrderId(orderId)
+        val coupon = order.couponId?.let { couponService.getCouponById(it) }
+        return StudentOrderDetailsResponse(
+            order, coupon?.code, orderDetails.map { it.service }
+        )
     }
 }
