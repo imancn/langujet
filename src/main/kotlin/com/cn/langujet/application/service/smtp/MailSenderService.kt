@@ -44,13 +44,9 @@ class MailSenderService(
         val hostRoot = "http://localhost:8080"
         val email = emailVerificationToken.user.email
         val token = emailVerificationToken.token
-        val logoPath =
-            "https://res.cloudinary.com/practicaldev/image/fetch/s--FSZb8Vto--/c_imagga_scale,f_auto,fl_progressive,h_420,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/x7qr5ksfk3zzmkcabvdm.png"
         val contentParams = mapOf(
             "TOKEN" to token,
             "LINK" to "$hostRoot/api/auth/signup/email/verify/$email/$token",
-            "SITE" to hostRoot,
-            "LOGO_PATH" to logoPath
         )
         sendWithTemplate(
             email, "Verification Mail", contentParams, "email_verification"
@@ -61,12 +57,9 @@ class MailSenderService(
         val hostRoot = "http://localhost:8080"
         val email = resetPasswordToken.user.email
         val token = resetPasswordToken.token
-        val logoPath =
-            "https://res.cloudinary.com/practicaldev/image/fetch/s--FSZb8Vto--/c_imagga_scale,f_auto,fl_progressive,h_420,q_auto,w_1000/https://dev-to-uploads.s3.amazonaws.com/uploads/articles/x7qr5ksfk3zzmkcabvdm.png"
         val contentParams = mapOf(
             "TOKEN" to token,
             "SITE" to hostRoot,
-            "LOGO_PATH" to logoPath
         )
         sendWithTemplate(
             email, "Reset Password Mail", contentParams, "reset_password"
