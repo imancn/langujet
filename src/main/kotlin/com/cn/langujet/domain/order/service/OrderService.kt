@@ -12,18 +12,15 @@ import com.cn.langujet.domain.order.model.OrderStatus
 import com.cn.langujet.domain.order.repository.OrderDetailRepository
 import com.cn.langujet.domain.order.repository.OrderRepository
 import com.cn.langujet.domain.payment.model.PaymentType
-import com.cn.langujet.domain.payment.repository.PaymentRepository
 import com.cn.langujet.domain.payment.service.PaymentService
 import com.cn.langujet.domain.service.model.ServiceEntity
 import com.cn.langujet.domain.service.model.ServiceType
 import com.cn.langujet.domain.service.service.ServiceService
-import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import java.util.*
 import kotlin.jvm.optionals.getOrElse
-import kotlin.jvm.optionals.getOrNull
 
 @Service
 class OrderService(
@@ -33,19 +30,8 @@ class OrderService(
     private val paymentService: PaymentService,
     private val examSessionService: ExamSessionService,
     private val couponService: CouponService,
-    private val paymentRepository: PaymentRepository,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass.simpleName)
-    
-    @PostConstruct
-    fun ad(){
-        orderRepository.findAll().forEach { order ->
-            order.paymentType = order.paymentId?.let{ paymentRepository.findById(it).getOrNull()?.paymentType }
-            orderRepository.save(order)
-            println("done for ${order.id}")
-        }
-        println("done")
-    }
     
     fun submitOrder(submitOrderRequest: SubmitOrderRequest): SubmitOrderResponse {
         val services = submitOrderRequest.serviceIds.map { serviceService.getById(it) }
