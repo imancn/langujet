@@ -1,9 +1,6 @@
 package com.cn.langujet.domain.order.service
 
-import com.cn.langujet.actor.order.payload.StudentOrderDetailsResponse
-import com.cn.langujet.actor.order.payload.StudentOrderResponse
-import com.cn.langujet.actor.order.payload.SubmitOrderRequest
-import com.cn.langujet.actor.order.payload.SubmitOrderResponse
+import com.cn.langujet.actor.order.payload.*
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.actor.util.models.CustomPage
 import com.cn.langujet.application.advice.UnprocessableException
@@ -157,5 +154,13 @@ class OrderService(
         return StudentOrderDetailsResponse(
             order, coupon?.code, orderDetails.map { it.service }
         )
+    }
+    
+    fun getOrderPaymentResult(orderId: String): StudentOrderPaymentResultResponse {
+        val order = getOrderById(orderId)
+        if (order.studentUserId != Auth.userId()) {
+            throw UnprocessableException("You don't access to this order")
+        }
+        return StudentOrderPaymentResultResponse(order)
     }
 }
