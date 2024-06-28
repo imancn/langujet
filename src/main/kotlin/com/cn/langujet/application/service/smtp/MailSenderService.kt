@@ -17,7 +17,9 @@ import javax.mail.internet.MimeMultipart
 class MailSenderService(
     private val session: Session
 ) {
+    private val hostRoot = "https://api.langujet.com"
     private val logger = LoggerFactory.getLogger(javaClass.simpleName)
+
     fun sendWithTemplate(to: List<String>, subject: String, contentParams: Map<String, String>, templateName: String) {
         val content = JinjaEngineUtil.render("${templateName}.html", contentParams)
         try {
@@ -41,20 +43,30 @@ class MailSenderService(
         )
 
     fun sendEmailVerificationMail(emailVerificationToken: EmailVerificationToken) {
-        val hostRoot = "http://localhost:8080"
         val email = emailVerificationToken.user.email
         val token = emailVerificationToken.token
         val contentParams = mapOf(
             "TOKEN" to token,
-            "LINK" to "$hostRoot/api/auth/signup/email/verify/$email/$token",
+            "LINK" to "$hostRoot/api/v1/auth/signup/email/verify/$email/$token",
         )
         sendWithTemplate(
             email, "Verification Mail", contentParams, "email_verification"
         )
     }
+    
+    fun sendDeleteAccountVerificationMail(emailVerificationToken: EmailVerificationToken) {
+        val email = emailVerificationToken.user.email
+        val token = emailVerificationToken.token
+        val contentParams = mapOf(
+            "TOKEN" to token,
+            "LINK" to "$hostRoot/api/v1/auth/delete-account/verify/$email/$token",
+        )
+        sendWithTemplate(
+            email, "Delete Account Verification Mail", contentParams, "delete_account_verification_mail"
+        )
+    }
 
     fun sendResetPasswordMail(resetPasswordToken: ResetPasswordToken) {
-        val hostRoot = "http://localhost:8080"
         val email = resetPasswordToken.user.email
         val token = resetPasswordToken.token
         val contentParams = mapOf(

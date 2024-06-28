@@ -19,7 +19,7 @@ data class EmailVerificationToken(
     )
 
     companion object {
-        private const val EXPIRATION = 60 * 24
+        private const val EXPIRATION = 15
 
         private fun makeRandom6DigitsToken(): String {
             val digit = Random().nextInt(899_999) + 100_000

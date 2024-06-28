@@ -5,6 +5,6 @@ import org.springframework.data.mongodb.repository.MongoRepository
 import java.util.*
 
 interface UserRepository : MongoRepository<User, String> {
-    fun findByEmail(email: String?): Optional<User>
-    fun existsByEmail(email: String?): Boolean
+    fun findByEmailAndDeleted(email: String, deleted: Boolean = false): Optional<User>
+    fun existsByEmailAndDeleted(email: String, deleted: Boolean = false): Boolean
 }

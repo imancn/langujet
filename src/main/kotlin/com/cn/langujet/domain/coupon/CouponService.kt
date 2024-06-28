@@ -33,7 +33,7 @@ class CouponService(
     
     fun createCoupon(name: String, email: String, amount: Double, tag: String?, description: String?): Coupon {
         val code = generateCouponCode()
-        val user = userRepository.findByEmail(email).getOrElse {
+        val user = userRepository.findByEmailAndDeleted(email).getOrElse { /// todo: Move userRepository dependency on AuthService and inject the service
             throw UnprocessableException("user with email $email not found")
         }
         return couponRepository.save(

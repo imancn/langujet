@@ -14,10 +14,10 @@ data class Student(
     var fullName: String,
     var biography: String?,
 ) {
-    constructor(user: User, fullName: String?) : this(
+    constructor(user: User, fullName: String) : this(
         null,
         user,
-        fullName ?: user.email,
+        fullName,
         null
     )
 }

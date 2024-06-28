@@ -16,24 +16,10 @@ data class Corrector(
     var ieltsScore: Double?,
     var credit: Double = 0.0,
 ) {
-    constructor(
-        user: User,
-        fullName: String,
-        biography: String?,
-        ieltsScore: Double?,
-    ) : this(
+    constructor(user: User, fullName: String) : this(
         null,
         user,
         fullName,
-        biography,
-        ieltsScore,
-        0.0
-    )
-
-    constructor(user: User, fullName: String?) : this(
-        null,
-        user,
-        fullName ?: user.email,
         null,
         null,
         0.0
