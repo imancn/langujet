@@ -52,9 +52,8 @@ class CouponService(
         }
     }
     
-    fun invalidateCoupon(coupon: Coupon) {
-        couponRepository.save(coupon.also { it.active = false })
-        /// todo: do roll back when order was canceled or failed ://
+    fun changeCouponActiveFlag(coupon: Coupon, active: Boolean) {
+        couponRepository.save(coupon.also { it.active = active })
     }
     
     fun getCouponsByUserId(userId: String, active: Boolean?): List<ActiveCouponsResponse> {
