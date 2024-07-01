@@ -202,12 +202,9 @@ class AuthController(
     
     @PostMapping("/delete-account")
     @PreAuthorize("hasAnyRole('STUDENT')")
-    fun deleteAccount(
-        @RequestParam @Email email: String, @RequestParam password: String
-    ): String {
-        val user = userRepository.findByEmailAndDeleted(email.toStandardMailAddress())
-            .orElseThrow { UnprocessableException("Invalid credentials") }
-        if (!encoder.matches(password, user.password)) throw UnprocessableException("Invalid credentials")
+    fun deleteAccount(): String {
+        val user = userRepository.findByEmailAndDeleted(Auth.userEmail())
+            .orElseThrow { UnprocessableException("User Not Found") }
         val emailVerificationToken = emailVerificationTokenRepository.findByUser(user).getOrElse {
             emailVerificationTokenRepository.save(EmailVerificationToken(user))
         }
@@ -215,11 +212,9 @@ class AuthController(
         return "Verification Mail Has Been Sent"
     }
     
-    @GetMapping("/delete-account/verify/{email}/{verificationCode}")
-    fun verifyDeleteAccount(
-        @PathVariable @Email @NotBlank email: String, @PathVariable @NotBlank verificationCode: String
-    ): String {
-        val user = userRepository.findByEmailAndDeleted(email.toStandardMailAddress())
+    @PostMapping("/delete-account/verify")
+    fun verifyDeleteAccount(@RequestParam @NotBlank verificationCode: String): String {
+        val user = userRepository.findByEmailAndDeleted(Auth.userEmail())
             .orElseThrow { NotFoundException("User Not Found") }
         val verificationToken = emailVerificationTokenRepository.findByUser(user).orElseThrow {
             mailSenderService.sendDeleteAccountVerificationMail(

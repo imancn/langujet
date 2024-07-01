@@ -59,7 +59,6 @@ class MailSenderService(
         val token = emailVerificationToken.token
         val contentParams = mapOf(
             "TOKEN" to token,
-            "LINK" to "$hostRoot/api/v1/auth/delete-account/verify/$email/$token",
         )
         sendWithTemplate(
             email, "Delete Account Verification Mail", contentParams, "delete_account_verification_mail"
