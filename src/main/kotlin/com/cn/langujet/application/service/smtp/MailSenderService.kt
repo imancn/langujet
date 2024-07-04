@@ -17,7 +17,6 @@ import javax.mail.internet.MimeMultipart
 class MailSenderService(
     private val session: Session
 ) {
-    private val hostRoot = "https://api.langujet.com"
     private val logger = LoggerFactory.getLogger(javaClass.simpleName)
 
     fun sendWithTemplate(to: List<String>, subject: String, contentParams: Map<String, String>, templateName: String) {
@@ -69,7 +68,6 @@ class MailSenderService(
         val token = resetPasswordToken.token
         val contentParams = mapOf(
             "TOKEN" to token,
-            "SITE" to hostRoot,
         )
         sendWithTemplate(
             email, "Reset Password Mail", contentParams, "reset_password"
