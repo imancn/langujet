@@ -47,7 +47,6 @@ class MailSenderService(
         val token = emailVerificationToken.token
         val contentParams = mapOf(
             "TOKEN" to token,
-            "LINK" to "$hostRoot/api/v1/auth/signup/email/verify/$email/$token",
         )
         sendWithTemplate(
             email, "Verification Mail", contentParams, "email_verification"
