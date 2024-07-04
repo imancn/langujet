@@ -21,7 +21,7 @@ class StripePaymentService {
         Stripe.apiKey = apiSecretKey
     }
     
-    fun createPaymentSession(price: Double): Session {
+    fun createPaymentSession(price: Double, orderId: String): Session {
         val sessionParams = SessionCreateParams.builder()
             .addAllPaymentMethodType(
                 listOf(
@@ -47,8 +47,8 @@ class StripePaymentService {
                     .build()
             )
             .setMode(SessionCreateParams.Mode.PAYMENT)
-            .setSuccessUrl("$paymentRedirectUrl?status=success")
-            .setCancelUrl("$paymentRedirectUrl?status=failure")
+            .setSuccessUrl("$paymentRedirectUrl?id=$orderId")
+            .setCancelUrl("$paymentRedirectUrl?id=$orderId")
             .build()
         
         return Session.create(sessionParams)
