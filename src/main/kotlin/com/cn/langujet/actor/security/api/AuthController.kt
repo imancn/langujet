@@ -84,9 +84,9 @@ class AuthController(
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/corrector/signup")
     fun registerCorrector(
-        @NotBlank fullName: String,
-        @NotBlank @Size(max = 50) @Email email: String,
-        @NotBlank @Size(min = 6, max = 40) password: String,
+        @RequestParam @NotBlank fullName: String,
+        @RequestParam @NotBlank @Email email: String,
+        @RequestParam @NotBlank @Size(min = 6, max = 40) password: String,
     ): ResponseEntity<String> {
         val user = registerUser(email.toStandardMailAddress(), password, mutableSetOf(Role.ROLE_CORRECTOR))
         sendVerificationMail(email.toStandardMailAddress())
