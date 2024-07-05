@@ -3,7 +3,6 @@ package com.cn.langujet.domain.user.services
 import com.cn.langujet.application.advice.InvalidTokenException
 import com.cn.langujet.domain.user.model.UserDetailsImpl
 import com.cn.langujet.domain.user.repository.UserRepository
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
@@ -15,13 +14,13 @@ class UserDetailsServiceImpl(
 ) : UserDetailsService {
     @Transactional
     @Throws(UsernameNotFoundException::class)
-    override fun loadUserByUsername(userId: String): UserDetails {
+    override fun loadUserByUsername(userId: String): UserDetailsImpl {
         return UserDetailsImpl.build(
-            userRepository.findById(userId).orElseThrow { InvalidTokenException("User Not Found") }
+            userRepository.findByIdAndDeleted(userId).orElseThrow { InvalidTokenException("User Not Found") }
         )
     }
 
     fun userExist(userId: String): Boolean {
-        return userRepository.existsById(userId)
+        return userRepository.existsByIdAndDeleted(userId)
     }
 }

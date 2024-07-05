@@ -7,4 +7,6 @@ import java.util.*
 interface UserRepository : MongoRepository<User, String> {
     fun findByEmailAndDeleted(email: String, deleted: Boolean = false): Optional<User>
     fun existsByEmailAndDeleted(email: String, deleted: Boolean = false): Boolean
+    fun findByIdAndDeleted(userId: String, deleted: Boolean = false): Optional<User>
+    fun existsByIdAndDeleted(userId: String, deleted: Boolean = false): Boolean
 }

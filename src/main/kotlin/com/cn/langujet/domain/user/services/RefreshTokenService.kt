@@ -30,8 +30,12 @@ class RefreshTokenService(
         return refreshToken
     }
 
-    fun deleteByUserId(userId: String): Int {
-        if (!userRepository.existsById(userId)) { throw NotFoundException("User Not Found") }
-        return refreshTokenRepository.deleteByUserId(userId)
+    fun deleteByUserId(userId: String) {
+        if (!userRepository.existsByIdAndDeleted(userId)) { throw NotFoundException("User Not Found") }
+        refreshTokenRepository.deleteByUserId(userId)
+    }
+    
+    fun deleteById(id: String) {
+        refreshTokenRepository.deleteById(id)
     }
 }

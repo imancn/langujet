@@ -58,7 +58,7 @@ class AuthController(
             UsernamePasswordAuthenticationToken(user.id, password)
         )
         SecurityContextHolder.getContext().authentication = authentication
-        val jwt = jwtService.generateJwtToken(authentication)
+        val jwt = jwtService.generateJwtToken(authentication.principal as UserDetailsImpl)
         val userDetails = authentication.principal as UserDetailsImpl
         if (!userDetails.emailVerified) throw UnprocessableException("User is not enabled ${userDetails.email}")
         val refreshToken = refreshTokenService.createRefreshToken(userDetails.id)
@@ -141,14 +141,15 @@ class AuthController(
     
     @PostMapping("/refresh-token")
     fun refreshToken(
-        @RequestParam @NotBlank refreshToken: String?,
+        @RequestParam @NotBlank refreshToken: String,
     ): ResponseEntity<RefreshTokenResponse> {
-        return toOkResponseEntity(refreshTokenService.findByToken(refreshToken!!).map {
-            val token = jwtService.generateJwtToken(SecurityContextHolder.getContext().authentication)
+        return toOkResponseEntity(refreshTokenService.findByToken(refreshToken).map {
+            val token = jwtService.generateTokenFromUserId(it.userId)
             val newRefreshToken = refreshTokenService.createRefreshToken(it.userId)
+            refreshTokenService.deleteById(refreshToken)
             RefreshTokenResponse(token, newRefreshToken.id ?: "")
         }.orElseThrow {
-            RefreshTokenException("Refresh token [${refreshToken}] is not available")
+            RefreshTokenException("Your Session has been expired")
         })
     }
     
@@ -188,7 +189,7 @@ class AuthController(
         @RequestParam @Size(min = 6, max = 40) @NotBlank oldPassword: String,
         @RequestParam @Size(min = 6, max = 40) @NotBlank newPassword: String
     ): ResponseEntity<String> {
-        val user = userRepository.findById(Auth.userId()).orElseThrow { NotFoundException("User Not Found") }
+        val user = userRepository.findByIdAndDeleted(Auth.userId()).orElseThrow { NotFoundException("User Not Found") }
         if (user.password == encoder.encode(oldPassword)) user.password = encoder.encode(newPassword)
         else throw InvalidInputException("Old Password is not correct.")
         return toOkResponseEntity("Your password has been changed.")

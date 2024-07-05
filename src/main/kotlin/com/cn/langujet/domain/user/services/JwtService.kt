@@ -5,21 +5,21 @@ import com.cn.langujet.domain.user.model.UserDetailsImpl
 import io.jsonwebtoken.*
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.stereotype.Component
 import java.util.*
 
 @Component
-class JwtService {
+class JwtService(
+    private val userDetailsServiceImpl: UserDetailsServiceImpl
+) {
     @Value("\${app.jwtSecret}")
     private val jwtSecret: String? = null
 
     @Value("\${app.jwtExpirationMs}")
     private val jwtExpirationMs = 0
 
-    fun generateJwtToken(authentication: Authentication): String {
-        val userPrincipal = authentication.principal as UserDetailsImpl
+    fun generateJwtToken(userPrincipal: UserDetailsImpl): String {
         val roles = userPrincipal.authorities.map { it.authority }
         return Jwts.builder()
             .setSubject(userPrincipal.username)
@@ -68,5 +68,9 @@ class JwtService {
         return claims.get("roles", List::class.java).map {
             SimpleGrantedAuthority(it.toString())
         }
+    }
+    
+    fun generateTokenFromUserId(userId: String): String {
+        return generateJwtToken(userDetailsServiceImpl.loadUserByUsername(userId))
     }
 }
