@@ -19,3 +19,5 @@ class FileException(message: String?) : HttpException(HttpStatus.INTERNAL_SERVER
 class LogicalException(message: String?): RuntimeException(message)
 
 class UnprocessableException(message: String?): HttpException(HttpStatus.UNPROCESSABLE_ENTITY, message)
+
+class AccessDeniedException(message: String?) : HttpException(HttpStatus.FORBIDDEN, message)

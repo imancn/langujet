@@ -52,7 +52,7 @@ class AuthController(
         @RequestParam @NotBlank password: String,
     ): ResponseEntity<JwtResponse> {
         val user = userRepository.findByEmailAndDeleted(email.toStandardMailAddress()).orElseThrow {
-            UnprocessableException("Invalid credentials")
+            AccessDeniedException("Invalid credentials")
         }
         val authentication = authenticationManager.authenticate(
             UsernamePasswordAuthenticationToken(user.id, password)
@@ -60,7 +60,7 @@ class AuthController(
         SecurityContextHolder.getContext().authentication = authentication
         val jwt = jwtService.generateJwtToken(authentication.principal as UserDetailsImpl)
         val userDetails = authentication.principal as UserDetailsImpl
-        if (!userDetails.emailVerified) throw UnprocessableException("User is not enabled ${userDetails.email}")
+        if (!userDetails.emailVerified) throw UnprocessableException("Your email isn't verified")
         val refreshToken = refreshTokenService.createRefreshToken(userDetails.id)
         return toOkResponseEntity(
             JwtResponse(
