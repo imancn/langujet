@@ -111,7 +111,7 @@ class ExamSessionService(
             throw UnprocessableException("The exam session has not been started")
         }
         if (examSession.state.order >= ExamSessionState.FINISHED.order) {
-            throw UnprocessableException("The exam session has been finished")
+            return ExamSessionFinishResponse(examSession.state)
         }
         examSession = examSessionRepository.save(examSession.also {
             it.state = ExamSessionState.FINISHED
