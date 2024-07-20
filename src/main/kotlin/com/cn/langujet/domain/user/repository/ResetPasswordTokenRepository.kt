@@ -1,11 +1,11 @@
 package com.cn.langujet.domain.user.repository
 
-import com.cn.langujet.domain.user.model.ResetPasswordToken
-import com.cn.langujet.domain.user.model.User
+import com.cn.langujet.domain.user.model.ResetPasswordTokenEntity
+import com.cn.langujet.domain.user.model.UserEntity
 import org.springframework.data.mongodb.repository.MongoRepository
 import java.util.*
 
-interface ResetPasswordTokenRepository : MongoRepository<ResetPasswordToken, String> {
+interface ResetPasswordTokenRepository : MongoRepository<ResetPasswordTokenEntity, String> {
 
-    fun findByUser(user: User): Optional<ResetPasswordToken>
+    fun findByUser(user: UserEntity): Optional<ResetPasswordTokenEntity>
 }

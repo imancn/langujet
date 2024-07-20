@@ -3,8 +3,8 @@ package com.cn.langujet.domain.exam.repository
 import com.cn.langujet.actor.exam.payload.ExamSessionSearchRequest
 import com.cn.langujet.actor.exam.payload.ExamSessionSearchResponse
 import com.cn.langujet.actor.util.models.CustomPage
-import com.cn.langujet.domain.exam.model.Exam
-import com.cn.langujet.domain.exam.model.ExamSession
+import com.cn.langujet.domain.exam.model.ExamEntity
+import com.cn.langujet.domain.exam.model.ExamSessionEntity
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.MongoOperations
@@ -23,7 +23,7 @@ class ExamSessionCustomRepository(
     ): CustomPage<ExamSessionSearchResponse> {
         var foundExams = if (!searchRequest.examName.isNullOrEmpty()) {
             mongoOperations.find(
-                Query(Criteria.where("name").regex(".*" + searchRequest.examName + ".*", "i")), Exam::class.java
+                Query(Criteria.where("name").regex(".*" + searchRequest.examName + ".*", "i")), ExamEntity::class.java
             )
         } else null
         
@@ -39,14 +39,14 @@ class ExamSessionCustomRepository(
         
         val sessions = mongoOperations.find(
             Query(sessionCriteria).with(Sort.by(Sort.Direction.DESC, "startDate"))
-                .with(PageRequest.of(searchRequest.pageNumber, searchRequest.pageSize)), ExamSession::class.java
+                .with(PageRequest.of(searchRequest.pageNumber, searchRequest.pageSize)), ExamSessionEntity::class.java
         )
         
-        val totalSessionCount = mongoOperations.count(Query(sessionCriteria), ExamSession::class.java)
+        val totalSessionCount = mongoOperations.count(Query(sessionCriteria), ExamSessionEntity::class.java)
         
         if (foundExams.isNullOrEmpty()) {
             foundExams = mongoOperations.find(
-                Query(Criteria.where("id").`in`(sessions.map { it.examId }.distinct())), Exam::class.java
+                Query(Criteria.where("id").`in`(sessions.map { it.examId }.distinct())), ExamEntity::class.java
             )
         }
         

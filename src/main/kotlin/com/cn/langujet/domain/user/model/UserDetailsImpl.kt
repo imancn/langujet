@@ -58,7 +58,7 @@ class UserDetailsImpl(
     }
     
     companion object {
-        fun build(user: User): UserDetailsImpl {
+        fun build(user: UserEntity): UserDetailsImpl {
             val authorities: List<GrantedAuthority> = user.roles.map { role ->
                 SimpleGrantedAuthority(
                     role.name

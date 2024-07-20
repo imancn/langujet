@@ -7,7 +7,7 @@ import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document(collection = "correct_answers")
-sealed class CorrectAnswer(
+sealed class CorrectAnswerEntity(
     @Id var id: String? = null,
     var examId: String,
     var sectionOrder: Int,
@@ -17,43 +17,43 @@ sealed class CorrectAnswer(
 ) {
     @Document(collection = "correct_answers")
     @TypeAlias("correct_text_answers")
-    class CorrectTextAnswer(
+    class CorrectTextAnswerEntity(
         examId: String,
         sectionOrder: Int,
         partOrder: Int,
         questionOrder: Int,
         var text: String
-    ) : CorrectAnswer(null, examId, sectionOrder, partOrder, questionOrder, AnswerType.TEXT)
+    ) : CorrectAnswerEntity(null, examId, sectionOrder, partOrder, questionOrder, AnswerType.TEXT)
 
     @Document(collection = "correct_answers")
     @TypeAlias("correct_text_issues_answers")
-    class CorrectTextIssuesAnswer(
+    class CorrectTextIssuesAnswerEntity(
         examId: String,
         sectionOrder: Int,
         partOrder: Int,
         questionOrder: Int,
         var issues: List<List<String>>
-    ) : CorrectAnswer(null, examId, sectionOrder, partOrder, questionOrder, AnswerType.TEXT_ISSUES)
+    ) : CorrectAnswerEntity(null, examId, sectionOrder, partOrder, questionOrder, AnswerType.TEXT_ISSUES)
 
     @Document(collection = "correct_answers")
     @TypeAlias("correct_true_false_answers")
-    class CorrectTrueFalseAnswer(
+    class CorrectTrueFalseAnswerEntity(
         examId: String,
         sectionOrder: Int,
         partOrder: Int,
         questionOrder: Int,
         var issues: List<TrueFalseAnswerType>
-    ) : CorrectAnswer(null, examId, sectionOrder, partOrder, questionOrder, AnswerType.TRUE_FALSE)
+    ) : CorrectAnswerEntity(null, examId, sectionOrder, partOrder, questionOrder, AnswerType.TRUE_FALSE)
 
     @Document(collection = "correct_answers")
     @TypeAlias("correct_multiple_choice_answers")
-    class CorrectMultipleChoiceAnswer(
+    class CorrectMultipleChoiceAnswerEntity(
         examId: String,
         sectionOrder: Int,
         partOrder: Int,
         questionOrder: Int,
         var issues: List<CorrectMultipleChoiceIssueAnswer>
-    ) : CorrectAnswer(null, examId, sectionOrder, partOrder, questionOrder, AnswerType.MULTIPLE_CHOICE)
+    ) : CorrectAnswerEntity(null, examId, sectionOrder, partOrder, questionOrder, AnswerType.MULTIPLE_CHOICE)
 
     class CorrectMultipleChoiceIssueAnswer(
         var order: Int,

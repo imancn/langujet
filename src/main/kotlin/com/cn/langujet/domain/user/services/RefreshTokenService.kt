@@ -1,7 +1,7 @@
 package com.cn.langujet.domain.user.services
 
 import com.cn.langujet.application.advice.NotFoundException
-import com.cn.langujet.domain.user.model.RefreshToken
+import com.cn.langujet.domain.user.model.RefreshTokenEntity
 import com.cn.langujet.domain.user.repository.RefreshTokenRepository
 import com.cn.langujet.domain.user.repository.UserRepository
 import org.springframework.beans.factory.annotation.Value
@@ -16,12 +16,12 @@ class RefreshTokenService(
     @Value("\${app.jwtRefreshExpirationMs}")
     private val refreshTokenDurationMs: Long? = null
 
-    fun findByToken(token: String): Optional<RefreshToken> {
+    fun findByToken(token: String): Optional<RefreshTokenEntity> {
         return refreshTokenRepository.findById(token)
     }
 
-    fun createRefreshToken(userId: String): RefreshToken {
-        var refreshToken = RefreshToken(
+    fun createRefreshToken(userId: String): RefreshTokenEntity {
+        var refreshToken = RefreshTokenEntity(
             null,
             userId,
             Date(System.currentTimeMillis() + refreshTokenDurationMs!!)

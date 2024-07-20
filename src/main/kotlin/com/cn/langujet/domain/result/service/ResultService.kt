@@ -9,9 +9,9 @@ import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.domain.correction.model.CorrectionStatus
 import com.cn.langujet.domain.correction.model.CorrectorType
 import com.cn.langujet.domain.correction.service.corrector.ScoreCalculator.Companion.calculateOverAllScore
-import com.cn.langujet.domain.exam.model.ExamSession
+import com.cn.langujet.domain.exam.model.ExamSessionEntity
 import com.cn.langujet.domain.exam.service.ExamSessionService
-import com.cn.langujet.domain.result.model.Result
+import com.cn.langujet.domain.result.model.ResultEntity
 import com.cn.langujet.domain.result.repository.ResultRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
@@ -26,10 +26,10 @@ class ResultService(
     @Autowired @Lazy
     private lateinit var examSessionService: ExamSessionService
     
-    fun initiateResult(examSession: ExamSession): Result {
+    fun initiateResult(examSession: ExamSessionEntity): ResultEntity {
         val now = Date(System.currentTimeMillis())
         return resultRepository.save(
-            Result(
+            ResultEntity(
                 id = null,
                 examSessionId = examSession.id ?: "",
                 examType = examSession.examType,
@@ -45,7 +45,7 @@ class ResultService(
         )
     }
     
-    fun assignResultToCorrector(result: Result, correctorUserId: String): Result {
+    fun assignResultToCorrector(result: ResultEntity, correctorUserId: String): ResultEntity {
         return resultRepository.save(
             result.also {
             it.correctorUserId = correctorUserId
@@ -63,13 +63,13 @@ class ResultService(
         return DetailedResultResponse(result, sectionResult)
     }
     
-    fun getResultByExamSessionId(examSessionId: String): Result {
+    fun getResultByExamSessionId(examSessionId: String): ResultEntity {
         return resultRepository.findByExamSessionId(examSessionId).orElseThrow {
             NotFoundException("Result not found")
         }
     }
     
-    fun getResultById(resultId: String): Result {
+    fun getResultById(resultId: String): ResultEntity {
         return resultRepository.findById(resultId).orElseThrow {
             NotFoundException("Result not found")
         }
@@ -96,7 +96,7 @@ class ResultService(
     
     fun getHumanResultsByStatus(
         correctionStatus: CorrectionStatus
-    ): List<Result> {
+    ): List<ResultEntity> {
         return resultRepository.findByCorrectorTypeAndStatusOrderByCreatedDateAsc(
             CorrectorType.HUMAN, correctionStatus
         )
@@ -104,13 +104,13 @@ class ResultService(
     
     fun getCorrectorResultsByStatus(
         correctionStatus: CorrectionStatus, correctorId: String
-    ): List<Result> {
+    ): List<ResultEntity> {
         return resultRepository.findByStatusAndCorrectorUserIdOrderByCreatedDateAsc(
             correctionStatus, correctorId
         )
     }
     
-    fun areAllSectionResultsApproved(result: Result): Boolean {
+    fun areAllSectionResultsApproved(result: ResultEntity): Boolean {
         val sectionResults = sectionResultService.getByResultId(result.id ?: "")
         sectionResults.forEach { 
             if (it.status != CorrectionStatus.APPROVED) {
@@ -120,7 +120,7 @@ class ResultService(
         return true
     }
     
-    fun finalizeCorrection(result: Result) {
+    fun finalizeCorrection(result: ResultEntity) {
         resultRepository.save(
             result.also {
                 it.status = CorrectionStatus.APPROVED

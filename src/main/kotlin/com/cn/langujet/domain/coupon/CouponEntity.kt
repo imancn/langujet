@@ -7,7 +7,7 @@ import java.util.Date
 
 @Document(collection = "coupons")
 @TypeAlias("coupons")
-data class Coupon(
+data class CouponEntity(
     @Id var id: String? = null,
     var name: String,
     var code: String,

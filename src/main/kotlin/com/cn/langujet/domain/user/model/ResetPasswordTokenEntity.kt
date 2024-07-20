@@ -7,18 +7,18 @@ import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
 
-@Document(collection = "reset_password_token")
-@TypeAlias("reset_password_token")
-data class ResetPasswordToken(
+@Document(collection = "reset_password_tokens")
+@TypeAlias("reset_password_tokens")
+data class ResetPasswordTokenEntity(
     @Id
     var id: String?,
     @DBRef
-    var user: User,
+    var user: UserEntity,
     var token: String,
     @Indexed(name = "expiry_date_ttl", expireAfterSeconds = 0)
     var expiryDate: Date,
 ) {
-    constructor(user: User) : this(
+    constructor(user: UserEntity) : this(
         id = null,
         user = user,
         token = makeRandom6DigitsToken(),

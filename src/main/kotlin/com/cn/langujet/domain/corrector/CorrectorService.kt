@@ -30,7 +30,7 @@ class CorrectorService(
         return CorrectorProfileResponse(correctorRepository.save(corrector))
     }
     
-    fun getCorrectorByUserId(userId: String): Corrector {
+    fun getCorrectorByUserId(userId: String): CorrectorEntity {
         return correctorRepository.findByUser_Id(userId).orElseThrow {
             NotFoundException("Corrector not found")
         }

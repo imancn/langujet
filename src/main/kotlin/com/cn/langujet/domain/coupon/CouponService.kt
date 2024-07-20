@@ -31,13 +31,13 @@ class CouponService(
         return code
     }
     
-    fun createCoupon(name: String, email: String, amount: Double, tag: String?, description: String?): Coupon {
+    fun createCoupon(name: String, email: String, amount: Double, tag: String?, description: String?): CouponEntity {
         val code = generateCouponCode()
         val user = userRepository.findByEmailAndDeleted(email).getOrElse { /// todo: Move userRepository dependency on AuthService and inject the service
             throw UnprocessableException("user with email $email not found")
         }
         return couponRepository.save(
-            Coupon(
+            CouponEntity(
                 name = name, code = code, userId = user.id ?: "", amount = amount, tag = tag, description = description
             )
         )
@@ -52,7 +52,7 @@ class CouponService(
         }
     }
     
-    fun changeCouponActiveFlag(coupon: Coupon, active: Boolean) {
+    fun changeCouponActiveFlag(coupon: CouponEntity, active: Boolean) {
         couponRepository.save(coupon.also { it.active = active })
     }
     
@@ -71,7 +71,7 @@ class CouponService(
         }
     }
     
-    fun getActiveCouponByCode(couponCode: String?): Coupon? {
+    fun getActiveCouponByCode(couponCode: String?): CouponEntity? {
         if (!couponCode.isNullOrBlank()) {
             val coupon = couponRepository.findByCode(couponCode.uppercase())
             if (coupon == null || !coupon.active)
@@ -82,7 +82,7 @@ class CouponService(
         }
     }
     
-    fun getCouponById(id: String): Coupon {
+    fun getCouponById(id: String): CouponEntity {
         return couponRepository.findById(id).orElseThrow {
             throw UnprocessableException("Payment with Id $id not found")
         }

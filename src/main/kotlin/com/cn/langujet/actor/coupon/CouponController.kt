@@ -4,7 +4,7 @@ import com.cn.langujet.actor.coupon.payload.request.CreateCouponRequest
 import com.cn.langujet.actor.coupon.payload.response.ActiveCouponsResponse
 import com.cn.langujet.actor.coupon.payload.response.CouponValidationResponse
 import com.cn.langujet.actor.util.Auth
-import com.cn.langujet.domain.coupon.Coupon
+import com.cn.langujet.domain.coupon.CouponEntity
 import com.cn.langujet.domain.coupon.CouponService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -17,7 +17,7 @@ class CouponController(
     
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin/coupons")
-    fun createCoupon(@RequestBody request: CreateCouponRequest): Coupon {
+    fun createCoupon(@RequestBody request: CreateCouponRequest): CouponEntity {
         return couponService.createCoupon(
             request.name,
             request.email,

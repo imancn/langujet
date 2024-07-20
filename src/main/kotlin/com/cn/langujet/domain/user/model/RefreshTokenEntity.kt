@@ -8,7 +8,7 @@ import java.util.Date
 
 @Document(collection = "refresh_tokens")
 @TypeAlias("refresh_tokens")
-data class RefreshToken(
+data class RefreshTokenEntity(
     @Id
     var id: String?,
     var userId: String,

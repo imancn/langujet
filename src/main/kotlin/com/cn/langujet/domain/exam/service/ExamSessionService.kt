@@ -7,7 +7,7 @@ import com.cn.langujet.application.advice.InvalidTokenException
 import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.correction.service.CorrectionService
-import com.cn.langujet.domain.exam.model.ExamSession
+import com.cn.langujet.domain.exam.model.ExamSessionEntity
 import com.cn.langujet.domain.exam.model.ExamSessionState
 import com.cn.langujet.domain.exam.repository.ExamSessionCustomRepository
 import com.cn.langujet.domain.exam.repository.ExamSessionRepository
@@ -26,7 +26,7 @@ class ExamSessionService(
     private val examGeneratorService: ExamGeneratorService,
     private val serviceService: ServiceService
 ) {
-    fun getExamSessionById(id: String): ExamSession {
+    fun getExamSessionById(id: String): ExamSessionEntity {
         return examSessionRepository.findById(id).orElseThrow {
             NotFoundException("ExamSession with id: $id not found")
         }
@@ -34,7 +34,7 @@ class ExamSessionService(
     
     fun getStudentExamSession(
         examSessionId: String,
-    ): ExamSession {
+    ): ExamSessionEntity {
         val examSession = getExamSessionById(examSessionId)
         if (Auth.userId() != examSession.studentUserId) {
             throw InvalidTokenException("Exam Session with id: $examSessionId is not belong to your token")
@@ -68,7 +68,7 @@ class ExamSessionService(
             examGeneratorService.getRandomStudentAvailableExam(userId, service)
         }
         val examSession = examSessionRepository.save(
-            ExamSession(
+            ExamSessionEntity(
                 userId, exam.id ?: "", exam.type, exam.mode, service.correctorType, Date(System.currentTimeMillis())
             )
         )

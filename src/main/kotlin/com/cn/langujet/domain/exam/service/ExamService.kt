@@ -5,7 +5,7 @@ import com.cn.langujet.actor.util.models.CustomPage
 import com.cn.langujet.actor.util.models.toCustomPage
 import com.cn.langujet.application.advice.InvalidInputException
 import com.cn.langujet.application.advice.NotFoundException
-import com.cn.langujet.domain.exam.model.Exam
+import com.cn.langujet.domain.exam.model.ExamEntity
 import com.cn.langujet.domain.exam.repository.ExamRepository
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -37,7 +37,7 @@ class ExamService(
         )
     }
     
-    fun getExamById(id: String): Exam {
+    fun getExamById(id: String): ExamEntity {
         return examRepository.findById(id).orElseThrow { NotFoundException("Exam with id $id not found") }
     }
     

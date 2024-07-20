@@ -1,6 +1,6 @@
 package com.cn.langujet.actor.exam.payload
 
-import com.cn.langujet.domain.exam.model.Section
+import com.cn.langujet.domain.exam.model.SectionEntity
 import com.cn.langujet.domain.exam.model.SectionType
 import com.fasterxml.jackson.annotation.JsonInclude
 
@@ -15,8 +15,8 @@ data class SectionDTO(
     var parts: List<PartDTO>? = null,
     var time: Long? = null
 ) {
-    fun toSection(): Section {
-        return Section(
+    fun toSection(): SectionEntity {
+        return SectionEntity(
             this.id,
             this.examId!!,
             this.header!!,
@@ -27,7 +27,7 @@ data class SectionDTO(
         )
     }
 
-    constructor(section: Section) : this(
+    constructor(section: SectionEntity) : this(
         section.id,
         section.examId,
         section.header,

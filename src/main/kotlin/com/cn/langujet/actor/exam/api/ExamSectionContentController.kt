@@ -1,7 +1,7 @@
 package com.cn.langujet.actor.exam.api
 
 import com.cn.langujet.actor.exam.payload.ExamSectionContentDownloadLink
-import com.cn.langujet.domain.exam.model.ExamSectionContent
+import com.cn.langujet.domain.exam.model.ExamSectionContentEntity
 import com.cn.langujet.domain.exam.service.ExamSectionContentService
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
@@ -22,7 +22,7 @@ class ExamSectionContentController(
         @RequestParam @NotBlank examId: String?,
         @RequestParam @NotNull sectionOrder: Int?,
         @RequestParam("file") file: MultipartFile
-    ): ExamSectionContent {
+    ): ExamSectionContentEntity {
         return examSectionContentService.uploadExamSectionContent(examId!!, sectionOrder!!, file)
     }
 

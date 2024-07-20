@@ -7,7 +7,7 @@ import com.cn.langujet.application.advice.InvalidTokenException
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.application.service.file.domain.data.model.FileBucket
 import com.cn.langujet.application.service.file.domain.service.FileService
-import com.cn.langujet.domain.exam.model.ExamSectionContent
+import com.cn.langujet.domain.exam.model.ExamSectionContentEntity
 import com.cn.langujet.domain.exam.repository.ExamSectionContentRepository
 import com.cn.langujet.domain.exam.repository.ExamSessionRepository
 import org.springframework.stereotype.Service
@@ -23,7 +23,7 @@ class ExamSectionContentService(
     private val examService: ExamService,
     private val fileService: FileService
 ) {
-    fun uploadExamSectionContent(examId: String, sectionOrder: Int, file: MultipartFile): ExamSectionContent {
+    fun uploadExamSectionContent(examId: String, sectionOrder: Int, file: MultipartFile): ExamSectionContentEntity {
         sectionService.getSectionsByExamId(examId).find {
             it.order == sectionOrder
         } ?: throw NotFoundException("Section not found")
@@ -31,7 +31,7 @@ class ExamSectionContentService(
         val fileEntity = fileService.uploadFile(file, FileBucket.EXAM_CONTENTS)
 
         return examSectionContentRepository.save(
-            ExamSectionContent(
+            ExamSectionContentEntity(
                 null,
                 examId,
                 sectionOrder,

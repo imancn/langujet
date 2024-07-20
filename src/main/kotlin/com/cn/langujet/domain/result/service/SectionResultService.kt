@@ -6,10 +6,10 @@ import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.domain.correction.model.CorrectionStatus
 import com.cn.langujet.domain.correction.model.CorrectorType
-import com.cn.langujet.domain.exam.model.ExamSession
+import com.cn.langujet.domain.exam.model.ExamSessionEntity
 import com.cn.langujet.domain.exam.model.SectionType
 import com.cn.langujet.domain.exam.repository.dto.SectionMetaDTO
-import com.cn.langujet.domain.result.model.SectionResult
+import com.cn.langujet.domain.result.model.SectionResultEntity
 import com.cn.langujet.domain.result.repository.SectionResultRepository
 import org.springframework.stereotype.Service
 import java.util.*
@@ -20,12 +20,12 @@ class SectionResultService(
 ) {
     fun initSectionResult(
         resultId: String,
-        examSession: ExamSession,
+        examSession: ExamSessionEntity,
         section: SectionMetaDTO,
-    ): SectionResult {
+    ): SectionResultEntity {
         val now = Date(System.currentTimeMillis())
         return sectionResultRepository.save(
-            SectionResult(
+            SectionResultEntity(
                 id = null,
                 resultId = resultId,
                 examSessionId = examSession.id ?: "",
@@ -43,21 +43,21 @@ class SectionResultService(
         )
     }
     
-    fun getSectionResultsByResultId(resultId: String): List<SectionResult> {
+    fun getSectionResultsByResultId(resultId: String): List<SectionResultEntity> {
         return sectionResultRepository.findAllByResultId(resultId)
     }
     
-    fun getSectionResultById(id: String): SectionResult {
+    fun getSectionResultById(id: String): SectionResultEntity {
         return sectionResultRepository.findById(id).orElseThrow {
             NotFoundException("Section Result not found")
         }
     }
     
-    fun getByStatusAndResultId(correctionStatus: CorrectionStatus, resultId: String): List<SectionResult> {
+    fun getByStatusAndResultId(correctionStatus: CorrectionStatus, resultId: String): List<SectionResultEntity> {
         return sectionResultRepository.findByStatusAndResultId(correctionStatus, resultId)
     }
     
-    fun getByResultId(resultId: String): List<SectionResult> {
+    fun getByResultId(resultId: String): List<SectionResultEntity> {
         return sectionResultRepository.findByResultId(resultId)
     }
     
@@ -69,10 +69,10 @@ class SectionResultService(
         correctIssuesCount: Int?,
         score: Double,
         recommendation: String? = null
-    ): SectionResult {
+    ): SectionResultEntity {
         val now = Date(System.currentTimeMillis())
         return sectionResultRepository.save(
-            SectionResult(
+            SectionResultEntity(
                 id = null,
                 resultId = resultId,
                 examSessionId = examSessionId,
@@ -90,7 +90,7 @@ class SectionResultService(
         )
     }
     
-    fun assignSectionResultToCorrector(sectionResults: List<SectionResult>, correctorUserId: String) {
+    fun assignSectionResultToCorrector(sectionResults: List<SectionResultEntity>, correctorUserId: String) {
         sectionResultRepository.saveAll(
             sectionResults.onEach {
                 it.correctorUserId = correctorUserId

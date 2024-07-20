@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.exam.service
 
-import com.cn.langujet.domain.exam.model.Exam
+import com.cn.langujet.domain.exam.model.ExamEntity
 import com.cn.langujet.domain.exam.model.ExamMode
 import com.cn.langujet.domain.exam.model.ExamType
 import com.cn.langujet.domain.exam.repository.ExamRepository
@@ -21,7 +21,7 @@ class ExamGeneratorService(
     private val mongoOperations: MongoOperations,
 ) {
     
-    fun getRandomStudentAvailableExam(studentUserId: String, examService: ServiceEntity.ExamServiceEntity): Exam {
+    fun getRandomStudentAvailableExam(studentUserId: String, examService: ServiceEntity.ExamServiceEntity): ExamEntity {
         val unavailableExamIds = examSessionRepository.findByStudentUserId(studentUserId).map { it.examId }.distinct()
         val exams = examRepository.findAllByTypeAndModeAndActiveAndIdNotIn(
             examService.examType,

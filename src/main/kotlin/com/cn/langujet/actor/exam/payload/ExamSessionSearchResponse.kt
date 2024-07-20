@@ -15,8 +15,8 @@ class ExamSessionSearchResponse (
     val correctionDate: Date?
 ) {
     constructor(
-        examSession: ExamSession,
-        exam: Exam?,
+        examSession: ExamSessionEntity,
+        exam: ExamEntity?,
     ):this (
         examSession.id ?: "",
         exam?.let {

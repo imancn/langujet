@@ -9,14 +9,14 @@ import java.util.*
 
 @Document(collection = "email_verification_tokens")
 @TypeAlias("email_verification_tokens")
-data class EmailVerificationToken(
+data class EmailVerificationTokenEntity(
     @Id var id: String?,
-    @DBRef var user: User,
+    @DBRef var user: UserEntity,
     var token: String,
     @Indexed(name = "expiry_date_ttl", expireAfterSeconds = 0)
     var expiryDate: Date,
 ) {
-    constructor(user: User) : this(
+    constructor(user: UserEntity) : this(
         id = null, user = user, token = makeRandom6DigitsToken(), expiryDate = calculateExpiryDate()
     )
 

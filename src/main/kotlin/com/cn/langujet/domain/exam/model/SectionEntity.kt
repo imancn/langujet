@@ -4,12 +4,14 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
 
-@Document(collection = "exam_section_contents")
-@TypeAlias("exam_section_contents")
-class ExamSectionContent(
-    @Id
-    var id: String?,
+@Document(collection = "sections")
+@TypeAlias("sections")
+class SectionEntity(
+    @Id var id: String?,
     var examId: String,
-    var sectionOrder: Int,
-    var fileId: String,
+    var header: String,
+    var order: Int,
+    var sectionType: SectionType,
+    var parts: List<Part>,
+    var time: Long
 )

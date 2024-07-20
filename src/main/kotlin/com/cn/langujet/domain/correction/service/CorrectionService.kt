@@ -7,13 +7,13 @@ import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.answer.AnswerRepository
-import com.cn.langujet.domain.answer.model.Answer
+import com.cn.langujet.domain.answer.model.AnswerEntity
 import com.cn.langujet.domain.correction.model.CorrectionStatus
 import com.cn.langujet.domain.correction.repository.CorrectAnswerRepository
 import com.cn.langujet.domain.correction.service.corrector.AutoCorrectorService
 import com.cn.langujet.domain.correction.service.corrector.ScoreCalculator.Companion.calculateOverAllScore
 import com.cn.langujet.domain.corrector.CorrectorService
-import com.cn.langujet.domain.exam.model.ExamSession
+import com.cn.langujet.domain.exam.model.ExamSessionEntity
 import com.cn.langujet.domain.exam.model.SpeakingPart
 import com.cn.langujet.domain.exam.model.WritingPart
 import com.cn.langujet.domain.exam.service.ExamSectionContentService
@@ -44,7 +44,7 @@ class CorrectionService(
     
     private val logger = LoggerFactory.getLogger(this::class.java)
     
-    fun initiateExamSessionCorrection(examSession: ExamSession) {
+    fun initiateExamSessionCorrection(examSession: ExamSessionEntity) {
         val sections = sectionService.getSectionsMetaData(examSession.examId)
         val result = resultService.initiateResult(examSession)
         val sectionResults = sections.map { section ->
@@ -167,7 +167,7 @@ class CorrectionService(
                             content = part.question.content?.let { content ->
                                 examSectionContentService.replaceFileIdsWithDownloadLink(content)
                             }),
-                        answer = answers.filterIsInstance<Answer.TextAnswer>().find { answer ->
+                        answer = answers.filterIsInstance<AnswerEntity.TextAnswerEntity>().find { answer ->
                             (answer.partOrder == part.order) && (answer.questionOrder == part.question.order)
                         }?.let { existingAnswer ->
                             TextCorrectorCorrectionAnswerResponse(
@@ -191,7 +191,7 @@ class CorrectionService(
                                         null
                                     }
                                 }),
-                                answer = answers.filterIsInstance<Answer.VoiceAnswer>().find { answer ->
+                                answer = answers.filterIsInstance<AnswerEntity.VoiceAnswerEntity>().find { answer ->
                                     (answer.partOrder == part.order) && (answer.questionOrder == question.order)
                                 }?.let { existingAnswer ->
                                     VoiceCorrectorCorrectionAnswerResponse(

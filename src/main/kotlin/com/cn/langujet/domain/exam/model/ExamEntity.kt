@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 
 @Document(collection = "exams")
 @TypeAlias("exams")
-data class Exam(
+data class ExamEntity(
     @Id var id: String?,
     var type: ExamType,
     var mode: ExamMode,

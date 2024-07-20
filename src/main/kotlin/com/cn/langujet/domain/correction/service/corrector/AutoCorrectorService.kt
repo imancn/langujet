@@ -3,14 +3,14 @@ package com.cn.langujet.domain.correction.service.corrector
 import com.cn.langujet.application.advice.LogicalException
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.answer.AnswerRepository
-import com.cn.langujet.domain.answer.model.Answer
-import com.cn.langujet.domain.correction.model.CorrectAnswer
+import com.cn.langujet.domain.answer.model.AnswerEntity
+import com.cn.langujet.domain.correction.model.CorrectAnswerEntity
 import com.cn.langujet.domain.correction.repository.CorrectAnswerRepository
-import com.cn.langujet.domain.exam.model.ExamSession
+import com.cn.langujet.domain.exam.model.ExamSessionEntity
 import com.cn.langujet.domain.exam.model.ExamType
 import com.cn.langujet.domain.exam.model.SectionType
 import com.cn.langujet.domain.exam.service.ExamService
-import com.cn.langujet.domain.result.model.SectionResult
+import com.cn.langujet.domain.result.model.SectionResultEntity
 import com.cn.langujet.domain.result.service.SectionResultService
 import com.rollbar.notifier.Rollbar
 import org.springframework.stereotype.Service
@@ -24,8 +24,8 @@ class AutoCorrectorService(
     private val rollbar: Rollbar,
 ) {
     fun correctExamSection(
-        examSession: ExamSession, resultId: String, sectionOrder: Int, sectionType: SectionType
-    ): SectionResult {
+        examSession: ExamSessionEntity, resultId: String, sectionOrder: Int, sectionType: SectionType
+    ): SectionResultEntity {
         val exam = examService.getExamById(examSession.examId)
         val correctAnswers = correctAnswerRepository.findAllByExamIdAndSectionOrder(examSession.examId, sectionOrder)
         val answers = answerRepository.findAllByExamSessionIdAndSectionOrder(examSession.id ?: "", sectionOrder)
@@ -41,7 +41,7 @@ class AutoCorrectorService(
         )
     }
     
-    private fun calculateCorrectIssuesCount(answers: List<Answer>, correctAnswers: List<CorrectAnswer>): Int {
+    private fun calculateCorrectIssuesCount(answers: List<AnswerEntity>, correctAnswers: List<CorrectAnswerEntity>): Int {
         var correctIssuesCount = 0
         answers.forEach { answer ->
             try {
@@ -50,23 +50,23 @@ class AutoCorrectorService(
                 } ?: throw NotFoundException("Correct Answer not found for Answer with id: ${answer.id}")
                 
                 correctIssuesCount += when (answer) {
-                    is Answer.TextAnswer -> {
-                        if (correctAnswer !is CorrectAnswer.CorrectTextAnswer) throw LogicalException("Correct Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${answer.id}")
+                    is AnswerEntity.TextAnswerEntity -> {
+                        if (correctAnswer !is CorrectAnswerEntity.CorrectTextAnswerEntity) throw LogicalException("Correct Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${answer.id}")
                         calculateCorrectIssuesCountForTextAnswer(answer, correctAnswer)
                     }
                     
-                    is Answer.TextIssuesAnswer -> {
-                        if (correctAnswer !is CorrectAnswer.CorrectTextIssuesAnswer) throw LogicalException("Correct Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${answer.id}")
+                    is AnswerEntity.TextIssuesAnswerEntity -> {
+                        if (correctAnswer !is CorrectAnswerEntity.CorrectTextIssuesAnswerEntity) throw LogicalException("Correct Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${answer.id}")
                         calculateCorrectIssuesCountForTextIssuesAnswer(answer, correctAnswer)
                     }
                     
-                    is Answer.TrueFalseAnswer -> {
-                        if (correctAnswer !is CorrectAnswer.CorrectTrueFalseAnswer) throw LogicalException("Correct Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${answer.id}")
+                    is AnswerEntity.TrueFalseAnswerEntity -> {
+                        if (correctAnswer !is CorrectAnswerEntity.CorrectTrueFalseAnswerEntity) throw LogicalException("Correct Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${answer.id}")
                         calculateCorrectIssuesCountForTrueFalseAnswer(answer, correctAnswer)
                     }
                     
-                    is Answer.MultipleChoiceAnswer -> {
-                        if (correctAnswer !is CorrectAnswer.CorrectMultipleChoiceAnswer) throw LogicalException("Correct Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${answer.id}")
+                    is AnswerEntity.MultipleChoiceAnswerEntity -> {
+                        if (correctAnswer !is CorrectAnswerEntity.CorrectMultipleChoiceAnswerEntity) throw LogicalException("Correct Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${answer.id}")
                         calculateCorrectIssuesCountForMultipleChoiceAnswer(answer, correctAnswer)
                     }
                     
@@ -80,13 +80,13 @@ class AutoCorrectorService(
     }
     
     private fun calculateCorrectIssuesCountForTextAnswer(
-        answer: Answer.TextAnswer, correctAnswer: CorrectAnswer.CorrectTextAnswer
+        answer: AnswerEntity.TextAnswerEntity, correctAnswer: CorrectAnswerEntity.CorrectTextAnswerEntity
     ): Int {
         return if (correctAnswer.text.pureEqual(answer.text)) 1 else 0
     }
     
     private fun calculateCorrectIssuesCountForTextIssuesAnswer(
-        answer: Answer.TextIssuesAnswer, correctAnswer: CorrectAnswer.CorrectTextIssuesAnswer
+        answer: AnswerEntity.TextIssuesAnswerEntity, correctAnswer: CorrectAnswerEntity.CorrectTextIssuesAnswerEntity
     ): Int {
         var correctIssuesCount = 0
         correctAnswer.issues.forEachIndexed { index, correctIssue ->
@@ -102,7 +102,7 @@ class AutoCorrectorService(
     }
     
     private fun calculateCorrectIssuesCountForTrueFalseAnswer(
-        answer: Answer.TrueFalseAnswer, correctAnswer: CorrectAnswer.CorrectTrueFalseAnswer
+        answer: AnswerEntity.TrueFalseAnswerEntity, correctAnswer: CorrectAnswerEntity.CorrectTrueFalseAnswerEntity
     ): Int {
         var correctIssuesCount = 0
         correctAnswer.issues.forEachIndexed { index, issue ->
@@ -114,7 +114,7 @@ class AutoCorrectorService(
     }
     
     private fun calculateCorrectIssuesCountForMultipleChoiceAnswer(
-        answer: Answer.MultipleChoiceAnswer, correctAnswer: CorrectAnswer.CorrectMultipleChoiceAnswer
+        answer: AnswerEntity.MultipleChoiceAnswerEntity, correctAnswer: CorrectAnswerEntity.CorrectMultipleChoiceAnswerEntity
     ): Int {
         var correctIssuesCount = 0
         correctAnswer.issues.forEach { correctIssue ->

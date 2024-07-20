@@ -2,7 +2,7 @@ package com.cn.langujet.actor.correction.payload.dto
 
 import com.cn.langujet.domain.answer.model.AnswerType
 import com.cn.langujet.domain.answer.model.TrueFalseAnswerType
-import com.cn.langujet.domain.correction.model.CorrectAnswer
+import com.cn.langujet.domain.correction.model.CorrectAnswerEntity
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.swagger.v3.oas.annotations.media.Schema
@@ -34,9 +34,9 @@ sealed class CorrectAnswerDTO(
     open val questionOrder: Int?,
     val type: AnswerType,
 ) {
-    inline fun <reified T : CorrectAnswer> toCorrectAnswer(examId: String, sectionOrder: Int): T {
-        val answer: CorrectAnswer = when (this) {
-            is CorrectTextAnswerDTO -> CorrectAnswer.CorrectTextAnswer(
+    inline fun <reified T : CorrectAnswerEntity> toCorrectAnswer(examId: String, sectionOrder: Int): T {
+        val answer: CorrectAnswerEntity = when (this) {
+            is CorrectTextAnswerDTO -> CorrectAnswerEntity.CorrectTextAnswerEntity(
                 examId,
                 sectionOrder,
                 partOrder!!,
@@ -44,7 +44,7 @@ sealed class CorrectAnswerDTO(
                 this.text!!
             )
 
-            is CorrectTextIssuesAnswerDTO -> CorrectAnswer.CorrectTextIssuesAnswer(
+            is CorrectTextIssuesAnswerDTO -> CorrectAnswerEntity.CorrectTextIssuesAnswerEntity(
                 examId,
                 sectionOrder,
                 partOrder!!,
@@ -52,7 +52,7 @@ sealed class CorrectAnswerDTO(
                 this.issues!!
             )
 
-            is CorrectTrueFalseAnswerDTO -> CorrectAnswer.CorrectTrueFalseAnswer(
+            is CorrectTrueFalseAnswerDTO -> CorrectAnswerEntity.CorrectTrueFalseAnswerEntity(
                 examId,
                 sectionOrder,
                 partOrder!!,
@@ -60,7 +60,7 @@ sealed class CorrectAnswerDTO(
                 this.issues!!
             )
 
-            is CorrectMultipleChoiceAnswerDTO -> CorrectAnswer.CorrectMultipleChoiceAnswer(
+            is CorrectMultipleChoiceAnswerDTO -> CorrectAnswerEntity.CorrectMultipleChoiceAnswerEntity(
                 examId,
                 sectionOrder,
                 partOrder!!,
@@ -77,12 +77,12 @@ sealed class CorrectAnswerDTO(
     }
 
     companion object {
-        inline fun <reified T : CorrectAnswerDTO> fromCorrectAnswer(correctAnswer: CorrectAnswer): T {
+        inline fun <reified T : CorrectAnswerDTO> fromCorrectAnswer(correctAnswer: CorrectAnswerEntity): T {
             val correctAnswerDTO = when (correctAnswer) {
-                is CorrectAnswer.CorrectTextAnswer -> CorrectTextAnswerDTO(correctAnswer)
-                is CorrectAnswer.CorrectTextIssuesAnswer -> CorrectTextIssuesAnswerDTO(correctAnswer)
-                is CorrectAnswer.CorrectTrueFalseAnswer -> CorrectTrueFalseAnswerDTO(correctAnswer)
-                is CorrectAnswer.CorrectMultipleChoiceAnswer -> CorrectMultipleChoiceAnswerDTO(correctAnswer)
+                is CorrectAnswerEntity.CorrectTextAnswerEntity -> CorrectTextAnswerDTO(correctAnswer)
+                is CorrectAnswerEntity.CorrectTextIssuesAnswerEntity -> CorrectTextIssuesAnswerDTO(correctAnswer)
+                is CorrectAnswerEntity.CorrectTrueFalseAnswerEntity -> CorrectTrueFalseAnswerDTO(correctAnswer)
+                is CorrectAnswerEntity.CorrectMultipleChoiceAnswerEntity -> CorrectMultipleChoiceAnswerDTO(correctAnswer)
             }
             if (correctAnswerDTO !is T) throw TypeCastException("The type of correct answer does not match the reified type.")
             return correctAnswerDTO
@@ -97,7 +97,7 @@ data class CorrectTextAnswerDTO(
     @field:NotNull override val questionOrder: Int? = null,
     @field:NotBlank val text: String? = null,
 ) : CorrectAnswerDTO(id, partOrder, questionOrder, AnswerType.TEXT) {
-    constructor(answer: CorrectAnswer.CorrectTextAnswer) : this(
+    constructor(answer: CorrectAnswerEntity.CorrectTextAnswerEntity) : this(
         id = answer.id,
         partOrder = answer.partOrder,
         questionOrder = answer.questionOrder,
@@ -111,7 +111,7 @@ data class CorrectTextIssuesAnswerDTO(
     @field:NotNull override val questionOrder: Int? = null,
     @field:NotNull val issues: List<List<String>>? = null,
 ) : CorrectAnswerDTO(id, partOrder, questionOrder, AnswerType.TEXT_ISSUES) {
-    constructor(answer: CorrectAnswer.CorrectTextIssuesAnswer) : this(
+    constructor(answer: CorrectAnswerEntity.CorrectTextIssuesAnswerEntity) : this(
         id = answer.id,
         partOrder = answer.partOrder,
         questionOrder = answer.questionOrder,
@@ -125,7 +125,7 @@ data class CorrectTrueFalseAnswerDTO(
     @field:NotNull override val questionOrder: Int? = null,
     @field:NotNull val issues: List<TrueFalseAnswerType>? = null,
 ) : CorrectAnswerDTO(id, partOrder, questionOrder, AnswerType.TRUE_FALSE) {
-    constructor(answer: CorrectAnswer.CorrectTrueFalseAnswer) : this(
+    constructor(answer: CorrectAnswerEntity.CorrectTrueFalseAnswerEntity) : this(
         id = answer.id,
         partOrder = answer.partOrder,
         questionOrder = answer.questionOrder,
@@ -139,7 +139,7 @@ data class CorrectMultipleChoiceAnswerDTO(
     @field:NotNull override val questionOrder: Int? = null,
     @field:NotNull val issues: List<CorrectMultipleChoiceIssueAnswerDTO>? = null,
 ) : CorrectAnswerDTO(id, partOrder, questionOrder, AnswerType.MULTIPLE_CHOICE) {
-    constructor(answer: CorrectAnswer.CorrectMultipleChoiceAnswer) : this(
+    constructor(answer: CorrectAnswerEntity.CorrectMultipleChoiceAnswerEntity) : this(
         id = answer.id,
         partOrder = answer.partOrder,
         questionOrder = answer.questionOrder,
@@ -151,12 +151,12 @@ class CorrectMultipleChoiceIssueAnswerDTO(
     @field:NotNull var issueOrder: Int? = null,
     @field:NotNull var options: List<String>? = null
 ) {
-    constructor(issue: CorrectAnswer.CorrectMultipleChoiceIssueAnswer) : this(
+    constructor(issue: CorrectAnswerEntity.CorrectMultipleChoiceIssueAnswer) : this(
         issue.order, issue.options
     )
 
-    fun toMultipleChoiceIssueAnswer(): CorrectAnswer.CorrectMultipleChoiceIssueAnswer {
-        return CorrectAnswer.CorrectMultipleChoiceIssueAnswer(
+    fun toMultipleChoiceIssueAnswer(): CorrectAnswerEntity.CorrectMultipleChoiceIssueAnswer {
+        return CorrectAnswerEntity.CorrectMultipleChoiceIssueAnswer(
             this.issueOrder!!,
             this.options!!
         )

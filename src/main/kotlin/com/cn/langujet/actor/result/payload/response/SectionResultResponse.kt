@@ -1,7 +1,7 @@
 package com.cn.langujet.actor.result.payload.response
 
 import com.cn.langujet.domain.exam.model.SectionType
-import com.cn.langujet.domain.result.model.SectionResult
+import com.cn.langujet.domain.result.model.SectionResultEntity
 
 data class SectionResultResponse(
     var sectionOrder: Int,
@@ -10,7 +10,7 @@ data class SectionResultResponse(
     var score: Double?,
     var recommendation: String?
 ) {
-    constructor(sectionResult: SectionResult) : this(
+    constructor(sectionResult: SectionResultEntity) : this(
         sectionResult.sectionOrder,
         sectionResult.sectionType,
         sectionResult.correctIssuesCount,

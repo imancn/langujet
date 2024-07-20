@@ -1,6 +1,6 @@
 package com.cn.langujet.actor.exam.payload
 
-import com.cn.langujet.domain.exam.model.Exam
+import com.cn.langujet.domain.exam.model.ExamEntity
 import com.cn.langujet.domain.exam.model.ExamMode
 import com.cn.langujet.domain.exam.model.ExamType
 import com.fasterxml.jackson.annotation.JsonInclude
@@ -20,7 +20,7 @@ data class ExamDTO(
     var examDuration: Long, // Seconds
     var active: Boolean, // Seconds
 ) {
-    constructor(exam: Exam): this(
+    constructor(exam: ExamEntity): this(
         exam.id,
         exam.type,
         exam.mode,
@@ -32,8 +32,8 @@ data class ExamDTO(
         exam.active
     )
 
-    fun toExam(): Exam {
-        return Exam(
+    fun toExam(): ExamEntity {
+        return ExamEntity(
             this.id,
             this.examType,
             this.examMode,

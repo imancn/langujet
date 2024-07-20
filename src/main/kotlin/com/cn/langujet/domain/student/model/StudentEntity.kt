@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.student.model
 
-import com.cn.langujet.domain.user.model.User
+import com.cn.langujet.domain.user.model.UserEntity
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.DBRef
@@ -8,15 +8,15 @@ import org.springframework.data.mongodb.core.mapping.Document
 
 @Document(collection = "students")
 @TypeAlias("students")
-data class Student(
+data class StudentEntity(
     @Id
     var id: String?,
     @DBRef
-    var user: User,
+    var user: UserEntity,
     var fullName: String,
     var biography: String?,
 ) {
-    constructor(user: User, fullName: String) : this(
+    constructor(user: UserEntity, fullName: String) : this(
         null,
         user,
         fullName,

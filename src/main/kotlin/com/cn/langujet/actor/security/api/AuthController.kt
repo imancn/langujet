@@ -6,9 +6,9 @@ import com.cn.langujet.application.advice.*
 import com.cn.langujet.application.security.security.payload.response.JwtResponse
 import com.cn.langujet.application.security.security.payload.response.RefreshTokenResponse
 import com.cn.langujet.application.service.smtp.MailSenderService
-import com.cn.langujet.domain.corrector.Corrector
+import com.cn.langujet.domain.corrector.CorrectorEntity
 import com.cn.langujet.domain.corrector.CorrectorRepository
-import com.cn.langujet.domain.student.model.Student
+import com.cn.langujet.domain.student.model.StudentEntity
 import com.cn.langujet.domain.student.repository.StudentRepository
 import com.cn.langujet.domain.user.model.*
 import com.cn.langujet.domain.user.repository.EmailVerificationTokenRepository
@@ -77,7 +77,7 @@ class AuthController(
     ): ResponseEntity<String> {
         val user = registerUser(email.toStandardMailAddress(), password, mutableSetOf(Role.ROLE_STUDENT))
         sendVerificationMail(user.email)
-        studentRepository.save(Student(user, fullName))
+        studentRepository.save(StudentEntity(user, fullName))
         return toOkResponseEntity("User registered successfully!")
     }
     
@@ -90,14 +90,14 @@ class AuthController(
     ): ResponseEntity<String> {
         val user = registerUser(email.toStandardMailAddress(), password, mutableSetOf(Role.ROLE_CORRECTOR))
         sendVerificationMail(email.toStandardMailAddress())
-        correctorRepository.save(Corrector(user, fullName))
+        correctorRepository.save(CorrectorEntity(user, fullName))
         return toOkResponseEntity("User registered successfully!")
     }
     
-    private fun registerUser(email: String, password: String, roles: Set<Role>): User {
+    private fun registerUser(email: String, password: String, roles: Set<Role>): UserEntity {
         if (userRepository.existsByEmailAndDeleted(email.toStandardMailAddress())) throw InvalidInputException("Email is already in use!")
         return userRepository.save(
-            User(
+            UserEntity(
                 id = null,
                 email = email.toStandardMailAddress(),
                 emailVerified = false,
@@ -116,7 +116,7 @@ class AuthController(
         if (user.emailVerified) throw UnprocessableException("Your Email Was Verified")
         val verificationToken = emailVerificationTokenRepository.findByUser(user).orElseThrow {
             mailSenderService.sendEmailVerificationMail(
-                emailVerificationTokenRepository.save(EmailVerificationToken(user))
+                emailVerificationTokenRepository.save(EmailVerificationTokenEntity(user))
             )
             UnprocessableException("Your verification code has been expired.\nWe sent a new verification code.")
         }
@@ -133,7 +133,7 @@ class AuthController(
         if (user.emailVerified) throw UnprocessableException("Your Email Was Verified")
         
         val emailVerificationToken = emailVerificationTokenRepository.findByUser(user).getOrElse {
-            emailVerificationTokenRepository.save(EmailVerificationToken(user))
+            emailVerificationTokenRepository.save(EmailVerificationTokenEntity(user))
         }
         mailSenderService.sendEmailVerificationMail(emailVerificationToken)
         return toOkResponseEntity("Verification Mail Has Been Sent.")
@@ -158,7 +158,7 @@ class AuthController(
         val user = userRepository.findByEmailAndDeleted(email.toStandardMailAddress())
             .orElseThrow { NotFoundException("User Not Found") }
         val token = resetPasswordTokenRepository.findByUser(user).getOrElse {
-            resetPasswordTokenRepository.save(ResetPasswordToken(user))
+            resetPasswordTokenRepository.save(ResetPasswordTokenEntity(user))
         }
         mailSenderService.sendResetPasswordMail(token)
         return toOkResponseEntity("The reset password link has been mailed to you.")
@@ -207,7 +207,7 @@ class AuthController(
         val user = userRepository.findByEmailAndDeleted(Auth.userEmail())
             .orElseThrow { UnprocessableException("User Not Found") }
         val emailVerificationToken = emailVerificationTokenRepository.findByUser(user).getOrElse {
-            emailVerificationTokenRepository.save(EmailVerificationToken(user))
+            emailVerificationTokenRepository.save(EmailVerificationTokenEntity(user))
         }
         mailSenderService.sendDeleteAccountVerificationMail(emailVerificationToken)
         return "Verification Mail Has Been Sent"
@@ -219,7 +219,7 @@ class AuthController(
             .orElseThrow { NotFoundException("User Not Found") }
         val verificationToken = emailVerificationTokenRepository.findByUser(user).orElseThrow {
             mailSenderService.sendDeleteAccountVerificationMail(
-                emailVerificationTokenRepository.save(EmailVerificationToken(user))
+                emailVerificationTokenRepository.save(EmailVerificationTokenEntity(user))
             )
             UnprocessableException("Your verification code has been expired.\nWe sent a new verification code")
         }

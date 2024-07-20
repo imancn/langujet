@@ -1,6 +1,6 @@
 package com.cn.langujet.actor.exam.payload
 
-import com.cn.langujet.domain.exam.model.ExamSession
+import com.cn.langujet.domain.exam.model.ExamSessionEntity
 import com.cn.langujet.domain.exam.model.ExamSessionState
 import java.util.*
 
@@ -10,7 +10,7 @@ class ExamSessionEnrollResponse(
     val sessionState: ExamSessionState,
 ) {
     constructor(
-        examSession: ExamSession,
+        examSession: ExamSessionEntity,
     ):this (
         examSession.id,
         examSession.enrollDate,

@@ -4,7 +4,7 @@ import com.cn.langujet.actor.answer.payload.request.*
 import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.application.service.file.domain.data.model.FileBucket
 import com.cn.langujet.application.service.file.domain.service.FileService
-import com.cn.langujet.domain.answer.model.Answer
+import com.cn.langujet.domain.answer.model.AnswerEntity
 import com.cn.langujet.domain.exam.model.ExamSessionState
 import com.cn.langujet.domain.exam.service.ExamSessionService
 import org.springframework.stereotype.Service
@@ -23,7 +23,7 @@ class AnswerService(
         partOrder: Int,
         questionOrder: Int,
         voice: MultipartFile
-    ): Answer.VoiceAnswer {
+    ): AnswerEntity.VoiceAnswerEntity {
         examSessionPreCheck(examSessionId)
         val fileEntity = fileService.uploadFile(voice, FileBucket.ANSWERS)
         
@@ -34,7 +34,7 @@ class AnswerService(
         }
         
         return answerRepository.save(
-            Answer.VoiceAnswer(
+            AnswerEntity.VoiceAnswerEntity(
                 examSessionId,
                 sectionOrder,
                 partOrder,
@@ -53,7 +53,7 @@ class AnswerService(
         examSessionPreCheck(examSessionId!!)
         val existingAnswers = answerRepository.findAllByExamSessionIdAndSectionOrder(examSessionId, sectionOrder!!)
         answerRepository.saveAll(
-            answerRequestList.map<AnswerBulkRequest, Answer> {
+            answerRequestList.map<AnswerBulkRequest, AnswerEntity> {
                 convertAnswerBulkRequestToAnswer(it, examSessionId, sectionOrder)
             }.onEach { answer ->
                 answer.id = existingAnswers.find {
@@ -64,13 +64,13 @@ class AnswerService(
         return true
     }
     
-    private inline fun <reified T : Answer> convertAnswerBulkRequestToAnswer(
+    private inline fun <reified T : AnswerEntity> convertAnswerBulkRequestToAnswer(
         answerRequest: AnswerBulkRequest,
         examSessionId: String,
         sectionOrder: Int
     ): T {
-        val answer: Answer = when (answerRequest) {
-            is TextBulkAnswerRequest -> Answer.TextAnswer(
+        val answer: AnswerEntity = when (answerRequest) {
+            is TextBulkAnswerRequest -> AnswerEntity.TextAnswerEntity(
                 examSessionId,
                 sectionOrder,
                 answerRequest.partOrder!!,
@@ -79,7 +79,7 @@ class AnswerService(
                 answerRequest.text!!
             )
             
-            is TextIssuesBulkAnswerRequest -> Answer.TextIssuesAnswer(
+            is TextIssuesBulkAnswerRequest -> AnswerEntity.TextIssuesAnswerEntity(
                 examSessionId,
                 sectionOrder,
                 answerRequest.partOrder!!,
@@ -88,7 +88,7 @@ class AnswerService(
                 answerRequest.issues!!
             )
             
-            is TrueFalseBulkAnswerRequest -> Answer.TrueFalseAnswer(
+            is TrueFalseBulkAnswerRequest -> AnswerEntity.TrueFalseAnswerEntity(
                 examSessionId,
                 sectionOrder,
                 answerRequest.partOrder!!,
@@ -97,7 +97,7 @@ class AnswerService(
                 answerRequest.issues!!
             )
             
-            is MultipleChoiceBulkAnswerRequest -> Answer.MultipleChoiceAnswer(
+            is MultipleChoiceBulkAnswerRequest -> AnswerEntity.MultipleChoiceAnswerEntity(
                 examSessionId,
                 sectionOrder,
                 answerRequest.partOrder!!,
@@ -105,7 +105,7 @@ class AnswerService(
                 Date(System.currentTimeMillis()),
                 answerRequest.issues!!.mapNotNull {
                     it?.let { multipleChoiceIssueAnswerRequest ->
-                        Answer.MultipleChoiceIssueAnswer(
+                        AnswerEntity.MultipleChoiceIssueAnswer(
                             multipleChoiceIssueAnswerRequest.issueOrder!!,
                             multipleChoiceIssueAnswerRequest.options!!
                         )

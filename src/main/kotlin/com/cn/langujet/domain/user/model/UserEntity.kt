@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 
 @Document(collection = "users")
 @TypeAlias("users")
-data class User(
+data class UserEntity(
     @Id
     var id: String?,
     var email: String,

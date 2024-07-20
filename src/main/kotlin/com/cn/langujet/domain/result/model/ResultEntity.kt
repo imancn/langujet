@@ -2,27 +2,26 @@ package com.cn.langujet.domain.result.model
 
 import com.cn.langujet.domain.correction.model.CorrectionStatus
 import com.cn.langujet.domain.correction.model.CorrectorType
-import com.cn.langujet.domain.exam.model.SectionType
-import nonapi.io.github.classgraph.json.Id
+import com.cn.langujet.domain.exam.model.ExamMode
+import com.cn.langujet.domain.exam.model.ExamType
+import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
 
-@Document(collection = "section_results")
-@TypeAlias("section_results")
-class SectionResult(
-    @Id
-    var id: String?,
-    var resultId: String,
+@Document(collection = "results")
+@TypeAlias("results")
+data class ResultEntity(
+    @Id var id: String?,
     var examSessionId: String,
-    var sectionOrder: Int,
-    var sectionType: SectionType,
+    var examType: ExamType,
+    var examMode: ExamMode,
     var correctorType: CorrectorType,
     var correctorUserId: String?,
     var status: CorrectionStatus,
-    var correctIssuesCount: Int?,
     var score: Double?,
     var recommendation: String?,
     var createdDate: Date,
     var updatedDate: Date
 )
+

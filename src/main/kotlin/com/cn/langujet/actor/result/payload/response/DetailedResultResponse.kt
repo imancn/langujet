@@ -1,8 +1,8 @@
 package com.cn.langujet.actor.result.payload.response
 
 import com.cn.langujet.domain.exam.model.ExamType
-import com.cn.langujet.domain.result.model.Result
-import com.cn.langujet.domain.result.model.SectionResult
+import com.cn.langujet.domain.result.model.ResultEntity
+import com.cn.langujet.domain.result.model.SectionResultEntity
 
 data class DetailedResultResponse(
     var examSessionId: String,
@@ -11,7 +11,7 @@ data class DetailedResultResponse(
     var score: Double?,
     var recommendation: String?,
 ) {
-    constructor(result: Result, sectionResults: List<SectionResult>) : this(
+    constructor(result: ResultEntity, sectionResults: List<SectionResultEntity>) : this(
         result.examSessionId,
         result.examType,
         sectionResults.map { SectionResultResponse(it) },

@@ -3,7 +3,7 @@ package com.cn.langujet.domain.exam.service
 import com.cn.langujet.application.advice.InvalidInputException
 import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.application.advice.NotFoundException
-import com.cn.langujet.domain.exam.model.Section
+import com.cn.langujet.domain.exam.model.SectionEntity
 import com.cn.langujet.domain.exam.repository.SectionCustomRepository
 import com.cn.langujet.domain.exam.repository.SectionRepository
 import com.cn.langujet.domain.exam.repository.dto.SectionMetaDTO
@@ -14,23 +14,23 @@ class SectionService(
     private val sectionRepository: SectionRepository,
     private val sectionCustomRepository: SectionCustomRepository
 ) {
-    fun getSectionById(id: String): Section {
+    fun getSectionById(id: String): SectionEntity {
         return sectionRepository.findById(id).orElseThrow {
             NotFoundException("Section with id $id not found")
         }
     }
 
-    fun getSectionsByExamId(examId: String): List<Section> {
+    fun getSectionsByExamId(examId: String): List<SectionEntity> {
         return sectionRepository.findAllByExamId(examId)
     }
 
-    fun getSectionByExamIdAndOrder(examId: String, order: Int): Section {
+    fun getSectionByExamIdAndOrder(examId: String, order: Int): SectionEntity {
         return sectionRepository.findByExamIdAndOrder(examId, order).orElseThrow {
             throw NotFoundException("Section not found")
         }
     }
 
-    fun createSection(section: Section): Section {
+    fun createSection(section: SectionEntity): SectionEntity {
         if (sectionRepository.existsByExamIdAndOrder(section.examId, section.order)) {
             throw UnprocessableException("Section with order ${section.order} already exists.")
         }
@@ -41,7 +41,7 @@ class SectionService(
         )
     }
 
-    fun updateSection(section: Section): Section {
+    fun updateSection(section: SectionEntity): SectionEntity {
         if (section.id.isNullOrBlank()) throw InvalidInputException("Section Id is empty")
         val existingSection = getSectionById(section.id ?: "")
         section.examId.let { existingSection.examId = it }

@@ -1,8 +1,8 @@
 package com.cn.langujet.application.service.smtp
 
 import com.cn.langujet.application.advice.EmailNotSentException
-import com.cn.langujet.domain.user.model.EmailVerificationToken
-import com.cn.langujet.domain.user.model.ResetPasswordToken
+import com.cn.langujet.domain.user.model.EmailVerificationTokenEntity
+import com.cn.langujet.domain.user.model.ResetPasswordTokenEntity
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import javax.mail.Message
@@ -41,7 +41,7 @@ class MailSenderService(
             templateName
         )
 
-    fun sendEmailVerificationMail(emailVerificationToken: EmailVerificationToken) {
+    fun sendEmailVerificationMail(emailVerificationToken: EmailVerificationTokenEntity) {
         val email = emailVerificationToken.user.email
         val token = emailVerificationToken.token
         val contentParams = mapOf(
@@ -52,7 +52,7 @@ class MailSenderService(
         )
     }
     
-    fun sendDeleteAccountVerificationMail(emailVerificationToken: EmailVerificationToken) {
+    fun sendDeleteAccountVerificationMail(emailVerificationToken: EmailVerificationTokenEntity) {
         val email = emailVerificationToken.user.email
         val token = emailVerificationToken.token
         val contentParams = mapOf(
@@ -63,7 +63,7 @@ class MailSenderService(
         )
     }
 
-    fun sendResetPasswordMail(resetPasswordToken: ResetPasswordToken) {
+    fun sendResetPasswordMail(resetPasswordToken: ResetPasswordTokenEntity) {
         val email = resetPasswordToken.user.email
         val token = resetPasswordToken.token
         val contentParams = mapOf(

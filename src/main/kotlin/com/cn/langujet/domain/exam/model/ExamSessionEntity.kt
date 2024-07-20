@@ -8,7 +8,7 @@ import java.util.*
 
 @Document(collection = "exam_sessions")
 @TypeAlias("exam_sessions")
-data class ExamSession(
+data class ExamSessionEntity(
     @Id var id: String?,
     
     var studentUserId: String,
