@@ -12,6 +12,7 @@ import com.cn.langujet.domain.exam.model.SectionType
 import com.cn.langujet.domain.exam.service.ExamService
 import com.cn.langujet.domain.result.model.SectionResult
 import com.cn.langujet.domain.result.service.SectionResultService
+import com.rollbar.notifier.Rollbar
 import org.springframework.stereotype.Service
 
 @Service
@@ -20,6 +21,7 @@ class AutoCorrectorService(
     private val answerRepository: AnswerRepository,
     private val examService: ExamService,
     private val sectionResultService: SectionResultService,
+    private val rollbar: Rollbar,
 ) {
     fun correctExamSection(
         examSession: ExamSession, resultId: String, sectionOrder: Int, sectionType: SectionType
@@ -42,32 +44,36 @@ class AutoCorrectorService(
     private fun calculateCorrectIssuesCount(answers: List<Answer>, correctAnswers: List<CorrectAnswer>): Int {
         var correctIssuesCount = 0
         answers.forEach { answer ->
-            val correctAnswer = correctAnswers.find {
-                it.partOrder == answer.partOrder && it.questionOrder == answer.questionOrder
-            } ?: throw NotFoundException("Correct Answer not found for Answer with id: ${answer.id}")
-            
-            correctIssuesCount += when (answer) {
-                is Answer.TextAnswer -> {
-                    if (correctAnswer !is CorrectAnswer.CorrectTextAnswer) throw LogicalException("Correct Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${answer.id}")
-                    calculateCorrectIssuesCountForTextAnswer(answer, correctAnswer)
-                }
+            try {
+                val correctAnswer = correctAnswers.find {
+                    it.partOrder == answer.partOrder && it.questionOrder == answer.questionOrder
+                } ?: throw NotFoundException("Correct Answer not found for Answer with id: ${answer.id}")
                 
-                is Answer.TextIssuesAnswer -> {
-                    if (correctAnswer !is CorrectAnswer.CorrectTextIssuesAnswer) throw LogicalException("Correct Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${answer.id}")
-                    calculateCorrectIssuesCountForTextIssuesAnswer(answer, correctAnswer)
+                correctIssuesCount += when (answer) {
+                    is Answer.TextAnswer -> {
+                        if (correctAnswer !is CorrectAnswer.CorrectTextAnswer) throw LogicalException("Correct Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${answer.id}")
+                        calculateCorrectIssuesCountForTextAnswer(answer, correctAnswer)
+                    }
+                    
+                    is Answer.TextIssuesAnswer -> {
+                        if (correctAnswer !is CorrectAnswer.CorrectTextIssuesAnswer) throw LogicalException("Correct Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${answer.id}")
+                        calculateCorrectIssuesCountForTextIssuesAnswer(answer, correctAnswer)
+                    }
+                    
+                    is Answer.TrueFalseAnswer -> {
+                        if (correctAnswer !is CorrectAnswer.CorrectTrueFalseAnswer) throw LogicalException("Correct Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${answer.id}")
+                        calculateCorrectIssuesCountForTrueFalseAnswer(answer, correctAnswer)
+                    }
+                    
+                    is Answer.MultipleChoiceAnswer -> {
+                        if (correctAnswer !is CorrectAnswer.CorrectMultipleChoiceAnswer) throw LogicalException("Correct Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${answer.id}")
+                        calculateCorrectIssuesCountForMultipleChoiceAnswer(answer, correctAnswer)
+                    }
+                    
+                    else -> throw IllegalArgumentException("Unsupported answer type")
                 }
-                
-                is Answer.TrueFalseAnswer -> {
-                    if (correctAnswer !is CorrectAnswer.CorrectTrueFalseAnswer) throw LogicalException("Correct Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${answer.id}")
-                    calculateCorrectIssuesCountForTrueFalseAnswer(answer, correctAnswer)
-                }
-                
-                is Answer.MultipleChoiceAnswer -> {
-                    if (correctAnswer !is CorrectAnswer.CorrectMultipleChoiceAnswer) throw LogicalException("Correct Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${answer.id}")
-                    calculateCorrectIssuesCountForMultipleChoiceAnswer(answer, correctAnswer)
-                }
-                
-                else -> throw IllegalArgumentException("Unsupported answer type")
+            } catch (ex: Exception) {
+                rollbar.critical(ex, "${ex.message}\nCorrection failed for answer: $answer")
             }
         }
         return correctIssuesCount
