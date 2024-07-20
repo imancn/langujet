@@ -1,12 +1,14 @@
 package com.cn.langujet.domain.user.model
 
 import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
 
 @Document(collection = "reset_password_token")
+@TypeAlias("reset_password_token")
 data class ResetPasswordToken(
     @Id
     var id: String?,

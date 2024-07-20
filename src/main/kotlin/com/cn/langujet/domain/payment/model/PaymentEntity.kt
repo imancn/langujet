@@ -5,7 +5,8 @@ import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.Date
 
-@Document("payments")
+@Document(collection = "payments")
+@TypeAlias("payments")
 sealed class PaymentEntity(
     @Id
     var id: String? = null,
@@ -18,7 +19,7 @@ sealed class PaymentEntity(
     var lastModifiedDate: Date
 )
 
-@Document("payments")
+@Document(collection = "payments")
 @TypeAlias("stripe_payments")
 class StripePaymentEntity(
     id: String? = null,
@@ -41,7 +42,7 @@ class StripePaymentEntity(
     lastModifiedDate
 )
 
-@Document("payments")
+@Document(collection = "payments")
 @TypeAlias("zarin_pal_payments")
 class ZarinPalPaymentEntity(
     id: String? = null,

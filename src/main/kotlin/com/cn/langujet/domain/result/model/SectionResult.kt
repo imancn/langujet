@@ -4,10 +4,12 @@ import com.cn.langujet.domain.correction.model.CorrectionStatus
 import com.cn.langujet.domain.correction.model.CorrectorType
 import com.cn.langujet.domain.exam.model.SectionType
 import nonapi.io.github.classgraph.json.Id
+import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
 
 @Document(collection = "section_results")
+@TypeAlias("section_results")
 class SectionResult(
     @Id
     var id: String?,

@@ -6,7 +6,7 @@ import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 
-@Document("order_details")
+@Document(collection = "order_details")
 @TypeAlias("exam_order_details") /// We could move examSessionId to a child class and create another classes that extends OrderDetailEntity
 class OrderDetailEntity(
     @Id

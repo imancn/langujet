@@ -2,10 +2,12 @@ package com.cn.langujet.domain.exam.model
 
 import com.cn.langujet.domain.correction.model.CorrectorType
 import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
 
 @Document(collection = "exam_sessions")
+@TypeAlias("exam_sessions")
 data class ExamSession(
     @Id var id: String?,
     

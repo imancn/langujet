@@ -1,10 +1,12 @@
 package com.cn.langujet.domain.coupon
 
 import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.Date
 
 @Document(collection = "coupons")
+@TypeAlias("coupons")
 data class Coupon(
     @Id var id: String? = null,
     var name: String,
