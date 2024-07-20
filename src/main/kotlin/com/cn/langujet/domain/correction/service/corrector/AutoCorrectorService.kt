@@ -5,15 +5,13 @@ import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.answer.AnswerRepository
 import com.cn.langujet.domain.answer.model.Answer
 import com.cn.langujet.domain.correction.model.CorrectAnswer
-import com.cn.langujet.domain.correction.model.CorrectionEntity
 import com.cn.langujet.domain.correction.repository.CorrectAnswerRepository
 import com.cn.langujet.domain.exam.model.ExamSession
 import com.cn.langujet.domain.exam.model.ExamType
 import com.cn.langujet.domain.exam.model.SectionType
 import com.cn.langujet.domain.exam.service.ExamService
-import com.cn.langujet.domain.result.service.ResultService
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.annotation.Lazy
+import com.cn.langujet.domain.result.model.SectionResult
+import com.cn.langujet.domain.result.service.SectionResultService
 import org.springframework.stereotype.Service
 
 @Service
@@ -21,18 +19,23 @@ class AutoCorrectorService(
     private val correctAnswerRepository: CorrectAnswerRepository,
     private val answerRepository: AnswerRepository,
     private val examService: ExamService,
+    private val sectionResultService: SectionResultService,
 ) {
-    @Autowired @Lazy private lateinit var resultService: ResultService
-    
-    fun correctExamSection(examSession: ExamSession, correction: CorrectionEntity) {
+    fun correctExamSection(
+        examSession: ExamSession, resultId: String, sectionOrder: Int, sectionType: SectionType
+    ): SectionResult {
         val exam = examService.getExamById(examSession.examId)
-        val correctAnswers = correctAnswerRepository.findAllByExamIdAndSectionOrder(examSession.examId, correction.sectionOrder)
-        val answers = answerRepository.findAllByExamSessionIdAndSectionOrder(examSession.id ?: "", correction.sectionOrder)
+        val correctAnswers = correctAnswerRepository.findAllByExamIdAndSectionOrder(examSession.examId, sectionOrder)
+        val answers = answerRepository.findAllByExamSessionIdAndSectionOrder(examSession.id ?: "", sectionOrder)
         val correctIssuesCount = calculateCorrectIssuesCount(answers, correctAnswers)
-        resultService.addSectionResult(
-            correction = correction,
+        return sectionResultService.addAutoCorrectionSectionResult(
+            resultId = resultId,
+            examSessionId = examSession.id ?: "",
+            sectionOrder = sectionOrder,
+            sectionType = sectionType,
             correctIssuesCount = correctIssuesCount,
-            score = calculateScore(correctIssuesCount, correction.sectionType, exam.type),
+            score = calculateScore(correctIssuesCount, sectionType, exam.type),
+            recommendation = null
         )
     }
     

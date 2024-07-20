@@ -7,7 +7,7 @@ data class SectionResultResponse(
     var sectionOrder: Int,
     var sectionType: SectionType,
     var correctIssuesCount: Int?,
-    var score: Double,
+    var score: Double?,
     var recommendation: String?
 ) {
     constructor(sectionResult: SectionResult) : this(
