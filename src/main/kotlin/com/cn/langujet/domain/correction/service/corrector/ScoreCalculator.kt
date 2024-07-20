@@ -1,6 +1,7 @@
 package com.cn.langujet.domain.correction.service.corrector
 
 import com.cn.langujet.application.advice.LogicalException
+import com.cn.langujet.domain.exam.model.ExamType
 import com.cn.langujet.domain.exam.model.SectionType
 
 class ScoreCalculator {
@@ -48,6 +49,14 @@ class ScoreCalculator {
                     }
                 }
                 else -> throw LogicalException("There is no score calculation for $sectionType section type")
+            }
+        }
+        
+        fun calculateOverAllScore(scores: List<Double>, examType: ExamType): Double {
+            return when (examType) {
+                ExamType.IELTS_GENERAL, ExamType.IELTS_ACADEMIC -> {
+                    scores.sumOf { it } / scores.count()
+                }
             }
         }
     }

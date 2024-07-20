@@ -1,10 +1,10 @@
 package com.cn.langujet.actor.correction.payload.response
 
+import com.cn.langujet.domain.exam.model.ExamMode
 import com.cn.langujet.domain.exam.model.ExamType
-import com.cn.langujet.domain.exam.model.SectionType
 
 class CorrectorAvailableCorrectionResponse (
     val examType: ExamType,
-    val sectionTypes: List<SectionType>,
+    val examMode: ExamMode,
     var count: Int
 )

@@ -1,43 +1,56 @@
 package com.cn.langujet.domain.result.service
 
-import com.cn.langujet.actor.result.payload.request.AddCorrectorSectionResultRequest
+import com.cn.langujet.actor.result.payload.request.SubmitCorrectorResultRequest
 import com.cn.langujet.actor.result.payload.response.DetailedResultResponse
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.advice.InvalidTokenException
-import com.cn.langujet.application.advice.LogicalException
 import com.cn.langujet.application.advice.NotFoundException
-import com.cn.langujet.domain.correction.model.CorrectionEntity
+import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.domain.correction.model.CorrectionStatus
-import com.cn.langujet.domain.correction.service.CorrectionService
-import com.cn.langujet.domain.exam.model.ExamType
+import com.cn.langujet.domain.correction.model.CorrectorType
+import com.cn.langujet.domain.correction.service.corrector.ScoreCalculator.Companion.calculateOverAllScore
+import com.cn.langujet.domain.exam.model.ExamSession
 import com.cn.langujet.domain.exam.service.ExamSessionService
 import com.cn.langujet.domain.result.model.Result
-import com.cn.langujet.domain.result.model.SectionResult
 import com.cn.langujet.domain.result.repository.ResultRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class ResultService(
     private val resultRepository: ResultRepository,
-    private val correctionService: CorrectionService,
     private val sectionResultService: SectionResultService
 ) {
-    @Autowired
-    @Lazy
+    @Autowired @Lazy
     private lateinit var examSessionService: ExamSessionService
     
-    fun initiateResult(examSessionId: String, examType: ExamType) {
-        resultRepository.save(
+    fun initiateResult(examSession: ExamSession): Result {
+        val now = Date(System.currentTimeMillis())
+        return resultRepository.save(
             Result(
                 id = null,
-                examSessionId = examSessionId,
-                examType = examType,
+                examSessionId = examSession.id ?: "",
+                examType = examSession.examType,
+                examMode = examSession.examMode,
+                correctorType = examSession.correctorType,
+                correctorUserId = null,
+                status = CorrectionStatus.PENDING,
                 score = null,
                 recommendation = null,
+                createdDate = now,
+                updatedDate = now,
             )
         )
+    }
+    
+    fun assignResultToCorrector(result: Result, correctorUserId: String): Result {
+        return resultRepository.save(
+            result.also {
+            it.correctorUserId = correctorUserId
+            it.status = CorrectionStatus.PROCESSING
+        })
     }
     
     fun getDetailedResultByExamSessionId(examSessionId: String): DetailedResultResponse {
@@ -56,53 +69,64 @@ class ResultService(
         }
     }
     
-    fun addCorrectorSectionResult(addCorrectorSectionResultRequest: AddCorrectorSectionResultRequest) {
-        val correction = correctionService.getCorrectorCorrectionEntity(addCorrectorSectionResultRequest.correctionId)
-        addSectionResult(
-            correction = correction,
-            correctIssuesCount = null,
-            score = addCorrectorSectionResultRequest.score,
-            recommendation = addCorrectorSectionResultRequest.recommendation,
-        )
-    }
-    
-    fun addSectionResult(
-        correction: CorrectionEntity,
-        correctIssuesCount: Int?,
-        score: Double,
-        recommendation: String? = null
-    ) {
-        val result = getResultByExamSessionId(correction.examSessionId)
-        
-        if (correction.status == CorrectionStatus.PROCESSED) {
-            throw LogicalException("Section with ExamSessionId: ${result.examSessionId} and SectionOrder: ${correction.sectionOrder} has been processed")
-        }
-        
-        sectionResultService.createSectionResult(
-            SectionResult(
-                id = null,
-                resultId = result.id ?: "",
-                sectionOrder = correction.sectionOrder,
-                sectionType = correction.sectionType,
-                correctIssuesCount = correctIssuesCount,
-                score = score,
-                recommendation = recommendation
-            )
-        )
-        correctionService.changeStatus(correction, CorrectionStatus.PROCESSED)
-        if (correctionService.areAllSectionCorrectionProcessed(result.examSessionId)) {
-            examSessionService.finalizeCorrection(result.examSessionId)
-            val sectionResults = sectionResultService.getSectionResultsByResultId(result.id ?: "")
-            val overAllScore = calculateOverAllScore(sectionResults.map { it.score }, result.examType)
-            resultRepository.save(result.also { it.score = overAllScore })
+    fun getResultById(resultId: String): Result {
+        return resultRepository.findById(resultId).orElseThrow {
+            NotFoundException("Result not found")
         }
     }
     
-    private fun calculateOverAllScore(scores: List<Double>, examType: ExamType): Double {
-        return when (examType) {
-            ExamType.IELTS_GENERAL, ExamType.IELTS_ACADEMIC -> {
-                scores.sumOf { it } / scores.count()
+    fun submitCorrectorResult(submitCorrectorResultRequest: SubmitCorrectorResultRequest) {
+        val sectionResults = sectionResultService.getSectionResultsByResultId(submitCorrectorResultRequest.resultId)
+        sectionResults.forEach {
+            if (it.status.order < CorrectionStatus.PROCESSED.order)
+                throw UnprocessableException("You should submit all sections correction before this")
+        }
+        val result = getResultById(submitCorrectorResultRequest.resultId)
+        if (result.correctorUserId != Auth.userId()) {
+            throw UnprocessableException("Correction is not belongs to you")
+        }
+        if (result.status.order >= CorrectionStatus.PROCESSED.order) {
+            throw UnprocessableException("Correction had been processed")
+        }
+        result.recommendation = submitCorrectorResultRequest.recommendation
+        result.score = calculateOverAllScore(sectionResults.mapNotNull { it.score }, result.examType)
+        // Todo: After Implementation of Approval flow it must be changed
+        finalizeCorrection(result)
+    }
+    
+    fun getHumanResultsByStatus(
+        correctionStatus: CorrectionStatus
+    ): List<Result> {
+        return resultRepository.findByCorrectorTypeAndStatusOrderByCreatedDateAsc(
+            CorrectorType.HUMAN, correctionStatus
+        )
+    }
+    
+    fun getCorrectorResultsByStatus(
+        correctionStatus: CorrectionStatus, correctorId: String
+    ): List<Result> {
+        return resultRepository.findByStatusAndCorrectorUserIdOrderByCreatedDateAsc(
+            correctionStatus, correctorId
+        )
+    }
+    
+    fun areAllSectionResultsApproved(result: Result): Boolean {
+        val sectionResults = sectionResultService.getByResultId(result.id ?: "")
+        sectionResults.forEach { 
+            if (it.status != CorrectionStatus.APPROVED) {
+                return false
             }
         }
+        return true
+    }
+    
+    fun finalizeCorrection(result: Result) {
+        resultRepository.save(
+            result.also {
+                it.status = CorrectionStatus.APPROVED
+                it.updatedDate = Date(System.currentTimeMillis())
+            }
+        )
+        examSessionService.finalizeCorrection(result.examSessionId)
     }
 }

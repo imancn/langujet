@@ -11,7 +11,6 @@ import com.cn.langujet.domain.exam.model.ExamSession
 import com.cn.langujet.domain.exam.model.ExamSessionState
 import com.cn.langujet.domain.exam.repository.ExamSessionCustomRepository
 import com.cn.langujet.domain.exam.repository.ExamSessionRepository
-import com.cn.langujet.domain.result.service.ResultService
 import com.cn.langujet.domain.service.model.ServiceEntity
 import com.cn.langujet.domain.service.service.ServiceService
 import org.springframework.stereotype.Service
@@ -24,7 +23,6 @@ class ExamSessionService(
     private val examService: ExamService,
     private val sectionService: SectionService,
     private val correctionService: CorrectionService,
-    private val resultService: ResultService,
     private val examGeneratorService: ExamGeneratorService,
     private val serviceService: ServiceService
 ) {
@@ -117,9 +115,7 @@ class ExamSessionService(
             it.state = ExamSessionState.FINISHED
             it.endDate = Date(System.currentTimeMillis())
         })
-        val exam = examService.getExamById(examSession.examId)
-        resultService.initiateResult(examSession.id ?: "", exam.type)
-        correctionService.makeExamSessionCorrection(examSession)
+        correctionService.initiateExamSessionCorrection(examSession)
         examSession = getExamSessionById(examSession.id ?: "")
         return ExamSessionFinishResponse(examSession.state)
     }
