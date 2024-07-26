@@ -112,7 +112,7 @@ class SectionResultService(
     }
     
     fun submitCorrectorSectionResult(submitCorrectorSectionResultRequest: SubmitCorrectorSectionResultRequest) {
-        val sectionResult = getSectionResultForSubmission(submitCorrectorSectionResultRequest.sectionResultId)
+        val sectionResult = getSectionResultForSubmission(submitCorrectorSectionResultRequest.sectionCorrectionId)
         sectionResult.score = submitCorrectorSectionResultRequest.score
         sectionResult.recommendation = submitCorrectorSectionResultRequest.recommendation
         sectionResult.updatedDate = Date(System.currentTimeMillis())

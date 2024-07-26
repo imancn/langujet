@@ -84,12 +84,12 @@ class ResultService(
     }
     
     fun submitCorrectorResult(submitCorrectorResultRequest: SubmitCorrectorResultRequest) {
-        val sectionResults = sectionResultService.getSectionResultsByResultId(submitCorrectorResultRequest.resultId)
+        val sectionResults = sectionResultService.getSectionResultsByResultId(submitCorrectorResultRequest.examCorrectionId)
         sectionResults.forEach {
             if (it.status.order < CorrectionStatus.PROCESSED.order)
                 throw UnprocessableException("You should submit all sections correction before this")
         }
-        val result = getResultById(submitCorrectorResultRequest.resultId)
+        val result = getResultById(submitCorrectorResultRequest.examCorrectionId)
         if (result.correctorUserId != Auth.userId()) {
             throw UnprocessableException("Correction is not belongs to you")
         }

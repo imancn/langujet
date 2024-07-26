@@ -40,9 +40,9 @@ class ResultController(
     @PreAuthorize("hasRole('CORRECTOR')")
     fun attachCorrectorSectionResultFile(
         @RequestParam attachment: MultipartFile,
-        @RequestParam sectionResultId: String,
+        @RequestParam sectionCorrectionId: String,
     ) {
-        return sectionResultService.attachCorrectorSectionResultFile(attachment, sectionResultId)
+        return sectionResultService.attachCorrectorSectionResultFile(attachment, sectionCorrectionId)
     }
     
     @PostMapping("/corrector/results")
