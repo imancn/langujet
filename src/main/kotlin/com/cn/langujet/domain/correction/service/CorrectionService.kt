@@ -111,17 +111,17 @@ class CorrectionService(
     }
     
     fun getCorrectorProcessingCorrection(): CorrectionResponse {
-        val processingResult = resultService.getCorrectorResultsByStatus(
+        val result = resultService.getCorrectorResultsByStatus(
             CorrectionStatus.PROCESSING, Auth.userId()
         ).firstOrNull()
-        if (processingResult != null) {
-            val processingSectionResults = sectionResultService.getByStatusAndResultId(
-                CorrectionStatus.PROCESSING, processingResult.id ?: ""
-            )
-            return CorrectionResponse(processingResult.id ?: "",
-                processingResult.examType,
-                processingResult.examMode,
-                processingSectionResults.map { correction ->
+        if (result != null) {
+            val sectionResults = sectionResultService.getByResultId(
+                result.id ?: ""
+            ).filter { it.correctorUserId == Auth.userId() }
+            return CorrectionResponse(result.id ?: "",
+                result.examType,
+                result.examMode,
+                sectionResults.map { correction ->
                     CorrectionSectionResponse(
                         correction.id, correction.sectionType, correction.sectionOrder
                     )
