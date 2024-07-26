@@ -6,6 +6,7 @@ import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.advice.InvalidTokenException
 import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.correction.model.CorrectionStatus
 import com.cn.langujet.domain.correction.model.CorrectorType
 import com.cn.langujet.domain.correction.service.corrector.ScoreCalculator.Companion.calculateOverAllScore
@@ -23,6 +24,9 @@ class ResultService(
     private val resultRepository: ResultRepository,
     private val sectionResultService: SectionResultService
 ) {
+    @Autowired
+    private lateinit var fileService: FileService
+    
     @Autowired @Lazy
     private lateinit var examSessionService: ExamSessionService
     
@@ -59,7 +63,11 @@ class ResultService(
             throw InvalidTokenException("Exam Session with id: $examSessionId is not belong to you")
         }
         val result = getResultByExamSessionId(examSessionId)
-        val sectionResult = sectionResultService.getSectionResultsByResultId(result.id ?: "")
+        val sectionResult = sectionResultService.getSectionResultsByResultId(result.id ?: "").onEach { sr ->
+            sr.attachmentFileId = sr.attachmentFileId?.let {
+                fileService.generatePublicDownloadLink(it, 86400)
+            }
+        }
         return DetailedResultResponse(result, sectionResult)
     }
     

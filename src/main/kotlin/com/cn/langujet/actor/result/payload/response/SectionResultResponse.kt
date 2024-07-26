@@ -8,13 +8,15 @@ data class SectionResultResponse(
     var sectionType: SectionType,
     var correctIssuesCount: Int?,
     var score: Double?,
-    var recommendation: String?
+    var recommendation: String?,
+    var attachmentUrl: String?
 ) {
     constructor(sectionResult: SectionResultEntity) : this(
         sectionResult.sectionOrder,
         sectionResult.sectionType,
         sectionResult.correctIssuesCount,
         sectionResult.score,
-        sectionResult.recommendation
+        sectionResult.recommendation,
+        sectionResult.attachmentFileId
     )
 }
