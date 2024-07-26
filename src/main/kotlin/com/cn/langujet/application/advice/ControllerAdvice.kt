@@ -16,16 +16,6 @@ import org.springframework.web.context.request.WebRequest
 class ControllerAdvice(private val rollbar: Rollbar) {
     private val logger = LoggerFactory.getLogger(javaClass.simpleName)
     
-    @ExceptionHandler(value = [Throwable::class])
-    fun handleThrowable(ex: Throwable, request: WebRequest): ResponseEntity<ErrorMessageResponse> {
-        rollbar.error(ex)
-        logger.error(ex.stackTraceToString(), ex.message)
-        return ResponseEntity(
-            ErrorMessageResponse("Internal Server Error"),
-            HttpStatus.INTERNAL_SERVER_ERROR
-        )
-    }
-    
     @ExceptionHandler(value = [HttpException::class])
     fun handleHttpException(ex: HttpException, request: WebRequest): ResponseEntity<ErrorMessageResponse> {
         rollbar.error(ex)
