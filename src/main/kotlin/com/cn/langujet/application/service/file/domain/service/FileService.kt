@@ -9,6 +9,7 @@ import io.minio.GetPresignedObjectUrlArgs
 import io.minio.MinioClient
 import io.minio.PutObjectArgs
 import io.minio.http.Method
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 
@@ -17,6 +18,7 @@ class FileService(
     private val minioClient: MinioClient,
     private val fileRepository: FileRepository
 ) {
+    private val logger = LoggerFactory.getLogger(javaClass.simpleName)
 
     fun uploadFile(file: MultipartFile, bucket: FileBucket): FileEntity {
         val originalFileName = file.originalFilename ?: ""
@@ -44,6 +46,7 @@ class FileService(
             )
         } catch (ex: Exception) {
             fileRepository.deleteById(fileEntity.id ?: "")
+            logger.error(ex.toString())
             throw FileException("Upload Failed")
         }
 

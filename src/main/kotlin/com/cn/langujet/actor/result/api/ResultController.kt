@@ -6,9 +6,11 @@ import com.cn.langujet.actor.result.payload.request.SubmitCorrectorSectionResult
 import com.cn.langujet.domain.result.service.ResultService
 import com.cn.langujet.domain.result.service.SectionResultService
 import jakarta.validation.constraints.NotBlank
+import org.springframework.http.MediaType
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("api/v1")
@@ -32,6 +34,15 @@ class ResultController(
         @RequestBody submitCorrectorSectionResultRequest: SubmitCorrectorSectionResultRequest
     ) {
         return sectionResultService.submitCorrectorSectionResult(submitCorrectorSectionResultRequest)
+    }
+    
+    @PostMapping("/corrector/results/sections/attachment", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    @PreAuthorize("hasRole('CORRECTOR')")
+    fun attachCorrectorSectionResultFile(
+        @RequestParam attachment: MultipartFile,
+        @RequestParam sectionResultId: String,
+    ) {
+        return sectionResultService.attachCorrectorSectionResultFile(attachment, sectionResultId)
     }
     
     @PostMapping("/corrector/results")

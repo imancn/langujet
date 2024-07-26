@@ -23,6 +23,7 @@ class SectionResultEntity(
     var correctIssuesCount: Int?,
     var score: Double?,
     var recommendation: String?,
+    var attachmentFileId: String?,
     var createdDate: Date,
     var updatedDate: Date
 )
