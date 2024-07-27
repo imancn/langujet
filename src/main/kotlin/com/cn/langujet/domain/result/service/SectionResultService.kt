@@ -123,12 +123,19 @@ class SectionResultService(
     
     fun attachCorrectorSectionResultFile(attachment: MultipartFile, sectionResultId: String) {
         val sectionResult = getSectionResultForSubmission(sectionResultId)
-        val file = fileService.uploadFile(attachment, FileBucket.RESULT_ATTACHMENTS)
-        sectionResultRepository.save(
-            sectionResult.also {
-                it.attachmentFileId = file.id ?: throw FileException("Upload Failed")
-            }
-        )
+        val extension = attachment.originalFilename?.substringAfterLast('.', "")
+        val contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        val extensionWhiteList = listOf("docx", "doc")
+        if (attachment.contentType == contentType && extensionWhiteList.contains(extension)) {
+            val file = fileService.uploadFile(attachment, FileBucket.RESULT_ATTACHMENTS)
+            sectionResultRepository.save(
+                sectionResult.also {
+                    it.attachmentFileId = file.id ?: throw FileException("Upload Failed")
+                }
+            )
+        } else {
+            throw UnprocessableException("Invalid File Format")
+        }
     }
     
     private fun getSectionResultForSubmission(sectionResultId: String): SectionResultEntity {
