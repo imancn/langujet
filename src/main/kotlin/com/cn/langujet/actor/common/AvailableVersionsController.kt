@@ -6,16 +6,20 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/v1/student/min-version")
-class MinVersionController {
+@RequestMapping("/api/v1/student/mobile-app/available-versions")
+class AvailableVersionsController {
     
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping
-    fun getDeviceAcceptableMinVersion(): DeviceAcceptableMinVersion {
-        return DeviceAcceptableMinVersion("1.0.0")
+    fun getMobileAppAvailableVersions(): MobileAppAvailableVersions {
+        return MobileAppAvailableVersions(
+            minimum = "1.0.0",
+            latest = "1.0.0"
+        )
     }
 }
 
-data class DeviceAcceptableMinVersion(
-    val minVersion: String
+data class MobileAppAvailableVersions(
+    val minimum: String,
+    val latest: String
 )
