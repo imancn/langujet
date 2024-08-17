@@ -1,7 +1,7 @@
 package com.cn.langujet.domain.exam.repository
 
-import com.cn.langujet.actor.exam.payload.ExamSessionSearchRequest
 import com.cn.langujet.actor.exam.payload.ExamSessionSearchResponse
+import com.cn.langujet.actor.exam.payload.ExamSessionSearchStudentRequest
 import com.cn.langujet.actor.util.models.CustomPage
 import com.cn.langujet.domain.exam.model.ExamEntity
 import com.cn.langujet.domain.exam.model.ExamSessionEntity
@@ -15,10 +15,10 @@ import java.util.*
 
 @Component
 class ExamSessionCustomRepository(
-    private val mongoOperations: MongoOperations, private val examRepository: ExamRepository
+    private val mongoOperations: MongoOperations
 ) {
     fun searchExamSessions(
-        searchRequest: ExamSessionSearchRequest,
+        searchRequest: ExamSessionSearchStudentRequest,
         userId: String
     ): CustomPage<ExamSessionSearchResponse> {
         var foundExams = if (!searchRequest.examName.isNullOrEmpty()) {

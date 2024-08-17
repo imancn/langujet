@@ -13,6 +13,7 @@ import com.cn.langujet.domain.exam.repository.ExamSessionCustomRepository
 import com.cn.langujet.domain.exam.repository.ExamSessionRepository
 import com.cn.langujet.domain.service.model.ServiceEntity
 import com.cn.langujet.domain.service.service.ServiceService
+import com.cn.langujet.domain.user.services.UserService
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -24,7 +25,8 @@ class ExamSessionService(
     private val sectionService: SectionService,
     private val correctionService: CorrectionService,
     private val examGeneratorService: ExamGeneratorService,
-    private val serviceService: ServiceService
+    private val serviceService: ServiceService,
+    private val userService: UserService
 ) {
     fun getExamSessionById(id: String): ExamSessionEntity {
         return examSessionRepository.findById(id).orElseThrow {
@@ -48,9 +50,25 @@ class ExamSessionService(
         return ExamSessionDetailsResponse(sections)
     }
     
-    fun searchExamSessions(request: ExamSessionSearchRequest): CustomPage<ExamSessionSearchResponse> {
+    fun searchExamSessions(request: ExamSessionSearchStudentRequest): CustomPage<ExamSessionSearchResponse> {
         return examSessionCustomRepository.searchExamSessions(
             request, Auth.userId()
+        )
+    }
+    
+    fun searchExamSessions(request: ExamSessionSearchAdminRequest): CustomPage<ExamSessionSearchResponse> {
+        return examSessionCustomRepository.searchExamSessions(
+            ExamSessionSearchStudentRequest(
+                states = request.states,
+                examTypes = request.examTypes,
+                examName = request.examName,
+                correctorTypes = request.correctorTypes,
+                startDateInterval = request.startDateInterval,
+                correctionDateInterval = request.correctionDateInterval,
+                pageSize = request.pageSize,
+                pageNumber = request.pageNumber,
+            ),
+            userService.getUserByEmail(request.studentEmail).id ?: ""
         )
     }
     

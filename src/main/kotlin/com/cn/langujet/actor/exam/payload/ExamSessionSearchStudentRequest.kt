@@ -7,7 +7,7 @@ import com.cn.langujet.domain.exam.model.ExamType
 import jakarta.validation.constraints.Positive
 import jakarta.validation.constraints.PositiveOrZero
 
-data class ExamSessionSearchRequest(
+data class ExamSessionSearchStudentRequest(
     val states: List<ExamSessionState>?,
     val examTypes: List<ExamType>?,
     val examName: String?,

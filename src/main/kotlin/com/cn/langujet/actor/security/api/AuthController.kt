@@ -16,6 +16,7 @@ import com.cn.langujet.domain.user.repository.ResetPasswordTokenRepository
 import com.cn.langujet.domain.user.repository.UserRepository
 import com.cn.langujet.domain.user.services.JwtService
 import com.cn.langujet.domain.user.services.RefreshTokenService
+import com.cn.langujet.domain.user.services.toStandardMailAddress
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
@@ -226,14 +227,5 @@ class AuthController(
         if (verificationToken.token == verificationCode) userRepository.save(user.also { it.deleted = true })
         else throw InvalidInputException("Your verification code is not available")
         return "Your account has been deleted successfully"
-    }
-    
-    private fun String.toStandardMailAddress(): String {
-        if (this.contains("..")) throw UnprocessableException("Invalid Email")
-        return this.lowercase().let {
-            if (it.contains("gmail")) {
-                it.replace(".", "").replace("@gmailcom", "@gmail.com")
-            } else it
-        }
     }
 }

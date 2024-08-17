@@ -33,7 +33,15 @@ class ExamSessionController(
     @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/student/exam-sessions/search")
     fun searchStudentExamSessions(
-        @RequestBody @Valid request: ExamSessionSearchRequest
+        @RequestBody @Valid request: ExamSessionSearchStudentRequest
+    ): CustomPage<ExamSessionSearchResponse> {
+        return examSessionService.searchExamSessions(request)
+    }
+    
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/admin/exam-sessions/search")
+    fun searchStudentExamSessionsByAdmin(
+        @RequestBody @Valid request: ExamSessionSearchAdminRequest
     ): CustomPage<ExamSessionSearchResponse> {
         return examSessionService.searchExamSessions(request)
     }
