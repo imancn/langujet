@@ -24,7 +24,15 @@ class ResultController(
     fun getStudentResultsByExamSessionId(
         @RequestParam @NotBlank examSessionId: String
     ): DetailedResultResponse {
-        return resultService.getDetailedResultByExamSessionId(examSessionId)
+        return resultService.getStudentDetailedResultByExamSessionId(examSessionId)
+    }
+    
+    @GetMapping("/corrector/results")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CORRECTOR')")
+    fun getCorrectorDetailedResultByExamCorrectionId(
+        @RequestParam @NotBlank examCorrectionId: String
+    ): DetailedResultResponse {
+        return resultService.getCorrectorDetailedResultByExamCorrectionId(examCorrectionId)
     }
     
     @PostMapping("/corrector/results/sections")

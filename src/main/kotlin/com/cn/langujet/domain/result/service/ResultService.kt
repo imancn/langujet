@@ -58,10 +58,10 @@ class ResultService(
         })
     }
     
-    fun getDetailedResultByExamSessionId(examSessionId: String): DetailedResultResponse {
+    fun getStudentDetailedResultByExamSessionId(examSessionId: String): DetailedResultResponse {
         val examSession = examSessionService.getExamSessionById(examSessionId)
         if (Auth.userId() != examSession.studentUserId) {
-            throw InvalidTokenException("Exam Session with id: $examSessionId is not belong to you")
+            throw InvalidTokenException("This Exam Session is not belong to you")
         }
         val result = getResultByExamSessionId(examSessionId).orElseThrow { UnprocessableException("Result not found") }
         val sectionResult = sectionResultService.getSectionResultsByResultId(result.id ?: "").onEach { sr ->
@@ -70,6 +70,20 @@ class ResultService(
             }
         }
         return DetailedResultResponse(result, sectionResult)
+    }
+    
+    fun getCorrectorDetailedResultByExamCorrectionId(examCorrectionId: String): DetailedResultResponse {
+        val result = getResultById(examCorrectionId)
+        if (Auth.isAdmin() || result.correctorUserId == Auth.userId()) {
+            val sectionResult = sectionResultService.getSectionResultsByResultId(result.id ?: "").onEach { sr ->
+                sr.attachmentFileId = sr.attachmentFileId?.let {
+                    fileService.generatePublicDownloadLink(it, 86400)
+                }
+            }
+            return DetailedResultResponse(result, sectionResult)
+        } else {
+            throw InvalidTokenException("This Exam Correction is not belong to you")
+        }
     }
     
     fun getResultByExamSessionId(examSessionId: String): Optional<ResultEntity> {
