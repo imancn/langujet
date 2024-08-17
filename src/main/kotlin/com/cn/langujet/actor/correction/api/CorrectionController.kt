@@ -6,6 +6,7 @@ import com.cn.langujet.actor.correction.payload.request.AssignCorrectionToCorrec
 import com.cn.langujet.actor.correction.payload.request.AssignSpecificCorrectionToCorrectorRequest
 import com.cn.langujet.actor.correction.payload.response.CorrectorAvailableCorrectionResponse
 import com.cn.langujet.actor.correction.payload.response.CorrectorCorrectionExamSessionContentResponse
+import com.cn.langujet.domain.correction.model.CorrectionStatus
 import com.cn.langujet.domain.correction.service.CorrectionService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
@@ -51,6 +52,12 @@ class CorrectionController(
     @PreAuthorize("hasRole('CORRECTOR')")
     fun getCorrectorProcessingCorrection(): CorrectionResponse {
         return correctionService.getCorrectorProcessingCorrection()
+    }
+    
+    @GetMapping("/corrector/corrections")
+    @PreAuthorize("hasRole('CORRECTOR')")
+    fun getCorrectorCorrectionsByStatus(@RequestParam status: CorrectionStatus): List<CorrectionResponse> {
+        return correctionService.getCorrectorCorrectionsByStatus(status)
     }
     
     @GetMapping("/corrector/corrections/exam-session-contents/{correctionId}")

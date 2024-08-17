@@ -167,6 +167,23 @@ class CorrectionService(
         }
     }
     
+    fun getCorrectorCorrectionsByStatus(status: CorrectionStatus): List<CorrectionResponse> {
+        val results = resultService.getCorrectorResultsByStatus(
+            status, Auth.userId()
+        )
+        return results.map { result ->
+            val sectionResults = sectionResultService.getByResultId(
+                result.id ?: ""
+            ).filter { it.correctorUserId == Auth.userId() }
+            CorrectionResponse(result.id ?: "",
+                result.examType,
+                result.examMode,
+                sectionResults.map { correction ->
+                    CorrectionSectionResponse(correction.id, correction.sectionType, correction.sectionOrder)
+                })
+        }
+    }
+    
     fun getCorrectorCorrectionExamSessionContent(sectionResultId: String): CorrectorCorrectionExamSessionContentResponse {
         val sectionResult = sectionResultService.getSectionResultById(sectionResultId)
         val result = resultService.getResultById(sectionResult.resultId)
