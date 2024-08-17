@@ -54,6 +54,7 @@ class ResultService(
             result.also {
             it.correctorUserId = correctorUserId
             it.status = CorrectionStatus.PROCESSING
+            it.updatedDate = Date(System.currentTimeMillis())
         })
     }
     
@@ -62,7 +63,7 @@ class ResultService(
         if (Auth.userId() != examSession.studentUserId) {
             throw InvalidTokenException("Exam Session with id: $examSessionId is not belong to you")
         }
-        val result = getResultByExamSessionId(examSessionId)
+        val result = getResultByExamSessionId(examSessionId).orElseThrow { UnprocessableException("Result not found") }
         val sectionResult = sectionResultService.getSectionResultsByResultId(result.id ?: "").onEach { sr ->
             sr.attachmentFileId = sr.attachmentFileId?.let {
                 fileService.generatePublicDownloadLink(it, 86400)
@@ -71,10 +72,8 @@ class ResultService(
         return DetailedResultResponse(result, sectionResult)
     }
     
-    fun getResultByExamSessionId(examSessionId: String): ResultEntity {
-        return resultRepository.findByExamSessionId(examSessionId).orElseThrow {
-            NotFoundException("Result not found")
-        }
+    fun getResultByExamSessionId(examSessionId: String): Optional<ResultEntity> {
+        return resultRepository.findByExamSessionId(examSessionId)
     }
     
     fun getResultById(resultId: String): ResultEntity {

@@ -107,6 +107,7 @@ class SectionResultService(
             sectionResults.onEach {
                 it.correctorUserId = correctorUserId
                 it.status = CorrectionStatus.PROCESSING
+                it.updatedDate = Date(System.currentTimeMillis())
             }
         )
     }

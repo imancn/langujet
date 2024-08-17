@@ -3,6 +3,7 @@ package com.cn.langujet.actor.correction.api
 import com.cn.langujet.actor.correction.payload.response.CorrectionResponse
 import com.cn.langujet.actor.correction.payload.request.AssignCorrectionRequest
 import com.cn.langujet.actor.correction.payload.request.AssignCorrectionToCorrectorRequest
+import com.cn.langujet.actor.correction.payload.request.AssignSpecificCorrectionToCorrectorRequest
 import com.cn.langujet.actor.correction.payload.response.CorrectorAvailableCorrectionResponse
 import com.cn.langujet.actor.correction.payload.response.CorrectorCorrectionExamSessionContentResponse
 import com.cn.langujet.domain.correction.service.CorrectionService
@@ -27,7 +28,7 @@ class CorrectionController(
     fun assignCorrection(
         @RequestBody assignCorrectionRequest: AssignCorrectionRequest
     ): CorrectionResponse {
-        return correctionService.assignCorrection(assignCorrectionRequest)
+        return correctionService.assignCorrectionByCorrector(assignCorrectionRequest)
     }
     
     @PostMapping("/admin/corrections/assign")
@@ -36,6 +37,14 @@ class CorrectionController(
         @RequestBody assignCorrectionToCorrectorRequest: AssignCorrectionToCorrectorRequest
     ): CorrectionResponse {
         return correctionService.assignCorrectionToCorrector(assignCorrectionToCorrectorRequest)
+    }
+    
+    @PostMapping("/admin/corrections/assign/exam-session")
+    @PreAuthorize("hasRole('ADMIN')")
+    fun assignSpecificCorrectionToCorrector(
+        @RequestBody assignSpecificCorrectionToCorrectorRequest: AssignSpecificCorrectionToCorrectorRequest
+    ): CorrectionResponse {
+        return correctionService.assignSpecificCorrectionToCorrector(assignSpecificCorrectionToCorrectorRequest)
     }
     
     @GetMapping("/corrector/corrections/processing")

@@ -2,6 +2,7 @@ package com.cn.langujet.domain.correction.service
 
 import com.cn.langujet.actor.correction.payload.request.AssignCorrectionRequest
 import com.cn.langujet.actor.correction.payload.request.AssignCorrectionToCorrectorRequest
+import com.cn.langujet.actor.correction.payload.request.AssignSpecificCorrectionToCorrectorRequest
 import com.cn.langujet.actor.correction.payload.response.*
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.advice.UnprocessableException
@@ -19,6 +20,7 @@ import com.cn.langujet.domain.exam.model.WritingPart
 import com.cn.langujet.domain.exam.service.ExamSectionContentService
 import com.cn.langujet.domain.exam.service.ExamSessionService
 import com.cn.langujet.domain.exam.service.SectionService
+import com.cn.langujet.domain.result.model.ResultEntity
 import com.cn.langujet.domain.result.service.ResultService
 import com.cn.langujet.domain.result.service.SectionResultService
 import org.slf4j.LoggerFactory
@@ -82,9 +84,8 @@ class CorrectionService(
         return responses
     }
     
-    fun assignCorrection(
-        assignCorrectionRequest: AssignCorrectionRequest, correctorUserId: String = Auth.userId()
-    ): CorrectionResponse {
+    fun assignCorrectionByCorrector(
+        assignCorrectionRequest: AssignCorrectionRequest, correctorUserId: String = Auth.userId()    ): CorrectionResponse {
         if (resultService.getCorrectorResultsByStatus(CorrectionStatus.PROCESSING, correctorUserId).isNotEmpty()) {
             throw UnprocessableException("Finish in-progress exam correction first")
         }
@@ -92,22 +93,57 @@ class CorrectionService(
             val pendingResult = resultService.getHumanResultsByStatus(CorrectionStatus.PENDING).first {
                 it.examMode == assignCorrectionRequest.examMode && it.examType == assignCorrectionRequest.examType
             }
-            val sectionCorrections = sectionResultService.getByStatusAndResultId(
-                CorrectionStatus.PENDING, pendingResult.id ?: ""
-            )
-            resultService.assignResultToCorrector(pendingResult, correctorUserId)
-            sectionResultService.assignSectionResultToCorrector(sectionCorrections, correctorUserId)
-            CorrectionResponse(pendingResult.id ?: "",
-                pendingResult.examType,
-                pendingResult.examMode,
-                sectionCorrections.map { correction ->
-                    CorrectionSectionResponse(
-                        correction.id, correction.sectionType, correction.sectionOrder
-                    )
-                })
+            assignCorrection(pendingResult, correctorUserId)
         } catch (ex: NoSuchElementException) {
             throw UnprocessableException("There is no exam of this type left for correction")
         }
+    }
+    
+    fun assignCorrectionToCorrector(
+        assignCorrectionToCorrectorRequest: AssignCorrectionToCorrectorRequest
+    ): CorrectionResponse {
+        if (!correctorService.correctorExistsByUserId(assignCorrectionToCorrectorRequest.correctorUserId)) {
+            throw UnprocessableException("The user isn't a Corrector")
+        }
+        return assignCorrectionByCorrector(
+            AssignCorrectionRequest(
+                assignCorrectionToCorrectorRequest.examType, assignCorrectionToCorrectorRequest.examMode
+            ), assignCorrectionToCorrectorRequest.correctorUserId
+        )
+    }
+    
+    fun assignSpecificCorrectionToCorrector(
+        request: AssignSpecificCorrectionToCorrectorRequest
+    ): CorrectionResponse {
+        val result = resultService.getResultByExamSessionId(request.examSessionId)
+            .orElseThrow { UnprocessableException("Correction not found") }
+        if (result.status != CorrectionStatus.PENDING) {
+            throw UnprocessableException("This exam correction had been assigned to another corrector")
+        }
+        if (resultService.getCorrectorResultsByStatus(CorrectionStatus.PROCESSING, request.correctorUserId).isNotEmpty()) {
+            throw UnprocessableException("Corrector must finish in-progress exam correction first")
+        }
+        return assignCorrection(result, request.correctorUserId)
+    }
+    
+    private fun assignCorrection(
+        pendingResult: ResultEntity,
+        correctorUserId: String
+    ): CorrectionResponse {
+        val sectionCorrections = sectionResultService.getByStatusAndResultId(
+            CorrectionStatus.PENDING, pendingResult.id ?: ""
+        )
+        resultService.assignResultToCorrector(pendingResult, correctorUserId)
+        sectionResultService.assignSectionResultToCorrector(sectionCorrections, correctorUserId)
+        return CorrectionResponse(
+            pendingResult.id ?: "",
+            pendingResult.examType,
+            pendingResult.examMode,
+            sectionCorrections.map { correction ->
+                CorrectionSectionResponse(
+                    correction.id, correction.sectionType, correction.sectionOrder
+                )
+            })
     }
     
     fun getCorrectorProcessingCorrection(): CorrectionResponse {
@@ -129,19 +165,6 @@ class CorrectionService(
         } else {
             throw UnprocessableException("You don't have any exam to correct")
         }
-    }
-    
-    fun assignCorrectionToCorrector(
-        assignCorrectionToCorrectorRequest: AssignCorrectionToCorrectorRequest
-    ): CorrectionResponse {
-        if (!correctorService.correctorExistsByUserId(assignCorrectionToCorrectorRequest.correctorUserId)) {
-            throw UnprocessableException("The user isn't a Corrector")
-        }
-        return assignCorrection(
-            AssignCorrectionRequest(
-                assignCorrectionToCorrectorRequest.examType, assignCorrectionToCorrectorRequest.examMode
-            ), assignCorrectionToCorrectorRequest.correctorUserId
-        )
     }
     
     fun getCorrectorCorrectionExamSessionContent(sectionResultId: String): CorrectorCorrectionExamSessionContentResponse {
