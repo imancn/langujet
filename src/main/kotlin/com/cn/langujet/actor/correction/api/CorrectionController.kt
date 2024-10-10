@@ -7,6 +7,7 @@ import com.cn.langujet.actor.correction.payload.request.AssignSpecificCorrection
 import com.cn.langujet.actor.correction.payload.response.CorrectorAvailableCorrectionResponse
 import com.cn.langujet.actor.correction.payload.response.CorrectorCorrectionExamSessionContentResponse
 import com.cn.langujet.domain.correction.model.CorrectionStatus
+import com.cn.langujet.domain.correction.model.CorrectorType
 import com.cn.langujet.domain.correction.service.CorrectionService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
@@ -21,7 +22,7 @@ class CorrectionController(
     @GetMapping("/corrector/corrections/pending")
     @PreAuthorize("hasAnyRole('CORRECTOR', 'ADMIN')")
     fun getCorrectorPendingCorrections(): List<CorrectorAvailableCorrectionResponse> {
-        return correctionService.getCorrectorPendingCorrections()
+        return correctionService.getCorrectorPendingCorrections(CorrectorType.HUMAN)
     }
     
     @PostMapping("/corrector/corrections/assign")
@@ -29,7 +30,7 @@ class CorrectionController(
     fun assignCorrection(
         @RequestBody assignCorrectionRequest: AssignCorrectionRequest
     ): CorrectionResponse {
-        return correctionService.assignCorrectionByCorrector(assignCorrectionRequest)
+        return correctionService.assignCorrectionByCorrector(assignCorrectionRequest, CorrectorType.HUMAN)
     }
     
     @PostMapping("/admin/corrections/assign")

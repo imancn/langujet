@@ -10,6 +10,7 @@ import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.answer.AnswerRepository
 import com.cn.langujet.domain.answer.model.AnswerEntity
 import com.cn.langujet.domain.correction.model.CorrectionStatus
+import com.cn.langujet.domain.correction.model.CorrectorType
 import com.cn.langujet.domain.correction.repository.CorrectAnswerRepository
 import com.cn.langujet.domain.correction.service.corrector.AutoCorrectorService
 import com.cn.langujet.domain.correction.service.corrector.ScoreCalculator.Companion.calculateOverAllScore
@@ -67,9 +68,9 @@ class CorrectionService(
         }
     }
     
-    fun getCorrectorPendingCorrections(): List<CorrectorAvailableCorrectionResponse> {
+    fun getCorrectorPendingCorrections(correctorType: CorrectorType): List<CorrectorAvailableCorrectionResponse> {
         val responses = mutableListOf<CorrectorAvailableCorrectionResponse>()
-        resultService.getHumanResultsByStatus(CorrectionStatus.PENDING).forEach { result ->
+        resultService.getResultsByStatusAndCorrectorType(CorrectionStatus.PENDING, correctorType).forEach { result ->
             val response = responses.find {
                 it.examType == result.examType && it.examMode == result.examMode
             }?.also {
@@ -85,12 +86,13 @@ class CorrectionService(
     }
     
     fun assignCorrectionByCorrector(
-        assignCorrectionRequest: AssignCorrectionRequest, correctorUserId: String = Auth.userId()    ): CorrectionResponse {
+        assignCorrectionRequest: AssignCorrectionRequest, correctorType: CorrectorType, correctorUserId: String = Auth.userId()
+    ): CorrectionResponse {
         if (resultService.getCorrectorResultsByStatus(CorrectionStatus.PROCESSING, correctorUserId).isNotEmpty()) {
             throw UnprocessableException("Finish in-progress exam correction first")
         }
         return try {
-            val pendingResult = resultService.getHumanResultsByStatus(CorrectionStatus.PENDING).first {
+            val pendingResult = resultService.getResultsByStatusAndCorrectorType(CorrectionStatus.PENDING, correctorType).first {
                 it.examMode == assignCorrectionRequest.examMode && it.examType == assignCorrectionRequest.examType
             }
             assignCorrection(pendingResult, correctorUserId)
@@ -108,7 +110,9 @@ class CorrectionService(
         return assignCorrectionByCorrector(
             AssignCorrectionRequest(
                 assignCorrectionToCorrectorRequest.examType, assignCorrectionToCorrectorRequest.examMode
-            ), assignCorrectionToCorrectorRequest.correctorUserId
+            ),
+            CorrectorType.HUMAN,
+            assignCorrectionToCorrectorRequest.correctorUserId
         )
     }
     

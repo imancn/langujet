@@ -36,7 +36,7 @@ class ResultController(
     }
     
     @PostMapping("/corrector/results/sections")
-    @PreAuthorize("hasRole('CORRECTOR')")
+    @PreAuthorize("hasAnyRole('CORRECTOR_AI', 'CORRECTOR')")
     fun submitCorrectorSectionResult(
         @RequestBody submitCorrectorSectionResultRequest: SubmitCorrectorSectionResultRequest
     ) {
@@ -44,7 +44,7 @@ class ResultController(
     }
     
     @PostMapping("/corrector/results")
-    @PreAuthorize("hasRole('CORRECTOR')")
+    @PreAuthorize("hasAnyRole('CORRECTOR_AI', 'CORRECTOR')")
     fun submitCorrectorResult(
         @RequestBody submitCorrectorResultRequest: SubmitCorrectorResultRequest
     ) {
@@ -52,7 +52,7 @@ class ResultController(
     }
     
     @PostMapping("/corrector/results/sections/attachment", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    @PreAuthorize("hasRole('CORRECTOR')")
+    @PreAuthorize("hasAnyRole('CORRECTOR_AI', 'CORRECTOR')")
     fun attachCorrectorSectionResultFile(
         @RequestParam attachment: MultipartFile,
         @RequestParam sectionCorrectionId: String,

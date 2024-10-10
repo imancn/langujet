@@ -115,8 +115,9 @@ class ResultService(
         finalizeCorrection(result)
     }
     
-    fun getHumanResultsByStatus(
-        correctionStatus: CorrectionStatus
+    fun getResultsByStatusAndCorrectorType(
+        correctionStatus: CorrectionStatus,
+        correctorType: CorrectorType
     ): List<ResultEntity> {
         return resultRepository.findByCorrectorTypeAndStatusOrderByCreatedDateAsc(
             CorrectorType.HUMAN, correctionStatus
