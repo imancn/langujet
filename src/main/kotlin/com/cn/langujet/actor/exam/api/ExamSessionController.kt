@@ -17,7 +17,7 @@ class ExamSessionController(
 ){
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/student/exam-sessions/enroll")
+    @PostMapping("/admin/exam-sessions/enroll")
     fun enrollExamSession(
         @RequestParam @NotBlank userId: String,
         @RequestParam @NotBlank examServiceId: String,
