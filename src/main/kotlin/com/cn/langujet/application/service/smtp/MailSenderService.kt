@@ -42,7 +42,7 @@ class MailSenderService(
         )
 
     fun sendEmailVerificationMail(emailVerificationToken: EmailVerificationTokenEntity) {
-        val email = emailVerificationToken.user.email
+        val email = emailVerificationToken.user.username
         val token = emailVerificationToken.token
         val contentParams = mapOf(
             "TOKEN" to token,
@@ -53,7 +53,7 @@ class MailSenderService(
     }
     
     fun sendDeleteAccountVerificationMail(emailVerificationToken: EmailVerificationTokenEntity) {
-        val email = emailVerificationToken.user.email
+        val email = emailVerificationToken.user.username
         val token = emailVerificationToken.token
         val contentParams = mapOf(
             "TOKEN" to token,
@@ -64,7 +64,7 @@ class MailSenderService(
     }
 
     fun sendResetPasswordMail(resetPasswordToken: ResetPasswordTokenEntity) {
-        val email = resetPasswordToken.user.email
+        val email = resetPasswordToken.user.username
         val token = resetPasswordToken.token
         val contentParams = mapOf(
             "TOKEN" to token,

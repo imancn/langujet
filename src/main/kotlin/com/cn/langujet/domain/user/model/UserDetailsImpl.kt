@@ -66,7 +66,7 @@ class UserDetailsImpl(
             }
             return UserDetailsImpl(
                 user.id!!,
-                user.email,
+                user.username,
                 user.emailVerified,
                 user.password,
                 authorities
