@@ -18,7 +18,7 @@ class ZarinPalPaymentService(
     
     private val webhookCallbackUrl = "https://api.langujet.com/api/v1/zarin-pal/payment/callback"
     
-    private val gateWayUrl: String = "https://www.zarinpal.com/pg/StartPay/"
+    private val gateWayUrl: String = "https://sandbox.zarinpal.com/pg/StartPay/"
     
     fun createPaymentSession(amount: Int, orderId: String): ZarinPalPaymentDetails {
         try {
