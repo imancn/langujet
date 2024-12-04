@@ -1,5 +1,6 @@
 package com.cn.langujet.domain.payment.service
 
+import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.domain.payment.model.*
 import com.cn.langujet.domain.payment.repository.PaymentRepository
 import com.cn.langujet.domain.payment.service.zarinpal.ZarinPalPaymentService
@@ -42,6 +43,10 @@ class PaymentService(
     }
     
     private fun createStripePayment(orderId: String, amount: Double, paymentType: PaymentType): PaymentEntity {
+        /**
+         * Remove it when Stripe be available
+         */
+        throw UnprocessableException("Not available in your country")
         val stripeSession = stripePaymentService.createPaymentSession(amount, orderId)
         return paymentRepository.save(
             StripePaymentEntity(
@@ -56,5 +61,4 @@ class PaymentService(
             )
         )
     }
-    
 }
