@@ -5,6 +5,7 @@ import com.cn.langujet.actor.coupon.payload.response.CouponValidationResponse
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.domain.user.repository.UserRepository
+import com.cn.langujet.domain.user.services.toStandardMail
 import org.springframework.stereotype.Service
 import java.security.SecureRandom
 import kotlin.jvm.optionals.getOrElse
@@ -33,7 +34,7 @@ class CouponService(
     
     fun createCoupon(name: String, email: String, amount: Double, tag: String?, description: String?): CouponEntity {
         val code = generateCouponCode()
-        val user = userRepository.findByEmailAndDeleted(email).getOrElse { /// todo: Move userRepository dependency on AuthService and inject the service
+        val user = userRepository.findByStandardEmailAndDeleted(email.toStandardMail()).getOrElse { /// todo: Move userRepository dependency on AuthService and inject the service
             throw UnprocessableException("user with email $email not found")
         }
         return couponRepository.save(

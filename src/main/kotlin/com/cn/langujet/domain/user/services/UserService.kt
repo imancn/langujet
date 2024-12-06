@@ -10,13 +10,13 @@ class UserService(
     private val repository: UserRepository
 ) {
     fun getUserByEmail(email: String): UserEntity {
-        return repository.findByEmailAndDeleted(
-            email.toStandardMailAddress()
+        return repository.findByStandardEmailAndDeleted(
+            email.toStandardMail()
         ).orElseThrow { UnprocessableException("User Not Found") }
     }
 }
 
-fun String.toStandardMailAddress(): String {
+fun String.toStandardMail(): String {
     if (this.contains("..")) throw UnprocessableException("Invalid Email")
     return this.lowercase().let {
         if (it.contains("gmail")) {

@@ -42,35 +42,32 @@ class MailSenderService(
         )
 
     fun sendEmailVerificationMail(emailVerificationToken: EmailVerificationTokenEntity) {
-        val email = emailVerificationToken.user.username
         val token = emailVerificationToken.token
         val contentParams = mapOf(
             "TOKEN" to token,
         )
         sendWithTemplate(
-            email, "Verification Mail", contentParams, "email_verification"
+            emailVerificationToken.user.email, "Verification Mail", contentParams, "email_verification"
         )
     }
     
     fun sendDeleteAccountVerificationMail(emailVerificationToken: EmailVerificationTokenEntity) {
-        val email = emailVerificationToken.user.username
         val token = emailVerificationToken.token
         val contentParams = mapOf(
             "TOKEN" to token,
         )
         sendWithTemplate(
-            email, "Delete Account Verification Mail", contentParams, "delete_account_verification_mail"
+            emailVerificationToken.user.email, "Delete Account Verification Mail", contentParams, "delete_account_verification_mail"
         )
     }
 
     fun sendResetPasswordMail(resetPasswordToken: ResetPasswordTokenEntity) {
-        val email = resetPasswordToken.user.username
         val token = resetPasswordToken.token
         val contentParams = mapOf(
             "TOKEN" to token,
         )
         sendWithTemplate(
-            email, "Reset Password Mail", contentParams, "reset_password"
+            resetPasswordToken.user.email, "Reset Password Mail", contentParams, "reset_password"
         )
     }
 

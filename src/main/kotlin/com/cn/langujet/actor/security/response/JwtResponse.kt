@@ -1,4 +1,4 @@
-package com.cn.langujet.application.security.security.payload.response
+package com.cn.langujet.actor.security.response
 
 data class JwtResponse(
     var accessToken: String,

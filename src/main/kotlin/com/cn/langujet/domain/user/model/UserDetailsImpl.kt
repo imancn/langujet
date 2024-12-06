@@ -9,7 +9,7 @@ class UserDetailsImpl(
     val id: String,
     val email: String,
     val emailVerified: Boolean,
-    @field:JsonIgnore private val password: String,
+    @field:JsonIgnore private val password: String?,
     private val authorities: Collection<GrantedAuthority>
 ) : UserDetails {
 
@@ -17,7 +17,7 @@ class UserDetailsImpl(
         return authorities
     }
 
-    override fun getPassword(): String {
+    override fun getPassword(): String? {
         return password
     }
 
@@ -66,7 +66,7 @@ class UserDetailsImpl(
             }
             return UserDetailsImpl(
                 user.id!!,
-                user.username,
+                user.standardEmail,
                 user.emailVerified,
                 user.password,
                 authorities
