@@ -31,7 +31,6 @@ class ResultService(
     private lateinit var examSessionService: ExamSessionService
     
     fun initiateResult(examSession: ExamSessionEntity): ResultEntity {
-        val now = Date(System.currentTimeMillis())
         return resultRepository.save(
             ResultEntity(
                 id = null,
@@ -42,9 +41,7 @@ class ResultService(
                 correctorUserId = null,
                 status = CorrectionStatus.PENDING,
                 score = null,
-                recommendation = null,
-                createdDate = now,
-                updatedDate = now,
+                recommendation = null
             )
         )
     }
@@ -54,7 +51,7 @@ class ResultService(
             result.also {
             it.correctorUserId = correctorUserId
             it.status = CorrectionStatus.PROCESSING
-            it.updatedDate = Date(System.currentTimeMillis())
+            it.updatedAt = Date(System.currentTimeMillis())
         })
     }
     
@@ -119,7 +116,7 @@ class ResultService(
         correctionStatus: CorrectionStatus,
         correctorType: CorrectorType
     ): List<ResultEntity> {
-        return resultRepository.findByCorrectorTypeAndStatusOrderByCreatedDateAsc(
+        return resultRepository.findByCorrectorTypeAndStatusOrderByCreatedAtAsc(
             CorrectorType.HUMAN, correctionStatus
         )
     }
@@ -127,7 +124,7 @@ class ResultService(
     fun getCorrectorResultsByStatus(
         correctionStatus: CorrectionStatus, correctorId: String
     ): List<ResultEntity> {
-        return resultRepository.findByStatusAndCorrectorUserIdOrderByCreatedDateAsc(
+        return resultRepository.findByStatusAndCorrectorUserIdOrderByCreatedAtAsc(
             correctionStatus, correctorId
         )
     }
@@ -146,7 +143,7 @@ class ResultService(
         resultRepository.save(
             result.also {
                 it.status = CorrectionStatus.APPROVED
-                it.updatedDate = Date(System.currentTimeMillis())
+                it.updatedAt = Date(System.currentTimeMillis())
             }
         )
         examSessionService.finalizeCorrection(result.examSessionId)

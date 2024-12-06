@@ -1,9 +1,9 @@
 package com.cn.langujet.domain.coupon
 
+import com.cn.langujet.application.shared.HistoricalEntity
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
-import java.util.Date
 
 @Document(collection = "coupons")
 @TypeAlias("coupons")
@@ -16,5 +16,4 @@ data class CouponEntity(
     var active: Boolean = true,
     var tag: String? = null,
     var description: String? = null,
-    var createdDate: Date = Date(System.currentTimeMillis()),
-)
+): HistoricalEntity()

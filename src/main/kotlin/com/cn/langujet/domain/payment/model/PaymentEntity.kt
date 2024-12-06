@@ -1,9 +1,9 @@
 package com.cn.langujet.domain.payment.model
 
+import com.cn.langujet.application.shared.HistoricalEntity
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
-import java.util.Date
 
 @Document(collection = "payments")
 @TypeAlias("payments")
@@ -14,10 +14,8 @@ sealed class PaymentEntity(
     var status: PaymentStatus,
     var paymentType: PaymentType,
     var amount: Double,
-    var link: String,
-    var createdDate: Date,
-    var lastModifiedDate: Date
-)
+    var link: String
+): HistoricalEntity()
 
 @Document(collection = "payments")
 @TypeAlias("stripe_payments")
@@ -28,8 +26,6 @@ class StripePaymentEntity(
     paymentType: PaymentType,
     amount: Double,
     link: String,
-    createdDate: Date,
-    lastModifiedDate: Date,
     var sessionId: String,
 ): PaymentEntity(
     id,
@@ -37,9 +33,7 @@ class StripePaymentEntity(
     status,
     paymentType,
     amount,
-    link,
-    createdDate,
-    lastModifiedDate
+    link
 )
 
 @Document(collection = "payments")
@@ -51,8 +45,6 @@ class ZarinPalPaymentEntity(
     paymentType: PaymentType,
     amount: Double,
     link: String,
-    createdDate: Date,
-    lastModifiedDate: Date,
     var authority: String,
     var refId: Int?,
     var amountInIRR: Int,
@@ -65,7 +57,5 @@ class ZarinPalPaymentEntity(
     status,
     paymentType,
     amount,
-    link,
-    createdDate,
-    lastModifiedDate
+    link
 )

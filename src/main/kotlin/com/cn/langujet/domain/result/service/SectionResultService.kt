@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
-import java.util.*
 
 @Service
 class SectionResultService(
@@ -33,7 +32,6 @@ class SectionResultService(
         examSession: ExamSessionEntity,
         section: SectionMetaDTO,
     ): SectionResultEntity {
-        val now = Date(System.currentTimeMillis())
         return sectionResultRepository.save(
             SectionResultEntity(
                 id = null,
@@ -47,9 +45,7 @@ class SectionResultService(
                 correctIssuesCount = null,
                 score = null,
                 recommendation = null,
-                attachmentFileId = null,
-                createdDate = now,
-                updatedDate = now,
+                attachmentFileId = null
             )
         )
     }
@@ -81,7 +77,6 @@ class SectionResultService(
         score: Double,
         recommendation: String? = null
     ): SectionResultEntity {
-        val now = Date(System.currentTimeMillis())
         return sectionResultRepository.save(
             SectionResultEntity(
                 id = null,
@@ -95,9 +90,7 @@ class SectionResultService(
                 correctIssuesCount = correctIssuesCount,
                 score = score,
                 recommendation = recommendation,
-                attachmentFileId = null,
-                createdDate = now,
-                updatedDate = now,
+                attachmentFileId = null
             )
         )
     }
@@ -107,7 +100,7 @@ class SectionResultService(
             sectionResults.onEach {
                 it.correctorUserId = correctorUserId
                 it.status = CorrectionStatus.PROCESSING
-                it.updatedDate = Date(System.currentTimeMillis())
+                it.updateLog()
             }
         )
     }
@@ -116,7 +109,7 @@ class SectionResultService(
         val sectionResult = getSectionResultForSubmission(submitCorrectorSectionResultRequest.sectionCorrectionId)
         sectionResult.score = submitCorrectorSectionResultRequest.score
         sectionResult.recommendation = submitCorrectorSectionResultRequest.recommendation
-        sectionResult.updatedDate = Date(System.currentTimeMillis())
+        sectionResult.updateLog()
         // Todo: After Implementation of Approval flow it should be changed to PROCESSED
         sectionResult.status = CorrectionStatus.APPROVED
         sectionResultRepository.save(sectionResult)

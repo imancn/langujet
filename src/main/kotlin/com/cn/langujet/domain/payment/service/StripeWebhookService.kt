@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class StripeWebhookService(
@@ -85,7 +84,7 @@ class StripeWebhookService(
     
     private fun updatePaymentStatus(payment: StripePaymentEntity, status: PaymentStatus) {
         payment.status = status
-        payment.lastModifiedDate = Date(System.currentTimeMillis())
+        payment.updateLog()
         stripePaymentRepository.save(payment)
     }
 }

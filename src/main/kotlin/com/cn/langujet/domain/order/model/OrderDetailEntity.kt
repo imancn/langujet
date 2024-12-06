@@ -1,5 +1,6 @@
 package com.cn.langujet.domain.order.model
 
+import com.cn.langujet.application.shared.LogEntity
 import com.cn.langujet.domain.service.model.ServiceEntity
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
@@ -15,4 +16,4 @@ class OrderDetailEntity(
     var orderId: String,
     var service: ServiceEntity,
     var examSessionId: String? = null,
-)
+): LogEntity()

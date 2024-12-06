@@ -1,5 +1,6 @@
 package com.cn.langujet.domain.exam.model
 
+import com.cn.langujet.application.shared.HistoricalEntity
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
@@ -16,4 +17,4 @@ data class ExamEntity(
     var questionNumber: Int,
     var examDuration: Long, // Seconds
     var active: Boolean
-)
+): HistoricalEntity()

@@ -1,5 +1,6 @@
 package com.cn.langujet.domain.service.model
 
+import com.cn.langujet.application.shared.HistoricalEntity
 import com.cn.langujet.domain.correction.model.CorrectorType
 import com.cn.langujet.domain.exam.model.ExamMode
 import com.cn.langujet.domain.exam.model.ExamType
@@ -17,7 +18,7 @@ sealed class ServiceEntity(
     var discount: Double,
     var order: Int,
     var active: Boolean
-) {
+): HistoricalEntity() {
     @Document(collation = "services")
     @TypeAlias("exam_services")
     class ExamServiceEntity(

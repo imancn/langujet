@@ -1,5 +1,6 @@
 package com.cn.langujet.domain.exam.model
 
+import com.cn.langujet.application.shared.HistoricalEntity
 import com.cn.langujet.domain.correction.model.CorrectorType
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
@@ -21,7 +22,7 @@ data class ExamSessionEntity(
     var startDate: Date?,
     var endDate: Date?,
     var correctionDate: Date?,
-) {
+): HistoricalEntity() {
     constructor(
         studentUserId: String,
         examId: String,

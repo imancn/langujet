@@ -1,5 +1,6 @@
 package com.cn.langujet.domain.correction.model
 
+import com.cn.langujet.application.shared.HistoricalEntity
 import com.cn.langujet.domain.answer.model.AnswerType
 import com.cn.langujet.domain.answer.model.TrueFalseAnswerType
 import org.springframework.data.annotation.Id
@@ -14,7 +15,7 @@ sealed class CorrectAnswerEntity(
     var partOrder: Int,
     var questionOrder: Int,
     var type: AnswerType,
-) {
+): HistoricalEntity() {
     @Document(collection = "correct_answers")
     @TypeAlias("correct_text_answers")
     class CorrectTextAnswerEntity(

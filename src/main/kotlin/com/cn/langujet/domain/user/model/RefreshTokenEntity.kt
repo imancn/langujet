@@ -1,5 +1,6 @@
 package com.cn.langujet.domain.user.model
 
+import com.cn.langujet.application.shared.LogEntity
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.index.Indexed
@@ -14,4 +15,4 @@ data class RefreshTokenEntity(
     var userId: String,
     @Indexed(expireAfterSeconds = 0)
     var expiryDate: Date,
-)
+): LogEntity()

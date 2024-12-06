@@ -1,5 +1,6 @@
 package com.cn.langujet.domain.user.model
 
+import com.cn.langujet.application.shared.HistoricalEntity
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
@@ -15,4 +16,4 @@ data class UserEntity(
     var password: String? = null,
     var roles: Set<Role> = HashSet(),
     var deleted: Boolean = false
-)
+): HistoricalEntity()

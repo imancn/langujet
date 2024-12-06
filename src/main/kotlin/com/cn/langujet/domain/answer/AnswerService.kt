@@ -9,7 +9,6 @@ import com.cn.langujet.domain.exam.model.ExamSessionState
 import com.cn.langujet.domain.exam.service.ExamSessionService
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
-import java.util.*
 
 @Service
 class AnswerService(
@@ -39,7 +38,6 @@ class AnswerService(
                 sectionOrder,
                 partOrder,
                 questionOrder,
-                Date(System.currentTimeMillis()),
                 fileEntity.id!!
             )
         )
@@ -75,7 +73,6 @@ class AnswerService(
                 sectionOrder,
                 answerRequest.partOrder!!,
                 answerRequest.questionOrder!!,
-                Date(System.currentTimeMillis()),
                 answerRequest.text!!
             )
             
@@ -84,7 +81,6 @@ class AnswerService(
                 sectionOrder,
                 answerRequest.partOrder!!,
                 answerRequest.questionOrder!!,
-                Date(System.currentTimeMillis()),
                 answerRequest.issues!!
             )
             
@@ -93,7 +89,6 @@ class AnswerService(
                 sectionOrder,
                 answerRequest.partOrder!!,
                 answerRequest.questionOrder!!,
-                Date(System.currentTimeMillis()),
                 answerRequest.issues!!
             )
             
@@ -102,7 +97,6 @@ class AnswerService(
                 sectionOrder,
                 answerRequest.partOrder!!,
                 answerRequest.questionOrder!!,
-                Date(System.currentTimeMillis()),
                 answerRequest.issues!!.mapNotNull {
                     it?.let { multipleChoiceIssueAnswerRequest ->
                         AnswerEntity.MultipleChoiceIssueAnswer(

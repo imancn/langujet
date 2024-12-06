@@ -8,12 +8,12 @@ import java.util.*
 
 interface ResultRepository : MongoRepository<ResultEntity, String> {
     fun findByExamSessionId(examSessionId: String): Optional<ResultEntity>
-    fun findByCorrectorTypeAndStatusOrderByCreatedDateAsc(
+    fun findByCorrectorTypeAndStatusOrderByCreatedAtAsc(
         correctorType: CorrectorType,
         correctionStatus: CorrectionStatus
     ) : List<ResultEntity>
     
-    fun findByStatusAndCorrectorUserIdOrderByCreatedDateAsc(
+    fun findByStatusAndCorrectorUserIdOrderByCreatedAtAsc(
         correctionStatus: CorrectionStatus,
         correctorId: String
     ): List<ResultEntity>

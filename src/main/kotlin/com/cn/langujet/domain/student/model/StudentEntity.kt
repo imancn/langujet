@@ -1,5 +1,6 @@
 package com.cn.langujet.domain.student.model
 
+import com.cn.langujet.application.shared.HistoricalEntity
 import com.cn.langujet.domain.user.model.UserEntity
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
@@ -15,7 +16,7 @@ data class StudentEntity(
     var user: UserEntity,
     var fullName: String,
     var biography: String?,
-) {
+): HistoricalEntity() {
     constructor(user: UserEntity, fullName: String) : this(
         null,
         user,

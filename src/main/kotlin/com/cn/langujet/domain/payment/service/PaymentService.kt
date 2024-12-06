@@ -5,7 +5,6 @@ import com.cn.langujet.domain.payment.model.*
 import com.cn.langujet.domain.payment.repository.PaymentRepository
 import com.cn.langujet.domain.payment.service.zarinpal.ZarinPalPaymentService
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class PaymentService(
@@ -30,8 +29,6 @@ class PaymentService(
                 paymentType = paymentType,
                 amount = amount,
                 link = zarinPalPayment.url,
-                createdDate = Date(System.currentTimeMillis()),
-                lastModifiedDate = Date(System.currentTimeMillis()),
                 authority = zarinPalPayment.authority,
                 refId = null,
                 amountInIRR = amountInIRR,
@@ -55,8 +52,6 @@ class PaymentService(
                 paymentType = paymentType,
                 amount = amount,
                 link = stripeSession.url,
-                createdDate = Date(System.currentTimeMillis()),
-                lastModifiedDate = Date(System.currentTimeMillis()),
                 sessionId = stripeSession.id
             )
         )

@@ -9,7 +9,6 @@ import com.cn.langujet.domain.payment.service.zarinpal.dto.ZarinPalVerifyRespons
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.servlet.view.RedirectView
-import java.util.*
 
 @Service
 class ZarinPalWebhookService(
@@ -51,7 +50,7 @@ class ZarinPalWebhookService(
             payment.status = PaymentStatus.FAILED
             orderService.rejectOrder(payment.orderId)
         }
-        payment.lastModifiedDate = Date(System.currentTimeMillis())
+        payment.updateLog()
         zarinPalPaymentRepository.save(payment)
         return RedirectView("$paymentRedirectUrl?id=${payment.orderId}")
     }
