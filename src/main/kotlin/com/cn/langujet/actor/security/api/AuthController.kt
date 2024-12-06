@@ -192,7 +192,7 @@ class AuthController(
         @RequestParam @Size(min = 6, max = 40) @NotBlank newPassword: String
     ): ResponseEntity<String> {
         val user = userRepository.findByIdAndDeleted(Auth.userId()).orElseThrow { NotFoundException("User Not Found") }
-        if (user.password == encoder.encode(oldPassword)) user.password = encoder.encode(newPassword)
+        if (encoder.matches(oldPassword, user.password)) user.password = encoder.encode(newPassword)
         else throw InvalidInputException("Old Password is not correct.")
         return toOkResponseEntity("Your password has been changed.")
     }
