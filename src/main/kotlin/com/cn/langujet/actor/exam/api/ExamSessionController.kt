@@ -22,7 +22,7 @@ class ExamSessionController(
         @RequestParam @NotBlank email: String,
         @RequestParam @NotBlank examServiceId: String,
         @RequestParam examId: String?,
-    ): ExamSessionEnrollResponse = examSessionService.enrollExamSession(email, examServiceId, examId)
+    ): ExamSessionEnrollResponse = examSessionService.enrollExamSessionByEmail(email, examServiceId, examId)
     
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/student/exam-sessions/details")

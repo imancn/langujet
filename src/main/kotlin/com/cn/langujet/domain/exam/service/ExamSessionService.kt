@@ -72,9 +72,14 @@ class ExamSessionService(
         )
     }
     
-    fun enrollExamSession(email: String, examServiceId: String, examId: String? = null): ExamSessionEnrollResponse {
-        val service = serviceService.getById(examServiceId) as ServiceEntity.ExamServiceEntity
+    
+    fun enrollExamSessionByEmail(email: String, examServiceId: String, examId: String? = null): ExamSessionEnrollResponse {
         val userId = userService.getUserByEmail(email).id ?: throw UnprocessableException("User not found")
+        return enrollExamSession(userId, examServiceId, examId)
+    }
+    
+    fun enrollExamSession(userId: String, examServiceId: String, examId: String? = null): ExamSessionEnrollResponse {
+        val service = serviceService.getById(examServiceId) as ServiceEntity.ExamServiceEntity
         val exam = if (examId != null) {
             examService.getExamById(examId).let {
                 if (service.examMode != it.mode || service.examType != it.type) {
