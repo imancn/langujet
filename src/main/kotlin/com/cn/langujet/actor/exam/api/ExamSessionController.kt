@@ -19,10 +19,10 @@ class ExamSessionController(
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin/exam-sessions/enroll")
     fun enrollExamSession(
-        @RequestParam @NotBlank userId: String,
+        @RequestParam @NotBlank email: String,
         @RequestParam @NotBlank examServiceId: String,
         @RequestParam examId: String?,
-    ): ExamSessionEnrollResponse = examSessionService.enrollExamSession(userId, examServiceId, examId)
+    ): ExamSessionEnrollResponse = examSessionService.enrollExamSession(email, examServiceId, examId)
     
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/student/exam-sessions/details")
