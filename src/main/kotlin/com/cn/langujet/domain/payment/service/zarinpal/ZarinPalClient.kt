@@ -6,7 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 
-@FeignClient(name = "zarinPalClient", url = "https://sandbox.zarinpal.com/pg/v4/payment/")
+@FeignClient(name = "zarinPalClient", url = "https://api.zarinpal.com/pg/v4/payment/")
 interface ZarinPalClient {
     @PostMapping(path = ["/request.json"])
     fun requestPayment(@RequestBody parameters: ZarinPalPaymentRequest): Map<String, Any>
