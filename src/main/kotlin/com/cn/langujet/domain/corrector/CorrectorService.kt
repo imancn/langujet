@@ -14,18 +14,16 @@ class CorrectorService(
         fullName: String?,
         biography: String?,
         ieltsScore: Double?,
-        credit: Double?
     ): CorrectorProfileResponse {
         val corrector = this.getCorrectorByUserId(Auth.userId())
         
-        if (fullName.isNullOrBlank() && biography.isNullOrBlank() && ieltsScore == null && credit == null) return CorrectorProfileResponse(
+        if (fullName.isNullOrBlank() && biography.isNullOrBlank() && ieltsScore == null) return CorrectorProfileResponse(
             corrector
         )
         
         if (!fullName.isNullOrBlank()) corrector.fullName = fullName
         if (!biography.isNullOrBlank()) corrector.biography = biography
         ieltsScore?.let { corrector.ieltsScore = it }
-        credit?.let { corrector.credit = it }
         
         return CorrectorProfileResponse(correctorRepository.save(corrector))
     }

@@ -9,7 +9,6 @@ data class CorrectorProfileResponse(
     var fullName: String,
     var biography: String?,
     var ieltsScore: Double?,
-    var credit: Double = 0.0,
 ) {
     constructor(corrector: CorrectorEntity) : this(
         corrector.id,
@@ -17,6 +16,5 @@ data class CorrectorProfileResponse(
         corrector.fullName,
         corrector.biography,
         corrector.ieltsScore,
-        corrector.credit
     )
 }

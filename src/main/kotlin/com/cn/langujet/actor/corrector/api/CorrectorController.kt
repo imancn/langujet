@@ -27,7 +27,6 @@ class CorrectorController(
         @RequestParam fullName: String?,
         @RequestParam biography: String?,
         @RequestParam ieltsScore: Double?,
-        @RequestParam credit: Double?
     ): ResponseEntity<CorrectorProfileResponse> =
-        toOkResponseEntity(correctorService.editProfile(fullName, biography, ieltsScore, credit))
+        toOkResponseEntity(correctorService.editProfile(fullName, biography, ieltsScore))
 }

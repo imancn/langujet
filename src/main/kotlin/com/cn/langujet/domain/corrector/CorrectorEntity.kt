@@ -15,16 +15,14 @@ data class CorrectorEntity(
     @DBRef
     var user: UserEntity,
     var fullName: String,
+    var ieltsScore: Double,
     var biography: String?,
-    var ieltsScore: Double?,
-    var credit: Double = 0.0,
 ): LogEntity() {
-    constructor(user: UserEntity, fullName: String) : this(
+    constructor(user: UserEntity, fullName: String, ieltsScore: Double) : this(
         null,
         user,
         fullName,
+        ieltsScore,
         null,
-        null,
-        0.0
     )
 }

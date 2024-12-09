@@ -10,16 +10,15 @@ import com.cn.langujet.domain.corrector.CorrectorEntity
 import com.cn.langujet.domain.corrector.CorrectorRepository
 import com.cn.langujet.domain.student.model.StudentEntity
 import com.cn.langujet.domain.student.repository.StudentRepository
+import com.cn.langujet.domain.student.service.StudentService
 import com.cn.langujet.domain.user.model.*
 import com.cn.langujet.domain.user.repository.EmailVerificationTokenRepository
 import com.cn.langujet.domain.user.repository.ResetPasswordTokenRepository
 import com.cn.langujet.domain.user.repository.UserRepository
-import com.cn.langujet.domain.user.services.GoogleAuthService
-import com.cn.langujet.domain.user.services.JwtService
-import com.cn.langujet.domain.user.services.RefreshTokenService
-import com.cn.langujet.domain.user.services.toStandardMail
+import com.cn.langujet.domain.user.services.*
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -46,6 +45,7 @@ class AuthController(
     val encoder: PasswordEncoder,
     val jwtService: JwtService,
     private val googleAuthService: GoogleAuthService,
+    private val studentService: StudentService,
 ) {
 //    @Todo: Move the logic to the service layer
     
@@ -94,14 +94,20 @@ class AuthController(
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/corrector/signup")
     fun registerCorrector(
-        @RequestParam @NotBlank fullName: String,
         @RequestParam @NotBlank @Email email: String,
-        @RequestParam @NotBlank @Size(min = 6, max = 40) password: String,
+        @RequestParam @NotNull ieltsScore: Double,
     ): ResponseEntity<String> {
-        val user = registerUser(email.toStandardMail(), password, mutableSetOf(Role.ROLE_CORRECTOR))
-        sendVerificationMail(email.toStandardMail())
-        correctorRepository.save(CorrectorEntity(user, fullName))
-        return toOkResponseEntity("User registered successfully!")
+        var user = userRepository.findByStandardEmailAndDeleted(email.toStandardMail()).getOrElse {
+            throw UnprocessableException("user must sign-up as student first")
+        }
+        if (user.id?.let { correctorRepository.existsByUser_Id(it) } != false){
+            throw UnprocessableException("Corrector already registered")
+        }
+        val fullName = user.id?.let { studentService.getStudentByUserId(it) }?.fullName ?: user.email
+        user.roles =  user.roles.toMutableSet().also { it.add(Role.ROLE_CORRECTOR) }
+        user = userRepository.save(user)
+        correctorRepository.save(CorrectorEntity(user, fullName, ieltsScore))
+        return toOkResponseEntity("Corrector registered successfully!")
     }
     
     private fun registerUser(email: String, password: String, roles: Set<Role>): UserEntity {
