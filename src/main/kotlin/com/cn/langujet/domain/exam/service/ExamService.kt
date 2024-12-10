@@ -12,13 +12,15 @@ import org.springframework.stereotype.Service
 
 @Service
 class ExamService(
-    val examRepository: ExamRepository,
+    private val examRepository: ExamRepository,
+    private val examValidatorService: ExamValidatorService,
 ) {
     
     fun createExam(exam: ExamDTO): ExamDTO {
         exam.id = null
+        exam.active = false
         return ExamDTO(
-            examRepository.save(exam.also { it.id = null }.toExam())
+            examRepository.save(exam.toExam())
         )
     }
     
@@ -32,6 +34,9 @@ class ExamService(
         existingExam.questionNumber = exam.questionNumber
         existingExam.examDuration = exam.examDuration
         existingExam.active = exam.active
+        if (exam.active) {
+            examValidatorService.validate(existingExam)
+        }
         return ExamDTO(
             examRepository.save(existingExam)
         )

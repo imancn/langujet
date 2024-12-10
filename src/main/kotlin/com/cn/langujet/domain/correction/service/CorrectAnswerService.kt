@@ -31,6 +31,11 @@ class CorrectAnswerService(
             )
         ).firstOrNull() ?: throw InvalidInputException("Correct Answer list is empty")
     }
+    
+    fun getSectionCorrectAnswers(
+        examId: String,
+        sectionOrder: Int
+    ) = repository.findAllByExamIdAndSectionOrder(examId, sectionOrder)
 
     fun getCorrectAnswer(
         examId: String,
