@@ -85,7 +85,7 @@ class AuthController(
         @RequestParam @NotBlank @Size(max = 50) @Email email: String,
         @RequestParam @NotBlank @Size(min = 6, max = 40) password: String,
     ): ResponseEntity<String> {
-        val user = registerUser(email.toStandardMail(), password, mutableSetOf(Role.ROLE_STUDENT))
+        val user = registerUser(email, password, mutableSetOf(Role.ROLE_STUDENT))
         sendVerificationMail(user.email)
         studentRepository.save(StudentEntity(user, fullName))
         return toOkResponseEntity("User registered successfully!")
