@@ -4,6 +4,7 @@ import com.cn.langujet.actor.correction.payload.response.CorrectionResponse
 import com.cn.langujet.actor.correction.payload.request.AssignCorrectionRequest
 import com.cn.langujet.actor.correction.payload.response.CorrectorAvailableCorrectionResponse
 import com.cn.langujet.actor.correction.payload.response.CorrectorCorrectionExamSessionContentResponse
+import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.domain.correction.model.CorrectionStatus
 import com.cn.langujet.domain.correction.model.CorrectorType
 import com.cn.langujet.domain.correction.service.CorrectionService
@@ -20,7 +21,7 @@ class AICorrectionController(
     @GetMapping("/corrections/pending")
     @PreAuthorize("hasRole('CORRECTOR_AI')")
     fun getCorrectorPendingCorrections(): List<CorrectorAvailableCorrectionResponse> {
-        return correctionService.getCorrectorPendingCorrections(CorrectorType.AI)
+        return correctionService.getCorrectorPendingCorrections(CorrectorType.valueOf(Auth.claim("type")))
     }
     
     @PostMapping("/corrections/assign")
@@ -28,7 +29,10 @@ class AICorrectionController(
     fun assignCorrection(
         @RequestBody assignCorrectionRequest: AssignCorrectionRequest
     ): CorrectionResponse {
-        return correctionService.assignCorrectionByCorrector(assignCorrectionRequest, CorrectorType.AI)
+        return correctionService.assignCorrectionByCorrector(
+            assignCorrectionRequest,
+            CorrectorType.valueOf(Auth.claim("type"))
+        )
     }
     
     @GetMapping("/corrections/processing")

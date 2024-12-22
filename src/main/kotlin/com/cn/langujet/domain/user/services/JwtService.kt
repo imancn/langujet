@@ -1,6 +1,9 @@
 package com.cn.langujet.domain.user.services
 
 import com.cn.langujet.application.advice.InvalidTokenException
+import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.domain.correction.model.CorrectorType
+import com.cn.langujet.domain.user.model.Role
 import com.cn.langujet.domain.user.model.UserDetailsImpl
 import io.jsonwebtoken.*
 import jakarta.servlet.http.HttpServletRequest
@@ -27,6 +30,22 @@ class JwtService(
             .claim("email", userPrincipal.email)
             .setIssuedAt(Date())
             .setExpiration(Date(Date().time + jwtExpirationMs))
+            .signWith(SignatureAlgorithm.HS512, jwtSecret)
+            .compact()
+    }
+    
+    fun generateAiToken(correctorType: CorrectorType, code: Int): String {
+        if (!arrayOf(CorrectorType.AI, CorrectorType.AI_PRO).contains(correctorType)) {
+            throw UnprocessableException("AI Token cannot be generated for $correctorType correction type")
+        }
+        return Jwts.builder()
+            .setSubject("$correctorType:$code")
+            .claim("roles", arrayOf(Role.ROLE_CORRECTOR_AI))
+            .claim("email", "langujet@gmail.com")
+            .claim("code", code)
+            .claim("type", correctorType.name)
+            .setIssuedAt(Date())
+            .setExpiration(Date(Date().time + 315569520000))
             .signWith(SignatureAlgorithm.HS512, jwtSecret)
             .compact()
     }

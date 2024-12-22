@@ -22,6 +22,8 @@ object Auth {
     
     fun isStudent() = hasAuthority("ROLE_STUDENT")
     
+    fun claim(key: String): String = getClaims()?.get(key, String::class.java) ?: ""
+    
     private fun hasAuthority(role: String): Boolean {
         return getAuthentication()?.authorities?.contains(SimpleGrantedAuthority(role)) ?: false
     }
