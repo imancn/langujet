@@ -16,8 +16,8 @@ class ExamValidatorService(
         validateSections(exam, sections)
         sections.forEach { section ->
             validateSectionParts(section)
-            validateCorrectAnswers(section, exam.type)
             validateSectionPartQuestions(section)
+            validateCorrectAnswers(section, exam.type)
         }
     }
     
