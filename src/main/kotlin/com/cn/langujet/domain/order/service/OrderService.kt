@@ -60,6 +60,12 @@ class OrderService(
             return SubmitOrderResponse(null)
         } else {
             val paymentType = submitOrderRequest.paymentType ?: PaymentType.STRIPE
+            /**
+             * Remove it when Stripe be available
+             */
+            if (paymentType == PaymentType.STRIPE) {
+                throw UnprocessableException("Not available in your country")
+            }
             val order = orderRepository.save(
                 OrderEntity(
                     id = null,
