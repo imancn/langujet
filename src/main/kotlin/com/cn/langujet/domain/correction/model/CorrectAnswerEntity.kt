@@ -19,42 +19,46 @@ sealed class CorrectAnswerEntity(
     @Document(collection = "correct_answers")
     @TypeAlias("correct_text_answers")
     class CorrectTextAnswerEntity(
+        id: String? = null,
         examId: String,
         sectionOrder: Int,
         partOrder: Int,
         questionOrder: Int,
         var text: String
-    ) : CorrectAnswerEntity(null, examId, sectionOrder, partOrder, questionOrder, AnswerType.TEXT)
+    ) : CorrectAnswerEntity(id, examId, sectionOrder, partOrder, questionOrder, AnswerType.TEXT)
 
     @Document(collection = "correct_answers")
     @TypeAlias("correct_text_issues_answers")
     class CorrectTextIssuesAnswerEntity(
+        id: String? = null,
         examId: String,
         sectionOrder: Int,
         partOrder: Int,
         questionOrder: Int,
         var issues: List<List<String>>
-    ) : CorrectAnswerEntity(null, examId, sectionOrder, partOrder, questionOrder, AnswerType.TEXT_ISSUES)
+    ) : CorrectAnswerEntity(id, examId, sectionOrder, partOrder, questionOrder, AnswerType.TEXT_ISSUES)
 
     @Document(collection = "correct_answers")
     @TypeAlias("correct_true_false_answers")
     class CorrectTrueFalseAnswerEntity(
+        id: String? = null,
         examId: String,
         sectionOrder: Int,
         partOrder: Int,
         questionOrder: Int,
         var issues: List<TrueFalseAnswerType>
-    ) : CorrectAnswerEntity(null, examId, sectionOrder, partOrder, questionOrder, AnswerType.TRUE_FALSE)
+    ) : CorrectAnswerEntity(id, examId, sectionOrder, partOrder, questionOrder, AnswerType.TRUE_FALSE)
 
     @Document(collection = "correct_answers")
     @TypeAlias("correct_multiple_choice_answers")
     class CorrectMultipleChoiceAnswerEntity(
+        id: String? = null,
         examId: String,
         sectionOrder: Int,
         partOrder: Int,
         questionOrder: Int,
         var issues: List<CorrectMultipleChoiceIssueAnswer>
-    ) : CorrectAnswerEntity(null, examId, sectionOrder, partOrder, questionOrder, AnswerType.MULTIPLE_CHOICE)
+    ) : CorrectAnswerEntity(id, examId, sectionOrder, partOrder, questionOrder, AnswerType.MULTIPLE_CHOICE)
 
     class CorrectMultipleChoiceIssueAnswer(
         var order: Int,

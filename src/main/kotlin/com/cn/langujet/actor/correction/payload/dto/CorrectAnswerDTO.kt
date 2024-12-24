@@ -29,7 +29,7 @@ import jakarta.validation.constraints.NotNull
     JsonSubTypes.Type(value = CorrectMultipleChoiceAnswerDTO::class, name = "MULTIPLE_CHOICE")
 )
 sealed class CorrectAnswerDTO(
-    open val id: String?,
+    open var id: String?,
     open val partOrder: Int?,
     open val questionOrder: Int?,
     val type: AnswerType,
@@ -37,6 +37,7 @@ sealed class CorrectAnswerDTO(
     inline fun <reified T : CorrectAnswerEntity> toCorrectAnswer(examId: String, sectionOrder: Int): T {
         val answer: CorrectAnswerEntity = when (this) {
             is CorrectTextAnswerDTO -> CorrectAnswerEntity.CorrectTextAnswerEntity(
+                id,
                 examId,
                 sectionOrder,
                 partOrder!!,
@@ -45,6 +46,7 @@ sealed class CorrectAnswerDTO(
             )
 
             is CorrectTextIssuesAnswerDTO -> CorrectAnswerEntity.CorrectTextIssuesAnswerEntity(
+                id,
                 examId,
                 sectionOrder,
                 partOrder!!,
@@ -53,6 +55,7 @@ sealed class CorrectAnswerDTO(
             )
 
             is CorrectTrueFalseAnswerDTO -> CorrectAnswerEntity.CorrectTrueFalseAnswerEntity(
+                id,
                 examId,
                 sectionOrder,
                 partOrder!!,
@@ -61,6 +64,7 @@ sealed class CorrectAnswerDTO(
             )
 
             is CorrectMultipleChoiceAnswerDTO -> CorrectAnswerEntity.CorrectMultipleChoiceAnswerEntity(
+                id,
                 examId,
                 sectionOrder,
                 partOrder!!,
@@ -92,7 +96,7 @@ sealed class CorrectAnswerDTO(
 }
 
 data class CorrectTextAnswerDTO(
-    override val id: String? = null,
+    override var id: String? = null,
     @field:NotNull override val partOrder: Int? = null,
     @field:NotNull override val questionOrder: Int? = null,
     @field:NotBlank val text: String? = null,
@@ -106,7 +110,7 @@ data class CorrectTextAnswerDTO(
 }
 
 data class CorrectTextIssuesAnswerDTO(
-    override val id: String? = null,
+    override var id: String? = null,
     @field:NotNull override val partOrder: Int? = null,
     @field:NotNull override val questionOrder: Int? = null,
     @field:NotNull val issues: List<List<String>>? = null,
@@ -120,7 +124,7 @@ data class CorrectTextIssuesAnswerDTO(
 }
 
 data class CorrectTrueFalseAnswerDTO(
-    override val id: String? = null,
+    override var id: String? = null,
     @field:NotNull override val partOrder: Int? = null,
     @field:NotNull override val questionOrder: Int? = null,
     @field:NotNull val issues: List<TrueFalseAnswerType>? = null,
@@ -134,7 +138,7 @@ data class CorrectTrueFalseAnswerDTO(
 }
 
 data class CorrectMultipleChoiceAnswerDTO(
-    override val id: String? = null,
+    override var id: String? = null,
     @field:NotNull override val partOrder: Int? = null,
     @field:NotNull override val questionOrder: Int? = null,
     @field:NotNull val issues: List<CorrectMultipleChoiceIssueAnswerDTO>? = null,

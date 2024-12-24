@@ -6,4 +6,10 @@ import org.springframework.data.mongodb.repository.MongoRepository
 interface CorrectAnswerRepository : MongoRepository<CorrectAnswerEntity, String> {
     fun existsByExamIdAndSectionOrder(examId: String, sectionOrder: Int): Boolean
     fun findAllByExamIdAndSectionOrder(examId: String, sectionOrder: Int): List<CorrectAnswerEntity>
+    fun existsByExamIdAndSectionOrderAndPartOrderAndQuestionOrder(
+        examId: String,
+        sectionOrder: Int,
+        partOrder: Int,
+        questionOrder: Int
+    ): Boolean
 }
