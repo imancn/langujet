@@ -1,4 +1,4 @@
-package com.cn.langujet.domain.payment.service
+package com.cn.langujet.domain.payment.service.stripe
 
 import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.domain.order.service.OrderService

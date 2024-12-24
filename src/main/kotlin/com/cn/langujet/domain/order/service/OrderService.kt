@@ -16,6 +16,7 @@ import com.cn.langujet.domain.payment.service.PaymentService
 import com.cn.langujet.domain.service.model.ServiceEntity
 import com.cn.langujet.domain.service.model.ServiceType
 import com.cn.langujet.domain.service.service.ServiceService
+import com.rollbar.notifier.Rollbar
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -30,6 +31,7 @@ class OrderService(
     private val paymentService: PaymentService,
     private val examSessionService: ExamSessionService,
     private val couponService: CouponService,
+    private val rollbar: Rollbar,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass.simpleName)
     
@@ -60,12 +62,6 @@ class OrderService(
             return SubmitOrderResponse(null)
         } else {
             val paymentType = submitOrderRequest.paymentType ?: PaymentType.STRIPE
-            /**
-             * Remove it when Stripe be available
-             */
-            if (paymentType == PaymentType.STRIPE) {
-                throw UnprocessableException("Not available in your country")
-            }
             val order = orderRepository.save(
                 OrderEntity(
                     id = null,
@@ -79,11 +75,18 @@ class OrderService(
                     date = Date(System.currentTimeMillis())
                 )
             )
-            val payment = paymentService.createPayment(
-                order.id ?: "",
-                finalPrice,
-                paymentType
-            )
+            val payment = try {
+                paymentService.createPayment(
+                    order.id ?: "",
+                    finalPrice,
+                    paymentType
+                )
+            } catch (ex: Exception) {
+                orderRepository.deleteById(order.id ?: "")
+                rollbar.error(ex)
+                ex.printStackTrace()
+                throw UnprocessableException("Payment Failed")
+            }
             order.paymentId = payment.id ?: ""
             orderRepository.save(order)
             initiateOrderDetails(order, services)

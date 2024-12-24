@@ -11,12 +11,19 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.web.filter.OncePerRequestFilter
 import java.io.IOException
 
-class AuthTokenFilter(private val jwtService: JwtService) : OncePerRequestFilter() {
+class AuthTokenFilter(
+    private val jwtService: JwtService,
+    private val internalClientSecret: String
+) : OncePerRequestFilter() {
     
     @Throws(ServletException::class, IOException::class)
     override fun doFilterInternal(
         request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain
     ) {
+        if (request.getHeader("Authorization") == internalClientSecret) {
+            SecurityContextHolder.getContext().authentication = null
+            filterChain.doFilter(request, response)
+        }
         try {
             val jwt = jwtService.parseJwt(request)
             val userId = jwtService.getUserIdFromJwtToken(jwt)

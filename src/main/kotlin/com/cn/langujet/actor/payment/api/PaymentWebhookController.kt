@@ -1,6 +1,6 @@
 package com.cn.langujet.actor.payment.api
 
-import com.cn.langujet.domain.payment.service.StripeWebhookService
+import com.cn.langujet.domain.payment.service.stripe.StripeWebhookService
 import com.cn.langujet.domain.payment.service.zarinpal.ZarinPalWebhookService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*

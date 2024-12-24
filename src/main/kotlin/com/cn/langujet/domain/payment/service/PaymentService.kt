@@ -1,16 +1,16 @@
 package com.cn.langujet.domain.payment.service
 
-import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.domain.payment.model.*
 import com.cn.langujet.domain.payment.repository.PaymentRepository
+import com.cn.langujet.domain.payment.service.stripe.StripePaymentService
 import com.cn.langujet.domain.payment.service.zarinpal.ZarinPalPaymentService
 import org.springframework.stereotype.Service
 
 @Service
 class PaymentService(
-    private val stripePaymentService: StripePaymentService,
     private val paymentRepository: PaymentRepository,
-    private val zarinPalPaymentService: ZarinPalPaymentService
+    private val zarinPalPaymentService: ZarinPalPaymentService,
+    private val stripePaymentService: StripePaymentService
 ) {
     fun createPayment(orderId: String, amount: Double, paymentType: PaymentType): PaymentEntity {
         return when(paymentType) {
@@ -40,11 +40,7 @@ class PaymentService(
     }
     
     private fun createStripePayment(orderId: String, amount: Double, paymentType: PaymentType): PaymentEntity {
-        /**
-         * Remove it when Stripe be available
-         */
-        throw UnprocessableException("Not available in your country")
-        val stripeSession = stripePaymentService.createPaymentSession(amount, orderId)
+        val stripeSession = stripePaymentService.createPaymentSessionByProxy(amount, orderId)
         return paymentRepository.save(
             StripePaymentEntity(
                 orderId = orderId,

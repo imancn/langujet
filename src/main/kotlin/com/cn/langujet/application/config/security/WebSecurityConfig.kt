@@ -1,6 +1,7 @@
 package com.cn.langujet.application.config.security
 
 import com.cn.langujet.domain.user.services.JwtService
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
@@ -23,6 +24,9 @@ class WebSecurityConfig(
     private val unauthorizedHandler: AuthenticationEntryPoint,
     private val accessDeniedHandler: AccessDeniedHandler,
 ) {
+    @Value("\${langujet.client.secret}")
+    private lateinit var internalClientSecret: String
+    
     @Bean
     @Throws(Exception::class)
     fun filterChain(http: HttpSecurity): SecurityFilterChain? {
@@ -31,7 +35,7 @@ class WebSecurityConfig(
             .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
             .exceptionHandling().accessDeniedHandler(accessDeniedHandler).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-            .addFilterBefore(AuthTokenFilter(jwtService), UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(AuthTokenFilter(jwtService, internalClientSecret), UsernamePasswordAuthenticationFilter::class.java)
             .build()
     }
     
