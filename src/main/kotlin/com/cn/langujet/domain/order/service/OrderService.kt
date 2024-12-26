@@ -20,6 +20,7 @@ import com.rollbar.notifier.Rollbar
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
+import java.math.BigDecimal
 import java.util.*
 import kotlin.jvm.optionals.getOrElse
 
@@ -37,10 +38,15 @@ class OrderService(
     
     fun submitOrder(submitOrderRequest: SubmitOrderRequest): SubmitOrderResponse {
         val services = submitOrderRequest.serviceIds.map { serviceService.getById(it) }
+        
         val totalPrice = services.sumOf { it.price }
-        val discountAmount = services.sumOf { it.discount }
-        val coupon = couponService.getActiveCouponByCode(submitOrderRequest.couponCode)
-        var finalPrice = totalPrice - discountAmount - (coupon?.amount ?: 0.0)
+        val discountAmount = services.sumOf { it.discount }.toBigDecimal()
+        val purchasableAmount = totalPrice.toBigDecimal() - discountAmount
+        
+        val coupon = couponService.getUserActiveCouponByCode(submitOrderRequest.couponCode)
+        val couponFinalAmount = coupon?.let { couponService.calculateCouponFinalAmount(it, purchasableAmount) } ?: BigDecimal(0.0)
+        
+        var finalPrice = (purchasableAmount - couponFinalAmount).toDouble()
         if (finalPrice <= 0.0) { finalPrice = 0.0 }
         
         if (finalPrice == 0.0) {
