@@ -2,13 +2,12 @@ package com.cn.langujet.actor.order.payload
 
 import com.cn.langujet.domain.order.model.OrderEntity
 import com.cn.langujet.domain.order.model.OrderStatus
-import com.cn.langujet.domain.payment.model.PaymentType
 import java.util.*
 
 data class StudentOrderResponse(
     val orderId: String?,
     val status: OrderStatus,
-    val paymentType: PaymentType?,
+    val paymentType: String?,
     val totalPrice: Double,
     val finalPrice: Double,
     val date: Date
@@ -16,7 +15,7 @@ data class StudentOrderResponse(
     constructor(orderEntity: OrderEntity) : this(
         orderEntity.id,
         orderEntity.status,
-        orderEntity.paymentType,
+        orderEntity.paymentType?.displayName,
         orderEntity.totalPrice,
         orderEntity.finalPrice,
         orderEntity.date
