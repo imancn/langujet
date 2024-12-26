@@ -6,5 +6,6 @@ data class ActiveCouponsResponse(
     val name: String,
     val code: String,
     val amount: Double,
+    val percent : Int,
     val createdDate: Date
 )

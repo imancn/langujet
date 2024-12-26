@@ -93,6 +93,7 @@ class CouponService(
                 name = it.name,
                 code = it.code,
                 amount = it.amount,
+                percent = it.percentage,
                 createdDate = it.createdAt,
             )
         }
