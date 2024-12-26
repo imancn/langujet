@@ -43,7 +43,7 @@ class CouponController(
     
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/student/coupons/")
-    fun getCoupons( /// currently it's not used by any client app
+    fun getCoupons(
         @RequestParam active: Boolean?
     ): List<ActiveCouponsResponse> {
         return couponService.getCouponsByUserId(Auth.userId(), active)
