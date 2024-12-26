@@ -1,6 +1,7 @@
 package com.cn.langujet.actor.util
 
 import io.jsonwebtoken.Claims
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
@@ -23,6 +24,12 @@ object Auth {
     fun isStudent() = hasAuthority("ROLE_STUDENT")
     
     fun claim(key: String): String = getClaims()?.get(key, String::class.java) ?: ""
+    
+    fun setCustomUserId(userId: String) {
+        SecurityContextHolder.getContext().authentication = UsernamePasswordAuthenticationToken(
+            userId, null, null
+        )
+    }
     
     private fun hasAuthority(role: String): Boolean {
         return getAuthentication()?.authorities?.contains(SimpleGrantedAuthority(role)) ?: false

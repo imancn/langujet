@@ -1,8 +1,10 @@
 package com.cn.langujet.domain.payment.service.zarinpal
 
+import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.domain.order.service.OrderService
 import com.cn.langujet.domain.payment.model.PaymentStatus
+import com.cn.langujet.domain.payment.model.PaymentType
 import com.cn.langujet.domain.payment.repository.ZarinPalPaymentRepository
 import com.cn.langujet.domain.payment.service.zarinpal.dto.ZarinPalVerifyRequest
 import com.cn.langujet.domain.payment.service.zarinpal.dto.ZarinPalVerifyResponse
@@ -23,6 +25,7 @@ class ZarinPalWebhookService(
     private lateinit var merchantId: String
     
     fun handleWebhook(authority: String, status: String): RedirectView {
+        Auth.setCustomUserId(PaymentType.ZARIN_PAL.name)
         val payment = zarinPalPaymentRepository.findByAuthority(authority).orElseThrow {
             UnprocessableException("Payment not found with authority = $authority")
         }

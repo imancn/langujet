@@ -1,8 +1,10 @@
 package com.cn.langujet.domain.payment.service.stripe
 
+import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.domain.order.service.OrderService
 import com.cn.langujet.domain.payment.model.PaymentStatus
+import com.cn.langujet.domain.payment.model.PaymentType
 import com.cn.langujet.domain.payment.model.StripePaymentEntity
 import com.cn.langujet.domain.payment.repository.StripePaymentRepository
 import com.stripe.model.checkout.Session
@@ -29,6 +31,7 @@ class StripeWebhookService(
     ): ResponseEntity<String> {
         try {
             val event = Webhook.constructEvent(payload, signatureHeader, webhookSecret)
+            Auth.setCustomUserId(PaymentType.STRIPE.name)
             logger.info("${event.type} Event received")
             val session = event.data.`object` as Session
             val payment = stripePaymentRepository.findBySessionId(session.id).orElseThrow {

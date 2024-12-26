@@ -1,5 +1,6 @@
 package com.cn.langujet.application.config.security
 
+import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.domain.user.services.JwtService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletException
@@ -21,7 +22,7 @@ class AuthTokenFilter(
         request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain
     ) {
         if (request.getHeader("Authorization") == internalClientSecret) {
-            SecurityContextHolder.getContext().authentication = null
+            Auth.setCustomUserId("INTERNAL_SERVICE")
             filterChain.doFilter(request, response)
         }
         try {
