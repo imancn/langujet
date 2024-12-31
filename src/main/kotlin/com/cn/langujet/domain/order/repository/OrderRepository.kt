@@ -10,4 +10,5 @@ interface OrderRepository: MongoRepository<OrderEntity, String> {
     fun findAllByStudentUserIdAndStatusOrderByDateDesc(userId: String, status: OrderStatus, pageRequest: PageRequest): Page<OrderEntity>
     fun findAllByStudentUserIdOrderByDateDesc(userId: String, pageRequest: PageRequest): Page<OrderEntity>
     fun countByStudentUserId(userId: String): Long
+    fun existsByStatusAndId(status: OrderStatus, id: String): Boolean
 }

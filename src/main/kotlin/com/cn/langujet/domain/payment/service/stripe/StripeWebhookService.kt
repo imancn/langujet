@@ -37,6 +37,9 @@ class StripeWebhookService(
             val payment = stripePaymentRepository.findBySessionId(session.id).orElseThrow {
                 UnprocessableException("Order with sessionId ${session.id} not found")
             }
+            if (!orderService.isAwaitingPayment(payment.orderId)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Event had been received")
+            }
             when (event.type) {
                 "checkout.session.async_payment_failed" -> {
                     updatePaymentStatus(payment, PaymentStatus.FAILED)

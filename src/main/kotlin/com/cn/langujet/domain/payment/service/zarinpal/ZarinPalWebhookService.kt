@@ -29,6 +29,9 @@ class ZarinPalWebhookService(
         val payment = zarinPalPaymentRepository.findByAuthority(authority).orElseThrow {
             UnprocessableException("Payment not found with authority = $authority")
         }
+        if (!orderService.isAwaitingPayment(payment.orderId)) {
+            return RedirectView("$paymentRedirectUrl?id=${payment.orderId}")
+        }
         if (status == "OK") {
             val verifyResponse = ZarinPalVerifyResponse(
                 zarinPalClient.verifyPayment(
@@ -53,7 +56,6 @@ class ZarinPalWebhookService(
             payment.status = PaymentStatus.FAILED
             orderService.rejectOrder(payment.orderId)
         }
-        payment.updateLog()
         zarinPalPaymentRepository.save(payment)
         return RedirectView("$paymentRedirectUrl?id=${payment.orderId}")
     }

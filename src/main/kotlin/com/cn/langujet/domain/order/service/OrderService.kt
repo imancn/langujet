@@ -181,4 +181,8 @@ class OrderService(
         }
         return StudentOrderPaymentResultResponse(order)
     }
+    
+    fun isAwaitingPayment(orderId: String): Boolean {
+        return orderRepository.existsByStatusAndId(OrderStatus.AWAITING_PAYMENT, orderId)
+    }
 }
