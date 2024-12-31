@@ -7,7 +7,7 @@ import java.util.*
 data class StudentOrderResponse(
     val orderId: String?,
     val status: OrderStatus,
-    val paymentType: String?,
+    val paymentType: String,
     val totalPrice: Double,
     val finalPrice: Double,
     val date: Date
@@ -15,7 +15,7 @@ data class StudentOrderResponse(
     constructor(orderEntity: OrderEntity) : this(
         orderEntity.id,
         orderEntity.status,
-        orderEntity.paymentType?.displayName,
+        orderEntity.paymentType?.displayName ?: "Free",
         orderEntity.totalPrice,
         orderEntity.finalPrice,
         orderEntity.date
