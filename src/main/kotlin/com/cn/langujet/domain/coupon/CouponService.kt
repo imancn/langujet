@@ -4,6 +4,7 @@ import com.cn.langujet.actor.coupon.payload.response.ActiveCouponsResponse
 import com.cn.langujet.actor.coupon.payload.response.VerifyUserCoupon
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.domain.campaign.CampaignService
 import com.cn.langujet.domain.user.services.UserService
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
@@ -13,14 +14,15 @@ import java.security.SecureRandom
 @Service
 class CouponService(
     private val couponRepository: CouponRepository,
-    private val userService: UserService
+    private val userService: UserService,
+    private val campaignService: CampaignService
 ) {
     
     private val random = SecureRandom()
     private val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     private val maxAttempts = 100
     
-    fun generateCouponCode(): String {
+    private fun generateCouponCode(): String {
         var code: String
         var attempts = 0
         do {
@@ -33,34 +35,39 @@ class CouponService(
         return code
     }
     
-    fun createCoupon(name: String, email: String?, amount: Double, percentage: Int, tag: String?, description: String?): CouponEntity {
-        if (percentage > 100 || percentage < 1) throw UnprocessableException("Percentage must be between 1% to 100%")
-        val code = generateCouponCode()
+    fun createCouponByUserEmail(campaignCode: String, email: String? = null): CouponEntity {
         val user = email?.let { userService.getUserByEmail(it) }
-        return couponRepository.save(
-            CouponEntity(
-                name = name, code = code, userId = user?.id, amount = amount, percentage = percentage, tag = tag, description = description
-            )
-        )
+        return createCoupon(campaignCode, user?.id)
+            ?: throw UnprocessableException("Failed to create a coupon for $campaignCode")
     }
     
-    fun validateUserCoupon(code: String): VerifyUserCoupon {
-        val coupon = couponRepository.findByCode(code.uppercase())
-        return if (coupon != null && coupon.userId == Auth.userId() && coupon.active) {
-            VerifyUserCoupon(isValid = true, message = "Coupon is valid")
-        } else {
-            VerifyUserCoupon(isValid = false, message = "Coupon is invalid")
+    fun createCoupon(campaignCode: String, userId: String? = null): CouponEntity? {
+        val campaign = campaignService.getActiveCampaignByCode(campaignCode.uppercase()) ?: return null
+        if (userId?.let { couponRepository.existsByUserIdAndCampaignId(campaign.id ?: "", it) } == true) {
+            return null
         }
+        return if (campaignService.consume(campaign.id ?: "")) {
+            val code = generateCouponCode()
+            couponRepository.save(
+                CouponEntity(
+                    campaignId = campaign.id ?: "",
+                    code = code,
+                    userId = userId,
+                    amount = campaign.amount,
+                    percentage = campaign.percentage,
+                )
+            )
+        } else null
     }
     
     fun verifyUserCoupon(code: String): VerifyUserCoupon {
-        val coupon = couponRepository.findByCode(code.uppercase())
-        
         return try {
-            verifyUserCoupon(coupon)
-            VerifyUserCoupon(isValid = true, message = "Coupon is valid")
+            val coupon = verifyUserCoupon(couponRepository.findByCode(code.uppercase()))
+            VerifyUserCoupon(isValid = true, message = "Coupon is valid", ActiveCouponsResponse(coupon))
         } catch (e: UnprocessableException) {
-            VerifyUserCoupon(isValid = false, message = "Coupon is invalid")
+            createCoupon(code, Auth.userId())?.let {
+                VerifyUserCoupon(isValid = true, message = "Coupon is valid", ActiveCouponsResponse(it))
+            } ?: VerifyUserCoupon(isValid = false, message = "Coupon is invalid")
         }
     }
     
@@ -74,7 +81,7 @@ class CouponService(
             couponRepository.save(coupon)
         } else if (coupon.userId == Auth.userId()) {
             coupon
-        } else  {
+        } else {
             throw UnprocessableException("Coupon is invalid")
         }
     }
@@ -84,26 +91,18 @@ class CouponService(
     }
     
     fun getCouponsByUserId(userId: String, active: Boolean?): List<ActiveCouponsResponse> {
-        val coupons = when(active) {
+        val coupons = when (active) {
             null -> couponRepository.findByUserId(userId)
             else -> couponRepository.findByUserIdAndActive(userId, active)
         }
         return coupons.map {
-            ActiveCouponsResponse(
-                name = it.name,
-                code = it.code,
-                amount = it.amount,
-                percent = it.percentage,
-                createdDate = it.createdAt,
-            )
+            ActiveCouponsResponse(it)
         }
     }
     
     fun getUserActiveCouponByCode(couponCode: String?): CouponEntity? {
         if (!couponCode.isNullOrBlank()) {
             val coupon = couponRepository.findByCode(couponCode.uppercase())
-            if (coupon == null || !coupon.active)
-                throw UnprocessableException("Coupon code $couponCode is invalid")
             verifyUserCoupon(coupon)
             return coupon
         } else {

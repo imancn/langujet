@@ -6,4 +6,5 @@ interface CouponRepository : MongoRepository<CouponEntity, String> {
     fun findByCode(code: String): CouponEntity?
     fun findByUserId(userId: String): List<CouponEntity>
     fun findByUserIdAndActive(userId: String, active: Boolean): List<CouponEntity>
+    fun existsByUserIdAndCampaignId(userId: String, campaignId: String): Boolean
 }

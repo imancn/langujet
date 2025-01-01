@@ -1,6 +1,5 @@
 package com.cn.langujet.actor.coupon
 
-import com.cn.langujet.actor.coupon.payload.request.CreateCouponRequest
 import com.cn.langujet.actor.coupon.payload.response.ActiveCouponsResponse
 import com.cn.langujet.actor.coupon.payload.response.VerifyUserCoupon
 import com.cn.langujet.actor.util.Auth
@@ -17,22 +16,8 @@ class CouponController(
     
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin/coupons")
-    fun createCoupon(@RequestBody request: CreateCouponRequest): CouponEntity {
-        return couponService.createCoupon(
-            request.name,
-            request.email,
-            request.amount,
-            request.percentage,
-            request.tag,
-            request.description
-        )
-    }
-    
-//    @Todo: Remove
-    @PreAuthorize("hasRole('STUDENT')")
-    @GetMapping("/student/coupons/validation")
-    fun validateCoupon(@RequestParam couponCode: String): VerifyUserCoupon {
-        return couponService.validateUserCoupon(couponCode)
+    fun createCoupon(@RequestParam campaignId: String, @RequestParam userEmail: String?): CouponEntity {
+        return couponService.createCouponByUserEmail(campaignId, userEmail)
     }
     
     @PreAuthorize("hasRole('STUDENT')")
