@@ -13,25 +13,57 @@ class CampaignService(
 ) {
     fun createCampaign(request: CreateCampaignRequest): CampaignEntity {
         if (request.percentage > 100 || request.percentage < 1) throw UnprocessableException("Percentage must be between 1% to 100%")
+        if (request.amount < 0) throw UnprocessableException("Amount must not be negative")
         return campaignRepository.save(
             CampaignEntity(
                 name = request.name,
                 code = request.code.uppercase(),
                 amount = request.amount,
                 percentage = request.percentage,
-                limit = request.limit,
-                consumedTimes = request.consumedTimes,
+                usageLimit = request.limit,
+                usedTimes = request.consumedTimes,
                 tag = request.tag,
                 description = request.description
             )
         )
     }
     
-    fun modifyCampaign(campaignEntity: CampaignEntity): CampaignEntity {
-        if (campaignRepository.existsById(campaignEntity.id ?: "")) {
-            return campaignRepository.save(campaignEntity)
+    fun changeCampaignActiveFlag(campaignId: String, active: Boolean): CampaignEntity {
+        val campaign = getForUpdate(campaignId)
+        if (active) {
+            if (campaignRepository.existsByActiveAndCode(true, campaign.code)) {
+                throw UnprocessableException("Another [${campaign.code}] campaign active flag is already active")
+            }
+            campaign.active = true
         } else {
-            throw UnprocessableException("Campaign with id ${campaignEntity.id} does not exist")
+            campaign.active = false
+        }
+        return campaignRepository.save(campaign)
+    }
+    
+    fun changeCampaignMetadata(campaignId: String, name: String? = null, tag: String? = null, description: String? = null): CampaignEntity {
+        val campaign = getForUpdate(campaignId)
+        name?.let { campaign.name = it }
+        tag?.let { campaign.tag = it }
+        description?.let { campaign.description = it }
+        return campaignRepository.save(campaign)
+    }
+    
+    fun changeUsageLimit(campaignId: String, usageLimit: Int): CampaignEntity {
+        val campaign = getForUpdate(campaignId)
+        if (usageLimit <= 0) {
+            throw UnprocessableException("UsageLimit must be positive")
+        } else if (campaign.usedTimes > usageLimit) {
+            throw UnprocessableException("UsageLimit must be bigger than than used time: ${campaign.usedTimes}")
+        } else {
+            campaign.usedTimes = usageLimit
+        }
+        return campaignRepository.save(campaign)
+    }
+    
+    private fun getForUpdate(campaignId: String): CampaignEntity {
+        return campaignRepository.findById(campaignId).orElseThrow {
+            UnprocessableException("Campaign with id $campaignId does not exist")
         }
     }
     
@@ -48,13 +80,13 @@ class CampaignService(
         return campaignRepository.findByCodeAndActive(code, true)
     }
     
-    fun consume(campaignId: String): Boolean {
+    fun campaignExceededLimit(campaignId: String): Boolean {
         val campaign = campaignRepository.findById(campaignId).getOrElse { return false }
         if (!campaign.active) return false
-        if (campaign.consumedTimes + 1 >= campaign.limit) {
+        if (campaign.usedTimes + 1 >= campaign.usageLimit) {
             campaign.active = false
         } else {
-            campaign.consumedTimes++
+            campaign.usedTimes++
         }
         campaignRepository.save(campaign)
         return campaign.active

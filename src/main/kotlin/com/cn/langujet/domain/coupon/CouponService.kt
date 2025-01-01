@@ -97,7 +97,7 @@ class CouponService(
         if (userId?.let { couponRepository.existsByUserIdAndCampaignId(campaign.id ?: "", it) } == true) {
             return null
         }
-        return if (campaignService.consume(campaign.id ?: "")) {
+        return if (campaignService.campaignExceededLimit(campaign.id ?: "")) { null } else {
             val code = generateCouponCode()
             couponRepository.save(
                 CouponEntity(
@@ -108,7 +108,7 @@ class CouponService(
                     percentage = campaign.percentage,
                 )
             )
-        } else null
+        }
     }
     
     private fun verifyUserCoupon(coupon: CouponEntity?): CouponEntity {
