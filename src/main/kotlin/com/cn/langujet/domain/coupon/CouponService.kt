@@ -25,7 +25,7 @@ class CouponService(
     fun createCouponByUserEmail(campaignCode: String, email: String? = null): CouponEntity {
         val user = email?.let { userService.getUserByEmail(it) }
         return createCoupon(campaignCode, user?.id)
-            ?: throw UnprocessableException("Failed to create a coupon for $campaignCode")
+            ?: throw UnprocessableException("Failed to create a coupon for $campaignCode Campaign")
     }
     
     fun verifyUserCoupon(code: String): VerifyUserCoupon {
@@ -94,21 +94,22 @@ class CouponService(
     
     private fun createCoupon(campaignCode: String, userId: String? = null): CouponEntity? {
         val campaign = campaignService.getActiveCampaignByCode(campaignCode.uppercase()) ?: return null
-        if (userId?.let { couponRepository.existsByUserIdAndCampaignId(campaign.id ?: "", it) } == true) {
+        val campaignId = campaign.id ?: ""
+        if (userId?.let { couponRepository.existsByUserIdAndCampaignId(it, campaignId) } == true) {
             return null
         }
-        return if (campaignService.campaignExceededLimit(campaign.id ?: "")) { null } else {
-            val code = generateCouponCode()
-            couponRepository.save(
-                CouponEntity(
-                    campaignId = campaign.id ?: "",
-                    code = code,
-                    userId = userId,
-                    amount = campaign.amount,
-                    percentage = campaign.percentage,
-                )
+        val code = generateCouponCode()
+        val coupon = couponRepository.save(
+            CouponEntity(
+                campaignId = campaignId,
+                code = code,
+                userId = userId,
+                amount = campaign.amount,
+                percentage = campaign.percentage,
             )
-        }
+        )
+        campaignService.useCampaign(campaignId)
+        return coupon
     }
     
     private fun verifyUserCoupon(coupon: CouponEntity?): CouponEntity {

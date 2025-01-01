@@ -14,7 +14,7 @@ data class CampaignEntity(
     var amount: Double,
     var percentage: Int,
     var usageLimit: Int,
-    var usedTimes: Int,
+    var usedTimes: Int = 0,
     var active: Boolean = false,
     var tag: String? = null,
     var description: String? = null,

@@ -2,14 +2,13 @@ package com.cn.langujet.domain.campaign
 
 import com.cn.langujet.actor.campaign.CreateCampaignRequest
 import com.cn.langujet.application.advice.UnprocessableException
-import com.cn.langujet.domain.user.services.UserService
 import org.springframework.stereotype.Service
-import kotlin.jvm.optionals.getOrElse
+import kotlin.jvm.optionals.getOrNull
 import kotlin.jvm.optionals.toList
 
 @Service
 class CampaignService(
-    private val campaignRepository: CampaignRepository, private val userService: UserService
+    private val campaignRepository: CampaignRepository
 ) {
     fun createCampaign(request: CreateCampaignRequest): CampaignEntity {
         if (request.percentage > 100 || request.percentage < 1) throw UnprocessableException("Percentage must be between 1% to 100%")
@@ -21,7 +20,6 @@ class CampaignService(
                 amount = request.amount,
                 percentage = request.percentage,
                 usageLimit = request.limit,
-                usedTimes = request.consumedTimes,
                 tag = request.tag,
                 description = request.description
             )
@@ -80,15 +78,16 @@ class CampaignService(
         return campaignRepository.findByCodeAndActive(code, true)
     }
     
-    fun campaignExceededLimit(campaignId: String): Boolean {
-        val campaign = campaignRepository.findById(campaignId).getOrElse { return false }
-        if (!campaign.active) return false
-        if (campaign.usedTimes + 1 >= campaign.usageLimit) {
+    fun useCampaign(campaignId: String): CampaignEntity? {
+        val campaign = campaignRepository.findById(campaignId).getOrNull() ?: return null
+        if (!campaign.active) return null
+        if (campaign.usedTimes + 1 > campaign.usageLimit) {
             campaign.active = false
+            campaignRepository.save(campaign)
+            return null
         } else {
             campaign.usedTimes++
+            return campaignRepository.save(campaign)
         }
-        campaignRepository.save(campaign)
-        return campaign.active
     }
 }

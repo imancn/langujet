@@ -16,8 +16,8 @@ class CouponController(
     
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin/coupons")
-    fun createCoupon(@RequestParam campaignId: String, @RequestParam userEmail: String?): CouponEntity {
-        return couponService.createCouponByUserEmail(campaignId, userEmail)
+    fun createCoupon(@RequestParam campaignCode: String, @RequestParam userEmail: String?): CouponEntity {
+        return couponService.createCouponByUserEmail(campaignCode, userEmail)
     }
     
     @PreAuthorize("hasRole('STUDENT')")
