@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
 import java.util.*
+import kotlin.math.ceil
 
 @Service
 class ResultService(
@@ -152,7 +153,8 @@ class ResultService(
     fun calculateOverAllScore(scores: List<Double>, examType: ExamType): Double {
         return when (examType) {
             ExamType.IELTS_GENERAL, ExamType.IELTS_ACADEMIC -> {
-                scores.sumOf { it } / scores.count()
+                val score = scores.sumOf { it } / scores.count()
+                ceil(score * 2) /2
             }
         }
     }
