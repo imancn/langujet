@@ -100,7 +100,6 @@ class SectionResultService(
             sectionResults.onEach {
                 it.correctorUserId = correctorUserId
                 it.status = CorrectionStatus.PROCESSING
-                it.updateLog()
             }
         )
     }
@@ -109,7 +108,6 @@ class SectionResultService(
         val sectionResult = getSectionResultForSubmission(submitCorrectorSectionResultRequest.sectionCorrectionId)
         sectionResult.score = submitCorrectorSectionResultRequest.score
         sectionResult.recommendation = submitCorrectorSectionResultRequest.recommendation
-        sectionResult.updateLog()
         // Todo: After Implementation of Approval flow it should be changed to PROCESSED
         sectionResult.status = CorrectionStatus.APPROVED
         sectionResultRepository.save(sectionResult)

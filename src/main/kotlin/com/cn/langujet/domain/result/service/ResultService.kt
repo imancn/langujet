@@ -9,10 +9,11 @@ import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.correction.model.CorrectionStatus
 import com.cn.langujet.domain.correction.model.CorrectorType
-import com.cn.langujet.domain.correction.service.corrector.ScoreCalculator.Companion.calculateOverAllScore
 import com.cn.langujet.domain.exam.model.ExamSessionEntity
+import com.cn.langujet.domain.exam.model.ExamType
 import com.cn.langujet.domain.exam.service.ExamSessionService
 import com.cn.langujet.domain.result.model.ResultEntity
+import com.cn.langujet.domain.result.model.SectionResultEntity
 import com.cn.langujet.domain.result.repository.ResultRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
@@ -83,15 +84,6 @@ class ResultService(
         }
     }
     
-    fun getResultByExamSessionId(examSessionId: String): Optional<ResultEntity> {
-        return resultRepository.findByExamSessionId(examSessionId)
-    }
-    
-    fun getResultById(resultId: String): ResultEntity {
-        return resultRepository.findById(resultId).orElseThrow {
-            NotFoundException("Result not found")
-        }
-    }
     
     fun submitCorrectorResult(submitCorrectorResultRequest: SubmitCorrectorResultRequest) {
         val sectionResults = sectionResultService.getSectionResultsByResultId(submitCorrectorResultRequest.examCorrectionId)
@@ -109,7 +101,17 @@ class ResultService(
         result.recommendation = submitCorrectorResultRequest.recommendation
         result.score = calculateOverAllScore(sectionResults.mapNotNull { it.score }, result.examType)
         // Todo: After Implementation of Approval flow it must be changed
-        finalizeCorrection(result)
+        finalizeCorrection(sectionResults, result)
+    }
+    
+    fun getResultByExamSessionId(examSessionId: String): Optional<ResultEntity> {
+        return resultRepository.findByExamSessionId(examSessionId)
+    }
+    
+    fun getResultById(resultId: String): ResultEntity {
+        return resultRepository.findById(resultId).orElseThrow {
+            NotFoundException("Result not found")
+        }
     }
     
     fun getResultsByStatusAndCorrectorType(
@@ -139,13 +141,19 @@ class ResultService(
         return true
     }
     
-    fun finalizeCorrection(result: ResultEntity) {
-        resultRepository.save(
-            result.also {
-                it.status = CorrectionStatus.APPROVED
-                it.updatedAt = Date(System.currentTimeMillis())
-            }
-        )
+    fun finalizeCorrection(sectionResults: List<SectionResultEntity>, result: ResultEntity) {
+        result.status = CorrectionStatus.APPROVED
+        result.score = calculateOverAllScore(sectionResults.mapNotNull { it.score }, result.examType)
+        result.updatedAt = Date(System.currentTimeMillis())
+        resultRepository.save(result)
         examSessionService.finalizeCorrection(result.examSessionId)
+    }
+    
+    fun calculateOverAllScore(scores: List<Double>, examType: ExamType): Double {
+        return when (examType) {
+            ExamType.IELTS_GENERAL, ExamType.IELTS_ACADEMIC -> {
+                scores.sumOf { it } / scores.count()
+            }
+        }
     }
 }

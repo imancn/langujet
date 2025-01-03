@@ -5,5 +5,14 @@ enum class TrueFalseAnswerType {
     FALSE,
     NOT_GIVEN,
     YES,
-    NO
+    NO;
+    
+    fun title(): String {
+        return this.name
+            .replace("Listening_", "")
+            .replace("READING_", "")
+            .lowercase()
+            .split("_")
+            .joinToString(" ") { it.replaceFirstChar { char -> char.uppercase() } }
+    }
 }

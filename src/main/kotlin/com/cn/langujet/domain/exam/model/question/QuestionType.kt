@@ -20,5 +20,14 @@ enum class QuestionType {
     LISTENING_TEXT_COMPLETION,
     LISTENING_MULTIPLE_CHOICES,
     LISTENING_PHOTO_COMPLETION,
-    LISTENING_SELECTIVE_PHOTO_COMPLETION,
+    LISTENING_SELECTIVE_PHOTO_COMPLETION;
+    
+    fun title(): String {
+        return this.name
+            .replace("LISTENING_", "")
+            .replace("READING_", "")
+            .lowercase()
+            .split("_")
+            .joinToString(" ") { it.replaceFirstChar { char -> char.uppercase() } }
+    }
 }

@@ -12,8 +12,7 @@ import com.cn.langujet.domain.answer.model.AnswerEntity
 import com.cn.langujet.domain.correction.model.CorrectionStatus
 import com.cn.langujet.domain.correction.model.CorrectorType
 import com.cn.langujet.domain.correction.repository.CorrectAnswerRepository
-import com.cn.langujet.domain.correction.service.corrector.AutoCorrectorService
-import com.cn.langujet.domain.correction.service.corrector.ScoreCalculator.Companion.calculateOverAllScore
+import com.cn.langujet.domain.correction.service.corrector.auto.AutoCorrectorService
 import com.cn.langujet.domain.corrector.CorrectorService
 import com.cn.langujet.domain.exam.model.ExamSessionEntity
 import com.cn.langujet.domain.exam.model.SpeakingPart
@@ -51,20 +50,20 @@ class CorrectionService(
         val sections = sectionService.getSectionsMetaData(examSession.examId)
         val result = resultService.initiateResult(examSession)
         val sectionResults = sections.map { section ->
-            if (correctAnswerRepository.existsByExamIdAndSectionOrder(examSession.examId, section.order)) {
+            val isAutoCorrection = correctAnswerRepository.existsByExamIdAndSectionOrder(examSession.examId, section.order)
+            if (isAutoCorrection) {
                 autoCorrectorService.correctExamSection(
                     examSession,
                     result.id ?: "",
                     section.order,
                     section.sectionType
-                )
+                ) ?: sectionResultService.initSectionResult(result.id ?: "", examSession, section)
             } else {
                 sectionResultService.initSectionResult(result.id ?: "", examSession, section)
             }
         }
         if (resultService.areAllSectionResultsApproved(result)) {
-            result.score = calculateOverAllScore(sectionResults.mapNotNull { it.score }, result.examType)
-            resultService.finalizeCorrection(result)
+            resultService.finalizeCorrection(sectionResults, result)
         }
     }
     
