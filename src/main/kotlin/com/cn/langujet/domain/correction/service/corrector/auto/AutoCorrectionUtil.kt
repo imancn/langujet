@@ -2,7 +2,6 @@ package com.cn.langujet.domain.correction.service.corrector.auto
 
 import com.cn.langujet.application.advice.LogicalException
 import com.cn.langujet.domain.answer.model.AnswerEntity
-import com.cn.langujet.domain.answer.model.TrueFalseAnswerType
 import com.cn.langujet.domain.correction.model.CorrectAnswerEntity
 import com.cn.langujet.domain.exam.model.ExamType
 import com.cn.langujet.domain.exam.model.SectionEntity
@@ -191,7 +190,7 @@ class AutoCorrectionUtil {
                     val correctAnswer = correctAnswers.find {
                         it.sectionOrder == section.order && it.partOrder == part.order && it.questionOrder == question.order
                     }
-                    
+                    val emptyAnswer = "    "
                     if (correctAnswer != null) {
                         when (correctAnswer) {
 //                            is AnswerEntity.TextAnswerEntity -> {
@@ -214,7 +213,7 @@ class AutoCorrectionUtil {
                                         val answerOption = answerIssue?.options?.find { it == correctOption }
                                         when (answerOption) {
                                             null -> {
-                                                rows.add(listOf(questionNumber.toString(), "No Answer".highlight("red"), correctOption.highlight("green")))
+                                                rows.add(listOf(questionNumber.toString(), emptyAnswer, correctOption.highlight("green")))
                                             }
                                             correctOption -> {
                                                 rows.add(listOf(questionNumber.toString(), answerOption.highlight("green"), correctOption.highlight("green")))
@@ -255,7 +254,7 @@ class AutoCorrectionUtil {
                                         rows.add(
                                             listOf(
                                                 questionNumber.toString(),
-                                                TrueFalseAnswerType.NOT_GIVEN.title().highlight("red") ,
+                                                emptyAnswer ,
                                                 correctIssue.title().highlight("green")
                                             )
                                         )
@@ -273,7 +272,7 @@ class AutoCorrectionUtil {
                                         rows.add(
                                             listOf(
                                                 questionNumber.toString(),
-                                                "Not Answer".highlight("red"),
+                                                emptyAnswer,
                                                 correctIssue.joinToString().highlight("green")
                                             )
                                         )
