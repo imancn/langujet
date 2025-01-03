@@ -119,7 +119,7 @@ class ResultService(
         correctorType: CorrectorType
     ): List<ResultEntity> {
         return resultRepository.findByCorrectorTypeAndStatusOrderByCreatedAtAsc(
-            CorrectorType.HUMAN, correctionStatus
+            correctorType, correctionStatus
         )
     }
     
