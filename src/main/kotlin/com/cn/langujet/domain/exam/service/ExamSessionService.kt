@@ -6,6 +6,7 @@ import com.cn.langujet.actor.util.models.CustomPage
 import com.cn.langujet.application.advice.InvalidTokenException
 import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.application.advice.NotFoundException
+import com.cn.langujet.application.service.smtp.MailSenderService
 import com.cn.langujet.domain.correction.service.CorrectionService
 import com.cn.langujet.domain.exam.model.ExamSessionEntity
 import com.cn.langujet.domain.exam.model.ExamSessionState
@@ -13,6 +14,7 @@ import com.cn.langujet.domain.exam.repository.ExamSessionCustomRepository
 import com.cn.langujet.domain.exam.repository.ExamSessionRepository
 import com.cn.langujet.domain.service.model.ServiceEntity
 import com.cn.langujet.domain.service.service.ServiceService
+import com.cn.langujet.domain.student.service.StudentService
 import com.cn.langujet.domain.user.services.UserService
 import org.springframework.stereotype.Service
 import java.util.*
@@ -26,7 +28,9 @@ class ExamSessionService(
     private val correctionService: CorrectionService,
     private val examGeneratorService: ExamGeneratorService,
     private val serviceService: ServiceService,
-    private val userService: UserService
+    private val userService: UserService,
+    private val mailSenderService: MailSenderService,
+    private val studentService: StudentService
 ) {
     fun getExamSessionById(id: String): ExamSessionEntity {
         return examSessionRepository.findById(id).orElseThrow {
@@ -145,9 +149,11 @@ class ExamSessionService(
     }
     
     fun finalizeCorrection(examSessionId: String) {
-        examSessionRepository.save(getExamSessionById(examSessionId).also {
-            it.state = ExamSessionState.CORRECTED
-            it.correctionDate = Date(System.currentTimeMillis())
-        })
+        val examSession = getExamSessionById(examSessionId)
+        val exam = examService.getExamById(examSession.examId)
+        examSessionRepository.save(examSession). run {
+            val username = studentService.getStudentByUserId(examSessionId).fullName
+            mailSenderService.sendExamCorrectionNotificationEmail(examSession.studentUserId, username, exam.name)
+        }
     }
 }

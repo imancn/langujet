@@ -1,0 +1,26 @@
+<html lang = "en">
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f8f9fa;">
+<div style="width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+    <!-- Header -->
+    <div style="background-color: #7b5cf3; color: white; padding: 20px; text-align: center;">
+        <h1 style="margin: 0; font-size: 24px;">Langujet Exam Correction Notification</h1>
+    </div>
+    <!-- Content -->
+    <div style="padding: 20px;">
+        <p style="margin: 16px 0;">Dear {{ USERNAME }},</p>
+        <p style="margin: 16px 0;">Your exam "<b>{{ EXAM_NAME }}</b>" has been corrected. You can view the corrections by clicking the link below:</p>
+        <p style="margin: 16px 0;">
+            <a href="{{ CORRECTION_LINK }}" target="_blank" style="color: #53bc4b; text-decoration: none; font-weight: bold;">View Corrections</a>
+        </p>
+        <p style="margin: 16px 0;">We hope this helps you in your learning journey!</p>
+    </div>
+    <!-- Footer -->
+    <div style="background-color: #f1f1f1; color: #666; text-align: center; padding: 10px; font-size: 12px;">
+        <p style="margin: 5px 0;">&copy; {{ CURRENT_YEAR }} Langujet. All rights reserved.</p>
+        <p style="margin: 5px 0;">Need help? Contact us at
+            <a href="mailto:langujet@gmail.com" style="color: #53bc4b; text-decoration: none;">support@langujet.com</a>
+        </p>
+    </div>
+</div>
+</body>
+</html>

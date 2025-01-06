@@ -5,6 +5,7 @@ import com.cn.langujet.domain.user.model.EmailVerificationTokenEntity
 import com.cn.langujet.domain.user.model.ResetPasswordTokenEntity
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import javax.mail.Message
 import javax.mail.Session
 import javax.mail.Transport
@@ -70,7 +71,26 @@ class MailSenderService(
             resetPasswordToken.user.email, "Reset Password Mail", contentParams, "reset_password"
         )
     }
-
+    
+    fun sendExamCorrectionNotificationEmail(
+        to: String, username: String, examName: String,
+        correctionLink: String = "https://app.langujet.com/exams/participated"
+    ) {
+        val contentParams = mapOf(
+            "USERNAME" to (username),
+            "EXAM_NAME" to examName,
+            "CORRECTION_LINK" to correctionLink,
+            "CURRENT_YEAR" to LocalDateTime.now().year.toString()
+        )
+        sendWithTemplate(
+            to,
+            "Exam Correction Notification",
+            contentParams,
+            "exam_correction_notification_mail"
+        )
+    }
+    
+    
     fun sendMimeMessage(htmlText: String, message: MimeMessage) {
         val htmlPart = MimeBodyPart()
         htmlPart.setContent(htmlText, "text/html; charset=utf-8")
