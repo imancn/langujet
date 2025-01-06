@@ -73,7 +73,7 @@ class MailSenderService(
     }
     
     fun sendExamCorrectionNotificationEmail(
-        to: String, username: String, examName: String,
+        email: String, username: String, examName: String,
         correctionLink: String = "https://app.langujet.com/exams/participated"
     ) {
         val contentParams = mapOf(
@@ -83,7 +83,7 @@ class MailSenderService(
             "CURRENT_YEAR" to LocalDateTime.now().year.toString()
         )
         sendWithTemplate(
-            to,
+            email,
             "Exam Correction Notification",
             contentParams,
             "exam_correction_notification_mail"
