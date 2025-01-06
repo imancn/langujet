@@ -2,22 +2,14 @@ package com.cn.langujet.application.advice
 
 import org.springframework.http.HttpStatus
 
-open class HttpException(val httpStatus: HttpStatus, override val message: String?) : RuntimeException(message)
+sealed class HttpException(val httpStatus: HttpStatus, val key: String, val args: Array<String>): RuntimeException()
 
-class RefreshTokenException(message: String?) : HttpException(HttpStatus.UNAUTHORIZED, message)
+class InvalidCredentialException(key: String = "invalid.credentials", vararg args: Any) : HttpException(HttpStatus.UNAUTHORIZED, key, args.map { it.toString() }.toTypedArray())
 
-class InvalidTokenException(message: String?) : HttpException(HttpStatus.UNAUTHORIZED, message)
+class AccessDeniedException(key: String = "access.denied", vararg args: Any) : HttpException(HttpStatus.FORBIDDEN, key, args.map { it.toString() }.toTypedArray())
 
-class InvalidInputException(message: String?) : HttpException(HttpStatus.BAD_REQUEST, message)
+class InvalidInputException(key: String = "invalid.input", vararg args: Any) : HttpException(HttpStatus.BAD_REQUEST, key, args.map { it.toString() }.toTypedArray())
 
-class NotFoundException(message: String?) : HttpException(HttpStatus.NOT_FOUND, message)
+class UnprocessableException(key: String = "unprocessable", vararg args: Any): HttpException(HttpStatus.UNPROCESSABLE_ENTITY, key, args.map { it.toString() }.toTypedArray())
 
-class EmailNotSentException(message: String?) : HttpException(HttpStatus.INTERNAL_SERVER_ERROR, message)
-
-class FileException(message: String?) : HttpException(HttpStatus.INTERNAL_SERVER_ERROR, message)
-
-class LogicalException(message: String?): RuntimeException(message)
-
-class UnprocessableException(message: String?): HttpException(HttpStatus.UNPROCESSABLE_ENTITY, message)
-
-class AccessDeniedException(message: String?) : HttpException(HttpStatus.FORBIDDEN, message)
+class InternalServerError(key: String = "internal.server.error", vararg args: Any) : HttpException(HttpStatus.INTERNAL_SERVER_ERROR, key, args.map { it.toString() }.toTypedArray())

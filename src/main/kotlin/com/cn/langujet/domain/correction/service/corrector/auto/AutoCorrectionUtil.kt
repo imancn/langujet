@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.correction.service.corrector.auto
 
-import com.cn.langujet.application.advice.LogicalException
+import com.cn.langujet.application.advice.InternalServerError
 import com.cn.langujet.domain.answer.model.AnswerEntity
 import com.cn.langujet.domain.correction.model.CorrectAnswerEntity
 import com.cn.langujet.domain.exam.model.ExamType
@@ -19,22 +19,22 @@ class AutoCorrectionUtil {
                     correctIssuesCount += when (correctAnswer) {
                         
                         is CorrectAnswerEntity.CorrectTextAnswerEntity -> {
-                            if (answer !is AnswerEntity.TextAnswerEntity) throw LogicalException("Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${correctAnswer.id}")
+                            if (answer !is AnswerEntity.TextAnswerEntity) throw InternalServerError("Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${correctAnswer.id}")
                             calculateCorrectIssuesCountForTextAnswer(answer, correctAnswer)
                         }
                         
                         is CorrectAnswerEntity.CorrectTextIssuesAnswerEntity -> {
-                            if (answer !is AnswerEntity.TextIssuesAnswerEntity) throw LogicalException("Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${correctAnswer.id}")
+                            if (answer !is AnswerEntity.TextIssuesAnswerEntity) throw InternalServerError("Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${correctAnswer.id}")
                             calculateCorrectIssuesCountForTextIssuesAnswer(answer, correctAnswer)
                         }
                         
                         is CorrectAnswerEntity.CorrectTrueFalseAnswerEntity -> {
-                            if (answer !is AnswerEntity.TrueFalseAnswerEntity) throw LogicalException("Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${correctAnswer.id}")
+                            if (answer !is AnswerEntity.TrueFalseAnswerEntity) throw InternalServerError("Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${correctAnswer.id}")
                             calculateCorrectIssuesCountForTrueFalseAnswer(answer, correctAnswer)
                         }
                         
                         is CorrectAnswerEntity.CorrectMultipleChoiceAnswerEntity -> {
-                            if (answer !is AnswerEntity.MultipleChoiceAnswerEntity) throw LogicalException("Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${correctAnswer.id}")
+                            if (answer !is AnswerEntity.MultipleChoiceAnswerEntity) throw InternalServerError("Answer whit id: ${correctAnswer.id} is not compatible with Answer with id: ${correctAnswer.id}")
                             calculateCorrectIssuesCountForMultipleChoiceAnswer(answer, correctAnswer)
                         }
                     }
@@ -164,7 +164,7 @@ class AutoCorrectionUtil {
                         else -> 0.0
                     }
                 }
-                else -> throw LogicalException("There is no score calculation for $sectionType section type")
+                else -> throw InternalServerError("There is no score calculation for $sectionType section type")
             }
         }
         

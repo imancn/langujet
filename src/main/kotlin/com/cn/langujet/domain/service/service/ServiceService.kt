@@ -6,7 +6,7 @@ import com.cn.langujet.actor.service.payload.ServiceRequest
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.actor.util.models.CustomPage
 import com.cn.langujet.actor.util.models.paginate
-import com.cn.langujet.application.advice.NotFoundException
+import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.domain.exam.service.ExamGeneratorService
 import com.cn.langujet.domain.service.model.ServiceEntity
 import com.cn.langujet.domain.service.model.ServiceType
@@ -68,6 +68,6 @@ class ServiceService(
     
     fun getById(serviceId: String): ServiceEntity {
         return serviceRepository.findById(serviceId)
-            .orElseThrow { NotFoundException("Service with id $serviceId not found") }
+            .orElseThrow { UnprocessableException("Service with id $serviceId not found") }
     }
 }

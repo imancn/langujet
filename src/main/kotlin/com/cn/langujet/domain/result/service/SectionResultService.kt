@@ -2,8 +2,7 @@ package com.cn.langujet.domain.result.service
 
 import com.cn.langujet.actor.result.payload.request.SubmitCorrectorSectionResultRequest
 import com.cn.langujet.actor.util.Auth
-import com.cn.langujet.application.advice.FileException
-import com.cn.langujet.application.advice.NotFoundException
+import com.cn.langujet.application.advice.InternalServerError
 import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.application.service.file.domain.data.model.FileBucket
 import com.cn.langujet.application.service.file.domain.service.FileService
@@ -56,7 +55,7 @@ class SectionResultService(
     
     fun getSectionResultById(id: String): SectionResultEntity {
         return sectionResultRepository.findById(id).orElseThrow {
-            NotFoundException("Section Result not found")
+            UnprocessableException("Section Result not found")
         }
     }
     
@@ -122,7 +121,7 @@ class SectionResultService(
             val file = fileService.uploadFile(attachment, FileBucket.RESULT_ATTACHMENTS)
             sectionResultRepository.save(
                 sectionResult.also {
-                    it.attachmentFileId = file.id ?: throw FileException("Upload Failed")
+                    it.attachmentFileId = file.id ?: throw InternalServerError("Upload Failed")
                 }
             )
         } else {

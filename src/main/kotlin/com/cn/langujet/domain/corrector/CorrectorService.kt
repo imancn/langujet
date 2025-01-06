@@ -2,7 +2,7 @@ package com.cn.langujet.domain.corrector
 
 import com.cn.langujet.actor.corrector.payload.response.CorrectorProfileResponse
 import com.cn.langujet.actor.util.Auth
-import com.cn.langujet.application.advice.NotFoundException
+import com.cn.langujet.application.advice.UnprocessableException
 import org.springframework.stereotype.Service
 
 @Service
@@ -30,7 +30,7 @@ class CorrectorService(
     
     fun getCorrectorByUserId(userId: String): CorrectorEntity {
         return correctorRepository.findByUser_Id(userId).orElseThrow {
-            NotFoundException("Corrector not found")
+            UnprocessableException("Corrector not found")
         }
     }
     

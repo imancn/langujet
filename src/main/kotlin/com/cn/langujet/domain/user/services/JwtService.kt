@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.user.services
 
-import com.cn.langujet.application.advice.InvalidTokenException
+import com.cn.langujet.application.advice.InvalidCredentialException
 import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.domain.correction.model.CorrectorType
 import com.cn.langujet.domain.user.model.Role
@@ -54,26 +54,26 @@ class JwtService(
         return try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).body.subject
         } catch (e: SignatureException) {
-            throw InvalidTokenException("Authorization JWT token is invalid: Invalid JWT signature")
+            throw InvalidCredentialException("Authorization JWT token is invalid: Invalid JWT signature")
         } catch (e: MalformedJwtException) {
-            throw InvalidTokenException("Authorization JWT token is invalid: Invalid JWT token")
+            throw InvalidCredentialException("Authorization JWT token is invalid: Invalid JWT token")
         } catch (e: ExpiredJwtException) {
-            throw InvalidTokenException("Authorization JWT token is invalid: JWT token is expired")
+            throw InvalidCredentialException("Authorization JWT token is invalid: JWT token is expired")
         } catch (e: UnsupportedJwtException) {
-            throw InvalidTokenException("Authorization JWT token is invalid: JWT token is unsupported")
+            throw InvalidCredentialException("Authorization JWT token is invalid: JWT token is unsupported")
         } catch (e: IllegalArgumentException) {
-            throw InvalidTokenException("Authorization JWT token is invalid: JWT claims string is empty")
+            throw InvalidCredentialException("Authorization JWT token is invalid: JWT claims string is empty")
         } catch (ex: Exception) {
-            throw InvalidTokenException("Authorization JWT token is invalid")
+            throw InvalidCredentialException("Authorization JWT token is invalid")
         }
     }
 
     fun parseJwt(request: HttpServletRequest): String {
         val authorizationHeader = request.getHeader("Authorization")
         if (authorizationHeader.isNullOrEmpty())
-            throw InvalidTokenException("Authorization header is missing")
+            throw InvalidCredentialException("Authorization header is missing")
         if (!authorizationHeader.startsWith("Bearer "))
-            throw InvalidTokenException("Authorization header is invalid")
+            throw InvalidCredentialException("Authorization header is invalid")
         
         return authorizationHeader.substring(7, authorizationHeader.length)
     }

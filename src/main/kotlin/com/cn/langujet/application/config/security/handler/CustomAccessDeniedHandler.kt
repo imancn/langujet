@@ -7,16 +7,19 @@ import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.stereotype.Component
+import java.util.*
 
 @Component
 class CustomAccessDeniedHandler(
-    private val modelMapper: ObjectMapper
+    private val modelMapper: ObjectMapper,
+    private val resourceBundle: ResourceBundle
 ) : AccessDeniedHandler {
     override fun handle(
         request: HttpServletRequest, response: HttpServletResponse, accessDeniedException: AccessDeniedException
     ) {
         response.status = HttpServletResponse.SC_FORBIDDEN
         response.contentType = "application/json"
-        response.writer.print(modelMapper.writeValueAsString(ErrorMessageResponse(accessDeniedException.message ?: "")))
+        val key = "access.denied"
+        response.writer.print(modelMapper.writeValueAsString(ErrorMessageResponse(key, resourceBundle.getString(key) ?: "")))
     }
 }

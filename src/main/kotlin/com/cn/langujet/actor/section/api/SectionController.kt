@@ -2,7 +2,7 @@ package com.cn.langujet.actor.section.api
 
 import com.cn.langujet.actor.exam.payload.SectionDTO
 import com.cn.langujet.actor.util.toOkResponseEntity
-import com.cn.langujet.application.advice.NotFoundException
+import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.domain.exam.service.SectionService
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -43,5 +43,5 @@ class SectionController(private val sectionService: SectionService) {
         @PathVariable id: String
     ): ResponseEntity<String> =
         if (sectionService.deleteSection(id)) toOkResponseEntity("Section deleted")
-        else throw NotFoundException("Section with id: $id not found")
+        else throw UnprocessableException("Section with id: $id not found")
 }

@@ -1,7 +1,7 @@
 package com.cn.langujet.application.service.file.domain.service
 
-import com.cn.langujet.application.advice.FileException
-import com.cn.langujet.application.advice.NotFoundException
+import com.cn.langujet.application.advice.InternalServerError
+import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.application.service.file.domain.data.model.FileBucket
 import com.cn.langujet.application.service.file.domain.data.model.FileEntity
 import com.cn.langujet.application.service.file.domain.data.repository.FileRepository
@@ -47,7 +47,7 @@ class FileService(
         } catch (ex: Exception) {
             fileRepository.deleteById(fileEntity.id ?: "")
             logger.error(ex.toString())
-            throw FileException("Upload Failed")
+            throw InternalServerError("Upload Failed")
         }
 
         return fileEntity
@@ -55,7 +55,7 @@ class FileService(
 
     fun generatePublicDownloadLink(fileId: String, expiryDuration: Int): String {
         val fileEntity = fileRepository.findById(fileId).orElseThrow {
-            throw NotFoundException("File with id: $fileId not found")
+            throw UnprocessableException("File with id: $fileId not found")
         }
 
         return minioClient.getPresignedObjectUrl(

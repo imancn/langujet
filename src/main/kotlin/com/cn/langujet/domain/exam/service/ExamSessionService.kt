@@ -3,9 +3,8 @@ package com.cn.langujet.domain.exam.service
 import com.cn.langujet.actor.exam.payload.*
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.actor.util.models.CustomPage
-import com.cn.langujet.application.advice.InvalidTokenException
+import com.cn.langujet.application.advice.InvalidCredentialException
 import com.cn.langujet.application.advice.UnprocessableException
-import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.application.service.smtp.MailSenderService
 import com.cn.langujet.domain.correction.service.CorrectionService
 import com.cn.langujet.domain.exam.model.ExamSessionEntity
@@ -34,7 +33,7 @@ class ExamSessionService(
 ) {
     fun getExamSessionById(id: String): ExamSessionEntity {
         return examSessionRepository.findById(id).orElseThrow {
-            NotFoundException("ExamSession with id: $id not found")
+            UnprocessableException("ExamSession with id: $id not found")
         }
     }
     
@@ -43,7 +42,7 @@ class ExamSessionService(
     ): ExamSessionEntity {
         val examSession = getExamSessionById(examSessionId)
         if (Auth.userId() != examSession.studentUserId) {
-            throw InvalidTokenException("Exam Session with id: $examSessionId is not belong to your token")
+            throw InvalidCredentialException("Exam Session with id: $examSessionId is not belong to your token")
         }
         return examSession
     }
@@ -119,7 +118,7 @@ class ExamSessionService(
         }
         val section = try {
             sectionService.getSectionByExamIdAndOrder(examSession.examId, sectionOrder)
-        } catch (ex: NotFoundException) {
+        } catch (ex: UnprocessableException) {
             throw UnprocessableException("There is no section left")
         }
         if (examSession.state == ExamSessionState.ENROLLED) {

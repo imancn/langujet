@@ -3,8 +3,7 @@ package com.cn.langujet.domain.result.service
 import com.cn.langujet.actor.result.payload.request.SubmitCorrectorResultRequest
 import com.cn.langujet.actor.result.payload.response.DetailedResultResponse
 import com.cn.langujet.actor.util.Auth
-import com.cn.langujet.application.advice.InvalidTokenException
-import com.cn.langujet.application.advice.NotFoundException
+import com.cn.langujet.application.advice.InvalidCredentialException
 import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.correction.model.CorrectionStatus
@@ -60,7 +59,7 @@ class ResultService(
     fun getStudentDetailedResultByExamSessionId(examSessionId: String): DetailedResultResponse {
         val examSession = examSessionService.getExamSessionById(examSessionId)
         if (Auth.userId() != examSession.studentUserId) {
-            throw InvalidTokenException("This Exam Session is not belong to you")
+            throw InvalidCredentialException("This Exam Session is not belong to you")
         }
         val result = getResultByExamSessionId(examSessionId).orElseThrow { UnprocessableException("Result not found") }
         val sectionResult = sectionResultService.getSectionResultsByResultId(result.id ?: "").onEach { sr ->
@@ -81,7 +80,7 @@ class ResultService(
             }
             return DetailedResultResponse(result, sectionResult)
         } else {
-            throw InvalidTokenException("This Exam Correction is not belong to you")
+            throw InvalidCredentialException("This Exam Correction is not belong to you")
         }
     }
     
@@ -111,7 +110,7 @@ class ResultService(
     
     fun getResultById(resultId: String): ResultEntity {
         return resultRepository.findById(resultId).orElseThrow {
-            NotFoundException("Result not found")
+            UnprocessableException("Result not found")
         }
     }
     

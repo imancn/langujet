@@ -2,7 +2,6 @@ package com.cn.langujet.domain.exam.service
 
 import com.cn.langujet.application.advice.InvalidInputException
 import com.cn.langujet.application.advice.UnprocessableException
-import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.domain.exam.model.SectionEntity
 import com.cn.langujet.domain.exam.repository.SectionCustomRepository
 import com.cn.langujet.domain.exam.repository.SectionRepository
@@ -16,7 +15,7 @@ class SectionService(
 ) {
     fun getSectionById(id: String): SectionEntity {
         return sectionRepository.findById(id).orElseThrow {
-            NotFoundException("Section with id $id not found")
+            UnprocessableException("Section with id $id not found")
         }
     }
 
@@ -26,7 +25,7 @@ class SectionService(
 
     fun getSectionByExamIdAndOrder(examId: String, order: Int): SectionEntity {
         return sectionRepository.findByExamIdAndOrder(examId, order).orElseThrow {
-            throw NotFoundException("Section not found")
+            throw UnprocessableException("Section not found")
         }
     }
 

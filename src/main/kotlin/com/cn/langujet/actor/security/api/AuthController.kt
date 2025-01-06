@@ -55,7 +55,7 @@ class AuthController(
         @RequestParam @NotBlank password: String,
     ): ResponseEntity<JwtResponse> {
         val user = userRepository.findByStandardEmailAndDeleted(email.toStandardMail()).orElseThrow {
-            AccessDeniedException("Invalid credentials")
+            InvalidCredentialException("Invalid credentials")
         }
         if (user.password.isNullOrBlank()) throw UnprocessableException("You must reset your password")
         val authentication = authenticationManager.authenticate(
@@ -129,7 +129,7 @@ class AuthController(
         @PathVariable @Email @NotBlank email: String, @PathVariable @NotBlank verificationCode: String
     ): ResponseEntity<String> {
         val user = userRepository.findByStandardEmailAndDeleted(email.toStandardMail())
-            .orElseThrow { NotFoundException("User Not Found") }
+            .orElseThrow { UnprocessableException("User Not Found") }
         if (user.emailVerified) throw UnprocessableException("Your Email Was Verified")
         val verificationToken = emailVerificationTokenRepository.findByUser(user).orElseThrow {
             mailSenderService.sendEmailVerificationMail(
@@ -145,7 +145,7 @@ class AuthController(
     @PostMapping("/signup/email/verification-mail")
     fun sendVerificationMail(@RequestParam @Email @NotBlank email: String): ResponseEntity<String> {
         val user = userRepository.findByStandardEmailAndDeleted(email.toStandardMail())
-            .orElseThrow { NotFoundException("User Not Found") }
+            .orElseThrow { UnprocessableException("User Not Found") }
         
         if (user.emailVerified) throw UnprocessableException("Your Email Was Verified")
         
@@ -166,14 +166,14 @@ class AuthController(
             refreshTokenService.deleteById(refreshToken)
             RefreshTokenResponse(token, newRefreshToken.id ?: "")
         }.orElseThrow {
-            RefreshTokenException("Your Session has been expired")
+            InvalidCredentialException("Your Session has been expired")
         })
     }
     
     @PostMapping("/reset-password")
     fun resetPassword(@RequestParam @Email @NotBlank email: String): ResponseEntity<String> {
         val user = userRepository.findByStandardEmailAndDeleted(email.toStandardMail())
-            .orElseThrow { NotFoundException("User Not Found") }
+            .orElseThrow { UnprocessableException("User Not Found") }
         val token = resetPasswordTokenRepository.findByUser(user).getOrElse {
             resetPasswordTokenRepository.save(ResetPasswordTokenEntity(user))
         }
@@ -188,15 +188,15 @@ class AuthController(
         @RequestParam @Size(min = 6, max = 40) @NotBlank newPassword: String
     ): ResponseEntity<String> {
         val user = userRepository.findByStandardEmailAndDeleted(email.toStandardMail())
-            .orElseThrow { NotFoundException("User Not Found") }
+            .orElseThrow { UnprocessableException("User Not Found") }
         val token = resetPasswordTokenRepository.findByUser(user).orElseThrow {
-            InvalidTokenException("Your reset password token has been expired. Request for reset password again.")
+            InvalidCredentialException("Your reset password token has been expired. Request for reset password again.")
         }
         if (token.token == code) {
             user.password = encoder.encode(newPassword)
             userRepository.save(user)
             resetPasswordTokenRepository.delete(token)
-        } else throw InvalidTokenException("Your reset password token is invalid.")
+        } else throw InvalidCredentialException("Your reset password token is invalid.")
         return toOkResponseEntity("Your password has been reset successfully")
     }
     
@@ -206,7 +206,7 @@ class AuthController(
         @RequestParam @Size(min = 6, max = 40) @NotBlank oldPassword: String,
         @RequestParam @Size(min = 6, max = 40) @NotBlank newPassword: String
     ): ResponseEntity<String> {
-        val user = userRepository.findByIdAndDeleted(Auth.userId()).orElseThrow { NotFoundException("User Not Found") }
+        val user = userRepository.findByIdAndDeleted(Auth.userId()).orElseThrow { UnprocessableException("User Not Found") }
         if (user.password.isNullOrBlank()) throw UnprocessableException("You must reset your password")
         if (encoder.matches(oldPassword, user.password)) user.password = encoder.encode(newPassword)
         else throw InvalidInputException("Old Password is not correct.")
@@ -234,7 +234,7 @@ class AuthController(
     @PostMapping("/delete-account/verify")
     fun verifyDeleteAccount(@RequestParam @NotBlank verificationCode: String): String {
         val user = userRepository.findByStandardEmailAndDeleted(Auth.userEmail())
-            .orElseThrow { NotFoundException("User Not Found") }
+            .orElseThrow { UnprocessableException("User Not Found") }
         val verificationToken = emailVerificationTokenRepository.findByUser(user).orElseThrow {
             mailSenderService.sendDeleteAccountVerificationMail(
                 emailVerificationTokenRepository.save(EmailVerificationTokenEntity(user))

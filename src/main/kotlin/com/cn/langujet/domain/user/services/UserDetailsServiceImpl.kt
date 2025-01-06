@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.user.services
 
-import com.cn.langujet.application.advice.InvalidTokenException
+import com.cn.langujet.application.advice.InvalidCredentialException
 import com.cn.langujet.domain.user.model.UserDetailsImpl
 import com.cn.langujet.domain.user.repository.UserRepository
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -16,7 +16,7 @@ class UserDetailsServiceImpl(
     @Throws(UsernameNotFoundException::class)
     override fun loadUserByUsername(userId: String): UserDetailsImpl {
         return UserDetailsImpl.build(
-            userRepository.findByIdAndDeleted(userId).orElseThrow { InvalidTokenException("User Not Found") }
+            userRepository.findByIdAndDeleted(userId).orElseThrow { InvalidCredentialException("User Not Found") }
         )
     }
 

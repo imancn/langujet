@@ -2,9 +2,9 @@ package com.cn.langujet.domain.exam.service
 
 import com.cn.langujet.actor.exam.payload.ExamSectionContentDownloadLink
 import com.cn.langujet.actor.util.Auth
-import com.cn.langujet.application.advice.FileException
-import com.cn.langujet.application.advice.InvalidTokenException
-import com.cn.langujet.application.advice.NotFoundException
+import com.cn.langujet.application.advice.InternalServerError
+import com.cn.langujet.application.advice.InvalidCredentialException
+import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.application.service.file.domain.data.model.FileBucket
 import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.exam.model.ExamSectionContentEntity
@@ -26,7 +26,7 @@ class ExamSectionContentService(
     fun uploadExamSectionContent(examId: String, sectionOrder: Int, file: MultipartFile): ExamSectionContentEntity {
         sectionService.getSectionsByExamId(examId).find {
             it.order == sectionOrder
-        } ?: throw NotFoundException("Section not found")
+        } ?: throw UnprocessableException("Section not found")
 
         val fileEntity = fileService.uploadFile(file, FileBucket.EXAM_CONTENTS)
 
@@ -35,7 +35,7 @@ class ExamSectionContentService(
                 null,
                 examId,
                 sectionOrder,
-                fileEntity.id ?: throw FileException("Upload Failed")
+                fileEntity.id ?: throw InternalServerError("Upload Failed")
             )
         )
     }
@@ -61,7 +61,7 @@ class ExamSectionContentService(
     ): List<ExamSectionContentDownloadLink> {
         val examSession = examSessionRepository.findById(examSessionId).getOrNull() ?: return emptyList()
         if (Auth.userId() != examSession.studentUserId) {
-            throw InvalidTokenException("Exam Session with id: $examSessionId is not belong to your token")
+            throw InvalidCredentialException("Exam Session with id: $examSessionId is not belong to your token")
         }
         val exam = examService.getExamById(examSession.examId)
         val examSectionContents = examSectionContentRepository.findAllByExamIdAndSectionOrder(exam.id ?: "", sectionOrder)

@@ -1,6 +1,6 @@
 package com.cn.langujet.application.service.smtp
 
-import com.cn.langujet.application.advice.EmailNotSentException
+import com.cn.langujet.application.advice.InternalServerError
 import com.cn.langujet.domain.user.model.EmailVerificationTokenEntity
 import com.cn.langujet.domain.user.model.ResetPasswordTokenEntity
 import org.slf4j.LoggerFactory
@@ -30,7 +30,7 @@ class MailSenderService(
             sendMimeMessage(content, message)
         } catch (e: Exception) {
             logger.error("Email not sent. error: ${e.message}")
-            throw EmailNotSentException("Email not sent.\nerror: ${e.message}")
+            throw InternalServerError("Email not sent.\nerror: ${e.message}")
         }
     }
 

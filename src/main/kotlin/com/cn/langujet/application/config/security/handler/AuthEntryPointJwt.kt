@@ -1,7 +1,7 @@
 package com.cn.langujet.application.config.security.handler
 
 import com.cn.langujet.application.advice.ErrorMessageResponse
-import com.cn.langujet.application.advice.InvalidTokenException
+import com.cn.langujet.application.advice.InvalidCredentialException
 import com.cn.langujet.domain.user.services.JwtService
 import com.cn.langujet.domain.user.services.UserDetailsServiceImpl
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -14,12 +14,14 @@ import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.stereotype.Component
 import java.io.IOException
+import java.util.*
 
 @Component
 class AuthEntryPointJwt(
     private val jwtService: JwtService,
     private val userDetailsService: UserDetailsServiceImpl,
-    private val modelMapper: ObjectMapper
+    private val modelMapper: ObjectMapper,
+    private val resourceBundle: ResourceBundle
 ) : AuthenticationEntryPoint {
     @Throws(IOException::class, ServletException::class)
     override fun commence(
@@ -33,7 +35,7 @@ class AuthEntryPointJwt(
                     val jwt = jwtService.parseJwt(request)
                     val userId = jwtService.getUserIdFromJwtToken(jwt)
                     
-                    if (!userDetailsService.userExist(userId)) throw InvalidTokenException("User Not Found")
+                    if (!userDetailsService.userExist(userId)) throw InvalidCredentialException("User Not Found")
                 }
                 
                 else -> throw authException
@@ -41,9 +43,10 @@ class AuthEntryPointJwt(
         } catch (exception: Exception) {
             response.status = HttpServletResponse.SC_UNAUTHORIZED
             response.contentType = "application/json"
+            val key = "invalid.credentials"
             response.writer.print(
                 modelMapper.writeValueAsString(
-                    ErrorMessageResponse(exception.message ?: "")
+                    ErrorMessageResponse(key, resourceBundle.getString(key) ?: "Unexpected error")
                 )
             )
         }

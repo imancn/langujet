@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.user.services
 
-import com.cn.langujet.application.advice.NotFoundException
+import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.domain.user.model.RefreshTokenEntity
 import com.cn.langujet.domain.user.repository.RefreshTokenRepository
 import com.cn.langujet.domain.user.repository.UserRepository
@@ -31,7 +31,7 @@ class RefreshTokenService(
     }
 
     fun deleteByUserId(userId: String) {
-        if (!userRepository.existsByIdAndDeleted(userId)) { throw NotFoundException("User Not Found") }
+        if (!userRepository.existsByIdAndDeleted(userId)) { throw UnprocessableException("User Not Found") }
         refreshTokenRepository.deleteByUserId(userId)
     }
     

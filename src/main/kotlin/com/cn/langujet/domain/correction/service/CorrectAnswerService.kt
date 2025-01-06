@@ -2,7 +2,6 @@ package com.cn.langujet.domain.correction.service
 
 import com.cn.langujet.actor.correction.payload.dto.CorrectAnswerListDTO
 import com.cn.langujet.application.advice.InvalidInputException
-import com.cn.langujet.application.advice.NotFoundException
 import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.domain.correction.model.CorrectAnswerEntity
 import com.cn.langujet.domain.correction.repository.CorrectAnswerCustomRepository
@@ -46,12 +45,12 @@ class CorrectAnswerService(
     ): CorrectAnswerListDTO {
         return CorrectAnswerListDTO.fromCorrectAnswer(
             customRepository.findCorrectAnswersByOptionalCriteria(examId, sectionOrder, partOrder, questionOrder)
-        ).firstOrNull() ?: throw NotFoundException("Correct Answer not found")
+        ).firstOrNull() ?: throw UnprocessableException("Correct Answer not found")
     }
 
     fun deleteCorrectAnswer(id: String) {
         if (!repository.existsById(id))
-            throw NotFoundException("CorrectAnswer with id $id not found")
+            throw UnprocessableException("CorrectAnswer with id $id not found")
         repository.deleteById(id)
     }
     
@@ -76,7 +75,7 @@ class CorrectAnswerService(
                 if (doesExist) throw UnprocessableException("Correct Answer with exam id: ${request.examId} and section order: ${request.sectionOrder} and part order: ${correctAnswer.partOrder} and question order: ${correctAnswer.questionOrder} already exists")
             } else { /// just for update
                 if (existingCorrectAnswers.find { it.id == correctAnswer.id } == null)
-                    throw NotFoundException("CorrectAnswer with id ${correctAnswer.id} not found")
+                    throw UnprocessableException("CorrectAnswer with id ${correctAnswer.id} not found")
             }
         }
         
