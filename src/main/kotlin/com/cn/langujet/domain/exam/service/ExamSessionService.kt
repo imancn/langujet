@@ -6,6 +6,7 @@ import com.cn.langujet.actor.util.models.CustomPage
 import com.cn.langujet.application.advice.InvalidCredentialException
 import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.application.service.smtp.MailSenderService
+import com.cn.langujet.domain.correction.service.CorrectionService
 import com.cn.langujet.domain.exam.model.ExamSessionEntity
 import com.cn.langujet.domain.exam.model.ExamSessionState
 import com.cn.langujet.domain.exam.repository.ExamSessionCustomRepository
@@ -23,7 +24,7 @@ class ExamSessionService(
     private val examSessionCustomRepository: ExamSessionCustomRepository,
     private val examService: ExamService,
     private val sectionService: SectionService,
-//    private val correctionService: CorrectionService,
+    private val correctionService: CorrectionService,
     private val examGeneratorService: ExamGeneratorService,
     private val serviceService: ServiceService,
     private val userService: UserService,
@@ -141,7 +142,7 @@ class ExamSessionService(
             it.state = ExamSessionState.FINISHED
             it.endDate = Date(System.currentTimeMillis())
         })
-//        correctionService.initiateExamSessionCorrection(examSession)
+        correctionService.initiateExamSessionCorrection(examSession)
         examSession = getExamSessionById(examSession.id ?: "")
         return ExamSessionFinishResponse(examSession.state)
     }
