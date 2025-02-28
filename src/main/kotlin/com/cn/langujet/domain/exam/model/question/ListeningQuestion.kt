@@ -1,6 +1,7 @@
 package com.cn.langujet.domain.exam.model.question
 
 import com.cn.langujet.domain.answer.model.AnswerType
+import com.cn.langujet.domain.exam.model.enums.QuestionType
 
 class ListeningTextCompletion(
     order: Int,

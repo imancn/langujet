@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.exam.repository.dto
 
-import com.cn.langujet.domain.exam.model.SectionType
+import com.cn.langujet.domain.exam.model.enums.SectionType
 
 data class SectionMetaDTO(
     var id: String?,

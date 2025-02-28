@@ -1,8 +1,8 @@
 package com.cn.langujet.actor.exam.payload
 
 import com.cn.langujet.domain.exam.model.ExamEntity
-import com.cn.langujet.domain.exam.model.ExamMode
-import com.cn.langujet.domain.exam.model.ExamType
+import com.cn.langujet.domain.exam.model.enums.ExamMode
+import com.cn.langujet.domain.exam.model.enums.ExamType
 import com.fasterxml.jackson.annotation.JsonInclude
 import jakarta.validation.constraints.NotBlank
 

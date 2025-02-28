@@ -8,7 +8,7 @@ import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.application.service.smtp.MailSenderService
 import com.cn.langujet.domain.correction.service.CorrectionService
 import com.cn.langujet.domain.exam.model.ExamSessionEntity
-import com.cn.langujet.domain.exam.model.ExamSessionState
+import com.cn.langujet.domain.exam.model.enums.ExamSessionState
 import com.cn.langujet.domain.exam.repository.ExamSessionCustomRepository
 import com.cn.langujet.domain.exam.repository.ExamSessionRepository
 import com.cn.langujet.domain.service.model.ServiceEntity

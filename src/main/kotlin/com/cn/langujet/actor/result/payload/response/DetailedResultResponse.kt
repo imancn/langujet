@@ -1,6 +1,6 @@
 package com.cn.langujet.actor.result.payload.response
 
-import com.cn.langujet.domain.exam.model.ExamType
+import com.cn.langujet.domain.exam.model.enums.ExamType
 import com.cn.langujet.domain.result.model.ResultEntity
 import com.cn.langujet.domain.result.model.SectionResultEntity
 

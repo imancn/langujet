@@ -1,4 +1,4 @@
-package com.cn.langujet.domain.exam.model.question
+package com.cn.langujet.domain.exam.model.enums
 
 enum class QuestionType {
     WRITING,

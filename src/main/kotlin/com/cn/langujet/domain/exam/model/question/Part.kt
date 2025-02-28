@@ -1,8 +1,6 @@
-package com.cn.langujet.domain.exam.model
+package com.cn.langujet.domain.exam.model.question
 
-import com.cn.langujet.domain.exam.model.question.Question
-import com.cn.langujet.domain.exam.model.question.SpeakingQuestion
-import com.cn.langujet.domain.exam.model.question.WritingQuestion
+import com.cn.langujet.domain.exam.model.enums.SectionType
 
 sealed class Part(
     var order: Int,

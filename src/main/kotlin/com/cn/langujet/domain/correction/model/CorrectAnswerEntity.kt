@@ -5,8 +5,22 @@ import com.cn.langujet.domain.answer.model.AnswerType
 import com.cn.langujet.domain.answer.model.TrueFalseAnswerType
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
+import org.springframework.data.mongodb.core.index.CompoundIndex
+import org.springframework.data.mongodb.core.index.CompoundIndexes
 import org.springframework.data.mongodb.core.mapping.Document
 
+@CompoundIndexes(
+    CompoundIndex(
+        name = "unique_correct_answers_index",
+        def = "{'examId': -1, 'sectionOrder': 1, 'partOrder': 1, 'questionOrder': 1}",
+        unique = true
+    ),
+    CompoundIndex(
+        name = "exam_id_section_order_index",
+        def = "{'examId': -1, 'sectionOrder': 1}",
+        unique = false
+    )
+)
 @Document(collection = "correct_answers")
 sealed class CorrectAnswerEntity(
     @Id var id: String? = null,

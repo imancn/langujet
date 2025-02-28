@@ -5,7 +5,7 @@ import com.cn.langujet.application.advice.UnprocessableException
 import com.cn.langujet.application.service.file.domain.data.model.FileBucket
 import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.answer.model.AnswerEntity
-import com.cn.langujet.domain.exam.model.ExamSessionState
+import com.cn.langujet.domain.exam.model.enums.ExamSessionState
 import com.cn.langujet.domain.exam.service.ExamSessionService
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile

@@ -1,7 +1,8 @@
 package com.cn.langujet.actor.order.payload
 
 import com.cn.langujet.domain.correction.model.CorrectorType
-import com.cn.langujet.domain.exam.model.*
+import com.cn.langujet.domain.exam.model.enums.ExamMode
+import com.cn.langujet.domain.exam.model.enums.ExamType
 import com.cn.langujet.domain.service.model.ServiceEntity
 import com.cn.langujet.domain.service.model.ServiceType
 

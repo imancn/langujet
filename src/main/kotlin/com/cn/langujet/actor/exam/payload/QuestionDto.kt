@@ -1,6 +1,7 @@
 package com.cn.langujet.actor.exam.payload
 
 import com.cn.langujet.domain.answer.model.AnswerType
+import com.cn.langujet.domain.exam.model.enums.QuestionType
 import com.cn.langujet.domain.exam.model.question.*
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo

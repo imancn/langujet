@@ -2,8 +2,8 @@ package com.cn.langujet.actor.exam.payload
 
 import com.cn.langujet.actor.util.models.DateInterval
 import com.cn.langujet.domain.correction.model.CorrectorType
-import com.cn.langujet.domain.exam.model.ExamSessionState
-import com.cn.langujet.domain.exam.model.ExamType
+import com.cn.langujet.domain.exam.model.enums.ExamSessionState
+import com.cn.langujet.domain.exam.model.enums.ExamType
 import jakarta.validation.constraints.Positive
 import jakarta.validation.constraints.PositiveOrZero
 

@@ -1,8 +1,8 @@
 package com.cn.langujet.actor.service.payload
 
 import com.cn.langujet.domain.correction.model.CorrectorType
-import com.cn.langujet.domain.exam.model.ExamMode
-import com.cn.langujet.domain.exam.model.ExamType
+import com.cn.langujet.domain.exam.model.enums.ExamMode
+import com.cn.langujet.domain.exam.model.enums.ExamType
 import com.cn.langujet.domain.service.model.ServiceEntity
 import com.cn.langujet.domain.service.model.ServiceType
 import com.fasterxml.jackson.annotation.JsonSubTypes

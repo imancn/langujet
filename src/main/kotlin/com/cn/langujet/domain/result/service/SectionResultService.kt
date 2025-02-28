@@ -9,7 +9,7 @@ import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.correction.model.CorrectionStatus
 import com.cn.langujet.domain.correction.model.CorrectorType
 import com.cn.langujet.domain.exam.model.ExamSessionEntity
-import com.cn.langujet.domain.exam.model.SectionType
+import com.cn.langujet.domain.exam.model.enums.SectionType
 import com.cn.langujet.domain.exam.repository.dto.SectionMetaDTO
 import com.cn.langujet.domain.result.model.SectionResultEntity
 import com.cn.langujet.domain.result.repository.SectionResultRepository
@@ -50,7 +50,7 @@ class SectionResultService(
     }
     
     fun getSectionResultsByResultId(resultId: String): List<SectionResultEntity> {
-        return sectionResultRepository.findAllByResultId(resultId)
+        return sectionResultRepository.findByResultId(resultId)
     }
     
     fun getSectionResultById(id: String): SectionResultEntity {

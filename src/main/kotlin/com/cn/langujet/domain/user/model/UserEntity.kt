@@ -3,6 +3,7 @@ package com.cn.langujet.domain.user.model
 import com.cn.langujet.application.shared.HistoricalEntity
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
+import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document(collection = "users")
@@ -10,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 data class UserEntity(
     @Id
     var id: String?,
+    @Indexed(name = "unique_users_index", unique = true)
     var standardEmail: String,
     var email: String,
     var emailVerified: Boolean,

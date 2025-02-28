@@ -3,9 +3,23 @@ package com.cn.langujet.domain.answer.model
 import com.cn.langujet.application.shared.LogEntity
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
+import org.springframework.data.mongodb.core.index.CompoundIndex
+import org.springframework.data.mongodb.core.index.CompoundIndexes
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document(collection = "answers")
+@CompoundIndexes(
+    CompoundIndex(
+        name = "unique_answers_index",
+        def = "{'examSessionId': -1, 'sectionOrder': 1, 'partOrder': 1, 'questionOrder': 1}",
+        unique = true
+    ),
+    CompoundIndex(
+        name = "exam_session_id_section_order_index",
+        def = "{'examSessionId': -1, 'sectionOrder': 1}",
+        unique = false
+    )
+)
 sealed class AnswerEntity(
     @Id
     var id: String? = null,

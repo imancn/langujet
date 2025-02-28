@@ -1,8 +1,8 @@
 package com.cn.langujet.actor.service.payload
 
 import com.cn.langujet.domain.correction.model.CorrectorType
-import com.cn.langujet.domain.exam.model.ExamMode
-import com.cn.langujet.domain.exam.model.ExamType
+import com.cn.langujet.domain.exam.model.enums.ExamMode
+import com.cn.langujet.domain.exam.model.enums.ExamType
 
 class GetAvailableExamServicesResponse(
     val id: String,

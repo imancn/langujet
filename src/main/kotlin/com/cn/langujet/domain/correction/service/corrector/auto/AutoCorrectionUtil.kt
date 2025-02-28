@@ -3,9 +3,9 @@ package com.cn.langujet.domain.correction.service.corrector.auto
 import com.cn.langujet.application.advice.InternalServerError
 import com.cn.langujet.domain.answer.model.AnswerEntity
 import com.cn.langujet.domain.correction.model.CorrectAnswerEntity
-import com.cn.langujet.domain.exam.model.ExamType
+import com.cn.langujet.domain.exam.model.enums.ExamType
 import com.cn.langujet.domain.exam.model.SectionEntity
-import com.cn.langujet.domain.exam.model.SectionType
+import com.cn.langujet.domain.exam.model.enums.SectionType
 
 class AutoCorrectionUtil {
     companion object {

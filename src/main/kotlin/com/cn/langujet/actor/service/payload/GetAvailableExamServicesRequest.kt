@@ -1,7 +1,7 @@
 package com.cn.langujet.actor.service.payload
 
 import com.cn.langujet.domain.correction.model.CorrectorType
-import com.cn.langujet.domain.exam.model.ExamType
+import com.cn.langujet.domain.exam.model.enums.ExamType
 
 class GetAvailableExamServicesRequest(
     val correctorType: List<CorrectorType>?,

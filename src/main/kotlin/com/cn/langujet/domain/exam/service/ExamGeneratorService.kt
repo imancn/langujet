@@ -1,8 +1,8 @@
 package com.cn.langujet.domain.exam.service
 
 import com.cn.langujet.domain.exam.model.ExamEntity
-import com.cn.langujet.domain.exam.model.ExamMode
-import com.cn.langujet.domain.exam.model.ExamType
+import com.cn.langujet.domain.exam.model.enums.ExamMode
+import com.cn.langujet.domain.exam.model.enums.ExamType
 import com.cn.langujet.domain.exam.repository.ExamRepository
 import com.cn.langujet.domain.exam.repository.ExamSessionRepository
 import com.cn.langujet.domain.service.model.ServiceEntity
@@ -23,12 +23,11 @@ class ExamGeneratorService(
     
     fun getRandomStudentAvailableExam(studentUserId: String, examService: ServiceEntity.ExamServiceEntity): ExamEntity {
         val unavailableExamIds = examSessionRepository.findByStudentUserId(studentUserId).map { it.examId }.distinct()
-        val exams = examRepository.findAllByTypeAndModeAndActiveAndIdNotIn(
+        val exams = examRepository.findAllByTypeAndModeAndActive(
             examService.examType,
             examService.examMode,
-            true,
-            unavailableExamIds
-        )
+            true
+        ).filter { !unavailableExamIds.contains(it.id) }
         return if (exams.isNotEmpty()) {
             exams.random(Random(System.currentTimeMillis()))
         } else {

@@ -1,7 +1,7 @@
 package com.cn.langujet.actor.exam.payload
 
 import com.cn.langujet.domain.exam.model.ExamSessionEntity
-import com.cn.langujet.domain.exam.model.ExamSessionState
+import com.cn.langujet.domain.exam.model.enums.ExamSessionState
 import java.util.*
 
 class ExamSessionEnrollResponse(

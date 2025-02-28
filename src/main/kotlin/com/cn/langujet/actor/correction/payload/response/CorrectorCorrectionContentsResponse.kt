@@ -1,8 +1,8 @@
 package com.cn.langujet.actor.correction.payload.response
 
 import com.cn.langujet.domain.answer.model.AnswerType
-import com.cn.langujet.domain.exam.model.SectionType
-import com.cn.langujet.domain.exam.model.question.QuestionType
+import com.cn.langujet.domain.exam.model.enums.SectionType
+import com.cn.langujet.domain.exam.model.enums.QuestionType
 
 data class CorrectorCorrectionExamSessionContentResponse(
     val examSessionId: String,

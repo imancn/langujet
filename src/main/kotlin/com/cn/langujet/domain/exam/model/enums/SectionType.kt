@@ -1,4 +1,4 @@
-package com.cn.langujet.domain.exam.model
+package com.cn.langujet.domain.exam.model.enums
 
 enum class SectionType {
     READING,

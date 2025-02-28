@@ -3,7 +3,7 @@ package com.cn.langujet.domain.correction.service.corrector.auto
 import com.cn.langujet.domain.answer.AnswerRepository
 import com.cn.langujet.domain.correction.service.CorrectAnswerService
 import com.cn.langujet.domain.exam.model.ExamSessionEntity
-import com.cn.langujet.domain.exam.model.SectionType
+import com.cn.langujet.domain.exam.model.enums.SectionType
 import com.cn.langujet.domain.exam.service.ExamService
 import com.cn.langujet.domain.exam.service.SectionService
 import com.cn.langujet.domain.result.model.SectionResultEntity
