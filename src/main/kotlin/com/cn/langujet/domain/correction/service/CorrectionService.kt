@@ -15,8 +15,8 @@ import com.cn.langujet.domain.correction.repository.CorrectAnswerRepository
 import com.cn.langujet.domain.correction.service.corrector.auto.AutoCorrectorService
 import com.cn.langujet.domain.corrector.CorrectorService
 import com.cn.langujet.domain.exam.model.ExamSessionEntity
-import com.cn.langujet.domain.exam.model.question.SpeakingPart
-import com.cn.langujet.domain.exam.model.question.WritingPart
+import com.cn.langujet.domain.exam.model.section.part.SpeakingPart
+import com.cn.langujet.domain.exam.model.section.part.WritingPart
 import com.cn.langujet.domain.exam.service.ExamSectionContentService
 import com.cn.langujet.domain.exam.service.ExamSessionService
 import com.cn.langujet.domain.exam.service.SectionService

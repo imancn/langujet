@@ -4,7 +4,7 @@ import com.cn.langujet.application.advice.InternalServerError
 import com.cn.langujet.domain.answer.model.AnswerEntity
 import com.cn.langujet.domain.correction.model.CorrectAnswerEntity
 import com.cn.langujet.domain.exam.model.enums.ExamType
-import com.cn.langujet.domain.exam.model.SectionEntity
+import com.cn.langujet.domain.exam.model.section.SectionEntity
 import com.cn.langujet.domain.exam.model.enums.SectionType
 
 class AutoCorrectionUtil {

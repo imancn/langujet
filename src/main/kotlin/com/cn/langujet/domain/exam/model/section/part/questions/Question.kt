@@ -1,8 +1,10 @@
-package com.cn.langujet.domain.exam.model.question
+package com.cn.langujet.domain.exam.model.section.part.questions
 
 import com.cn.langujet.domain.answer.model.AnswerType
 import com.cn.langujet.domain.exam.model.enums.QuestionType
+import org.springframework.data.annotation.TypeAlias
 
+@TypeAlias("questions")
 sealed class Question(
     var order: Int,
     var header: String,
@@ -10,6 +12,7 @@ sealed class Question(
     var answerType: AnswerType,
 )
 
+@TypeAlias("speaking_questions")
 class SpeakingQuestion(
     order: Int,
     header: String,
@@ -17,6 +20,7 @@ class SpeakingQuestion(
     var time: Long,
 ) : Question(order, header, QuestionType.SPEAKING, AnswerType.VOICE)
 
+@TypeAlias("writing_questions")
 class WritingQuestion(
     order: Int,
     header: String,

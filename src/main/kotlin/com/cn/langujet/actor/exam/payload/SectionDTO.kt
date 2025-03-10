@@ -1,6 +1,6 @@
 package com.cn.langujet.actor.exam.payload
 
-import com.cn.langujet.domain.exam.model.SectionEntity
+import com.cn.langujet.domain.exam.model.section.SectionEntity
 import com.cn.langujet.domain.exam.model.enums.SectionType
 import com.fasterxml.jackson.annotation.JsonInclude
 

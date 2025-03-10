@@ -2,7 +2,7 @@ package com.cn.langujet.actor.exam.payload
 
 import com.cn.langujet.domain.answer.model.AnswerType
 import com.cn.langujet.domain.exam.model.enums.QuestionType
-import com.cn.langujet.domain.exam.model.question.*
+import com.cn.langujet.domain.exam.model.section.part.questions.*
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.swagger.v3.oas.annotations.media.Schema
@@ -100,7 +100,7 @@ sealed class QuestionDTO(
                 this.items!!
             )
             
-            is ReadingFlowChartCompletionDTO -> ReadingFlowChartCompletion(this.questionOrder!!, this.header!!, this.content!!, this.issues!!)
+            is ReadingFlowChartCompletionDTO -> ReadingFlowchartCompletion(this.questionOrder!!, this.header!!, this.content!!, this.issues!!)
             
             is ListeningTextCompletionDTO -> ListeningTextCompletion(this.questionOrder!!, this.header!!, this.text!!)
             is ListeningTableCompletionDTO -> ListeningTableCompletion(
@@ -167,7 +167,7 @@ sealed class QuestionDTO(
                 is ReadingMatchingHeadings -> ReadingMatchingHeadingsDTO(question)
                 is ReadingTrueFalse -> ReadingTrueFalseDTO(question)
                 is ReadingSelectiveTextCompletion -> ReadingSelectiveTextCompletionDTO(question)
-                is ReadingFlowChartCompletion -> ReadingFlowChartCompletionDTO(question)
+                is ReadingFlowchartCompletion -> ReadingFlowChartCompletionDTO(question)
                 
                 is ListeningTextCompletion -> ListeningTextCompletionDTO(question)
                 is ListeningTableCompletion -> ListeningTableCompletionDTO(question)
@@ -336,7 +336,7 @@ class ReadingFlowChartCompletionDTO(
     val content: String? = null,
     val issues: List<String>? = null,
 ) : QuestionDTO(questionOrder, header, QuestionType.READING_FLOWCHART_COMPLETION, AnswerType.TEXT_ISSUES) {
-    constructor(question: ReadingFlowChartCompletion) : this(
+    constructor(question: ReadingFlowchartCompletion) : this(
         question.order,
         question.header,
         question.content,

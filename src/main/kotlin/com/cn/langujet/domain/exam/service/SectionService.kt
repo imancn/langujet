@@ -2,7 +2,7 @@ package com.cn.langujet.domain.exam.service
 
 import com.cn.langujet.application.advice.InvalidInputException
 import com.cn.langujet.application.advice.UnprocessableException
-import com.cn.langujet.domain.exam.model.SectionEntity
+import com.cn.langujet.domain.exam.model.section.SectionEntity
 import com.cn.langujet.domain.exam.repository.SectionCustomRepository
 import com.cn.langujet.domain.exam.repository.SectionRepository
 import com.cn.langujet.domain.exam.repository.dto.SectionMetaDTO

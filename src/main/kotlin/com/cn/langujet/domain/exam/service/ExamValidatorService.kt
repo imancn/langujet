@@ -5,6 +5,7 @@ import com.cn.langujet.domain.correction.service.CorrectAnswerService
 import com.cn.langujet.domain.exam.model.*
 import com.cn.langujet.domain.exam.model.enums.ExamType
 import com.cn.langujet.domain.exam.model.enums.SectionType
+import com.cn.langujet.domain.exam.model.section.SectionEntity
 import com.cn.langujet.domain.exam.repository.SectionRepository
 import org.springframework.stereotype.Service
 

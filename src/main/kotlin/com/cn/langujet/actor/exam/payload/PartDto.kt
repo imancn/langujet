@@ -1,7 +1,7 @@
 package com.cn.langujet.actor.exam.payload
 
 import com.cn.langujet.domain.exam.model.enums.SectionType
-import com.cn.langujet.domain.exam.model.question.*
+import com.cn.langujet.domain.exam.model.section.part.*
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.swagger.v3.oas.annotations.media.Schema

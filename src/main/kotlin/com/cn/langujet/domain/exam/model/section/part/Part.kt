@@ -1,14 +1,21 @@
-package com.cn.langujet.domain.exam.model.question
+package com.cn.langujet.domain.exam.model.section.part
 
 import com.cn.langujet.domain.exam.model.enums.SectionType
+import com.cn.langujet.domain.exam.model.section.part.questions.Question
+import com.cn.langujet.domain.exam.model.section.part.questions.SpeakingQuestion
+import com.cn.langujet.domain.exam.model.section.part.questions.WritingQuestion
+import org.springframework.data.annotation.TypeAlias
 
+@TypeAlias("part")
 sealed class Part(
-    var order: Int,
-    var type: SectionType,
+    var order: Int = 1,
+    var type: SectionType = SectionType.READING,
 ) {
     abstract fun getQuestions(): List<Question>
+    
 }
 
+@TypeAlias("reading_parts")
 class ReadingPart(
     order: Int,
     var passageHeader: String?,
@@ -20,11 +27,13 @@ class ReadingPart(
     }
 }
 
+@TypeAlias("parts.passages")
 class Passage(
     var indicator: String?,
     var paragraph: String
 )
 
+@TypeAlias("listening_parts")
 class ListeningPart(
     order: Int,
     var audioId: String,
@@ -36,6 +45,8 @@ class ListeningPart(
     }
 }
 
+
+@TypeAlias("writing_parts")
 class WritingPart(
     order: Int,
     var question: WritingQuestion
@@ -45,6 +56,8 @@ class WritingPart(
     }
 }
 
+
+@TypeAlias("speaking_parts")
 class SpeakingPart(
     order: Int,
     var questionList: List<SpeakingQuestion>,
