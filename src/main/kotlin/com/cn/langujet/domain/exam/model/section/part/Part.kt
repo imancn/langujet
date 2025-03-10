@@ -19,7 +19,7 @@ sealed class Part(
 class ReadingPart(
     order: Int,
     var passageHeader: String?,
-    var passage: List<Passage>,
+    var readingPassage: List<ReadingPassage>,
     var questionList: List<Question>
 ) : Part(order, SectionType.READING) {
     override fun getQuestions(): List<Question> {
@@ -27,8 +27,8 @@ class ReadingPart(
     }
 }
 
-@TypeAlias("parts.passages")
-class Passage(
+@TypeAlias("reading_parts.passages")
+class ReadingPassage(
     var indicator: String?,
     var paragraph: String
 )

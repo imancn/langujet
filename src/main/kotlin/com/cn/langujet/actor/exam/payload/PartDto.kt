@@ -28,7 +28,7 @@ sealed class PartDTO(
                 this.partOrder!!,
                 this.passageHeader,
                 this.passage!!.map {
-                    Passage(
+                    ReadingPassage(
                         it.indicator,
                         it.paragraph!!
                     )
@@ -83,7 +83,7 @@ data class ReadingPartDTO(
     constructor(part: ReadingPart) : this(
         part.order,
         part.passageHeader,
-        part.passage.map { PassageDTO(it) },
+        part.readingPassage.map { PassageDTO(it) },
         part.questionList.map { QuestionDTO.from(it) }
     )
 }
@@ -92,9 +92,9 @@ data class PassageDTO(
     var indicator: String? = null,
     var paragraph: String? = null
 ) {
-    constructor(passage: Passage) : this(
-        passage.indicator,
-        passage.paragraph
+    constructor(readingPassage: ReadingPassage) : this(
+        readingPassage.indicator,
+        readingPassage.paragraph
     )
 }
 
