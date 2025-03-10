@@ -19,7 +19,7 @@ sealed class Part(
 class ReadingPart(
     order: Int,
     var passageHeader: String?,
-    var readingPassage: List<ReadingPassage>,
+    var passage: List<ReadingPassage>,
     var questionList: List<Question>
 ) : Part(order, SectionType.READING) {
     override fun getQuestions(): List<Question> {

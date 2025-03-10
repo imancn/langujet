@@ -83,7 +83,7 @@ data class ReadingPartDTO(
     constructor(part: ReadingPart) : this(
         part.order,
         part.passageHeader,
-        part.readingPassage.map { PassageDTO(it) },
+        part.passage.map { PassageDTO(it) },
         part.questionList.map { QuestionDTO.from(it) }
     )
 }
