@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.user.model
 
-import com.cn.langujet.application.shared.HistoricalEntity
+import com.cn.langujet.application.shared.entity.HistoricalEntity
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.index.Indexed

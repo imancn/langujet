@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.service.model
 
-import com.cn.langujet.application.shared.HistoricalEntity
+import com.cn.langujet.application.shared.entity.HistoricalEntity
 import com.cn.langujet.domain.correction.model.CorrectorType
 import com.cn.langujet.domain.exam.model.enums.ExamMode
 import com.cn.langujet.domain.exam.model.enums.ExamType

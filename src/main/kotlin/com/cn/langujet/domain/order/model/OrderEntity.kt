@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.order.model
 
-import com.cn.langujet.application.shared.HistoricalEntity
+import com.cn.langujet.application.shared.entity.HistoricalEntity
 import com.cn.langujet.domain.payment.model.PaymentType
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias

@@ -1,6 +1,6 @@
 package com.cn.langujet.application.service.file.domain.data.model
 
-import com.cn.langujet.application.shared.LogEntity
+import com.cn.langujet.application.shared.entity.LogEntity
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document

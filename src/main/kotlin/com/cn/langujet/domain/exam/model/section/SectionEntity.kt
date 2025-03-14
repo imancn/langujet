@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.exam.model.section
 
-import com.cn.langujet.application.shared.HistoricalEntity
+import com.cn.langujet.application.shared.entity.HistoricalEntity
 import com.cn.langujet.domain.exam.model.enums.SectionType
 import com.cn.langujet.domain.exam.model.section.part.Part
 import org.springframework.data.annotation.Id
@@ -24,10 +24,10 @@ class SectionEntity(
     @Id
     var id: String?,
     @Indexed(name = "exam_id_index", direction = IndexDirection.DESCENDING)
-    var examId: String = "iman",
-    var header: String = "iman",
-    var order: Int = 5,
-    var sectionType: SectionType = SectionType.READING,
-    var parts: List<Part> = listOf(),
-    var time: Long = 1
+    var examId: String,
+    var header: String,
+    var order: Int,
+    var sectionType: SectionType,
+    var parts: List<Part>,
+    var time: Long
 ): HistoricalEntity()

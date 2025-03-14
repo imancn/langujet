@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.corrector
 
-import com.cn.langujet.application.shared.LogEntity
+import com.cn.langujet.application.shared.entity.LogEntity
 import com.cn.langujet.domain.user.model.UserEntity
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias

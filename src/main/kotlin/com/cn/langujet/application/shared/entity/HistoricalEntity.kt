@@ -1,4 +1,4 @@
-package com.cn.langujet.application.shared
+package com.cn.langujet.application.shared.entity
 
 import com.cn.langujet.actor.util.Auth
 import org.springframework.data.annotation.LastModifiedBy

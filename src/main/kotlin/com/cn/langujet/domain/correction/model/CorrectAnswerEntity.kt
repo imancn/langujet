@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.correction.model
 
-import com.cn.langujet.application.shared.HistoricalEntity
+import com.cn.langujet.application.shared.entity.HistoricalEntity
 import com.cn.langujet.domain.answer.model.AnswerType
 import com.cn.langujet.domain.answer.model.TrueFalseAnswerType
 import org.springframework.data.annotation.Id
