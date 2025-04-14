@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.user.services
 
-import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.domain.user.model.UserEntity
 import com.cn.langujet.domain.user.repository.UserRepository
 import org.springframework.stereotype.Service

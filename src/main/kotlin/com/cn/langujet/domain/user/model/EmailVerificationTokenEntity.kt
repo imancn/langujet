@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.user.model
 
-import com.cn.langujet.application.shared.entity.LogEntity
+import com.cn.langujet.application.arch.models.Log
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.index.Indexed
@@ -16,7 +16,7 @@ data class EmailVerificationTokenEntity(
     var token: String,
     @Indexed(name = "expiry_date_ttl", expireAfterSeconds = 0)
     var expiryDate: Date,
-): LogEntity() {
+) : Log() {
     constructor(user: UserEntity) : this(
         id = null, user = user, token = makeRandom6DigitsToken(), expiryDate = calculateExpiryDate()
     )

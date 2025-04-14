@@ -1,7 +1,7 @@
 package com.cn.langujet.application.service.file.domain.service
 
-import com.cn.langujet.application.advice.InternalServerError
-import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.application.arch.advice.InternalServerError
+import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.application.service.file.domain.data.model.FileBucket
 import com.cn.langujet.application.service.file.domain.data.model.FileEntity
 import com.cn.langujet.application.service.file.domain.data.repository.FileRepository

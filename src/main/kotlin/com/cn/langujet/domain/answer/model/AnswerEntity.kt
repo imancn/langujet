@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.answer.model
 
-import com.cn.langujet.application.shared.entity.LogEntity
+import com.cn.langujet.application.arch.models.Log
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.index.CompoundIndex
@@ -28,7 +28,7 @@ sealed class AnswerEntity(
     var type: AnswerType,
     var partOrder: Int,
     var questionOrder: Int,
-): LogEntity() {
+) : Log() {
     @Document(collection = "answers")
     @TypeAlias("text_answers")
     class TextAnswerEntity(

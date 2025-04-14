@@ -1,4 +1,4 @@
-package com.cn.langujet.application.advice
+package com.cn.langujet.application.arch.advice
 
 import jakarta.validation.ValidationException
 import org.springframework.http.HttpStatus
@@ -25,6 +25,17 @@ class ControllerAdvice {
         return ResponseEntity(
             ErrorMessageResponse("invalid.input", ex.message ?: ""),
             HttpStatus.BAD_REQUEST
+        )
+    }
+    
+    @ExceptionHandler(value = [NoSuchElementException::class])
+    fun handleNoSuchElementException(
+        ex: NoSuchElementException,
+        request: WebRequest
+    ): ResponseEntity<ErrorMessageResponse> {
+        return ResponseEntity(
+            ErrorMessageResponse("not.found", ex.message ?: ""),
+            HttpStatus.NOT_FOUND
         )
     }
     

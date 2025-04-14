@@ -3,7 +3,7 @@ package com.cn.langujet.domain.order.service
 import com.cn.langujet.actor.order.payload.*
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.actor.util.models.CustomPage
-import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.domain.coupon.CouponService
 import com.cn.langujet.domain.exam.service.ExamSessionService
 import com.cn.langujet.domain.order.model.OrderDetailEntity

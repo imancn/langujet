@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.result.model
 
-import com.cn.langujet.application.shared.entity.HistoricalEntity
+import com.cn.langujet.application.arch.models.Historical
 import com.cn.langujet.domain.correction.model.CorrectionStatus
 import com.cn.langujet.domain.correction.model.CorrectorType
 import com.cn.langujet.domain.exam.model.enums.SectionType
@@ -35,4 +35,4 @@ class SectionResultEntity(
     var score: Double?,
     var recommendation: String?,
     var attachmentFileId: String?
-): HistoricalEntity()
+) : Historical()

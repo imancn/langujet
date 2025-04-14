@@ -1,6 +1,6 @@
 package com.cn.langujet.application.config.security.handler
 
-import com.cn.langujet.application.advice.ErrorMessageResponse
+import com.cn.langujet.application.arch.advice.ErrorMessageResponse
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse

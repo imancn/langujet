@@ -1,19 +1,24 @@
 package com.cn.langujet.domain.correction.service
 
 import com.cn.langujet.actor.correction.payload.dto.CorrectAnswerListDTO
-import com.cn.langujet.application.advice.InvalidInputException
-import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.application.arch.advice.InvalidInputException
+import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.domain.correction.model.CorrectAnswerEntity
 import com.cn.langujet.domain.correction.repository.CorrectAnswerCustomRepository
 import com.cn.langujet.domain.correction.repository.CorrectAnswerRepository
+import com.cn.langujet.domain.exam.service.PartService
+import com.cn.langujet.domain.exam.service.QuestionService
 import com.cn.langujet.domain.exam.service.SectionService
+import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.stereotype.Service
 
 @Service
 class CorrectAnswerService(
     private val repository: CorrectAnswerRepository,
     private val customRepository: CorrectAnswerCustomRepository,
-    private val sectionService: SectionService
+    private val sectionService: SectionService,
+    private val partService: PartService,
+    private val questionService: QuestionService
 ) {
     fun createCorrectAnswer(request: CorrectAnswerListDTO): CorrectAnswerListDTO {
         request.answers?.forEach { it.id = null }
@@ -59,10 +64,18 @@ class CorrectAnswerService(
         val existingCorrectAnswers = getSectionCorrectAnswers(section.examId, section.order)
         
         request.answers?.forEach { correctAnswer ->
-            val part = section.parts.find { part -> part.order == correctAnswer.partOrder }
-                ?: throw UnprocessableException("There is no part with order: ${correctAnswer.partOrder}")
+            val part = partService.find(
+                Criteria.where("examId").`is`(section.examId)
+                    .and("sectionId").`is`(section.id)
+                    .and("order").`is`(correctAnswer.partOrder)
+            ).firstOrNull() ?: throw UnprocessableException("There is no part with order: ${correctAnswer.partOrder}")
             
-            part.getQuestions().find { question -> question.order == correctAnswer.questionOrder }
+            val question = questionService.find(
+                Criteria.where("examId").`is`(section.examId)
+                    .and("sectionId").`is`(section.id)
+                    .and("partId").`is`(part.id)
+                    .and("questionOrder").`is`(correctAnswer.questionOrder)
+            ).firstOrNull()
                 ?: throw UnprocessableException("There is no question with part order: ${correctAnswer.partOrder} and question order ${correctAnswer.questionOrder}")
             
             if (correctAnswer.id == null) { /// just for create

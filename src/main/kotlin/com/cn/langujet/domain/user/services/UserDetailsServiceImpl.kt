@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.user.services
 
-import com.cn.langujet.application.advice.InvalidCredentialException
+import com.cn.langujet.application.arch.advice.InvalidCredentialException
 import com.cn.langujet.domain.user.model.UserDetailsImpl
 import com.cn.langujet.domain.user.repository.UserRepository
 import org.springframework.security.core.userdetails.UserDetailsService

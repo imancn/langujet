@@ -3,7 +3,7 @@ package com.cn.langujet.domain.coupon
 import com.cn.langujet.actor.coupon.payload.response.ActiveCouponsResponse
 import com.cn.langujet.actor.coupon.payload.response.VerifyUserCoupon
 import com.cn.langujet.actor.util.Auth
-import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.domain.campaign.CampaignService
 import com.cn.langujet.domain.user.services.UserService
 import org.springframework.stereotype.Service

@@ -1,7 +1,7 @@
 package com.cn.langujet.domain.user.services
 
-import com.cn.langujet.application.advice.InvalidCredentialException
-import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.application.arch.advice.InvalidCredentialException
+import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.domain.correction.model.CorrectorType
 import com.cn.langujet.domain.user.model.Role
 import com.cn.langujet.domain.user.model.UserDetailsImpl

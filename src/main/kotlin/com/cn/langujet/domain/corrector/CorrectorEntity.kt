@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.corrector
 
-import com.cn.langujet.application.shared.entity.LogEntity
+import com.cn.langujet.application.arch.models.Log
 import com.cn.langujet.domain.user.model.UserEntity
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
@@ -17,7 +17,7 @@ data class CorrectorEntity(
     var fullName: String,
     var ieltsScore: Double,
     var biography: String?,
-): LogEntity() {
+) : Log() {
     constructor(user: UserEntity, fullName: String, ieltsScore: Double) : this(
         null,
         user,

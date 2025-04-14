@@ -1,6 +1,6 @@
 package com.cn.langujet.actor.util.models
 
-import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.application.arch.advice.UnprocessableException
 import org.springframework.data.domain.Page
 
 data class CustomPage<T>(

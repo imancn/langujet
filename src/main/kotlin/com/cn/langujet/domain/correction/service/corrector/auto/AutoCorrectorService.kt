@@ -5,10 +5,13 @@ import com.cn.langujet.domain.correction.service.CorrectAnswerService
 import com.cn.langujet.domain.exam.model.ExamSessionEntity
 import com.cn.langujet.domain.exam.model.enums.SectionType
 import com.cn.langujet.domain.exam.service.ExamService
+import com.cn.langujet.domain.exam.service.PartService
+import com.cn.langujet.domain.exam.service.QuestionService
 import com.cn.langujet.domain.exam.service.SectionService
 import com.cn.langujet.domain.result.model.SectionResultEntity
 import com.cn.langujet.domain.result.service.SectionResultService
 import com.rollbar.notifier.Rollbar
+import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.stereotype.Service
 
 @Service
@@ -19,6 +22,8 @@ class AutoCorrectorService(
     private val rollbar: Rollbar,
     private val correctAnswerService: CorrectAnswerService,
     private val sectionService: SectionService,
+    private val partService: PartService,
+    private val questionService: QuestionService,
 ) {
     fun correctExamSection(
         examSession: ExamSessionEntity, resultId: String, sectionOrder: Int, sectionType: SectionType
@@ -30,7 +35,10 @@ class AutoCorrectorService(
         try {
             val correctIssuesCount = AutoCorrectionUtil.getCorrectionScore(answers, correctAnswers)
             val score = AutoCorrectionUtil.calculateScore(correctIssuesCount, sectionType, exam.type)
-            val recommendation = AutoCorrectionUtil.generateSectionResultMd(section, answers, correctAnswers)
+            val parts = partService.find(Criteria.where("sectionId").`is`(section.id))
+            val questions = questionService.find(Criteria.where("sectionId").`is`(section.id))
+            val recommendation =
+                AutoCorrectionUtil.generateSectionResultMd(section, parts, questions, answers, correctAnswers)
             return sectionResultService.addAutoCorrectionSectionResult(
                 resultId = resultId,
                 examSessionId = examSession.id ?: "",

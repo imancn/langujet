@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.campaign
 
-import com.cn.langujet.application.shared.entity.HistoricalEntity
+import com.cn.langujet.application.arch.models.Historical
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
@@ -18,4 +18,4 @@ data class CampaignEntity(
     var active: Boolean = false,
     var tag: String? = null,
     var description: String? = null,
-): HistoricalEntity()
+) : Historical()

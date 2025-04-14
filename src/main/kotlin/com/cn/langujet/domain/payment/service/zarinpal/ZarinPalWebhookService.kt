@@ -1,7 +1,7 @@
 package com.cn.langujet.domain.payment.service.zarinpal
 
 import com.cn.langujet.actor.util.Auth
-import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.domain.order.service.OrderService
 import com.cn.langujet.domain.payment.model.PaymentStatus
 import com.cn.langujet.domain.payment.model.PaymentType

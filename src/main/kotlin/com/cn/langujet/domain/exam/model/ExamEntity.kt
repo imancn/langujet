@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.exam.model
 
-import com.cn.langujet.application.shared.entity.HistoricalEntity
+import com.cn.langujet.application.arch.models.Historical
 import com.cn.langujet.domain.exam.model.enums.ExamMode
 import com.cn.langujet.domain.exam.model.enums.ExamType
 import org.springframework.data.annotation.Id
@@ -33,4 +33,4 @@ data class ExamEntity(
     var examDuration: Long, // Seconds
     @Indexed(name = "active_index")
     var active: Boolean
-): HistoricalEntity()
+) : Historical()

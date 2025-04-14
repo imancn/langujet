@@ -1,7 +1,7 @@
 package com.cn.langujet.domain.answer
 
 import com.cn.langujet.actor.answer.payload.request.*
-import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.application.service.file.domain.data.model.FileBucket
 import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.answer.model.AnswerEntity

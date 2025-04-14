@@ -3,8 +3,8 @@ package com.cn.langujet.domain.exam.service
 import com.cn.langujet.actor.exam.payload.ExamDTO
 import com.cn.langujet.actor.util.models.CustomPage
 import com.cn.langujet.actor.util.models.toCustomPage
-import com.cn.langujet.application.advice.InvalidInputException
-import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.application.arch.advice.InvalidInputException
+import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.domain.exam.model.ExamEntity
 import com.cn.langujet.domain.exam.repository.ExamRepository
 import org.springframework.data.domain.PageRequest

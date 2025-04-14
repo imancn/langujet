@@ -1,11 +1,11 @@
-package com.cn.langujet.application.shared.entity
+package com.cn.langujet.application.arch.models
 
 import com.cn.langujet.actor.util.Auth
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.annotation.LastModifiedDate
 import java.util.*
 
-open class HistoricalEntity: LogEntity() {
+abstract class Historical : Log() {
     @field:LastModifiedBy
     var updatedBy: String = "undefined"
     @field:LastModifiedDate
@@ -13,8 +13,10 @@ open class HistoricalEntity: LogEntity() {
     
     fun updateLog() {
         this.also {
+            updatedBy = userId()
             updatedAt = Date()
-            updatedBy = Auth.userId()
         }
     }
+    
+    private fun userId() = Auth.userId()
 }

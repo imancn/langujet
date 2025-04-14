@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.exam.model
 
-import com.cn.langujet.application.shared.entity.HistoricalEntity
+import com.cn.langujet.application.arch.models.Historical
 import com.cn.langujet.domain.correction.model.CorrectorType
 import com.cn.langujet.domain.exam.model.enums.ExamMode
 import com.cn.langujet.domain.exam.model.enums.ExamSessionState
@@ -37,7 +37,7 @@ data class ExamSessionEntity(
     var startDate: Date?,
     var endDate: Date?,
     var correctionDate: Date?,
-): HistoricalEntity() {
+) : Historical() {
     constructor(
         studentUserId: String,
         examId: String,

@@ -2,7 +2,7 @@ package com.cn.langujet.domain.corrector
 
 import com.cn.langujet.actor.corrector.payload.response.CorrectorProfileResponse
 import com.cn.langujet.actor.util.Auth
-import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.application.arch.advice.UnprocessableException
 import org.springframework.stereotype.Service
 
 @Service

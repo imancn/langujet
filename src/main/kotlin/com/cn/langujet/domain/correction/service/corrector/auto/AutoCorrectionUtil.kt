@@ -1,11 +1,13 @@
 package com.cn.langujet.domain.correction.service.corrector.auto
 
-import com.cn.langujet.application.advice.InternalServerError
+import com.cn.langujet.application.arch.advice.InternalServerError
 import com.cn.langujet.domain.answer.model.AnswerEntity
 import com.cn.langujet.domain.correction.model.CorrectAnswerEntity
 import com.cn.langujet.domain.exam.model.enums.ExamType
-import com.cn.langujet.domain.exam.model.section.SectionEntity
 import com.cn.langujet.domain.exam.model.enums.SectionType
+import com.cn.langujet.domain.exam.model.section.SectionEntity
+import com.cn.langujet.domain.exam.model.section.part.PartEntity
+import com.cn.langujet.domain.exam.model.section.part.questions.QuestionEntity
 
 class AutoCorrectionUtil {
     companion object {
@@ -170,6 +172,8 @@ class AutoCorrectionUtil {
         
         fun generateSectionResultMd(
             section: SectionEntity,
+            parts: List<PartEntity>,
+            questions: List<QuestionEntity>,
             answers: List<AnswerEntity>,
             correctAnswers: List<CorrectAnswerEntity>
         ): String {
@@ -178,8 +182,8 @@ class AutoCorrectionUtil {
             sb.append("- **Duration**: ${section.time} seconds\n\n")
             
             var questionNumber = 0
-            section.parts.forEach { part ->
-                part.getQuestions().forEach { question ->
+            parts.forEach { part ->
+                questions.filter { it.partId == part.id }.forEach { question ->
                     sb.append("### ${if (section.sectionType == SectionType.LISTENING) "Audio" else "Passage"} ${part.order} - Question ${question.order}\n")
                     sb.append("- **Type**: ${question.questionType.title()}\n")
                     sb.append("- **Header**: ${question.header.split("\n").first()}\n")

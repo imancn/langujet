@@ -2,7 +2,7 @@ package com.cn.langujet.domain.student.service
 
 import com.cn.langujet.actor.student.payload.response.StudentProfileResponse
 import com.cn.langujet.actor.util.Auth
-import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.domain.student.model.StudentEntity
 import com.cn.langujet.domain.student.repository.StudentRepository
 import org.springframework.stereotype.Service

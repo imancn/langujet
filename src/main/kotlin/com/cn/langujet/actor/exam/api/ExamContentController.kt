@@ -1,8 +1,8 @@
 package com.cn.langujet.actor.exam.api
 
-import com.cn.langujet.actor.exam.payload.ExamSectionContentDownloadLink
-import com.cn.langujet.domain.exam.model.ExamSectionContentEntity
-import com.cn.langujet.domain.exam.service.ExamSectionContentService
+import com.cn.langujet.actor.exam.payload.ExamContentDownloadLink
+import com.cn.langujet.domain.exam.model.ExamContentEntity
+import com.cn.langujet.domain.exam.service.ExamContentService
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import org.springframework.security.access.prepost.PreAuthorize
@@ -13,37 +13,39 @@ import org.springframework.web.multipart.MultipartFile
 @RestController
 @RequestMapping("api/v1")
 @Validated
-class ExamSectionContentController(
-    private val examSectionContentService: ExamSectionContentService
+class ExamContentController(
+    private val examContentService: ExamContentService
 ) {
-    @PostMapping("admin/exam-section-contents")
+    @PostMapping("admin/exam-contents")
     @PreAuthorize("hasRole('ADMIN')")
-    fun uploadExamSectionContent(
+    fun uploadExamContent(
         @RequestParam @NotBlank examId: String?,
         @RequestParam @NotNull sectionOrder: Int?,
+        @RequestParam @NotNull partOrder: Int?,
+        @RequestParam @NotNull questionOrder: Int?,
         @RequestParam("file") file: MultipartFile
-    ): ExamSectionContentEntity {
-        return examSectionContentService.uploadExamSectionContent(examId!!, sectionOrder!!, file)
+    ): ExamContentEntity {
+        return examContentService.uploadExamContent(file, examId!!, sectionOrder, partOrder, questionOrder)
     }
-
-    @GetMapping("/admin/exam-section-contents/download-links")
+    
+    @GetMapping("/admin/exam-contents/download-links")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    fun getAdminExamSectionContentDownloadLink(
+    fun getAdminExamContentDownloadLink(
         @RequestParam examId: @NotBlank String?,
         @RequestParam sectionOrder: @NotNull Int?
-    ): List<ExamSectionContentDownloadLink> {
-        return examSectionContentService.getAdminExamSectionContentDownloadLink(
+    ): List<ExamContentDownloadLink> {
+        return examContentService.getAdminExamContentDownloadLink(
             examId!!, sectionOrder!!
         )
     }
-
-    @GetMapping("/student/exam-section-contents/download-links")
+    
+    @GetMapping("/student/exam-contents/download-links")
     @PreAuthorize("hasAnyRole('STUDENT')")
-    fun getStudentExamSectionContentDownloadLink(
+    fun getStudentExamContentDownloadLink(
         @RequestParam examSessionId: @NotBlank String?,
         @RequestParam sectionOrder: @NotNull Int?
-    ): List<ExamSectionContentDownloadLink> {
-        return examSectionContentService.getStudentExamSectionContentDownloadLink(
+    ): List<ExamContentDownloadLink> {
+        return examContentService.getStudentExamContentDownloadLink(
             examSessionId!!, sectionOrder!!
         )
     }

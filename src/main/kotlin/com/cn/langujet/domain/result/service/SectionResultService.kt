@@ -2,8 +2,8 @@ package com.cn.langujet.domain.result.service
 
 import com.cn.langujet.actor.result.payload.request.SubmitCorrectorSectionResultRequest
 import com.cn.langujet.actor.util.Auth
-import com.cn.langujet.application.advice.InternalServerError
-import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.application.arch.advice.InternalServerError
+import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.application.service.file.domain.data.model.FileBucket
 import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.correction.model.CorrectionStatus

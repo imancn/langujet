@@ -3,8 +3,8 @@ package com.cn.langujet.domain.result.service
 import com.cn.langujet.actor.result.payload.request.SubmitCorrectorResultRequest
 import com.cn.langujet.actor.result.payload.response.DetailedResultResponse
 import com.cn.langujet.actor.util.Auth
-import com.cn.langujet.application.advice.InvalidCredentialException
-import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.application.arch.advice.InvalidCredentialException
+import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.correction.model.CorrectionStatus
 import com.cn.langujet.domain.correction.model.CorrectorType

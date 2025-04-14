@@ -3,8 +3,8 @@ package com.cn.langujet.domain.exam.service
 import com.cn.langujet.actor.exam.payload.*
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.actor.util.models.CustomPage
-import com.cn.langujet.application.advice.InvalidCredentialException
-import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.application.arch.advice.InvalidCredentialException
+import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.application.service.smtp.MailSenderService
 import com.cn.langujet.domain.correction.service.CorrectionService
 import com.cn.langujet.domain.exam.model.ExamSessionEntity
@@ -15,6 +15,7 @@ import com.cn.langujet.domain.service.model.ServiceEntity
 import com.cn.langujet.domain.service.service.ServiceService
 import com.cn.langujet.domain.student.service.StudentService
 import com.cn.langujet.domain.user.services.UserService
+import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -29,7 +30,9 @@ class ExamSessionService(
     private val serviceService: ServiceService,
     private val userService: UserService,
     private val mailSenderService: MailSenderService,
-    private val studentService: StudentService
+    private val studentService: StudentService,
+    private val partService: PartService,
+    private val questionService: QuestionService
 ) {
     fun getExamSessionById(id: String): ExamSessionEntity {
         return examSessionRepository.findById(id).orElseThrow {
@@ -127,7 +130,14 @@ class ExamSessionService(
                 it.state = ExamSessionState.STARTED
             })
         }
-        return SectionDTO(section).also { it.id = null; it.examId = null }
+        val criteria = Criteria.where("sectionId").`is`(section.id)
+        val parts = partService.find(criteria)
+        val questions = questionService.find(criteria)
+        return SectionDTO(
+            section = section,
+            parts = parts,
+            questions = questions
+        ).also { it.id = null; it.examId = null }
     }
     
     fun finishExamSession(examSessionId: String): ExamSessionFinishResponse {

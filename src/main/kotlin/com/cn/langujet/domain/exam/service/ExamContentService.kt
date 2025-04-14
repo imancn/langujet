@@ -1,14 +1,14 @@
 package com.cn.langujet.domain.exam.service
 
-import com.cn.langujet.actor.exam.payload.ExamSectionContentDownloadLink
+import com.cn.langujet.actor.exam.payload.ExamContentDownloadLink
 import com.cn.langujet.actor.util.Auth
-import com.cn.langujet.application.advice.InternalServerError
-import com.cn.langujet.application.advice.InvalidCredentialException
-import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.application.arch.advice.InternalServerError
+import com.cn.langujet.application.arch.advice.InvalidCredentialException
+import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.application.service.file.domain.data.model.FileBucket
 import com.cn.langujet.application.service.file.domain.service.FileService
-import com.cn.langujet.domain.exam.model.ExamSectionContentEntity
-import com.cn.langujet.domain.exam.repository.ExamSectionContentRepository
+import com.cn.langujet.domain.exam.model.ExamContentEntity
+import com.cn.langujet.domain.exam.repository.ExamContentRepository
 import com.cn.langujet.domain.exam.repository.ExamSessionRepository
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -16,58 +16,65 @@ import java.util.regex.Pattern
 import kotlin.jvm.optionals.getOrNull
 
 @Service
-class ExamSectionContentService(
-    private val examSectionContentRepository: ExamSectionContentRepository,
+class ExamContentService(
+    private val examContentRepository: ExamContentRepository,
     private val examSessionRepository: ExamSessionRepository,
     private val sectionService: SectionService,
     private val examService: ExamService,
     private val fileService: FileService
 ) {
-    fun uploadExamSectionContent(examId: String, sectionOrder: Int, file: MultipartFile): ExamSectionContentEntity {
+    fun uploadExamContent(
+        file: MultipartFile,
+        examId: String,
+        sectionOrder: Int?,
+        partOrder: Int?,
+        questionOrder: Int?
+    ): ExamContentEntity {
         sectionService.getSectionsByExamId(examId).find {
             it.order == sectionOrder
         } ?: throw UnprocessableException("Section not found")
 
         val fileEntity = fileService.uploadFile(file, FileBucket.EXAM_CONTENTS)
-
-        return examSectionContentRepository.save(
-            ExamSectionContentEntity(
-                null,
+        
+        return examContentRepository.save(
+            ExamContentEntity(
                 examId,
                 sectionOrder,
+                partOrder,
+                questionOrder,
                 fileEntity.id ?: throw InternalServerError("Upload Failed")
             )
         )
     }
-
-    fun getAdminExamSectionContentDownloadLink(
+    
+    fun getAdminExamContentDownloadLink(
         examId: String,
         sectionOrder: Int
-    ): List<ExamSectionContentDownloadLink> {
+    ): List<ExamContentDownloadLink> {
         val exam = examService.getExamById(examId)
-        val examSectionContents = examSectionContentRepository.findAllByExamIdAndSectionOrder(exam.id ?: "", sectionOrder)
+        val examSectionContents = examContentRepository.findAllByExamIdAndSectionOrder(exam.id ?: "", sectionOrder)
 
         return examSectionContents.map {
-            ExamSectionContentDownloadLink(
+            ExamContentDownloadLink(
                 fileId = it.fileId,
                 link = fileService.generatePublicDownloadLink(it.fileId, 86400)
             )
         }
     }
-
-    fun getStudentExamSectionContentDownloadLink(
+    
+    fun getStudentExamContentDownloadLink(
         examSessionId: String,
         sectionOrder: Int
-    ): List<ExamSectionContentDownloadLink> {
+    ): List<ExamContentDownloadLink> {
         val examSession = examSessionRepository.findById(examSessionId).getOrNull() ?: return emptyList()
         if (Auth.userId() != examSession.studentUserId) {
             throw InvalidCredentialException("Exam Session with id: $examSessionId is not belong to your token")
         }
         val exam = examService.getExamById(examSession.examId)
-        val examSectionContents = examSectionContentRepository.findAllByExamIdAndSectionOrder(exam.id ?: "", sectionOrder)
+        val examSectionContents = examContentRepository.findAllByExamIdAndSectionOrder(exam.id ?: "", sectionOrder)
 
         return examSectionContents.map {
-            ExamSectionContentDownloadLink(
+            ExamContentDownloadLink(
                 fileId = it.fileId,
                 link = fileService.generatePublicDownloadLink(it.fileId, exam.examDuration.toInt())
             )

@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.payment.model
 
-import com.cn.langujet.application.shared.entity.HistoricalEntity
+import com.cn.langujet.application.arch.models.Historical
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
@@ -15,7 +15,7 @@ sealed class PaymentEntity(
     var paymentType: PaymentType,
     var amount: Double,
     var link: String
-): HistoricalEntity()
+) : Historical()
 
 @Document(collection = "payments")
 @TypeAlias("stripe_payments")

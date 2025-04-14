@@ -1,11 +1,11 @@
 package com.cn.langujet.domain.order.model
 
-import com.cn.langujet.application.shared.entity.HistoricalEntity
+import com.cn.langujet.application.arch.models.Historical
 import com.cn.langujet.domain.payment.model.PaymentType
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
-import java.util.Date
+import java.util.*
 
 @Document(collection = "orders")
 @TypeAlias("orders")
@@ -20,4 +20,4 @@ class OrderEntity(
     var totalPrice: Double,
     var finalPrice: Double,
     var date: Date
-): HistoricalEntity()
+) : Historical()

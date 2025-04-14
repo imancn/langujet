@@ -1,6 +1,6 @@
 package com.cn.langujet.application.service.smtp
 
-import com.cn.langujet.application.advice.InternalServerError
+import com.cn.langujet.application.arch.advice.InternalServerError
 import com.cn.langujet.domain.user.model.EmailVerificationTokenEntity
 import com.cn.langujet.domain.user.model.ResetPasswordTokenEntity
 import org.slf4j.LoggerFactory

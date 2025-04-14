@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.coupon
 
-import com.cn.langujet.application.shared.entity.HistoricalEntity
+import com.cn.langujet.application.arch.models.Historical
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.index.Indexed
@@ -17,4 +17,4 @@ data class CouponEntity(
     var amount: Double,
     var percentage: Int,
     var active: Boolean = true,
-): HistoricalEntity()
+) : Historical()

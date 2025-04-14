@@ -5,7 +5,7 @@ import com.cn.langujet.actor.correction.payload.request.AssignCorrectionToCorrec
 import com.cn.langujet.actor.correction.payload.request.AssignSpecificCorrectionToCorrectorRequest
 import com.cn.langujet.actor.correction.payload.response.*
 import com.cn.langujet.actor.util.Auth
-import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.answer.AnswerRepository
 import com.cn.langujet.domain.answer.model.AnswerEntity
@@ -15,19 +15,19 @@ import com.cn.langujet.domain.correction.repository.CorrectAnswerRepository
 import com.cn.langujet.domain.correction.service.corrector.auto.AutoCorrectorService
 import com.cn.langujet.domain.corrector.CorrectorService
 import com.cn.langujet.domain.exam.model.ExamSessionEntity
-import com.cn.langujet.domain.exam.model.section.part.SpeakingPart
-import com.cn.langujet.domain.exam.model.section.part.WritingPart
-import com.cn.langujet.domain.exam.service.ExamSectionContentService
-import com.cn.langujet.domain.exam.service.ExamSessionService
-import com.cn.langujet.domain.exam.service.SectionService
+import com.cn.langujet.domain.exam.model.section.part.SpeakingPartEntity
+import com.cn.langujet.domain.exam.model.section.part.WritingPartEntity
+import com.cn.langujet.domain.exam.model.section.part.questions.SpeakingQuestionEntity
+import com.cn.langujet.domain.exam.model.section.part.questions.WritingQuestionEntity
+import com.cn.langujet.domain.exam.service.*
 import com.cn.langujet.domain.result.model.ResultEntity
 import com.cn.langujet.domain.result.service.ResultService
 import com.cn.langujet.domain.result.service.SectionResultService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
+import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.stereotype.Service
-import java.util.*
 
 @Service
 class CorrectionService(
@@ -36,11 +36,17 @@ class CorrectionService(
     private val sectionService: SectionService,
     private val correctorService: CorrectorService,
     private val answerRepository: AnswerRepository,
-    private val examSectionContentService: ExamSectionContentService,
+    private val examContentService: ExamContentService,
     private val fileService: FileService,
     private val resultService: ResultService,
     private val sectionResultService: SectionResultService,
 ) {
+    @Autowired
+    private lateinit var questionService: QuestionService
+    
+    @Autowired
+    private lateinit var partService: PartService
+    
     @Autowired @Lazy
     private lateinit var examSessionService: ExamSessionService
     
@@ -198,29 +204,42 @@ class CorrectionService(
         )
         val examSession = examSessionService.getExamSessionById(result.examSessionId)
         val section = sectionService.getSectionByExamIdAndOrder(examSession.examId, sectionResult.sectionOrder)
+        val parts = partService.find(
+            Criteria.where("examId").`is`(section.examId).and("sectionId").`is`(section.id)
+        )
         return CorrectorCorrectionExamSessionContentResponse(
             examSessionId = result.examSessionId, section = CorrectorCorrectionSectionResponse(header = section.header,
             sectionOrder = section.order,
             sectionType = section.sectionType,
-            parts = section.parts.mapNotNull { part ->
-                when (part) {
-                    is WritingPart -> WritingCorrectorCorrectionPartResponse(
-                        partOrder = part.order,
-                        question = WritingCorrectorCorrectionQuestionResponse(header = part.question.header,
-                            content = part.question.content?.let { content ->
-                                examSectionContentService.replaceFileIdsWithDownloadLink(content)
-                            }),
-                        answer = answers.filterIsInstance<AnswerEntity.TextAnswerEntity>().find { answer ->
-                            (answer.partOrder == part.order) && (answer.questionOrder == part.question.order)
-                        }?.let { existingAnswer ->
-                            TextCorrectorCorrectionAnswerResponse(
-                                text = existingAnswer.text
-                            )
-                        }
+                parts = parts.mapNotNull { part ->
+                    val questions = questionService.find(
+                        Criteria.where("examId").`is`(section.examId)
+                            .and("sectionId").`is`(section.id)
+                            .and("partId").`is`(part.id)
                     )
-                    is SpeakingPart -> SpeakingCorrectorCorrectionPartResponse(
+                when (part) {
+                    is WritingPartEntity -> {
+                        val question = questions.first() as WritingQuestionEntity
+                        WritingCorrectorCorrectionPartResponse(
+                            partOrder = part.order,
+                            question = WritingCorrectorCorrectionQuestionResponse(
+                                header = question.header,
+                                content = question.content?.let { content ->
+                                    examContentService.replaceFileIdsWithDownloadLink(content)
+                                }),
+                            answer = answers.filterIsInstance<AnswerEntity.TextAnswerEntity>().find { answer ->
+                                (answer.partOrder == part.order) && (answer.questionOrder == question.order)
+                            }?.let { existingAnswer ->
+                                TextCorrectorCorrectionAnswerResponse(
+                                    text = existingAnswer.text
+                                )
+                            }
+                        )
+                    }
+                    
+                    is SpeakingPartEntity -> SpeakingCorrectorCorrectionPartResponse(
                         partOrder = part.order,
-                        questionAnswerList = part.questionList.map { question ->
+                        questionAnswerList = questions.map { it as SpeakingQuestionEntity }.map { question ->
                             SpeakingCorrectorCorrectionQuestionAnswerResponse(
                                 questionOrder = question.order,
                                 question = SpeakingCorrectorCorrectionQuestionResponse(header = question.header,

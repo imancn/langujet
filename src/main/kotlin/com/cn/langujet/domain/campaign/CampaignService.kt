@@ -1,7 +1,7 @@
 package com.cn.langujet.domain.campaign
 
 import com.cn.langujet.actor.campaign.CreateCampaignRequest
-import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.application.arch.advice.UnprocessableException
 import org.springframework.stereotype.Service
 import kotlin.jvm.optionals.getOrNull
 import kotlin.jvm.optionals.toList

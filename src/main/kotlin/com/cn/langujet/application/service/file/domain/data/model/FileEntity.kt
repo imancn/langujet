@@ -1,6 +1,6 @@
 package com.cn.langujet.application.service.file.domain.data.model
 
-import com.cn.langujet.application.shared.entity.LogEntity
+import com.cn.langujet.application.arch.models.Log
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
@@ -15,7 +15,7 @@ data class FileEntity(
     var bucket: FileBucket,
     var contentType: String,
     var size: Long,
-): LogEntity() {
+) : Log() {
     fun getObjectName() = "${id}.${extension}"
     fun getBucketName() = bucket.bucketName
 }

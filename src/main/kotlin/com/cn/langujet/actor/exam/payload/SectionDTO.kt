@@ -1,39 +1,44 @@
 package com.cn.langujet.actor.exam.payload
 
-import com.cn.langujet.domain.exam.model.section.SectionEntity
 import com.cn.langujet.domain.exam.model.enums.SectionType
+import com.cn.langujet.domain.exam.model.section.SectionEntity
+import com.cn.langujet.domain.exam.model.section.part.PartEntity
+import com.cn.langujet.domain.exam.model.section.part.questions.QuestionEntity
 import com.fasterxml.jackson.annotation.JsonInclude
 
 data class SectionDTO(
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     var id: String? = null,
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
-    var examId: String? = null,
-    var header: String? = null,
-    var sectionOrder: Int? = null,
-    var sectionType: SectionType? = null,
-    var parts: List<PartDTO>? = null,
-    var time: Long? = null
+    var examId: String?,
+    var header: String,
+    var sectionOrder: Int,
+    var sectionType: SectionType,
+    var parts: List<PartDTO>,
+    var time: Long
 ) {
     fun toSection(): SectionEntity {
         return SectionEntity(
             this.id,
             this.examId!!,
-            this.header!!,
-            this.sectionOrder!!,
-            this.sectionType!!,
-            this.parts?.map { it.toPart() }!!,
-            this.time!!
+            this.header,
+            this.sectionOrder,
+            this.sectionType,
+            this.time
         )
     }
-
-    constructor(section: SectionEntity) : this(
+    
+    constructor(section: SectionEntity, parts: List<PartEntity>, questions: List<QuestionEntity>) : this(
         section.id,
         section.examId,
         section.header,
         section.order,
         section.sectionType,
-        section.parts.map { PartDTO.from(it) },
+        questions.groupBy { question ->
+            question.partId
+        }.mapNotNull { (partId, questions) ->
+            parts.find { part -> part.id == partId }?.let { PartDTO.from(it, questions) }
+        },
         section.time
     )
 }

@@ -1,4 +1,4 @@
-package com.cn.langujet.application.advice
+package com.cn.langujet.application.arch.advice
 
 import com.rollbar.notifier.Rollbar
 import org.slf4j.LoggerFactory

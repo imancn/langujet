@@ -1,19 +1,23 @@
 package com.cn.langujet.domain.exam.service
 
-import com.cn.langujet.application.advice.UnprocessableException
+import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.domain.correction.service.CorrectAnswerService
-import com.cn.langujet.domain.exam.model.*
+import com.cn.langujet.domain.exam.model.ExamEntity
 import com.cn.langujet.domain.exam.model.enums.ExamType
 import com.cn.langujet.domain.exam.model.enums.SectionType
 import com.cn.langujet.domain.exam.model.section.SectionEntity
 import com.cn.langujet.domain.exam.repository.SectionRepository
+import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.stereotype.Service
 
 @Service
 class ExamValidatorService(
     private val sectionRepository: SectionRepository,
-    private val correctAnswerService: CorrectAnswerService
+    private val correctAnswerService: CorrectAnswerService,
+    private val questionService: QuestionService,
+    private val partService: PartService
 ) {
+    
     fun validate(exam: ExamEntity) {
         val sections = sectionRepository.findAllByExamId(exam.id ?: "")
         validateSections(exam, sections)
@@ -41,7 +45,8 @@ class ExamValidatorService(
     }
     
     private fun validateSectionParts(section: SectionEntity) {
-        val partsOrders = section.parts.map { it.order }
+        val parts = partService.find(Criteria("sectionId").`is`(section.id))
+        val partsOrders = parts.map { it.order }
         if (partsOrders.size != partsOrders.distinct().size) {
             throw UnprocessableException("Duplicate part orders must be removed for sectionOrder: ${section.order}")
         }
@@ -51,8 +56,10 @@ class ExamValidatorService(
     }
     
     private fun validateSectionPartQuestions(section: SectionEntity) {
-        section.parts.forEach { part ->
-            val questionOrders = part.getQuestions().map { it.order }
+        val parts = partService.find(Criteria("sectionId").`is`(section.id))
+        val questions = questionService.find(Criteria("sectionId").`is`(section.id))
+        parts.forEach { part ->
+            val questionOrders = questions.filter { it.partId == part.id }.map { it.order }
             if (questionOrders.size != questionOrders.distinct().size) {
                 throw UnprocessableException("Duplicate question orders must be removed for sectionOrder: ${section.order}, partOrder: ${part.order}")
             }
@@ -65,8 +72,10 @@ class ExamValidatorService(
     private fun validateCorrectAnswers(section: SectionEntity, examType: ExamType) {
         if (arrayOf(ExamType.IELTS_GENERAL, ExamType.IELTS_ACADEMIC).contains(examType) and arrayOf(SectionType.READING, SectionType.LISTENING).contains(section.sectionType)) {
             val correctAnswers = correctAnswerService.getSectionCorrectAnswers(section.examId, section.order)
-            section.parts.forEach { part ->
-                part.getQuestions().forEach { question ->
+            val parts = partService.find(Criteria("sectionId").`is`(section.id))
+            val questions = questionService.find(Criteria("sectionId").`is`(section.id))
+            parts.forEach { part ->
+                questions.filter { it.partId == part.id }.forEach { question ->
                     correctAnswers.find { correctAnswer ->
                         correctAnswer.examId == section.examId &&
                             correctAnswer.sectionOrder == section.order &&
