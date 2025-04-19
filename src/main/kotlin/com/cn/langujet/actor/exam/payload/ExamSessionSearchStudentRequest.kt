@@ -1,6 +1,6 @@
 package com.cn.langujet.actor.exam.payload
 
-import com.cn.langujet.actor.util.models.DateInterval
+import com.cn.langujet.application.arch.controller.payload.request.DateIntervalRequest
 import com.cn.langujet.domain.correction.model.CorrectorType
 import com.cn.langujet.domain.exam.model.enums.ExamSessionState
 import com.cn.langujet.domain.exam.model.enums.ExamType
@@ -12,8 +12,8 @@ data class ExamSessionSearchStudentRequest(
     val examTypes: List<ExamType>?,
     val examName: String?,
     val correctorTypes: List<CorrectorType>?,
-    val startDateInterval: DateInterval?,
-    val correctionDateInterval: DateInterval?,
+    val startDateInterval: DateIntervalRequest?,
+    val correctionDateInterval: DateIntervalRequest?,
     @field:Positive val pageSize: Int,
     @field:PositiveOrZero val pageNumber: Int,
 )

@@ -4,8 +4,8 @@ import com.cn.langujet.actor.service.payload.GetAvailableExamServicesRequest
 import com.cn.langujet.actor.service.payload.GetAvailableExamServicesResponse
 import com.cn.langujet.actor.service.payload.ServiceRequest
 import com.cn.langujet.actor.util.Auth
-import com.cn.langujet.actor.util.models.CustomPage
-import com.cn.langujet.actor.util.models.paginate
+import com.cn.langujet.application.arch.controller.payload.response.PageResponse
+import com.cn.langujet.application.arch.controller.payload.response.paginate
 import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.domain.exam.service.ExamGeneratorService
 import com.cn.langujet.domain.service.model.ServiceEntity
@@ -43,7 +43,7 @@ class ServiceService(
         return serviceRepository.findAll()
     }
     
-    fun getAvailableExamServices(request: GetAvailableExamServicesRequest): CustomPage<GetAvailableExamServicesResponse> {
+    fun getAvailableExamServices(request: GetAvailableExamServicesRequest): PageResponse<GetAvailableExamServicesResponse> {
         val examServices = serviceRepository.findByTypeAndActiveOrderByOrder(ServiceType.EXAM, true)
             .filterIsInstance<ServiceEntity.ExamServiceEntity>()
         val availableServiceCount = examGeneratorService.countAvailableExamsForExamServices(

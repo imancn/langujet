@@ -1,7 +1,7 @@
 package com.cn.langujet.actor.exam.api
 
 import com.cn.langujet.actor.exam.payload.*
-import com.cn.langujet.actor.util.models.CustomPage
+import com.cn.langujet.application.arch.controller.payload.response.PageResponse
 import com.cn.langujet.domain.exam.service.ExamSessionService
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
@@ -34,7 +34,7 @@ class ExamSessionController(
     @PostMapping("/student/exam-sessions/search")
     fun searchStudentExamSessions(
         @RequestBody @Valid request: ExamSessionSearchStudentRequest
-    ): CustomPage<ExamSessionSearchResponse> {
+    ): PageResponse<ExamSessionSearchResponse> {
         return examSessionService.searchExamSessions(request)
     }
     
@@ -42,7 +42,7 @@ class ExamSessionController(
     @PostMapping("/admin/exam-sessions/search")
     fun searchStudentExamSessionsByAdmin(
         @RequestBody @Valid request: ExamSessionSearchAdminRequest
-    ): CustomPage<ExamSessionSearchResponse> {
+    ): PageResponse<ExamSessionSearchResponse> {
         return examSessionService.searchExamSessions(request)
     }
     

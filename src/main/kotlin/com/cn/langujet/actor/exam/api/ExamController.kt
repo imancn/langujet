@@ -1,7 +1,7 @@
 package com.cn.langujet.actor.exam.api
 
 import com.cn.langujet.actor.exam.payload.ExamDTO
-import com.cn.langujet.actor.util.models.CustomPage
+import com.cn.langujet.application.arch.controller.payload.response.PageResponse
 import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.domain.exam.service.ExamService
 import jakarta.validation.Valid
@@ -48,7 +48,7 @@ class ExamController(private val examService: ExamService) {
         @RequestParam @NotBlank name: String?,
         @RequestParam(defaultValue = "10") pageSize: Int,
         @RequestParam(defaultValue = "0") pageNumber: Int,
-    ): ResponseEntity<CustomPage<ExamDTO>> = toOkResponseEntity(
+    ): ResponseEntity<PageResponse<ExamDTO>> = toOkResponseEntity(
         examService.getAllExamsByName(
             name!!, PageRequest.of(pageNumber, pageSize)
         )

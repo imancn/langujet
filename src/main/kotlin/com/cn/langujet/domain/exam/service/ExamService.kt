@@ -1,8 +1,8 @@
 package com.cn.langujet.domain.exam.service
 
 import com.cn.langujet.actor.exam.payload.ExamDTO
-import com.cn.langujet.actor.util.models.CustomPage
-import com.cn.langujet.actor.util.models.toCustomPage
+import com.cn.langujet.application.arch.controller.payload.response.PageResponse
+import com.cn.langujet.application.arch.controller.payload.response.toCustomPage
 import com.cn.langujet.application.arch.advice.InvalidInputException
 import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.domain.exam.model.ExamEntity
@@ -52,7 +52,7 @@ class ExamService(
     
     fun getAllExamsByName(
         name: String, pageRequest: PageRequest
-    ): CustomPage<ExamDTO> {
+    ): PageResponse<ExamDTO> {
         return examRepository.findAllByNameContainingIgnoreCaseOrderByNameAsc(
             name, pageRequest
         ).map { ExamDTO(it) }.toCustomPage()

@@ -1,15 +1,30 @@
-package com.cn.langujet.application.arch.mongo.sequesnce
+package com.cn.langujet.application.arch.mongo
 
-import com.cn.langujet.application.arch.mongo.models.SequentialEntity
-import com.cn.langujet.application.arch.mongo.service.EntityService
+import com.cn.langujet.application.arch.models.entity.HistoricalEntity
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.data.mongodb.core.FindAndModifyOptions
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
+import org.springframework.stereotype.Service
 
-abstract class SequentialEntityService<T : SequentialEntity> : EntityService<Long, T>() {
-    override fun generateSequence(): Long {
+@Service
+class HistoricalEntityService<T : HistoricalEntity> : EntityService<T, Long>() {
+    
+    override fun create(entity: T): T {
+        entity.id(generateSequence())
+        return mongoOperations.save(entity)
+    }
+    
+    override fun createMany(entities: List<T>): List<T> {
+        return entities.map { create(it) }
+    }
+    
+    fun archive(entity: T): Boolean {
+        return update(entity.also { it.deleted = true }).id != null
+    }
+    
+    private fun generateSequence(): Long {
         var retryCount = 0
         val maxRetries = 5
         

@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.exam.model.section.part
 
-import com.cn.langujet.application.arch.mongo.models.SequentialEntity
+import com.cn.langujet.application.arch.models.entity.HistoricalEntity
 import com.cn.langujet.domain.exam.model.enums.SectionType
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
@@ -13,7 +13,7 @@ sealed class PartEntity(
     var sectionId: String,
     var order: Int,
     var type: SectionType,
-) : SequentialEntity(id = id)
+) : HistoricalEntity(id = id)
 
 @TypeAlias("reading_parts")
 @Document(collection = "parts")

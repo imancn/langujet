@@ -2,7 +2,7 @@ package com.cn.langujet.domain.exam.service
 
 import com.cn.langujet.actor.exam.payload.*
 import com.cn.langujet.actor.util.Auth
-import com.cn.langujet.actor.util.models.CustomPage
+import com.cn.langujet.application.arch.controller.payload.response.PageResponse
 import com.cn.langujet.application.arch.advice.InvalidCredentialException
 import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.application.service.smtp.MailSenderService
@@ -56,13 +56,13 @@ class ExamSessionService(
         return ExamSessionDetailsResponse(sections)
     }
     
-    fun searchExamSessions(request: ExamSessionSearchStudentRequest): CustomPage<ExamSessionSearchResponse> {
+    fun searchExamSessions(request: ExamSessionSearchStudentRequest): PageResponse<ExamSessionSearchResponse> {
         return examSessionCustomRepository.searchExamSessions(
             request, Auth.userId()
         )
     }
     
-    fun searchExamSessions(request: ExamSessionSearchAdminRequest): CustomPage<ExamSessionSearchResponse> {
+    fun searchExamSessions(request: ExamSessionSearchAdminRequest): PageResponse<ExamSessionSearchResponse> {
         return examSessionCustomRepository.searchExamSessions(
             ExamSessionSearchStudentRequest(
                 states = request.states,

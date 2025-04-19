@@ -3,7 +3,7 @@ package com.cn.langujet.actor.order
 import com.cn.langujet.actor.order.payload.*
 import com.cn.langujet.actor.order.payload.Currency
 import com.cn.langujet.actor.util.Auth
-import com.cn.langujet.actor.util.models.CustomPage
+import com.cn.langujet.application.arch.controller.payload.response.PageResponse
 import com.cn.langujet.domain.coupon.CouponService
 import com.cn.langujet.domain.order.model.OrderStatus
 import com.cn.langujet.domain.order.service.OrderService
@@ -38,7 +38,7 @@ class OrderController(
         @RequestParam orderStatus: OrderStatus?,
         @RequestParam pageNumber: Int,
         @RequestParam pageSize: Int,
-    ) : CustomPage<StudentOrderResponse> {
+    ) : PageResponse<StudentOrderResponse> {
         return orderService.getStudentOrders(
             orderStatus, pageNumber, pageSize
         )

@@ -38,6 +38,7 @@ class ExamContentService(
         
         return examContentRepository.save(
             ExamContentEntity(
+                null,
                 examId,
                 sectionOrder,
                 partOrder,

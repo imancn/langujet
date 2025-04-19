@@ -2,7 +2,7 @@ package com.cn.langujet.domain.order.service
 
 import com.cn.langujet.actor.order.payload.*
 import com.cn.langujet.actor.util.Auth
-import com.cn.langujet.actor.util.models.CustomPage
+import com.cn.langujet.application.arch.controller.payload.response.PageResponse
 import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.domain.coupon.CouponService
 import com.cn.langujet.domain.exam.service.ExamSessionService
@@ -151,7 +151,7 @@ class OrderService(
         }
     }
     
-    fun getStudentOrders(orderStatus: OrderStatus?, pageNumber: Int, pageSize: Int): CustomPage<StudentOrderResponse> {
+    fun getStudentOrders(orderStatus: OrderStatus?, pageNumber: Int, pageSize: Int): PageResponse<StudentOrderResponse> {
         val orders = if (orderStatus != null) {
             orderRepository.findAllByStudentUserIdAndStatusOrderByDateDesc(Auth.userId(), orderStatus, PageRequest.of(pageNumber, pageSize))
         } else {
@@ -159,7 +159,7 @@ class OrderService(
         }
         val totalOrders = orderRepository.countByStudentUserId(Auth.userId())
         val orderResponse = orders.map { StudentOrderResponse(it) }
-        return CustomPage(orderResponse.content, pageSize, pageNumber, totalOrders)
+        return PageResponse(orderResponse.content, pageNumber, pageSize, totalOrders)
     }
     
     fun getStudentOrderDetails(orderId: String): StudentOrderDetailsResponse {

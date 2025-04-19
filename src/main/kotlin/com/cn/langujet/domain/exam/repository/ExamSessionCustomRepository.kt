@@ -2,7 +2,7 @@ package com.cn.langujet.domain.exam.repository
 
 import com.cn.langujet.actor.exam.payload.ExamSessionSearchResponse
 import com.cn.langujet.actor.exam.payload.ExamSessionSearchStudentRequest
-import com.cn.langujet.actor.util.models.CustomPage
+import com.cn.langujet.application.arch.controller.payload.response.PageResponse
 import com.cn.langujet.domain.exam.model.ExamEntity
 import com.cn.langujet.domain.exam.model.ExamSessionEntity
 import org.springframework.data.domain.PageRequest
@@ -20,7 +20,7 @@ class ExamSessionCustomRepository(
     fun searchExamSessions(
         searchRequest: ExamSessionSearchStudentRequest,
         userId: String
-    ): CustomPage<ExamSessionSearchResponse> {
+    ): PageResponse<ExamSessionSearchResponse> {
         var foundExams = if (!searchRequest.examName.isNullOrEmpty()) {
             mongoOperations.find(
                 Query(Criteria.where("name").regex(".*" + searchRequest.examName + ".*", "i")), ExamEntity::class.java
@@ -54,8 +54,8 @@ class ExamSessionCustomRepository(
             val exam = foundExams.find { it.id == session.examId }
             ExamSessionSearchResponse(session, exam)
         }
-        return CustomPage(
-            sessionResponses, searchRequest.pageSize, searchRequest.pageNumber, totalSessionCount
+        return PageResponse(
+            sessionResponses, searchRequest.pageNumber, searchRequest.pageSize, totalSessionCount
         )
     }
 }

@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.exam.model.section.part.questions
 
-import com.cn.langujet.application.arch.mongo.models.SequentialEntity
+import com.cn.langujet.application.arch.models.entity.HistoricalEntity
 import com.cn.langujet.domain.answer.model.AnswerType
 import com.cn.langujet.domain.exam.model.enums.QuestionType
 import org.springframework.data.annotation.TypeAlias
@@ -17,7 +17,7 @@ sealed class QuestionEntity(
     var header: String,
     var questionType: QuestionType,
     var answerType: AnswerType,
-) : SequentialEntity(id = id)
+) : HistoricalEntity(id = id)
 
 @TypeAlias("speaking_questions")
 @Document(collection = "questions")

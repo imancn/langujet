@@ -3,7 +3,7 @@ package com.cn.langujet.actor.service
 import com.cn.langujet.actor.service.payload.GetAvailableExamServicesRequest
 import com.cn.langujet.actor.service.payload.GetAvailableExamServicesResponse
 import com.cn.langujet.actor.service.payload.ServiceRequest
-import com.cn.langujet.actor.util.models.CustomPage
+import com.cn.langujet.application.arch.controller.payload.response.PageResponse
 import com.cn.langujet.domain.service.model.ServiceEntity
 import com.cn.langujet.domain.service.service.ServiceService
 import jakarta.validation.Valid
@@ -38,7 +38,7 @@ class ServiceController(
     @PostMapping("/student/services/exams/search")
     fun getAvailableExamServices(
         @RequestBody request: GetAvailableExamServicesRequest
-    ): CustomPage<GetAvailableExamServicesResponse> {
+    ): PageResponse<GetAvailableExamServicesResponse> {
         return serviceService.getAvailableExamServices(request)
     }
 }

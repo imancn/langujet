@@ -1,4 +1,4 @@
-package com.cn.langujet.application.arch.mongo.sequesnce
+package com.cn.langujet.application.arch.mongo
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Version
