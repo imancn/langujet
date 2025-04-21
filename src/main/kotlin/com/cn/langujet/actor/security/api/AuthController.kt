@@ -71,14 +71,12 @@ class AuthController(
     }
     
     private fun signIn(username: String, password: String): ResponseEntity<JwtResponse> {
-        val user = userRepository.findByUsernameAndDeleted(
-            if (username.endsWith("@gmail.com")) username else username
-        ).orElseThrow {
+        val user = userRepository.findByUsernameAndDeleted(username).orElseThrow {
             InvalidCredentialException("Invalid credentials")
         }
         if (user.password.isNullOrBlank()) throw UnprocessableException("You must reset your password")
         val authentication = authenticationManager.authenticate(
-            UsernamePasswordAuthenticationToken(user.id, password)
+            UsernamePasswordAuthenticationToken(user.username, password)
         )
         SecurityContextHolder.getContext().authentication = authentication
         val jwt = jwtService.generateJwtToken(authentication.principal as UserDetailsImpl)
@@ -179,9 +177,10 @@ class AuthController(
     fun refreshToken(
         @RequestParam @NotBlank refreshToken: String,
     ): ResponseEntity<RefreshTokenResponse> {
-        return toOkResponseEntity(refreshTokenService.findByToken(refreshToken).map {
-            val token = jwtService.generateTokenFromUserId(it.userId)
-            val newRefreshToken = refreshTokenService.createRefreshToken(it.userId)
+        return toOkResponseEntity(refreshTokenService.findByToken(refreshToken).map { refreshTokenEntity ->
+            val user = userService.getById(refreshTokenEntity.userId)
+            val token = jwtService.generateTokenFromUsername(user.username)
+            val newRefreshToken = refreshTokenService.createRefreshToken(refreshTokenEntity.userId)
             refreshTokenService.deleteById(refreshToken)
             RefreshTokenResponse(token, newRefreshToken.id ?: "")
         }.orElseThrow {
@@ -241,7 +240,7 @@ class AuthController(
     @PostMapping("/delete-account")
     @PreAuthorize("hasAnyRole('STUDENT')")
     fun deleteAccount(): String {
-        val user = userRepository.findByUsernameAndDeleted(Auth.userEmail())
+        val user = userRepository.findByUsernameAndDeleted(Auth.email())
             .orElseThrow { UnprocessableException("User Not Found") }
         val emailVerificationToken = emailVerificationTokenRepository.findByUser(user).getOrElse {
             emailVerificationTokenService.save(EmailVerificationTokenEntity(user))
@@ -252,7 +251,7 @@ class AuthController(
     
     @PostMapping("/delete-account/verify")
     fun verifyDeleteAccount(@RequestParam @NotBlank verificationCode: String): String {
-        val user = userRepository.findByUsernameAndDeleted(Auth.userEmail())
+        val user = userRepository.findByUsernameAndDeleted(Auth.email())
             .orElseThrow { UnprocessableException("User Not Found") }
         val verificationToken = emailVerificationTokenRepository.findByUser(user).orElseThrow {
             mailSenderService.sendDeleteAccountVerificationMail(

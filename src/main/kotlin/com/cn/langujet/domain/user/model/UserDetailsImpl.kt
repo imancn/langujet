@@ -6,12 +6,25 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
 class UserDetailsImpl(
-    val id: Long,
+    @field:JsonIgnore val id: Long,
+    val _username: String,
     val email: String,
     val emailVerified: Boolean,
     @field:JsonIgnore private val password: String?,
     private val authorities: Collection<GrantedAuthority>
 ) : UserDetails {
+    constructor(user: UserEntity): this(
+        id = user.id!!,
+        _username = user.username,
+        email = user.email,
+        emailVerified = user.emailVerified,
+        password = user.password,
+        authorities = user.roles.map { role ->
+            SimpleGrantedAuthority(
+                role.name
+            )
+        }
+    )
 
     override fun getAuthorities(): Collection<GrantedAuthority> {
         return authorities
@@ -22,7 +35,7 @@ class UserDetailsImpl(
     }
 
     override fun getUsername(): String {
-        return id.toString()
+        return _username
     }
 
     override fun isAccountNonExpired(): Boolean {
@@ -55,22 +68,5 @@ class UserDetailsImpl(
         result = 31 * result + password.hashCode()
         result = 31 * result + authorities.sumOf { it.authority.hashCode() }
         return result
-    }
-    
-    companion object {
-        fun build(user: UserEntity): UserDetailsImpl {
-            val authorities: List<GrantedAuthority> = user.roles.map { role ->
-                SimpleGrantedAuthority(
-                    role.name
-                )
-            }
-            return UserDetailsImpl(
-                user.id!!,
-                user.username,
-                user.emailVerified,
-                user.password,
-                authorities
-            )
-        }
     }
 }

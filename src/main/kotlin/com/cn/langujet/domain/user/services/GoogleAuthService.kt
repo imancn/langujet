@@ -1,7 +1,6 @@
 package com.cn.langujet.domain.user.services
 
 import com.cn.langujet.actor.security.response.JwtResponse
-import com.cn.langujet.application.arch.models.entity.Entity
 import com.cn.langujet.domain.user.model.Role
 import com.cn.langujet.domain.user.model.UserEntity
 import com.cn.langujet.domain.user.repository.UserRepository
@@ -26,7 +25,7 @@ class GoogleAuthService(
         val user = userRepository.findByUsernameAndDeleted(username).orElseGet {
             registerNewGoogleUser(email, username)
         }
-        val jwt = jwtService.generateTokenFromUserId(user.id ?: Entity.UNKNOWN_ID)
+        val jwt = jwtService.generateTokenFromUsername(user.username)
         return JwtResponse(jwt, "", user.email)
     }
     

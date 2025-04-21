@@ -13,19 +13,17 @@ object Auth {
     const val EXTERNAL_SERVICE = -3L
     const val SCHEDULED = -4L
     
-    fun userId(): Long {
-        return getAuthentication()?.principal?.let {
-            if (it is Long) it else null
-        } ?: Entity.UNKNOWN_ID
-    }
-    
     fun username(): String {
         return getAuthentication()?.principal?.let {
             if (it is String) it else null
         } ?: "undefined"
     }
     
-    fun userEmail(): String {
+    fun userId(): Long {
+        return getClaims()?.get("id", Long::class.java) ?: Entity.UNKNOWN_ID
+    }
+    
+    fun email(): String {
         return getClaims()?.get("email", String::class.java) ?: ""
     }
     

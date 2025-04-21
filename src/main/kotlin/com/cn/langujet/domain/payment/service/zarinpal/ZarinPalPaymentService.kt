@@ -30,7 +30,7 @@ class ZarinPalPaymentService(
                 amount = amount,
                 callbackUrl = webhookCallbackUrl,
                 description = "OrderId: $orderId",
-                metadata = ZarinPalRequestMetadata("N/A", Auth.userEmail())
+                metadata = ZarinPalRequestMetadata("N/A", Auth.email())
             )
             val response = ZarinPalPaymentResponse(zarinPalClient.requestPayment(parameters))
             if (response.data?.authority != null) {

@@ -14,9 +14,9 @@ class UserDetailsServiceImpl(
 ) : UserDetailsService {
     @Transactional
     @Throws(UsernameNotFoundException::class)
-    override fun loadUserByUsername(userId: String): UserDetailsImpl {
-        return UserDetailsImpl.build(
-            userRepository.findByIdAndDeleted(userId.toLong())
+    override fun loadUserByUsername(username: String): UserDetailsImpl {
+        return UserDetailsImpl(
+            userRepository.findByUsernameAndDeleted(username)
                 .orElseThrow { InvalidCredentialException("User Not Found") }
         )
     }
