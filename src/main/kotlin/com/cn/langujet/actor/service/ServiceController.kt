@@ -25,7 +25,7 @@ class ServiceController(
     
     @PostMapping("/admin/services/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    fun updateExamService(@PathVariable id: String?, @Valid @RequestBody request: ServiceRequest): ServiceEntity {
+    fun updateExamService(@PathVariable id: Long?, @Valid @RequestBody request: ServiceRequest): ServiceEntity {
         return serviceService.updateService(id!!, request)
     }
     

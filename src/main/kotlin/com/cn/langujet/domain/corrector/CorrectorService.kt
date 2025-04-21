@@ -3,12 +3,13 @@ package com.cn.langujet.domain.corrector
 import com.cn.langujet.actor.corrector.payload.response.CorrectorProfileResponse
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.arch.advice.UnprocessableException
+import com.cn.langujet.application.arch.mongo.HistoricalEntityService
 import org.springframework.stereotype.Service
 
 @Service
 class CorrectorService(
     private val correctorRepository: CorrectorRepository,
-) {
+) : HistoricalEntityService<CorrectorEntity>() {
     
     fun editProfile(
         fullName: String?,
@@ -25,16 +26,16 @@ class CorrectorService(
         if (!biography.isNullOrBlank()) corrector.biography = biography
         ieltsScore?.let { corrector.ieltsScore = it }
         
-        return CorrectorProfileResponse(correctorRepository.save(corrector))
+        return CorrectorProfileResponse(save(corrector))
     }
     
-    fun getCorrectorByUserId(userId: String): CorrectorEntity {
+    fun getCorrectorByUserId(userId: Long): CorrectorEntity {
         return correctorRepository.findByUser_Id(userId).orElseThrow {
             UnprocessableException("Corrector not found")
         }
     }
     
-    fun correctorExistsByUserId(userId: String): Boolean {
+    fun correctorExistsByUserId(userId: Long): Boolean {
         return correctorRepository.existsByUser_Id(userId)
     }
 }

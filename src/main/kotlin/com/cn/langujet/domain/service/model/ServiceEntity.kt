@@ -1,24 +1,22 @@
 package com.cn.langujet.domain.service.model
 
-import com.cn.langujet.application.arch.models.Historical
+import com.cn.langujet.application.arch.models.entity.HistoricalEntity
 import com.cn.langujet.domain.correction.model.CorrectorType
 import com.cn.langujet.domain.exam.model.enums.ExamMode
 import com.cn.langujet.domain.exam.model.enums.ExamType
-import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document(collection = "services")
 sealed class ServiceEntity(
-    @Id
-    var id: String?,
+    id: Long?,
     var name: String,
     var type: ServiceType,
     var price: Double,
     var discount: Double,
     var order: Int,
     var active: Boolean
-) : Historical() {
+) : HistoricalEntity(id = id) {
     @Document(collation = "services")
     @TypeAlias("exam_services")
     class ExamServiceEntity(

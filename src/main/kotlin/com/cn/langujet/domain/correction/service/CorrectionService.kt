@@ -6,6 +6,7 @@ import com.cn.langujet.actor.correction.payload.request.AssignSpecificCorrection
 import com.cn.langujet.actor.correction.payload.response.*
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.arch.advice.UnprocessableException
+import com.cn.langujet.application.arch.models.entity.Entity
 import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.answer.AnswerRepository
 import com.cn.langujet.domain.answer.model.AnswerEntity
@@ -59,13 +60,12 @@ class CorrectionService(
             val isAutoCorrection = correctAnswerRepository.existsByExamIdAndSectionOrder(examSession.examId, section.order)
             if (isAutoCorrection) {
                 autoCorrectorService.correctExamSection(
-                    examSession,
-                    result.id ?: "",
+                    examSession, result.id ?: Entity.UNKNOWN_ID,
                     section.order,
                     section.sectionType
-                ) ?: sectionResultService.initSectionResult(result.id ?: "", examSession, section)
+                ) ?: sectionResultService.initSectionResult(result.id ?: Entity.UNKNOWN_ID, examSession, section)
             } else {
-                sectionResultService.initSectionResult(result.id ?: "", examSession, section)
+                sectionResultService.initSectionResult(result.id ?: Entity.UNKNOWN_ID, examSession, section)
             }
         }
         if (resultService.areAllSectionResultsApproved(result)) {
@@ -91,7 +91,9 @@ class CorrectionService(
     }
     
     fun assignCorrectionByCorrector(
-        assignCorrectionRequest: AssignCorrectionRequest, correctorType: CorrectorType, correctorUserId: String = Auth.userId()
+        assignCorrectionRequest: AssignCorrectionRequest,
+        correctorType: CorrectorType,
+        correctorUserId: Long = Auth.userId()
     ): CorrectionResponse {
         if (resultService.getCorrectorResultsByStatus(CorrectionStatus.PROCESSING, correctorUserId).isNotEmpty()) {
             throw UnprocessableException("Finish in-progress exam correction first")
@@ -136,16 +138,15 @@ class CorrectionService(
     }
     
     private fun assignCorrection(
-        pendingResult: ResultEntity,
-        correctorUserId: String
+        pendingResult: ResultEntity, correctorUserId: Long
     ): CorrectionResponse {
         val sectionCorrections = sectionResultService.getByStatusAndResultId(
-            CorrectionStatus.PENDING, pendingResult.id ?: ""
+            CorrectionStatus.PENDING, pendingResult.id ?: Entity.UNKNOWN_ID
         )
         resultService.assignResultToCorrector(pendingResult, correctorUserId)
         sectionResultService.assignSectionResultToCorrector(sectionCorrections, correctorUserId)
         return CorrectionResponse(
-            pendingResult.id ?: "",
+            pendingResult.id ?: Entity.UNKNOWN_ID,
             pendingResult.examType,
             pendingResult.examMode,
             sectionCorrections.map { correction ->
@@ -161,9 +162,10 @@ class CorrectionService(
         ).firstOrNull()
         if (result != null) {
             val sectionResults = sectionResultService.getByResultId(
-                result.id ?: ""
+                result.id ?: Entity.UNKNOWN_ID
             ).filter { it.correctorUserId == Auth.userId() }
-            return CorrectionResponse(result.id ?: "",
+            return CorrectionResponse(
+                result.id ?: Entity.UNKNOWN_ID,
                 result.examType,
                 result.examMode,
                 sectionResults.map { correction ->
@@ -182,9 +184,10 @@ class CorrectionService(
         )
         return results.map { result ->
             val sectionResults = sectionResultService.getByResultId(
-                result.id ?: ""
+                result.id ?: Entity.UNKNOWN_ID
             ).filter { it.correctorUserId == Auth.userId() }
-            CorrectionResponse(result.id ?: "",
+            CorrectionResponse(
+                result.id ?: Entity.UNKNOWN_ID,
                 result.examType,
                 result.examMode,
                 sectionResults.map { correction ->
@@ -193,7 +196,7 @@ class CorrectionService(
         }
     }
     
-    fun getCorrectorCorrectionExamSessionContent(sectionResultId: String): CorrectorCorrectionExamSessionContentResponse {
+    fun getCorrectorCorrectionExamSessionContent(sectionResultId: Long): CorrectorCorrectionExamSessionContentResponse {
         val sectionResult = sectionResultService.getSectionResultById(sectionResultId)
         val result = resultService.getResultById(sectionResult.resultId)
         if (result.correctorUserId != Auth.userId()) throw UnprocessableException("You don't have access to this correction")
@@ -241,18 +244,17 @@ class CorrectionService(
                         partOrder = part.order,
                         questionAnswerList = questions.map { it as SpeakingQuestionEntity }.map { question ->
                             SpeakingCorrectorCorrectionQuestionAnswerResponse(
-                                questionOrder = question.order,
-                                question = SpeakingCorrectorCorrectionQuestionResponse(header = question.header,
-                                audioId = question.audioId?.let { audioId ->
-                                    try {
-                                        fileService.generatePublicDownloadLink(
-                                            audioId, (24 * 3600)
-                                        )
-                                    } catch (ex: Exception) {
-                                        logger.error("There is an invalid FileId in sectionId = ${section.id} , partOrder = ${part.order} , questionOrder = ${question.order} , audioId = $audioId  ")
-                                        null
-                                    }
-                                }),
+                                questionOrder = question.order, question = SpeakingCorrectorCorrectionQuestionResponse(
+                                    header = question.header, audioUrl = question.audioId?.let { audioId ->
+                                        try {
+                                            fileService.generatePublicDownloadLink(
+                                                audioId, (24 * 3600)
+                                            )
+                                        } catch (ex: Exception) {
+                                            logger.error("There is an invalid FileId in sectionId = ${section.id} , partOrder = ${part.order} , questionOrder = ${question.order} , audioId = $audioId  ")
+                                            null
+                                        }
+                                    }),
                                 answer = answers.filterIsInstance<AnswerEntity.VoiceAnswerEntity>().find { answer ->
                                     (answer.partOrder == part.order) && (answer.questionOrder == question.order)
                                 }?.let { existingAnswer ->

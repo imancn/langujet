@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotBlank
 
 data class ExamDTO(
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
-    var id: String? = null,
+    var id: Long? = null,
     var examType: ExamType,
     var examMode: ExamMode,
     @field:NotBlank

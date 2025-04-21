@@ -5,6 +5,8 @@ import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.arch.advice.InternalServerError
 import com.cn.langujet.application.arch.advice.InvalidCredentialException
 import com.cn.langujet.application.arch.advice.UnprocessableException
+import com.cn.langujet.application.arch.models.entity.Entity
+import com.cn.langujet.application.arch.mongo.HistoricalEntityService
 import com.cn.langujet.application.service.file.domain.data.model.FileBucket
 import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.exam.model.ExamContentEntity
@@ -22,10 +24,9 @@ class ExamContentService(
     private val sectionService: SectionService,
     private val examService: ExamService,
     private val fileService: FileService
-) {
+) : HistoricalEntityService<ExamContentEntity>() {
     fun uploadExamContent(
-        file: MultipartFile,
-        examId: String,
+        file: MultipartFile, examId: Long,
         sectionOrder: Int?,
         partOrder: Int?,
         questionOrder: Int?
@@ -36,7 +37,7 @@ class ExamContentService(
 
         val fileEntity = fileService.uploadFile(file, FileBucket.EXAM_CONTENTS)
         
-        return examContentRepository.save(
+        return save(
             ExamContentEntity(
                 null,
                 examId,
@@ -49,11 +50,12 @@ class ExamContentService(
     }
     
     fun getAdminExamContentDownloadLink(
-        examId: String,
+        examId: Long,
         sectionOrder: Int
     ): List<ExamContentDownloadLink> {
         val exam = examService.getExamById(examId)
-        val examSectionContents = examContentRepository.findAllByExamIdAndSectionOrder(exam.id ?: "", sectionOrder)
+        val examSectionContents =
+            examContentRepository.findAllByExamIdAndSectionOrder(exam.id ?: Entity.UNKNOWN_ID, sectionOrder)
 
         return examSectionContents.map {
             ExamContentDownloadLink(
@@ -64,7 +66,7 @@ class ExamContentService(
     }
     
     fun getStudentExamContentDownloadLink(
-        examSessionId: String,
+        examSessionId: Long,
         sectionOrder: Int
     ): List<ExamContentDownloadLink> {
         val examSession = examSessionRepository.findById(examSessionId).getOrNull() ?: return emptyList()
@@ -72,7 +74,8 @@ class ExamContentService(
             throw InvalidCredentialException("Exam Session with id: $examSessionId is not belong to your token")
         }
         val exam = examService.getExamById(examSession.examId)
-        val examSectionContents = examContentRepository.findAllByExamIdAndSectionOrder(exam.id ?: "", sectionOrder)
+        val examSectionContents =
+            examContentRepository.findAllByExamIdAndSectionOrder(exam.id ?: Entity.UNKNOWN_ID, sectionOrder)
 
         return examSectionContents.map {
             ExamContentDownloadLink(
@@ -86,7 +89,7 @@ class ExamContentService(
         val pattern = Pattern.compile("<img src=\"([^\"]+)\"/>")
         val matcher = pattern.matcher(string)
         return matcher.replaceAll { matchResult ->
-            val imageLink = fileService.generatePublicDownloadLink(matchResult.group(1), 24 * 3600)
+            val imageLink = fileService.generatePublicDownloadLink(matchResult.group(1).toLong(), 24 * 3600)
             "<img src=\"$imageLink\"/>"
         }
     }

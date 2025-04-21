@@ -11,7 +11,7 @@ class CorrectAnswerCustomRepository(
     private val mongo: MongoOperations
 ) {
     fun findCorrectAnswersByOptionalCriteria(
-        examId: String,
+        examId: Long,
         sectionOrder: Int,
         partOrder: Int?,
         questionOrder: Int?

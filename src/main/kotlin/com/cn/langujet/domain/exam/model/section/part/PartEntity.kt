@@ -9,8 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document(collection = "parts")
 sealed class PartEntity(
     id: Long?,
-    var examId: String,
-    var sectionId: String,
+    var examId: Long,
+    var sectionId: Long,
     var order: Int,
     var type: SectionType,
 ) : HistoricalEntity(id = id)
@@ -19,8 +19,8 @@ sealed class PartEntity(
 @Document(collection = "parts")
 class ReadingPartEntity(
     id: Long?,
-    examId: String,
-    sectionId: String,
+    examId: Long,
+    sectionId: Long,
     order: Int,
     var passageHeader: String?,
     var passage: List<ReadingPassage>,
@@ -36,10 +36,10 @@ class ReadingPassage(
 @Document(collection = "parts")
 class ListeningPartEntity(
     id: Long?,
-    examId: String,
-    sectionId: String,
+    examId: Long,
+    sectionId: Long,
     order: Int,
-    var audioId: String,
+    var audioId: Long,
     var time: Long
 ) : PartEntity(id = id, examId = examId, sectionId = sectionId, order = order, type = SectionType.LISTENING)
 
@@ -48,8 +48,8 @@ class ListeningPartEntity(
 @Document(collection = "parts")
 class WritingPartEntity(
     id: Long?,
-    examId: String,
-    sectionId: String,
+    examId: Long,
+    sectionId: Long,
     order: Int,
 ) : PartEntity(id = id, examId = examId, sectionId = sectionId, order = order, type = SectionType.WRITING)
 
@@ -58,8 +58,8 @@ class WritingPartEntity(
 @Document(collection = "parts")
 class SpeakingPartEntity(
     id: Long?,
-    examId: String,
-    sectionId: String,
+    examId: Long,
+    sectionId: Long,
     order: Int,
     var focus: String?
 ) : PartEntity(id = id, examId = examId, sectionId = sectionId, order = order, type = SectionType.SPEAKING)

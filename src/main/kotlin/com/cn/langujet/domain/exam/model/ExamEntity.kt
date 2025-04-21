@@ -1,9 +1,8 @@
 package com.cn.langujet.domain.exam.model
 
-import com.cn.langujet.application.arch.models.Historical
+import com.cn.langujet.application.arch.models.entity.HistoricalEntity
 import com.cn.langujet.domain.exam.model.enums.ExamMode
 import com.cn.langujet.domain.exam.model.enums.ExamType
-import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.index.CompoundIndexes
@@ -20,8 +19,8 @@ import org.springframework.data.mongodb.core.mapping.Document
         unique = false
     )
 )
-data class ExamEntity(
-    @Id var id: String?,
+class ExamEntity(
+    id: Long?,
     var type: ExamType,
     var mode: ExamMode,
     @TextIndexed
@@ -33,4 +32,4 @@ data class ExamEntity(
     var examDuration: Long, // Seconds
     @Indexed(name = "active_index")
     var active: Boolean
-) : Historical()
+) : HistoricalEntity(id = id)

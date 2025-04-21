@@ -19,8 +19,8 @@ class RefreshTokenService(
     fun findByToken(token: String): Optional<RefreshTokenEntity> {
         return refreshTokenRepository.findById(token)
     }
-
-    fun createRefreshToken(userId: String): RefreshTokenEntity {
+    
+    fun createRefreshToken(userId: Long): RefreshTokenEntity {
         var refreshToken = RefreshTokenEntity(
             null,
             userId,
@@ -29,8 +29,8 @@ class RefreshTokenService(
         refreshToken = refreshTokenRepository.save(refreshToken)
         return refreshToken
     }
-
-    fun deleteByUserId(userId: String) {
+    
+    fun deleteByUserId(userId: Long) {
         if (!userRepository.existsByIdAndDeleted(userId)) { throw UnprocessableException("User Not Found") }
         refreshTokenRepository.deleteByUserId(userId)
     }

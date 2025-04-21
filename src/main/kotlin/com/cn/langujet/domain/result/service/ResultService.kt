@@ -5,6 +5,8 @@ import com.cn.langujet.actor.result.payload.response.DetailedResultResponse
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.arch.advice.InvalidCredentialException
 import com.cn.langujet.application.arch.advice.UnprocessableException
+import com.cn.langujet.application.arch.models.entity.Entity
+import com.cn.langujet.application.arch.mongo.HistoricalEntityService
 import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.correction.model.CorrectionStatus
 import com.cn.langujet.domain.correction.model.CorrectorType
@@ -24,7 +26,7 @@ import kotlin.math.ceil
 class ResultService(
     private val resultRepository: ResultRepository,
     private val sectionResultService: SectionResultService
-) {
+) : HistoricalEntityService<ResultEntity>() {
     @Autowired
     private lateinit var fileService: FileService
     
@@ -32,10 +34,10 @@ class ResultService(
     private lateinit var examSessionService: ExamSessionService
     
     fun initiateResult(examSession: ExamSessionEntity): ResultEntity {
-        return resultRepository.save(
+        return save(
             ResultEntity(
                 id = null,
-                examSessionId = examSession.id ?: "",
+                examSessionId = examSession.id ?: Entity.UNKNOWN_ID,
                 examType = examSession.examType,
                 examMode = examSession.examMode,
                 correctorType = examSession.correctorType,
@@ -47,8 +49,8 @@ class ResultService(
         )
     }
     
-    fun assignResultToCorrector(result: ResultEntity, correctorUserId: String): ResultEntity {
-        return resultRepository.save(
+    fun assignResultToCorrector(result: ResultEntity, correctorUserId: Long): ResultEntity {
+        return save(
             result.also {
             it.correctorUserId = correctorUserId
             it.status = CorrectionStatus.PROCESSING
@@ -56,27 +58,35 @@ class ResultService(
         })
     }
     
-    fun getStudentDetailedResultByExamSessionId(examSessionId: String): DetailedResultResponse {
+    fun getStudentDetailedResultByExamSessionId(examSessionId: Long): DetailedResultResponse {
         val examSession = examSessionService.getExamSessionById(examSessionId)
         if (Auth.userId() != examSession.studentUserId) {
             throw InvalidCredentialException("This Exam Session is not belong to you")
         }
         val result = getResultByExamSessionId(examSessionId).orElseThrow { UnprocessableException("Result not found") }
-        val sectionResult = sectionResultService.getSectionResultsByResultId(result.id ?: "").onEach { sr ->
-            sr.attachmentFileId = sr.attachmentFileId?.let {
-                fileService.generatePublicDownloadLink(it, 86400)
-            }
+        val sectionResults =
+            sectionResultService.getSectionResultsByResultId(result.id ?: Entity.UNKNOWN_ID).map { sr ->
+                Pair(
+                    sr,
+                    sr.attachmentFileId?.let {
+                        fileService.generatePublicDownloadLink(it, 86400)
+                    }
+                )
         }
-        return DetailedResultResponse(result, sectionResult)
+        return DetailedResultResponse(result, sectionResults)
     }
     
-    fun getCorrectorDetailedResultByExamCorrectionId(examCorrectionId: String): DetailedResultResponse {
+    fun getCorrectorDetailedResultByExamCorrectionId(examCorrectionId: Long): DetailedResultResponse {
         val result = getResultById(examCorrectionId)
         if (Auth.isAdmin() || result.correctorUserId == Auth.userId()) {
-            val sectionResult = sectionResultService.getSectionResultsByResultId(result.id ?: "").onEach { sr ->
-                sr.attachmentFileId = sr.attachmentFileId?.let {
-                    fileService.generatePublicDownloadLink(it, 86400)
-                }
+            val sectionResult =
+                sectionResultService.getSectionResultsByResultId(result.id ?: Entity.UNKNOWN_ID).map { sr ->
+                    Pair(
+                        sr,
+                        sr.attachmentFileId?.let {
+                            fileService.generatePublicDownloadLink(it, 86400)
+                        }
+                    )
             }
             return DetailedResultResponse(result, sectionResult)
         } else {
@@ -104,11 +114,11 @@ class ResultService(
         finalizeCorrection(sectionResults, result)
     }
     
-    fun getResultByExamSessionId(examSessionId: String): Optional<ResultEntity> {
+    fun getResultByExamSessionId(examSessionId: Long): Optional<ResultEntity> {
         return resultRepository.findByExamSessionId(examSessionId)
     }
     
-    fun getResultById(resultId: String): ResultEntity {
+    fun getResultById(resultId: Long): ResultEntity {
         return resultRepository.findById(resultId).orElseThrow {
             UnprocessableException("Result not found")
         }
@@ -124,7 +134,7 @@ class ResultService(
     }
     
     fun getCorrectorResultsByStatus(
-        correctionStatus: CorrectionStatus, correctorId: String
+        correctionStatus: CorrectionStatus, correctorId: Long
     ): List<ResultEntity> {
         return resultRepository.findByStatusAndCorrectorUserIdOrderByCreatedAtAsc(
             correctionStatus, correctorId
@@ -132,7 +142,7 @@ class ResultService(
     }
     
     fun areAllSectionResultsApproved(result: ResultEntity): Boolean {
-        val sectionResults = sectionResultService.getByResultId(result.id ?: "")
+        val sectionResults = sectionResultService.getByResultId(result.id ?: Entity.UNKNOWN_ID)
         sectionResults.forEach { 
             if (it.status != CorrectionStatus.APPROVED) {
                 return false
@@ -145,7 +155,7 @@ class ResultService(
         result.status = CorrectionStatus.APPROVED
         result.score = calculateOverAllScore(sectionResults.mapNotNull { it.score }, result.examType)
         result.updatedAt = Date(System.currentTimeMillis())
-        resultRepository.save(result)
+        save(result)
         examSessionService.finalizeCorrection(result.examSessionId)
     }
     

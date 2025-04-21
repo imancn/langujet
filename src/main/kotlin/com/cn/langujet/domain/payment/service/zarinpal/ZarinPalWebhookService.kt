@@ -2,9 +2,10 @@ package com.cn.langujet.domain.payment.service.zarinpal
 
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.arch.advice.UnprocessableException
+import com.cn.langujet.application.arch.mongo.HistoricalEntityService
 import com.cn.langujet.domain.order.service.OrderService
 import com.cn.langujet.domain.payment.model.PaymentStatus
-import com.cn.langujet.domain.payment.model.PaymentType
+import com.cn.langujet.domain.payment.model.ZarinPalPaymentEntity
 import com.cn.langujet.domain.payment.repository.ZarinPalPaymentRepository
 import com.cn.langujet.domain.payment.service.zarinpal.dto.ZarinPalVerifyRequest
 import com.cn.langujet.domain.payment.service.zarinpal.dto.ZarinPalVerifyResponse
@@ -17,7 +18,7 @@ class ZarinPalWebhookService(
     private val zarinPalClient: ZarinPalClient,
     private val zarinPalPaymentRepository: ZarinPalPaymentRepository,
     private val orderService: OrderService
-) {
+) : HistoricalEntityService<ZarinPalPaymentEntity>() {
     @Value("\${payment.redirect.url}")
     private lateinit var paymentRedirectUrl: String
     
@@ -25,7 +26,7 @@ class ZarinPalWebhookService(
     private lateinit var merchantId: String
     
     fun handleWebhook(authority: String, status: String): RedirectView {
-        Auth.setCustomUserId(PaymentType.ZARIN_PAL.name)
+        Auth.setCustomUserId(Auth.EXTERNAL_SERVICE)
         val payment = zarinPalPaymentRepository.findByAuthority(authority).orElseThrow {
             UnprocessableException("Payment not found with authority = $authority")
         }
@@ -56,7 +57,7 @@ class ZarinPalWebhookService(
             payment.status = PaymentStatus.FAILED
             orderService.rejectOrder(payment.orderId)
         }
-        zarinPalPaymentRepository.save(payment)
+        save(payment)
         return RedirectView("$paymentRedirectUrl?id=${payment.orderId}")
     }
 }

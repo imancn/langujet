@@ -12,7 +12,7 @@ import java.util.*
 data class RefreshTokenEntity(
     @Id
     var id: String?,
-    var userId: String,
-    @Indexed(expireAfterSeconds = 0)
+    var userId: Long,
+    @Indexed(name = "expiry_date_ttl", expireAfterSeconds = 0)
     var expiryDate: Date,
 ) : Log()

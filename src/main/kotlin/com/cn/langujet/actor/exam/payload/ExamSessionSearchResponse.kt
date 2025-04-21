@@ -1,14 +1,16 @@
 package com.cn.langujet.actor.exam.payload
 
+import com.cn.langujet.application.arch.models.entity.Entity
 import com.cn.langujet.domain.correction.model.CorrectorType
-import com.cn.langujet.domain.exam.model.*
+import com.cn.langujet.domain.exam.model.ExamEntity
+import com.cn.langujet.domain.exam.model.ExamSessionEntity
 import com.cn.langujet.domain.exam.model.enums.ExamMode
 import com.cn.langujet.domain.exam.model.enums.ExamSessionState
 import com.cn.langujet.domain.exam.model.enums.ExamType
 import java.util.*
 
 class ExamSessionSearchResponse (
-    val examSessionId: String,
+    val examSessionId: Long,
     val exam: ExamSessionExamSearchResponse?,
     val correctorType: CorrectorType?,
     val state: ExamSessionState,
@@ -21,7 +23,7 @@ class ExamSessionSearchResponse (
         examSession: ExamSessionEntity,
         exam: ExamEntity?,
     ):this (
-        examSession.id ?: "",
+        examSession.id ?: Entity.UNKNOWN_ID,
         exam?.let {
             ExamSessionExamSearchResponse(
                 it.type,

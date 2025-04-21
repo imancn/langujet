@@ -1,5 +1,6 @@
 package com.cn.langujet.domain.correction.service.corrector.auto
 
+import com.cn.langujet.application.arch.models.entity.Entity
 import com.cn.langujet.domain.answer.AnswerRepository
 import com.cn.langujet.domain.correction.service.CorrectAnswerService
 import com.cn.langujet.domain.exam.model.ExamSessionEntity
@@ -26,12 +27,13 @@ class AutoCorrectorService(
     private val questionService: QuestionService,
 ) {
     fun correctExamSection(
-        examSession: ExamSessionEntity, resultId: String, sectionOrder: Int, sectionType: SectionType
+        examSession: ExamSessionEntity, resultId: Long, sectionOrder: Int, sectionType: SectionType
     ): SectionResultEntity? {
         val exam = examService.getExamById(examSession.examId)
         val section = sectionService.getSectionByExamIdAndOrder(examSession.examId, sectionOrder)
         val correctAnswers = correctAnswerService.getSectionCorrectAnswers(examSession.examId, sectionOrder)
-        val answers = answerRepository.findAllByExamSessionIdAndSectionOrder(examSession.id ?: "", sectionOrder)
+        val answers =
+            answerRepository.findAllByExamSessionIdAndSectionOrder(examSession.id ?: Entity.UNKNOWN_ID, sectionOrder)
         try {
             val correctIssuesCount = AutoCorrectionUtil.getCorrectionScore(answers, correctAnswers)
             val score = AutoCorrectionUtil.calculateScore(correctIssuesCount, sectionType, exam.type)
@@ -41,7 +43,7 @@ class AutoCorrectorService(
                 AutoCorrectionUtil.generateSectionResultMd(section, parts, questions, answers, correctAnswers)
             return sectionResultService.addAutoCorrectionSectionResult(
                 resultId = resultId,
-                examSessionId = examSession.id ?: "",
+                examSessionId = examSession.id ?: Entity.UNKNOWN_ID,
                 sectionOrder = sectionOrder,
                 sectionType = sectionType,
                 correctIssuesCount = correctIssuesCount,

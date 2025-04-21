@@ -1,10 +1,10 @@
 package com.cn.langujet.actor.corrector.payload.response
 
-import com.cn.langujet.domain.user.model.UserEntity
 import com.cn.langujet.domain.corrector.CorrectorEntity
+import com.cn.langujet.domain.user.model.UserEntity
 
 data class CorrectorProfileResponse(
-    var id: String?,
+    var id: Long?,
     var user: UserEntity,
     var fullName: String,
     var biography: String?,

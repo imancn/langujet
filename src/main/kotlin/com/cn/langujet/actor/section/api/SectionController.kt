@@ -22,13 +22,13 @@ class SectionController(
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     fun getSectionById(
-        @PathVariable id: String
+        @PathVariable id: Long
     ): SectionDTO = sectionService.getSectionById(id)
 
     @GetMapping("by-exam-id/{examId}")
     @PreAuthorize("hasRole('ADMIN')")
     fun getSectionByExamId(
-        @PathVariable examId: String
+        @PathVariable examId: Long
     ): List<SectionEntity> = sectionService.getSectionsByExamId(examId)
 
     @PostMapping
@@ -51,7 +51,7 @@ class SectionController(
     @PostMapping("delete/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     fun deleteSection(
-        @PathVariable id: String
+        @PathVariable id: Long
     ): ResponseEntity<String> =
         if (sectionService.deleteSection(id)) toOkResponseEntity("Section deleted")
         else throw UnprocessableException("Section with id: $id not found")

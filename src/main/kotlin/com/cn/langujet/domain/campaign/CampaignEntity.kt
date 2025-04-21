@@ -1,14 +1,13 @@
 package com.cn.langujet.domain.campaign
 
-import com.cn.langujet.application.arch.models.Historical
-import org.springframework.data.annotation.Id
+import com.cn.langujet.application.arch.models.entity.HistoricalEntity
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document(collection = "campaigns")
 @TypeAlias("campaigns")
-data class CampaignEntity(
-    @Id var id: String? = null,
+class CampaignEntity(
+    id: Long? = null,
     var name: String,
     var code: String,
     var amount: Double,
@@ -18,4 +17,4 @@ data class CampaignEntity(
     var active: Boolean = false,
     var tag: String? = null,
     var description: String? = null,
-) : Historical()
+) : HistoricalEntity(id = id)

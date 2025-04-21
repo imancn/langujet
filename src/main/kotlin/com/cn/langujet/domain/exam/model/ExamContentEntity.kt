@@ -24,10 +24,10 @@ import org.springframework.data.mongodb.core.mapping.Document
 class ExamContentEntity(
     id: Long? = null,
     @Indexed(name = "exam_id_index", unique = false)
-    var examId: String,
+    var examId: Long,
     var sectionOrder: Int?,
     var partOrder: Int?,
     var questionOrder: Int?,
-    @Indexed(name = "file_id_index", unique = true)
-    var fileId: String,
+    @Indexed(name = "unique_file_id_index", unique = true)
+    var fileId: Long,
 ) : HistoricalEntity(id = id)

@@ -22,7 +22,7 @@ class ResultController(
     @GetMapping("/student/results")
     @PreAuthorize("hasRole('STUDENT')")
     fun getStudentResultsByExamSessionId(
-        @RequestParam @NotBlank examSessionId: String
+        @RequestParam @NotBlank examSessionId: Long
     ): DetailedResultResponse {
         return resultService.getStudentDetailedResultByExamSessionId(examSessionId)
     }
@@ -30,7 +30,7 @@ class ResultController(
     @GetMapping("/corrector/results")
     @PreAuthorize("hasAnyRole('ADMIN', 'CORRECTOR')")
     fun getCorrectorDetailedResultByExamCorrectionId(
-        @RequestParam @NotBlank examCorrectionId: String
+        @RequestParam @NotBlank examCorrectionId: Long
     ): DetailedResultResponse {
         return resultService.getCorrectorDetailedResultByExamCorrectionId(examCorrectionId)
     }
@@ -55,7 +55,7 @@ class ResultController(
     @PreAuthorize("hasAnyRole('CORRECTOR_AI', 'CORRECTOR')")
     fun attachCorrectorSectionResultFile(
         @RequestParam attachment: MultipartFile,
-        @RequestParam sectionCorrectionId: String,
+        @RequestParam sectionCorrectionId: Long,
     ) {
         return sectionResultService.attachCorrectorSectionResultFile(attachment, sectionCorrectionId)
     }

@@ -9,8 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document(collection = "questions")
 class ReadingTextCompletion(
     id: Long?,
-    examId: String,
-    sectionId: String,
+    examId: Long,
+    sectionId: Long,
     partId: Long,
     order: Int,
     header: String,
@@ -30,8 +30,8 @@ class ReadingTextCompletion(
 @Document(collection = "questions")
 class ReadingTableCompletion(
     id: Long?,
-    examId: String,
-    sectionId: String,
+    examId: Long,
+    sectionId: Long,
     partId: Long,
     order: Int,
     header: String,
@@ -51,8 +51,8 @@ class ReadingTableCompletion(
 @Document(collection = "questions")
 class ReadingMultipleChoice(
     id: Long?,
-    examId: String,
-    sectionId: String,
+    examId: Long,
+    sectionId: Long,
     partId: Long,
     order: Int,
     header: String,
@@ -73,8 +73,8 @@ class ReadingMultipleChoice(
 @Document(collection = "questions")
 class ReadingMatchingFeatures(
     id: Long?,
-    examId: String,
-    sectionId: String,
+    examId: Long,
+    sectionId: Long,
     partId: Long,
     order: Int,
     header: String,
@@ -97,8 +97,8 @@ class ReadingMatchingFeatures(
 @Document(collection = "questions")
 class ReadingMatchingEndings(
     id: Long?,
-    examId: String,
-    sectionId: String,
+    examId: Long,
+    sectionId: Long,
     partId: Long,
     order: Int,
     header: String,
@@ -119,8 +119,8 @@ class ReadingMatchingEndings(
 @Document(collection = "questions")
 class ReadingMatchingHeadings(
     id: Long?,
-    examId: String,
-    sectionId: String,
+    examId: Long,
+    sectionId: Long,
     partId: Long,
     order: Int,
     header: String,
@@ -140,8 +140,8 @@ class ReadingMatchingHeadings(
 @Document(collection = "questions")
 class ReadingTrueFalse(
     id: Long?,
-    examId: String,
-    sectionId: String,
+    examId: Long,
+    sectionId: Long,
     partId: Long,
     order: Int,
     header: String,
@@ -161,8 +161,8 @@ class ReadingTrueFalse(
 @Document(collection = "questions")
 class ReadingSelectiveTextCompletion(
     id: Long?,
-    examId: String,
-    sectionId: String,
+    examId: Long,
+    sectionId: Long,
     partId: Long,
     order: Int,
     header: String,
@@ -184,8 +184,8 @@ class ReadingSelectiveTextCompletion(
 @Document(collection = "questions")
 class ReadingFlowchartCompletion(
     id: Long?,
-    examId: String,
-    sectionId: String,
+    examId: Long,
+    sectionId: Long,
     partId: Long,
     order: Int,
     header: String,

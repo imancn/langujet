@@ -8,9 +8,9 @@ import com.fasterxml.jackson.annotation.JsonInclude
 
 data class SectionDTO(
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
-    var id: String? = null,
+    var id: Long? = null,
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
-    var examId: String?,
+    var examId: Long?,
     var header: String,
     var sectionOrder: Int,
     var sectionType: SectionType,

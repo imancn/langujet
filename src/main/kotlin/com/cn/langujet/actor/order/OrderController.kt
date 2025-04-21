@@ -1,7 +1,6 @@
 package com.cn.langujet.actor.order
 
 import com.cn.langujet.actor.order.payload.*
-import com.cn.langujet.actor.order.payload.Currency
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.arch.controller.payload.response.PageResponse
 import com.cn.langujet.domain.coupon.CouponService
@@ -46,14 +45,14 @@ class OrderController(
     
     @GetMapping("student/orders/details")
     fun getOrderDetails(
-        @RequestParam orderId: String
+        @RequestParam orderId: Long
     ) : StudentOrderDetailsResponse {
         return orderService.getStudentOrderDetails(orderId)
     }
     
     @GetMapping("student/orders/payments/result")
     fun getOrderPaymentResult(
-        @RequestParam orderId: String
+        @RequestParam orderId: Long
     ) : StudentOrderPaymentResultResponse {
         return orderService.getOrderPaymentResult(orderId)
     }

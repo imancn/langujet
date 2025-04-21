@@ -7,7 +7,7 @@ import java.util.*
 
 abstract class Historical : Log() {
     @field:LastModifiedBy
-    var updatedBy: String = "undefined"
+    var updatedBy: Long = Auth.UNDEFINED
     @field:LastModifiedDate
     var updatedAt: Date = Date(0)
     

@@ -1,6 +1,6 @@
 package com.cn.langujet.actor.exam.payload
 
 class ExamContentDownloadLink(
-    val fileId: String,
+    val fileId: Long,
     val link: String,
 )

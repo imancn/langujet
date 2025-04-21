@@ -1,15 +1,13 @@
 package com.cn.langujet.domain.exam.model
 
-import com.cn.langujet.application.arch.models.Historical
+import com.cn.langujet.application.arch.models.entity.HistoricalEntity
 import com.cn.langujet.domain.correction.model.CorrectorType
 import com.cn.langujet.domain.exam.model.enums.ExamMode
 import com.cn.langujet.domain.exam.model.enums.ExamSessionState
 import com.cn.langujet.domain.exam.model.enums.ExamType
-import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.index.CompoundIndexes
-import org.springframework.data.mongodb.core.index.IndexDirection
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
@@ -23,12 +21,12 @@ import java.util.*
         unique = false
     )
 )
-data class ExamSessionEntity(
-    @Id var id: String?,
+class ExamSessionEntity(
+    id: Long?,
     
-    @Indexed(name = "student_user_id_index", direction = IndexDirection.ASCENDING)
-    var studentUserId: String,
-    var examId: String,
+    @Indexed(name = "student_user_id_index")
+    var studentUserId: Long,
+    var examId: Long,
     var examType: ExamType,
     var examMode: ExamMode,
     var correctorType: CorrectorType,
@@ -37,10 +35,10 @@ data class ExamSessionEntity(
     var startDate: Date?,
     var endDate: Date?,
     var correctionDate: Date?,
-) : Historical() {
+) : HistoricalEntity(id = id) {
     constructor(
-        studentUserId: String,
-        examId: String,
+        studentUserId: Long,
+        examId: Long,
         examType: ExamType,
         examMode: ExamMode,
         correctorType: CorrectorType,

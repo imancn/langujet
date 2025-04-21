@@ -21,6 +21,18 @@ class EntityService<T : Entity<ID>, ID> : EntityServiceInterface<T, ID> {
     @field:Autowired
     lateinit var mongoOperations: MongoOperations
     
+    override fun save(entity: T): T {
+        return if (entity.id != null) {
+            create(entity)
+        } else {
+            update(entity)
+        }
+    }
+    
+    override fun saveMany(entities: List<T>): List<T> {
+        return entities.map { save(it) }
+    }
+    
     override fun create(entity: T): T {
         entity.id(null)
         return mongoOperations.save(entity)
@@ -28,6 +40,17 @@ class EntityService<T : Entity<ID>, ID> : EntityServiceInterface<T, ID> {
     
     override fun createMany(entities: List<T>): List<T> {
         return entities.map { create(it) }
+    }
+    
+    
+    override fun update(entity: T): T {
+        return doIfExist(entity) {
+            mongoOperations.save(entity)
+        }
+    }
+    
+    override fun updateMany(entities: List<T>): List<T> {
+        return entities.map { update(it) }
     }
     
     override fun getById(id: ID): T {
@@ -41,8 +64,11 @@ class EntityService<T : Entity<ID>, ID> : EntityServiceInterface<T, ID> {
         return mongoOperations.findOne(query, clazz, collection)
     }
     
-    override fun find(criteria: Criteria, pageable: Pageable?): List<T> {
-        return find(Query(criteria))
+    override fun findTop(count: Int): List<T> {
+        val query = Query()
+            .with(PageRequest.of(0, count))
+            .with(Sort.by(Sort.Direction.DESC, "_id"))
+        return mongoOperations.find(query, clazz, collection)
     }
     
     override fun find(query: Query, pageable: Pageable?): List<T> {
@@ -53,29 +79,8 @@ class EntityService<T : Entity<ID>, ID> : EntityServiceInterface<T, ID> {
         }
     }
     
-    override fun find(criteria: Criteria, page: Int, size: Int): List<T> {
-        val pageable: Pageable = PageRequest.of(page, size)
-        val query = Query(criteria).with(pageable)
-        return mongoOperations.find(query, clazz, collection)
-    }
-    
-    override fun find(criteria: Criteria, page: Int, size: Int, sort: Sort): List<T> {
-        val pageable: Pageable = PageRequest.of(page, size, sort)
-        val query = Query(criteria).with(pageable)
-        return mongoOperations.find(query, clazz, collection)
-    }
-    
-    override fun findTop(count: Int): List<T> {
-        val query = Query()
-            .with(PageRequest.of(0, count))
-            .with(Sort.by(Sort.Direction.DESC, "_id"))
-        return mongoOperations.find(query, clazz, collection)
-    }
-    
-    override fun update(entity: T): T {
-        return doIfExist(entity) {
-            mongoOperations.save(entity)
-        }
+    override fun find(criteria: Criteria, pageable: Pageable?): List<T> {
+        return find(Query(criteria))
     }
     
     @Deprecated("use archive()", ReplaceWith("archive"))

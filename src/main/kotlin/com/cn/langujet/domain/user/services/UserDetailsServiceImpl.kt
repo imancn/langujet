@@ -16,11 +16,12 @@ class UserDetailsServiceImpl(
     @Throws(UsernameNotFoundException::class)
     override fun loadUserByUsername(userId: String): UserDetailsImpl {
         return UserDetailsImpl.build(
-            userRepository.findByIdAndDeleted(userId).orElseThrow { InvalidCredentialException("User Not Found") }
+            userRepository.findByIdAndDeleted(userId.toLong())
+                .orElseThrow { InvalidCredentialException("User Not Found") }
         )
     }
-
-    fun userExist(userId: String): Boolean {
+    
+    fun userExist(userId: Long): Boolean {
         return userRepository.existsByIdAndDeleted(userId)
     }
 }

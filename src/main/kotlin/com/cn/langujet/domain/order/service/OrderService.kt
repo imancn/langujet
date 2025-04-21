@@ -2,8 +2,10 @@ package com.cn.langujet.domain.order.service
 
 import com.cn.langujet.actor.order.payload.*
 import com.cn.langujet.actor.util.Auth
-import com.cn.langujet.application.arch.controller.payload.response.PageResponse
 import com.cn.langujet.application.arch.advice.UnprocessableException
+import com.cn.langujet.application.arch.controller.payload.response.PageResponse
+import com.cn.langujet.application.arch.models.entity.Entity
+import com.cn.langujet.application.arch.mongo.HistoricalEntityService
 import com.cn.langujet.domain.coupon.CouponService
 import com.cn.langujet.domain.exam.service.ExamSessionService
 import com.cn.langujet.domain.order.model.OrderDetailEntity
@@ -27,13 +29,14 @@ import kotlin.jvm.optionals.getOrElse
 @Service
 class OrderService(
     private val orderRepository: OrderRepository,
+    private val orderDetailService: OrderDetailService,
     private val orderDetailRepository: OrderDetailRepository,
     private val serviceService: ServiceService,
     private val paymentService: PaymentService,
     private val examSessionService: ExamSessionService,
     private val couponService: CouponService,
     private val rollbar: Rollbar,
-) {
+) : HistoricalEntityService<OrderEntity>() {
     private val logger = LoggerFactory.getLogger(javaClass.simpleName)
     
     fun submitOrder(submitOrderRequest: SubmitOrderRequest): SubmitOrderResponse {
@@ -61,14 +64,14 @@ class OrderService(
                 finalPrice = finalPrice,
                 date = Date(System.currentTimeMillis())
             )
-            order = orderRepository.save(order)
+            order = save(order)
             initiateOrderDetails(order, services)
-            processOrder(order.id ?: "")
+            processOrder(order.id ?: Entity.UNKNOWN_ID)
             coupon?.let { couponService.changeCouponActiveFlag(it, false) }
             return SubmitOrderResponse(null)
         } else {
             val paymentType = submitOrderRequest.paymentType ?: PaymentType.STRIPE
-            val order = orderRepository.save(
+            val order = save(
                 OrderEntity(
                     id = null,
                     studentUserId = Auth.userId(),
@@ -83,18 +86,18 @@ class OrderService(
             )
             val payment = try {
                 paymentService.createPayment(
-                    order.id ?: "",
+                    order.id ?: Entity.UNKNOWN_ID,
                     finalPrice,
                     paymentType
                 )
             } catch (ex: Exception) {
-                orderRepository.deleteById(order.id ?: "")
+                orderRepository.deleteById(order.id ?: Entity.UNKNOWN_ID)
                 rollbar.error(ex)
                 ex.printStackTrace()
                 throw UnprocessableException("Payment Failed")
             }
-            order.paymentId = payment.id ?: ""
-            orderRepository.save(order)
+            order.paymentId = payment.id ?: Entity.UNKNOWN_ID
+            save(order)
             initiateOrderDetails(order, services)
             coupon?.let { couponService.changeCouponActiveFlag(it, false) }
             return SubmitOrderResponse(payment.link)
@@ -102,29 +105,30 @@ class OrderService(
     }
     
     private fun initiateOrderDetails(order: OrderEntity, services: List<ServiceEntity>) {
-        orderDetailRepository.saveAll(
+        orderDetailService.saveMany(
             services.map { service ->
                 OrderDetailEntity(
-                    orderId = order.id ?: "",
+                    orderId = order.id ?: Entity.UNKNOWN_ID,
                     service = service,
                 )
             }
         )
     }
     
-    fun processOrder(orderId: String) {
+    fun processOrder(orderId: Long) {
         val order = getOrderById(orderId)
         var orderDetails = orderDetailRepository.findByOrderId(orderId)
         orderDetails = orderDetails.map { orderDetail ->
             when (orderDetail.service.type) {
                 ServiceType.EXAM -> {
                     val examService = orderDetail.service as ServiceEntity.ExamServiceEntity
-                    val examSession = examSessionService.enrollExamSession(order.studentUserId, examService.id ?: "")
+                    val examSession =
+                        examSessionService.enrollExamSession(order.studentUserId, examService.id ?: Entity.UNKNOWN_ID)
                     orderDetail.also { it.examSessionId = examSession.examSessionId }
                 }
             }
         }
-        orderDetailRepository.saveAll(orderDetails)
+        orderDetailService.saveMany(orderDetails)
         orderRepository.save(
             order.also {
                 it.status = OrderStatus.COMPLETED
@@ -132,9 +136,9 @@ class OrderService(
         )
     }
     
-    fun rejectOrder(orderId: String) {
+    fun rejectOrder(orderId: Long) {
         val order = getOrderById(orderId)
-        orderRepository.save(
+        save(
             order.also {
                 it.status = OrderStatus.FAILED
             }
@@ -144,7 +148,7 @@ class OrderService(
         }
     }
     
-    private fun getOrderById(orderId: String): OrderEntity {
+    private fun getOrderById(orderId: Long): OrderEntity {
         return orderRepository.findById(orderId).getOrElse {
             logger.error("Order with Id $orderId not found")
             throw UnprocessableException("Order with Id $orderId not found")
@@ -162,7 +166,7 @@ class OrderService(
         return PageResponse(orderResponse.content, pageNumber, pageSize, totalOrders)
     }
     
-    fun getStudentOrderDetails(orderId: String): StudentOrderDetailsResponse {
+    fun getStudentOrderDetails(orderId: Long): StudentOrderDetailsResponse {
         val order = getOrderById(orderId)
         if (order.studentUserId != Auth.userId()) {
             throw UnprocessableException("You don't access to this order")
@@ -174,7 +178,7 @@ class OrderService(
         )
     }
     
-    fun getOrderPaymentResult(orderId: String): StudentOrderPaymentResultResponse {
+    fun getOrderPaymentResult(orderId: Long): StudentOrderPaymentResultResponse {
         val order = getOrderById(orderId)
         if (order.studentUserId != Auth.userId()) {
             throw UnprocessableException("You don't access to this order")
@@ -182,7 +186,7 @@ class OrderService(
         return StudentOrderPaymentResultResponse(order)
     }
     
-    fun isAwaitingPayment(orderId: String): Boolean {
+    fun isAwaitingPayment(orderId: Long): Boolean {
         return orderRepository.existsByStatusAndId(OrderStatus.AWAITING_PAYMENT, orderId)
     }
 }

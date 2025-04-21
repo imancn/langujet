@@ -4,6 +4,8 @@ import com.cn.langujet.actor.coupon.payload.response.ActiveCouponsResponse
 import com.cn.langujet.actor.coupon.payload.response.VerifyUserCoupon
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.arch.advice.UnprocessableException
+import com.cn.langujet.application.arch.models.entity.Entity
+import com.cn.langujet.application.arch.mongo.HistoricalEntityService
 import com.cn.langujet.domain.campaign.CampaignService
 import com.cn.langujet.domain.user.services.UserService
 import org.springframework.stereotype.Service
@@ -16,7 +18,7 @@ class CouponService(
     private val couponRepository: CouponRepository,
     private val userService: UserService,
     private val campaignService: CampaignService
-) {
+) : HistoricalEntityService<CouponEntity>() {
     
     private val random = SecureRandom()
     private val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -39,7 +41,7 @@ class CouponService(
         }
     }
     
-    fun getCouponsByUserId(userId: String, active: Boolean?): List<ActiveCouponsResponse> {
+    fun getCouponsByUserId(userId: Long, active: Boolean?): List<ActiveCouponsResponse> {
         val coupons = when (active) {
             null -> couponRepository.findByUserId(userId)
             else -> couponRepository.findByUserIdAndActive(userId, active)
@@ -50,7 +52,7 @@ class CouponService(
     }
     
     fun changeCouponActiveFlag(coupon: CouponEntity, active: Boolean) {
-        couponRepository.save(coupon.also { it.active = active })
+        save(coupon.also { it.active = active })
     }
     
     fun getUserActiveCouponByCode(couponCode: String?): CouponEntity? {
@@ -63,7 +65,7 @@ class CouponService(
         }
     }
     
-    fun getCouponById(id: String): CouponEntity {
+    fun getCouponById(id: Long): CouponEntity {
         return couponRepository.findById(id).orElseThrow {
             throw UnprocessableException("Payment with Id $id not found")
         }
@@ -92,14 +94,14 @@ class CouponService(
         return code
     }
     
-    private fun createCoupon(campaignCode: String, userId: String? = null): CouponEntity? {
+    private fun createCoupon(campaignCode: String, userId: Long? = null): CouponEntity? {
         val campaign = campaignService.getActiveCampaignByCode(campaignCode.uppercase()) ?: return null
-        val campaignId = campaign.id ?: ""
+        val campaignId = campaign.id ?: Entity.UNKNOWN_ID
         if (userId?.let { couponRepository.existsByUserIdAndCampaignId(it, campaignId) } == true) {
             return null
         }
         val code = generateCouponCode()
-        val coupon = couponRepository.save(
+        val coupon = save(
             CouponEntity(
                 campaignId = campaignId,
                 code = code,
@@ -119,7 +121,7 @@ class CouponService(
             throw UnprocessableException("Coupon is invalid")
         } else if (coupon.userId == null) {
             coupon.userId = Auth.userId()
-            couponRepository.save(coupon)
+            save(coupon)
         } else if (coupon.userId == Auth.userId()) {
             coupon
         } else {

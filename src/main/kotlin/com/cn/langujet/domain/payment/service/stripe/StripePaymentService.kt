@@ -25,14 +25,14 @@ class StripePaymentService(private val stripePaymentClient: StripePaymentClient)
     }
     
     
-    fun createPaymentSessionByProxy(amount: Double, orderId: String): StripeSessionInfo {
+    fun createPaymentSessionByProxy(amount: Double, orderId: Long): StripeSessionInfo {
         return stripePaymentClient.createPaymentSession(amount, orderId, langujetProxyClientSecret)
     }
     
     /**
      * this method immediately unused because of sanctions
      */
-    fun createPaymentSession(price: Double, orderId: String): Session {
+    fun createPaymentSession(price: Double, orderId: Long): Session {
         val sessionParams = SessionCreateParams.builder()
             .addAllPaymentMethodType(
                 listOf(

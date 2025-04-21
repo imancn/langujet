@@ -7,7 +7,7 @@ import java.util.*
 
 abstract class LogEntity : Entity<String>() {
     @field:CreatedBy
-    var createdBy: String = "undefined"
+    var createdBy: Long = Auth.UNDEFINED
     
     @field:CreatedDate
     var createdAt: Date = Date(0)

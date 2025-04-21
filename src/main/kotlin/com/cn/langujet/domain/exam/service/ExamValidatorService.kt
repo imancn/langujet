@@ -1,6 +1,7 @@
 package com.cn.langujet.domain.exam.service
 
 import com.cn.langujet.application.arch.advice.UnprocessableException
+import com.cn.langujet.application.arch.models.entity.Entity
 import com.cn.langujet.domain.correction.service.CorrectAnswerService
 import com.cn.langujet.domain.exam.model.ExamEntity
 import com.cn.langujet.domain.exam.model.enums.ExamType
@@ -19,7 +20,7 @@ class ExamValidatorService(
 ) {
     
     fun validate(exam: ExamEntity) {
-        val sections = sectionRepository.findAllByExamId(exam.id ?: "")
+        val sections = sectionRepository.findAllByExamId(exam.id ?: Entity.UNKNOWN_ID)
         validateSections(exam, sections)
         sections.forEach { section ->
             validateSectionParts(section)

@@ -1,7 +1,6 @@
 package com.cn.langujet.domain.user.model
 
-import com.cn.langujet.application.arch.models.Log
-import org.springframework.data.annotation.Id
+import com.cn.langujet.application.arch.models.entity.HistoricalEntity
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.DBRef
@@ -10,13 +9,13 @@ import java.util.*
 
 @Document(collection = "email_verification_tokens")
 @TypeAlias("email_verification_tokens")
-data class EmailVerificationTokenEntity(
-    @Id var id: String?,
+class EmailVerificationTokenEntity(
+    id: Long?,
     @DBRef var user: UserEntity,
     var token: String,
     @Indexed(name = "expiry_date_ttl", expireAfterSeconds = 0)
     var expiryDate: Date,
-) : Log() {
+) : HistoricalEntity(id = id) {
     constructor(user: UserEntity) : this(
         id = null, user = user, token = makeRandom6DigitsToken(), expiryDate = calculateExpiryDate()
     )

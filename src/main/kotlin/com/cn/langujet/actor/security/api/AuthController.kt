@@ -4,26 +4,20 @@ import com.cn.langujet.actor.security.response.JwtResponse
 import com.cn.langujet.actor.security.response.RefreshTokenResponse
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.actor.util.toOkResponseEntity
-import com.cn.langujet.application.arch.advice.AccessDeniedException
 import com.cn.langujet.application.arch.advice.InvalidCredentialException
 import com.cn.langujet.application.arch.advice.InvalidInputException
 import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.application.service.smtp.MailSenderService
 import com.cn.langujet.domain.corrector.CorrectorEntity
 import com.cn.langujet.domain.corrector.CorrectorRepository
+import com.cn.langujet.domain.corrector.CorrectorService
 import com.cn.langujet.domain.student.model.StudentEntity
-import com.cn.langujet.domain.student.repository.StudentRepository
 import com.cn.langujet.domain.student.service.StudentService
 import com.cn.langujet.domain.user.model.*
 import com.cn.langujet.domain.user.repository.EmailVerificationTokenRepository
 import com.cn.langujet.domain.user.repository.ResetPasswordTokenRepository
 import com.cn.langujet.domain.user.repository.UserRepository
-import com.cn.langujet.domain.user.services.GoogleAuthService
-import com.cn.langujet.domain.user.services.JwtService
-import com.cn.langujet.domain.user.services.RefreshTokenService
-import com.cn.langujet.domain.user.services.toStandardMail
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
+import com.cn.langujet.domain.user.services.*
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
@@ -36,34 +30,50 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-import java.util.*
 import kotlin.jvm.optionals.getOrElse
 
 @RestController
 @RequestMapping("/api/v1/auth")
 @Validated
 class AuthController(
-    val authenticationManager: AuthenticationManager,
-    val userRepository: UserRepository,
-    val studentRepository: StudentRepository,
-    val correctorRepository: CorrectorRepository,
-    val refreshTokenService: RefreshTokenService,
-    val emailVerificationTokenRepository: EmailVerificationTokenRepository,
-    val resetPasswordTokenRepository: ResetPasswordTokenRepository,
-    val mailSenderService: MailSenderService,
-    val encoder: PasswordEncoder,
-    val jwtService: JwtService,
+    private val authenticationManager: AuthenticationManager,
+    private val userRepository: UserRepository,
+    private val correctorRepository: CorrectorRepository,
+    private val refreshTokenService: RefreshTokenService,
+    private val emailVerificationTokenRepository: EmailVerificationTokenRepository,
+    private val resetPasswordTokenRepository: ResetPasswordTokenRepository,
+    private val mailSenderService: MailSenderService,
+    private val encoder: PasswordEncoder,
+    private val jwtService: JwtService,
     private val googleAuthService: GoogleAuthService,
     private val studentService: StudentService,
+    private val userService: UserService,
+    private val correctorService: CorrectorService,
+    private val emailVerificationTokenService: EmailVerificationTokenService,
+    private val resetPasswordTokenService: ResetPasswordTokenService,
 ) {
 //    @Todo: Move the logic to the service layer
     
-    @PostMapping("/sign-in")
-    fun authenticateUser(
+    @PostMapping("/sign-in/mail")
+    fun signingByEmail(
         @RequestParam @NotBlank @Email email: String,
         @RequestParam @NotBlank password: String,
     ): ResponseEntity<JwtResponse> {
-        val user = userRepository.findByStandardEmailAndDeleted(email.toStandardMail()).orElseThrow {
+        return signIn(email.toStandardMail(), password)
+    }
+    
+    @PostMapping("/sign-in/username")
+    fun signingByUsername(
+        @RequestParam @NotBlank username: String,
+        @RequestParam @NotBlank password: String,
+    ): ResponseEntity<JwtResponse> {
+        return signingByEmail(username, password)
+    }
+    
+    private fun signIn(username: String, password: String): ResponseEntity<JwtResponse> {
+        val user = userRepository.findByUsernameAndDeleted(
+            if (username.endsWith("@gmail.com")) username else username
+        ).orElseThrow {
             InvalidCredentialException("Invalid credentials")
         }
         if (user.password.isNullOrBlank()) throw UnprocessableException("You must reset your password")
@@ -94,9 +104,9 @@ class AuthController(
         @RequestParam @NotBlank @Size(max = 50) @Email email: String,
         @RequestParam @NotBlank @Size(min = 6, max = 40) password: String,
     ): ResponseEntity<String> {
-        val user = registerUser(email, password, mutableSetOf(Role.ROLE_STUDENT))
+        val user = registerUserByEmail(email, password, mutableSetOf(Role.ROLE_STUDENT))
         sendVerificationMail(user.email)
-        studentRepository.save(StudentEntity(user, fullName))
+        studentService.create(StudentEntity(user, fullName))
         return toOkResponseEntity("User registered successfully!")
     }
     
@@ -106,7 +116,7 @@ class AuthController(
         @RequestParam @NotBlank @Email email: String,
         @RequestParam @NotNull ieltsScore: Double,
     ): ResponseEntity<String> {
-        var user = userRepository.findByStandardEmailAndDeleted(email.toStandardMail()).getOrElse {
+        var user = userRepository.findByUsernameAndDeleted(email.toStandardMail()).getOrElse {
             throw UnprocessableException("user must sign-up as student first")
         }
         if (user.id?.let { correctorRepository.existsByUser_Id(it) } != false){
@@ -114,17 +124,17 @@ class AuthController(
         }
         val fullName = user.id?.let { studentService.getStudentByUserId(it) }?.fullName ?: user.email
         user.roles =  user.roles.toMutableSet().also { it.add(Role.ROLE_CORRECTOR) }
-        user = userRepository.save(user)
-        correctorRepository.save(CorrectorEntity(user, fullName, ieltsScore))
+        user = userService.save(user)
+        correctorService.save(CorrectorEntity(user, fullName, ieltsScore))
         return toOkResponseEntity("Corrector registered successfully!")
     }
     
-    private fun registerUser(email: String, password: String, roles: Set<Role>): UserEntity {
-        if (userRepository.existsByStandardEmailAndDeleted(email.toStandardMail())) throw InvalidInputException("Email is already in use!")
-        return userRepository.save(
+    private fun registerUserByEmail(email: String, password: String, roles: Set<Role>): UserEntity {
+        if (userRepository.existsByUsernameAndDeleted(email.toStandardMail())) throw InvalidInputException("Email is already in use!")
+        return userService.save(
             UserEntity(
                 id = null,
-                standardEmail = email.toStandardMail(),
+                username = email.toStandardMail(),
                 email = email,
                 emailVerified = false,
                 password = encoder.encode(password),
@@ -137,29 +147,29 @@ class AuthController(
     fun verifyEmail(
         @PathVariable @Email @NotBlank email: String, @PathVariable @NotBlank verificationCode: String
     ): ResponseEntity<String> {
-        val user = userRepository.findByStandardEmailAndDeleted(email.toStandardMail())
+        val user = userRepository.findByUsernameAndDeleted(email.toStandardMail())
             .orElseThrow { UnprocessableException("User Not Found") }
         if (user.emailVerified) throw UnprocessableException("Your Email Was Verified")
         val verificationToken = emailVerificationTokenRepository.findByUser(user).orElseThrow {
             mailSenderService.sendEmailVerificationMail(
-                emailVerificationTokenRepository.save(EmailVerificationTokenEntity(user))
+                emailVerificationTokenService.save(EmailVerificationTokenEntity(user))
             )
             UnprocessableException("Your verification code has been expired.\nWe sent a new verification code.")
         }
-        if (verificationToken.token == verificationCode) userRepository.save(user.also { it.emailVerified = true })
+        if (verificationToken.token == verificationCode) userService.save(user.also { it.emailVerified = true })
         else throw InvalidInputException("Your verification code is not available.")
         return toOkResponseEntity("Email Verified successfully!")
     }
     
     @PostMapping("/signup/email/verification-mail")
     fun sendVerificationMail(@RequestParam @Email @NotBlank email: String): ResponseEntity<String> {
-        val user = userRepository.findByStandardEmailAndDeleted(email.toStandardMail())
+        val user = userRepository.findByUsernameAndDeleted(email.toStandardMail())
             .orElseThrow { UnprocessableException("User Not Found") }
         
         if (user.emailVerified) throw UnprocessableException("Your Email Was Verified")
         
         val emailVerificationToken = emailVerificationTokenRepository.findByUser(user).getOrElse {
-            emailVerificationTokenRepository.save(EmailVerificationTokenEntity(user))
+            emailVerificationTokenService.save(EmailVerificationTokenEntity(user))
         }
         mailSenderService.sendEmailVerificationMail(emailVerificationToken)
         return toOkResponseEntity("Verification Mail Has Been Sent.")
@@ -181,10 +191,10 @@ class AuthController(
     
     @PostMapping("/reset-password")
     fun resetPassword(@RequestParam @Email @NotBlank email: String): ResponseEntity<String> {
-        val user = userRepository.findByStandardEmailAndDeleted(email.toStandardMail())
+        val user = userRepository.findByUsernameAndDeleted(email.toStandardMail())
             .orElseThrow { UnprocessableException("User Not Found") }
         val token = resetPasswordTokenRepository.findByUser(user).getOrElse {
-            resetPasswordTokenRepository.save(ResetPasswordTokenEntity(user))
+            resetPasswordTokenService.save(ResetPasswordTokenEntity(user))
         }
         mailSenderService.sendResetPasswordMail(token)
         return toOkResponseEntity("The reset password link has been mailed to you.")
@@ -196,14 +206,14 @@ class AuthController(
         @RequestParam @NotBlank code: String,
         @RequestParam @Size(min = 6, max = 40) @NotBlank newPassword: String
     ): ResponseEntity<String> {
-        val user = userRepository.findByStandardEmailAndDeleted(email.toStandardMail())
+        val user = userRepository.findByUsernameAndDeleted(email.toStandardMail())
             .orElseThrow { UnprocessableException("User Not Found") }
         val token = resetPasswordTokenRepository.findByUser(user).orElseThrow {
             InvalidCredentialException("Your reset password token has been expired. Request for reset password again.")
         }
         if (token.token == code) {
             user.password = encoder.encode(newPassword)
-            userRepository.save(user)
+            userService.save(user)
             resetPasswordTokenRepository.delete(token)
         } else throw InvalidCredentialException("Your reset password token is invalid.")
         return toOkResponseEntity("Your password has been reset successfully")
@@ -231,10 +241,10 @@ class AuthController(
     @PostMapping("/delete-account")
     @PreAuthorize("hasAnyRole('STUDENT')")
     fun deleteAccount(): String {
-        val user = userRepository.findByStandardEmailAndDeleted(Auth.userEmail())
+        val user = userRepository.findByUsernameAndDeleted(Auth.userEmail())
             .orElseThrow { UnprocessableException("User Not Found") }
         val emailVerificationToken = emailVerificationTokenRepository.findByUser(user).getOrElse {
-            emailVerificationTokenRepository.save(EmailVerificationTokenEntity(user))
+            emailVerificationTokenService.save(EmailVerificationTokenEntity(user))
         }
         mailSenderService.sendDeleteAccountVerificationMail(emailVerificationToken)
         return "Verification Mail Has Been Sent"
@@ -242,15 +252,15 @@ class AuthController(
     
     @PostMapping("/delete-account/verify")
     fun verifyDeleteAccount(@RequestParam @NotBlank verificationCode: String): String {
-        val user = userRepository.findByStandardEmailAndDeleted(Auth.userEmail())
+        val user = userRepository.findByUsernameAndDeleted(Auth.userEmail())
             .orElseThrow { UnprocessableException("User Not Found") }
         val verificationToken = emailVerificationTokenRepository.findByUser(user).orElseThrow {
             mailSenderService.sendDeleteAccountVerificationMail(
-                emailVerificationTokenRepository.save(EmailVerificationTokenEntity(user))
+                emailVerificationTokenService.save(EmailVerificationTokenEntity(user))
             )
             UnprocessableException("Your verification code has been expired.\nWe sent a new verification code")
         }
-        if (verificationToken.token == verificationCode) userRepository.save(user.also { it.deleted = true })
+        if (verificationToken.token == verificationCode) userService.save(user.also { it.deleted = true })
         else throw InvalidInputException("Your verification code is not available")
         return "Your account has been deleted successfully"
     }

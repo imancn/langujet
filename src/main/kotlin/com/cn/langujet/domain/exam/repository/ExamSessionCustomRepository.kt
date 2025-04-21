@@ -19,7 +19,7 @@ class ExamSessionCustomRepository(
 ) {
     fun searchExamSessions(
         searchRequest: ExamSessionSearchStudentRequest,
-        userId: String
+        userId: Long
     ): PageResponse<ExamSessionSearchResponse> {
         var foundExams = if (!searchRequest.examName.isNullOrEmpty()) {
             mongoOperations.find(

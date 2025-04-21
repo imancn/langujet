@@ -5,7 +5,7 @@ import com.cn.langujet.domain.user.model.UserEntity
 import org.springframework.data.mongodb.repository.MongoRepository
 import java.util.*
 
-interface EmailVerificationTokenRepository : MongoRepository<EmailVerificationTokenEntity, String> {
+interface EmailVerificationTokenRepository : MongoRepository<EmailVerificationTokenEntity, Long> {
 
     fun findByUser(user: UserEntity): Optional<EmailVerificationTokenEntity>
 }

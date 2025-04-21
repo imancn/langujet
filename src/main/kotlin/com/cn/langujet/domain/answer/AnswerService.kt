@@ -2,6 +2,7 @@ package com.cn.langujet.domain.answer
 
 import com.cn.langujet.actor.answer.payload.request.*
 import com.cn.langujet.application.arch.advice.UnprocessableException
+import com.cn.langujet.application.arch.mongo.HistoricalEntityService
 import com.cn.langujet.application.service.file.domain.data.model.FileBucket
 import com.cn.langujet.application.service.file.domain.service.FileService
 import com.cn.langujet.domain.answer.model.AnswerEntity
@@ -15,9 +16,9 @@ class AnswerService(
     private val answerRepository: AnswerRepository,
     private val examSessionService: ExamSessionService,
     private val fileService: FileService
-) {
+) : HistoricalEntityService<AnswerEntity>() {
     fun submitVoiceAnswer(
-        examSessionId: String,
+        examSessionId: Long,
         sectionOrder: Int,
         partOrder: Int,
         questionOrder: Int,
@@ -32,19 +33,20 @@ class AnswerService(
             throw UnprocessableException("You have submitted this answer once")
         }
         
-        return answerRepository.save(
+        return create(
             AnswerEntity.VoiceAnswerEntity(
+                null,
                 examSessionId,
                 sectionOrder,
                 partOrder,
                 questionOrder,
                 fileEntity.id!!
             )
-        )
+        ) as AnswerEntity.VoiceAnswerEntity
     }
     
     fun submitBulkAnswers(
-        examSessionId: String?,
+        examSessionId: Long?,
         sectionOrder: Int?,
         answerRequestList: List<AnswerBulkRequest>,
     ): Boolean {
@@ -64,11 +66,12 @@ class AnswerService(
     
     private inline fun <reified T : AnswerEntity> convertAnswerBulkRequestToAnswer(
         answerRequest: AnswerBulkRequest,
-        examSessionId: String,
+        examSessionId: Long,
         sectionOrder: Int
     ): T {
         val answer: AnswerEntity = when (answerRequest) {
             is TextBulkAnswerRequest -> AnswerEntity.TextAnswerEntity(
+                null,
                 examSessionId,
                 sectionOrder,
                 answerRequest.partOrder!!,
@@ -77,6 +80,7 @@ class AnswerService(
             )
             
             is TextIssuesBulkAnswerRequest -> AnswerEntity.TextIssuesAnswerEntity(
+                null,
                 examSessionId,
                 sectionOrder,
                 answerRequest.partOrder!!,
@@ -85,6 +89,7 @@ class AnswerService(
             )
             
             is TrueFalseBulkAnswerRequest -> AnswerEntity.TrueFalseAnswerEntity(
+                null,
                 examSessionId,
                 sectionOrder,
                 answerRequest.partOrder!!,
@@ -93,6 +98,7 @@ class AnswerService(
             )
             
             is MultipleChoiceBulkAnswerRequest -> AnswerEntity.MultipleChoiceAnswerEntity(
+                null,
                 examSessionId,
                 sectionOrder,
                 answerRequest.partOrder!!,
@@ -115,7 +121,7 @@ class AnswerService(
         return answer
     }
     
-    private fun examSessionPreCheck(examSessionId: String) {
+    private fun examSessionPreCheck(examSessionId: Long) {
         val examSession = examSessionService.getStudentExamSession(examSessionId)
         if (examSession.state.order == ExamSessionState.ENROLLED.order)
             throw UnprocessableException("The exam session has been not started yet")

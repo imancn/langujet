@@ -10,8 +10,8 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document(collection = "questions")
 sealed class QuestionEntity(
     id: Long?,
-    var examId: String,
-    var sectionId: String,
+    var examId: Long,
+    var sectionId: Long,
     var partId: Long,
     var order: Int,
     var header: String,
@@ -23,12 +23,12 @@ sealed class QuestionEntity(
 @Document(collection = "questions")
 class SpeakingQuestionEntity(
     id: Long?,
-    examId: String,
-    sectionId: String,
+    examId: Long,
+    sectionId: Long,
     partId: Long,
     order: Int,
     header: String,
-    var audioId: String?,
+    var audioId: Long?,
     var time: Long,
 ) : QuestionEntity(
     id = id,
@@ -45,8 +45,8 @@ class SpeakingQuestionEntity(
 @Document(collection = "questions")
 class WritingQuestionEntity(
     id: Long?,
-    examId: String,
-    sectionId: String,
+    examId: Long,
+    sectionId: Long,
     partId: Long,
     order: Int,
     header: String,

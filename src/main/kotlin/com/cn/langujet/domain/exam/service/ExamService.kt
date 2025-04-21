@@ -1,10 +1,12 @@
 package com.cn.langujet.domain.exam.service
 
 import com.cn.langujet.actor.exam.payload.ExamDTO
-import com.cn.langujet.application.arch.controller.payload.response.PageResponse
-import com.cn.langujet.application.arch.controller.payload.response.toCustomPage
 import com.cn.langujet.application.arch.advice.InvalidInputException
 import com.cn.langujet.application.arch.advice.UnprocessableException
+import com.cn.langujet.application.arch.controller.payload.response.PageResponse
+import com.cn.langujet.application.arch.controller.payload.response.toCustomPage
+import com.cn.langujet.application.arch.models.entity.Entity
+import com.cn.langujet.application.arch.mongo.HistoricalEntityService
 import com.cn.langujet.domain.exam.model.ExamEntity
 import com.cn.langujet.domain.exam.repository.ExamRepository
 import org.springframework.data.domain.PageRequest
@@ -14,19 +16,19 @@ import org.springframework.stereotype.Service
 class ExamService(
     private val examRepository: ExamRepository,
     private val examValidatorService: ExamValidatorService,
-) {
+) : HistoricalEntityService<ExamEntity>() {
     
     fun createExam(exam: ExamDTO): ExamDTO {
         exam.id = null
         exam.active = false
         return ExamDTO(
-            examRepository.save(exam.toExam())
+            save(exam.toExam())
         )
     }
     
     fun updateExam(exam: ExamDTO): ExamDTO {
-        if (exam.id.isNullOrBlank()) throw InvalidInputException("Exam Id is empty")
-        val existingExam = getExamById(exam.id ?: "")
+        if (exam.id == null) throw InvalidInputException("Exam Id is empty")
+        val existingExam = getExamById(exam.id ?: Entity.UNKNOWN_ID)
         existingExam.name = exam.name
         existingExam.type = exam.examType
         existingExam.description = exam.description
@@ -38,11 +40,11 @@ class ExamService(
             examValidatorService.validate(existingExam)
         }
         return ExamDTO(
-            examRepository.save(existingExam)
+            save(existingExam)
         )
     }
     
-    fun getExamById(id: String): ExamEntity {
+    fun getExamById(id: Long): ExamEntity {
         return examRepository.findById(id).orElseThrow { UnprocessableException("Exam with id $id not found") }
     }
     

@@ -6,7 +6,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
 class UserDetailsImpl(
-    val id: String,
+    val id: Long,
     val email: String,
     val emailVerified: Boolean,
     @field:JsonIgnore private val password: String?,
@@ -22,7 +22,7 @@ class UserDetailsImpl(
     }
 
     override fun getUsername(): String {
-        return id
+        return id.toString()
     }
 
     override fun isAccountNonExpired(): Boolean {
@@ -66,7 +66,7 @@ class UserDetailsImpl(
             }
             return UserDetailsImpl(
                 user.id!!,
-                user.standardEmail,
+                user.username,
                 user.emailVerified,
                 user.password,
                 authorities

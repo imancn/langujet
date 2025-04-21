@@ -5,7 +5,7 @@ import com.cn.langujet.domain.order.model.OrderStatus
 import java.util.*
 
 data class StudentOrderResponse(
-    val orderId: String?,
+    val orderId: Long?,
     val status: OrderStatus,
     val paymentType: String,
     val totalPrice: Double,

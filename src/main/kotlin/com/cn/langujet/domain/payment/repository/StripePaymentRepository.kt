@@ -3,9 +3,9 @@ package com.cn.langujet.domain.payment.repository
 import com.cn.langujet.domain.payment.model.StripePaymentEntity
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Repository
-import java.util.Optional
+import java.util.*
 
 @Repository
-interface StripePaymentRepository: MongoRepository<StripePaymentEntity, String> {
+interface StripePaymentRepository : MongoRepository<StripePaymentEntity, Long> {
     fun findBySessionId(id: String): Optional<StripePaymentEntity>
 }

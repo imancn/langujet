@@ -1,5 +1,6 @@
 package com.cn.langujet.domain.payment.service
 
+import com.cn.langujet.application.arch.mongo.HistoricalEntityService
 import com.cn.langujet.domain.payment.model.*
 import com.cn.langujet.domain.payment.repository.PaymentRepository
 import com.cn.langujet.domain.payment.service.stripe.StripePaymentService
@@ -11,18 +12,18 @@ class PaymentService(
     private val paymentRepository: PaymentRepository,
     private val zarinPalPaymentService: ZarinPalPaymentService,
     private val stripePaymentService: StripePaymentService
-) {
-    fun createPayment(orderId: String, amount: Double, paymentType: PaymentType): PaymentEntity {
+) : HistoricalEntityService<PaymentEntity>() {
+    fun createPayment(orderId: Long, amount: Double, paymentType: PaymentType): PaymentEntity {
         return when(paymentType) {
             PaymentType.STRIPE -> createStripePayment(orderId, amount, paymentType)
             PaymentType.ZARIN_PAL -> createZarinPalPayment(orderId, amount, paymentType)
         }
     }
     
-    private fun createZarinPalPayment(orderId: String, amount: Double, paymentType: PaymentType): PaymentEntity {
+    private fun createZarinPalPayment(orderId: Long, amount: Double, paymentType: PaymentType): PaymentEntity {
         val amountInIRR = (amount * 600_000).toInt() /// todo: it should be modified later and use exchange service
         val zarinPalPayment = zarinPalPaymentService.createPaymentSession(amountInIRR, orderId)
-        return paymentRepository.save(
+        return save(
             ZarinPalPaymentEntity(
                 orderId = orderId,
                 status = PaymentStatus.PENDING,
@@ -39,9 +40,9 @@ class PaymentService(
         )
     }
     
-    private fun createStripePayment(orderId: String, amount: Double, paymentType: PaymentType): PaymentEntity {
+    private fun createStripePayment(orderId: Long, amount: Double, paymentType: PaymentType): PaymentEntity {
         val stripeSession = stripePaymentService.createPaymentSessionByProxy(amount, orderId)
-        return paymentRepository.save(
+        return save(
             StripePaymentEntity(
                 orderId = orderId,
                 status = PaymentStatus.PENDING,

@@ -2,9 +2,9 @@ package com.cn.langujet.domain.coupon
 
 import org.springframework.data.mongodb.repository.MongoRepository
 
-interface CouponRepository : MongoRepository<CouponEntity, String> {
+interface CouponRepository : MongoRepository<CouponEntity, Long> {
     fun findByCode(code: String): CouponEntity?
-    fun findByUserId(userId: String): List<CouponEntity>
-    fun findByUserIdAndActive(userId: String, active: Boolean): List<CouponEntity>
-    fun existsByUserIdAndCampaignId(userId: String, campaignId: String): Boolean
+    fun findByUserId(userId: Long): List<CouponEntity>
+    fun findByUserIdAndActive(userId: Long, active: Boolean): List<CouponEntity>
+    fun existsByUserIdAndCampaignId(userId: Long, campaignId: Long): Boolean
 }

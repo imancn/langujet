@@ -11,12 +11,12 @@ data class SectionResultResponse(
     var recommendation: String?,
     var attachmentUrl: String?
 ) {
-    constructor(sectionResult: SectionResultEntity) : this(
+    constructor(sectionResult: SectionResultEntity, attachmentUrl: String? = null) : this(
         sectionResult.sectionOrder,
         sectionResult.sectionType,
         sectionResult.correctIssuesCount,
         sectionResult.score,
         sectionResult.recommendation,
-        sectionResult.attachmentFileId
+        attachmentUrl
     )
 }

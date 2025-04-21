@@ -2,9 +2,11 @@ package com.cn.langujet.domain.exam.service
 
 import com.cn.langujet.actor.exam.payload.*
 import com.cn.langujet.actor.util.Auth
-import com.cn.langujet.application.arch.controller.payload.response.PageResponse
 import com.cn.langujet.application.arch.advice.InvalidCredentialException
 import com.cn.langujet.application.arch.advice.UnprocessableException
+import com.cn.langujet.application.arch.controller.payload.response.PageResponse
+import com.cn.langujet.application.arch.models.entity.Entity
+import com.cn.langujet.application.arch.mongo.HistoricalEntityService
 import com.cn.langujet.application.service.smtp.MailSenderService
 import com.cn.langujet.domain.correction.service.CorrectionService
 import com.cn.langujet.domain.exam.model.ExamSessionEntity
@@ -33,15 +35,15 @@ class ExamSessionService(
     private val studentService: StudentService,
     private val partService: PartService,
     private val questionService: QuestionService
-) {
-    fun getExamSessionById(id: String): ExamSessionEntity {
+) : HistoricalEntityService<ExamSessionEntity>() {
+    fun getExamSessionById(id: Long): ExamSessionEntity {
         return examSessionRepository.findById(id).orElseThrow {
             UnprocessableException("ExamSession with id: $id not found")
         }
     }
     
     fun getStudentExamSession(
-        examSessionId: String,
+        examSessionId: Long,
     ): ExamSessionEntity {
         val examSession = getExamSessionById(examSessionId)
         if (Auth.userId() != examSession.studentUserId) {
@@ -50,7 +52,7 @@ class ExamSessionService(
         return examSession
     }
     
-    fun getStudentExamSessionDetailsResponse(examSessionId: String): ExamSessionDetailsResponse {
+    fun getStudentExamSessionDetailsResponse(examSessionId: Long): ExamSessionDetailsResponse {
         val examSession = getStudentExamSession(examSessionId)
         val sections = sectionService.getSectionsMetaData(examSession.examId).sortedBy { it.order }
         return ExamSessionDetailsResponse(sections)
@@ -74,17 +76,17 @@ class ExamSessionService(
                 pageSize = request.pageSize,
                 pageNumber = request.pageNumber,
             ),
-            userService.getUserByEmail(request.studentEmail).id ?: ""
+            userService.getUserByEmail(request.studentEmail).id ?: Entity.UNKNOWN_ID
         )
     }
     
     
-    fun enrollExamSessionByEmail(email: String, examServiceId: String, examId: String? = null): ExamSessionEnrollResponse {
+    fun enrollExamSessionByEmail(email: String, examServiceId: Long, examId: Long? = null): ExamSessionEnrollResponse {
         val userId = userService.getUserByEmail(email).id ?: throw UnprocessableException("User not found")
         return enrollExamSession(userId, examServiceId, examId)
     }
     
-    fun enrollExamSession(userId: String, examServiceId: String, examId: String? = null): ExamSessionEnrollResponse {
+    fun enrollExamSession(userId: Long, examServiceId: Long, examId: Long? = null): ExamSessionEnrollResponse {
         val service = serviceService.getById(examServiceId) as ServiceEntity.ExamServiceEntity
         val exam = if (examId != null) {
             examService.getExamById(examId).let {
@@ -97,16 +99,21 @@ class ExamSessionService(
         } else {
             examGeneratorService.getRandomStudentAvailableExam(userId, service)
         }
-        val examSession = examSessionRepository.save(
+        val examSession = save(
             ExamSessionEntity(
-                userId, exam.id ?: "", exam.type, exam.mode, service.correctorType, Date(System.currentTimeMillis())
+                userId,
+                exam.id ?: Entity.UNKNOWN_ID,
+                exam.type,
+                exam.mode,
+                service.correctorType,
+                Date(System.currentTimeMillis())
             )
         )
         return ExamSessionEnrollResponse(examSession)
     }
     
     fun getExamSection(
-        examSessionId: String, sectionOrder: Int
+        examSessionId: Long, sectionOrder: Int
     ): SectionDTO {
         val examSession = examSessionRepository.findByStudentUserIdAndState(
             Auth.userId(), ExamSessionState.STARTED
@@ -125,7 +132,7 @@ class ExamSessionService(
             throw UnprocessableException("There is no section left")
         }
         if (examSession.state == ExamSessionState.ENROLLED) {
-            examSessionRepository.save(examSession.also {
+            save(examSession.also {
                 it.startDate = Date(System.currentTimeMillis())
                 it.state = ExamSessionState.STARTED
             })
@@ -140,7 +147,7 @@ class ExamSessionService(
         ).also { it.id = null; it.examId = null }
     }
     
-    fun finishExamSession(examSessionId: String): ExamSessionFinishResponse {
+    fun finishExamSession(examSessionId: Long): ExamSessionFinishResponse {
         var examSession = getStudentExamSession(examSessionId)
         if (examSession.state == ExamSessionState.ENROLLED) {
             throw UnprocessableException("The exam session has not been started")
@@ -148,24 +155,28 @@ class ExamSessionService(
         if (examSession.state.order >= ExamSessionState.FINISHED.order) {
             return ExamSessionFinishResponse(examSession.state)
         }
-        examSession = examSessionRepository.save(examSession.also {
+        examSession = save(examSession.also {
             it.state = ExamSessionState.FINISHED
             it.endDate = Date(System.currentTimeMillis())
         })
         correctionService.initiateExamSessionCorrection(examSession)
-        examSession = getExamSessionById(examSession.id ?: "")
+        examSession = getExamSessionById(examSession.id ?: Entity.UNKNOWN_ID)
         return ExamSessionFinishResponse(examSession.state)
     }
     
-    fun finalizeCorrection(examSessionId: String) {
+    fun finalizeCorrection(examSessionId: Long) {
         val examSession = getExamSessionById(examSessionId)
         if (examSession.state == ExamSessionState.FINISHED) {
             examSession.state = ExamSessionState.CORRECTED
             examSession.correctionDate = Date(System.currentTimeMillis())
             val exam = examService.getExamById(examSession.examId)
-            examSessionRepository.save(examSession).run {
+            save(examSession).run {
                 val student = studentService.getStudentByUserId(examSession.studentUserId)
-                mailSenderService.sendExamCorrectionNotificationEmail(student.user.standardEmail, student.fullName, exam.name)
+                mailSenderService.sendExamCorrectionNotificationEmail(
+                    student.user.username,
+                    student.fullName,
+                    exam.name
+                )
             }
         }
     }

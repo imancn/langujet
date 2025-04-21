@@ -20,7 +20,7 @@ class CampaignController(private val campaignService: CampaignService) {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/active")
     fun changeCampaignActiveFlag(
-        @RequestParam campaignId: String, @RequestParam active: Boolean
+        @RequestParam campaignId: Long, @RequestParam active: Boolean
     ): CampaignEntity {
         return campaignService.changeCampaignActiveFlag(campaignId, active)
     }
@@ -28,7 +28,7 @@ class CampaignController(private val campaignService: CampaignService) {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/metadata")
     fun changeCampaignMetadata(
-        @RequestParam campaignId: String, @RequestParam name: String? = null,
+        @RequestParam campaignId: Long, @RequestParam name: String? = null,
         @RequestParam tag: String? = null, @RequestParam description: String? = null
     ): CampaignEntity {
         return campaignService.changeCampaignMetadata(campaignId, name, tag, description)
@@ -37,7 +37,7 @@ class CampaignController(private val campaignService: CampaignService) {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/usage-limit")
     fun changeUsageLimit(
-        @RequestParam campaignId: String, @RequestParam usageLimit: Int,
+        @RequestParam campaignId: Long, @RequestParam usageLimit: Int,
     ): CampaignEntity {
         return campaignService.changeUsageLimit(campaignId, usageLimit)
     }
@@ -45,7 +45,7 @@ class CampaignController(private val campaignService: CampaignService) {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{campaignId}")
     fun getCampaigns(
-        @RequestParam active: Boolean?, @PathVariable campaignId: String?
+        @RequestParam active: Boolean?, @PathVariable campaignId: Long?
     ): List<CampaignEntity> {
         return campaignService.getCampaigns(active, campaignId)
     }

@@ -5,7 +5,7 @@ import com.cn.langujet.domain.exam.model.enums.ExamSessionState
 import java.util.*
 
 class ExamSessionEnrollResponse(
-    val examSessionId: String?,
+    val examSessionId: Long?,
     val enrollDate: Date,
     val sessionState: ExamSessionState,
 ) {

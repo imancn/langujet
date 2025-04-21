@@ -1,14 +1,16 @@
 package com.cn.langujet.domain.user.services
 
+import com.cn.langujet.actor.security.response.JwtResponse
+import com.cn.langujet.application.arch.models.entity.Entity
+import com.cn.langujet.domain.user.model.Role
 import com.cn.langujet.domain.user.model.UserEntity
 import com.cn.langujet.domain.user.repository.UserRepository
-import com.cn.langujet.actor.security.response.JwtResponse
-import com.cn.langujet.domain.user.model.Role
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 @Service
 class GoogleAuthService(
+    private val userService: UserService,
     private val userRepository: UserRepository,
     private val jwtService: JwtService,
     private val googleAuthClient: GoogleAuthClient,
@@ -19,11 +21,12 @@ class GoogleAuthService(
     
     fun authenticateWithGoogle(authCode: String): JwtResponse {
         val tokenResponse = getGoogleAccessToken(authCode)
-        val email = googleAuthClient.getGoogleUserInfo(tokenResponse.accessToken).email.toStandardMail()
-        val user = userRepository.findByStandardEmailAndDeleted(email).orElseGet {
-            registerNewGoogleUser(email)
+        val email = googleAuthClient.getGoogleUserInfo(tokenResponse.accessToken).email
+        val username = email.toStandardMail()
+        val user = userRepository.findByUsernameAndDeleted(username).orElseGet {
+            registerNewGoogleUser(email, username)
         }
-        val jwt = jwtService.generateTokenFromUserId(user.id ?: "")
+        val jwt = jwtService.generateTokenFromUserId(user.id ?: Entity.UNKNOWN_ID)
         return JwtResponse(jwt, "", user.email)
     }
     
@@ -36,15 +39,15 @@ class GoogleAuthService(
         )
     }
     
-    private fun registerNewGoogleUser(email: String): UserEntity {
+    private fun registerNewGoogleUser(email: String, username: String): UserEntity {
         val user = UserEntity(
             id = null,
-            standardEmail = email,
+            username = email,
             email = email,
             emailVerified = true,
             password = null,
             roles = mutableSetOf(Role.ROLE_STUDENT)
         )
-        return userRepository.save(user)
+        return userService.save(user)
     }
 }

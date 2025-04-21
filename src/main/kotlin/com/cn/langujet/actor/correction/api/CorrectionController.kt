@@ -1,9 +1,9 @@
 package com.cn.langujet.actor.correction.api
 
-import com.cn.langujet.actor.correction.payload.response.CorrectionResponse
 import com.cn.langujet.actor.correction.payload.request.AssignCorrectionRequest
 import com.cn.langujet.actor.correction.payload.request.AssignCorrectionToCorrectorRequest
 import com.cn.langujet.actor.correction.payload.request.AssignSpecificCorrectionToCorrectorRequest
+import com.cn.langujet.actor.correction.payload.response.CorrectionResponse
 import com.cn.langujet.actor.correction.payload.response.CorrectorAvailableCorrectionResponse
 import com.cn.langujet.actor.correction.payload.response.CorrectorCorrectionExamSessionContentResponse
 import com.cn.langujet.domain.correction.model.CorrectionStatus
@@ -64,7 +64,7 @@ class CorrectionController(
     @GetMapping("/corrector/corrections/exam-session-contents/{correctionId}")
     @PreAuthorize("hasRole('CORRECTOR')")
     fun getCorrectorCorrectionExamSessionContent(
-        @PathVariable correctionId: String
+        @PathVariable correctionId: Long
     ): CorrectorCorrectionExamSessionContentResponse {
         return correctionService.getCorrectorCorrectionExamSessionContent(correctionId)
     }

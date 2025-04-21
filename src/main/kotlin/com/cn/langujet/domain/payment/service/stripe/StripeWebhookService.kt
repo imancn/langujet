@@ -2,9 +2,9 @@ package com.cn.langujet.domain.payment.service.stripe
 
 import com.cn.langujet.actor.util.Auth
 import com.cn.langujet.application.arch.advice.UnprocessableException
+import com.cn.langujet.application.arch.mongo.HistoricalEntityService
 import com.cn.langujet.domain.order.service.OrderService
 import com.cn.langujet.domain.payment.model.PaymentStatus
-import com.cn.langujet.domain.payment.model.PaymentType
 import com.cn.langujet.domain.payment.model.StripePaymentEntity
 import com.cn.langujet.domain.payment.repository.StripePaymentRepository
 import com.stripe.model.checkout.Session
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service
 class StripeWebhookService(
     private val stripePaymentRepository: StripePaymentRepository,
     private val orderService: OrderService
-) {
+) : HistoricalEntityService<StripePaymentEntity>() {
     @Value("\${stripe.webhook.secret}")
     private lateinit var webhookSecret: String
     
@@ -31,7 +31,7 @@ class StripeWebhookService(
     ): ResponseEntity<String> {
         try {
             val event = Webhook.constructEvent(payload, signatureHeader, webhookSecret)
-            Auth.setCustomUserId(PaymentType.STRIPE.name)
+            Auth.setCustomUserId(Auth.EXTERNAL_SERVICE)
             logger.info("${event.type} Event received")
             val session = event.data.`object` as Session
             val payment = stripePaymentRepository.findBySessionId(session.id).orElseThrow {
@@ -91,6 +91,6 @@ class StripeWebhookService(
     private fun updatePaymentStatus(payment: StripePaymentEntity, status: PaymentStatus) {
         payment.status = status
         payment.updateLog()
-        stripePaymentRepository.save(payment)
+        save(payment)
     }
 }

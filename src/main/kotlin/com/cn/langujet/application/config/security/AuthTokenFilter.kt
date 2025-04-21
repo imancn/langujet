@@ -22,7 +22,7 @@ class AuthTokenFilter(
         request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain
     ) {
         if (request.getHeader("Authorization") == internalClientSecret) {
-            Auth.setCustomUserId("INTERNAL_SERVICE")
+            Auth.setCustomUserId(Auth.INTERNAL_SERVICE)
             filterChain.doFilter(request, response)
         }
         try {

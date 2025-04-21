@@ -3,6 +3,8 @@ package com.cn.langujet.domain.exam.service
 import com.cn.langujet.actor.exam.payload.SectionDTO
 import com.cn.langujet.application.arch.advice.InvalidInputException
 import com.cn.langujet.application.arch.advice.UnprocessableException
+import com.cn.langujet.application.arch.models.entity.Entity
+import com.cn.langujet.application.arch.mongo.HistoricalEntityService
 import com.cn.langujet.domain.exam.model.section.SectionEntity
 import com.cn.langujet.domain.exam.repository.SectionCustomRepository
 import com.cn.langujet.domain.exam.repository.SectionRepository
@@ -17,8 +19,8 @@ class SectionService(
     private val sectionCustomRepository: SectionCustomRepository,
     private val questionService: QuestionService,
     private val partService: PartService
-) {
-    fun getSectionById(id: String): SectionDTO {
+) : HistoricalEntityService<SectionEntity>() {
+    fun getSectionById(id: Long): SectionDTO {
         val section = sectionRepository.findById(id).orElseThrow {
             UnprocessableException("Section with id $id not found")
         }
@@ -29,12 +31,12 @@ class SectionService(
             parts = partService.find(criteria)
         )
     }
-
-    fun getSectionsByExamId(examId: String): List<SectionEntity> {
+    
+    fun getSectionsByExamId(examId: Long): List<SectionEntity> {
         return sectionRepository.findAllByExamId(examId)
     }
-
-    fun getSectionByExamIdAndOrder(examId: String, order: Int): SectionEntity {
+    
+    fun getSectionByExamIdAndOrder(examId: Long, order: Int): SectionEntity {
         return sectionRepository.findByExamIdAndOrder(examId, order).orElseThrow {
             throw UnprocessableException("Section not found")
         }
@@ -44,7 +46,7 @@ class SectionService(
         if (sectionRepository.existsByExamIdAndOrder(section.examId, section.order)) {
             throw UnprocessableException("Section with order ${section.order} already exists.")
         }
-        return sectionRepository.save(
+        return save(
             section.also {
                 it.id = null
             }
@@ -52,17 +54,17 @@ class SectionService(
     }
 
     fun updateSection(section: SectionEntity): SectionEntity {
-        if (section.id.isNullOrBlank()) throw InvalidInputException("Section Id is empty")
-        val existingSection = sectionRepository.findById(section.id ?: "")
+        if (section.id == null) throw InvalidInputException("Section Id is empty")
+        val existingSection = sectionRepository.findById(section.id ?: Entity.UNKNOWN_ID)
             .getOrElse { throw NoSuchElementException("Section with id ${section.id} not found") }
         section.examId.let { existingSection.examId = it }
         section.header.let { existingSection.header = it }
         section.order.let { existingSection.order = it }
         section.sectionType.let { existingSection.sectionType = it }
-        return sectionRepository.save(existingSection)
+        return save(existingSection)
     }
-
-    fun deleteSection(id: String): Boolean {
+    
+    fun deleteSection(id: Long): Boolean {
         val section = sectionRepository.findById(id).orElse(null)
         return if (section != null) {
             sectionRepository.delete(section)
@@ -72,7 +74,7 @@ class SectionService(
         }
     }
     
-    fun getSectionsMetaData(examId: String): List<SectionMetaDTO> {
+    fun getSectionsMetaData(examId: Long): List<SectionMetaDTO> {
         return sectionCustomRepository.findSectionsMetaDataByExamId(examId)
     }
 }

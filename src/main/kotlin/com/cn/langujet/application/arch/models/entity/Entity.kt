@@ -13,4 +13,8 @@ abstract class Entity<ID>(
     override fun id(id: ID?) {
         this.id = id
     }
+    
+    companion object {
+        const val UNKNOWN_ID: Long = 0
+    }
 }

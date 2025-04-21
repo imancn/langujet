@@ -6,6 +6,6 @@ import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface ServiceRepository: MongoRepository<ServiceEntity, String> {
+interface ServiceRepository : MongoRepository<ServiceEntity, Long> {
     fun findByTypeAndActiveOrderByOrder(type: ServiceType, active: Boolean): List<ServiceEntity>
 }

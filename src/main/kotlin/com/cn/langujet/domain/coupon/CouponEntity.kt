@@ -1,20 +1,19 @@
 package com.cn.langujet.domain.coupon
 
-import com.cn.langujet.application.arch.models.Historical
-import org.springframework.data.annotation.Id
+import com.cn.langujet.application.arch.models.entity.HistoricalEntity
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document(collection = "coupons")
 @TypeAlias("coupons")
-data class CouponEntity(
-    @Id var id: String? = null,
-    var campaignId: String,
-    @Indexed(unique = true)
+class CouponEntity(
+    id: Long? = null,
+    var campaignId: Long,
+    @Indexed(name = "unique_code_index", unique = true)
     var code: String,
-    var userId: String? = null,
+    var userId: Long? = null,
     var amount: Double,
     var percentage: Int,
     var active: Boolean = true,
-) : Historical()
+) : HistoricalEntity(id = id)

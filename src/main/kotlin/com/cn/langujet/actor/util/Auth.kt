@@ -1,5 +1,6 @@
 package com.cn.langujet.actor.util
 
+import com.cn.langujet.application.arch.models.entity.Entity
 import io.jsonwebtoken.Claims
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -7,10 +8,21 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 
 object Auth {
-    fun userId(): String {
+    const val UNDEFINED = -1L
+    const val INTERNAL_SERVICE = -2L
+    const val EXTERNAL_SERVICE = -3L
+    const val SCHEDULED = -4L
+    
+    fun userId(): Long {
+        return getAuthentication()?.principal?.let {
+            if (it is Long) it else null
+        } ?: Entity.UNKNOWN_ID
+    }
+    
+    fun username(): String {
         return getAuthentication()?.principal?.let {
             if (it is String) it else null
-        } ?: ""
+        } ?: "undefined"
     }
     
     fun userEmail(): String {
@@ -25,7 +37,7 @@ object Auth {
     
     fun claim(key: String): String = getClaims()?.get(key, String::class.java) ?: ""
     
-    fun setCustomUserId(userId: String) {
+    fun setCustomUserId(userId: Long) {
         SecurityContextHolder.getContext().authentication = UsernamePasswordAuthenticationToken(
             userId, null, null
         )

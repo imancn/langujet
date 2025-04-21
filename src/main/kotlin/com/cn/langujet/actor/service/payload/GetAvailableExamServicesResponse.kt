@@ -5,7 +5,7 @@ import com.cn.langujet.domain.exam.model.enums.ExamMode
 import com.cn.langujet.domain.exam.model.enums.ExamType
 
 class GetAvailableExamServicesResponse(
-    val id: String,
+    val id: Long,
     val name: String,
     val price: Double,
     val discount: Double,

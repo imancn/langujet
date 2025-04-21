@@ -4,7 +4,7 @@ import com.cn.langujet.domain.correction.model.CorrectionStatus
 import com.cn.langujet.domain.result.model.SectionResultEntity
 import org.springframework.data.mongodb.repository.MongoRepository
 
-interface SectionResultRepository : MongoRepository<SectionResultEntity, String> {
-    fun findByStatusAndResultId(status: CorrectionStatus, resultId: String): List<SectionResultEntity>
-    fun findByResultId(resultId: String): List<SectionResultEntity>
+interface SectionResultRepository : MongoRepository<SectionResultEntity, Long> {
+    fun findByStatusAndResultId(status: CorrectionStatus, resultId: Long): List<SectionResultEntity>
+    fun findByResultId(resultId: Long): List<SectionResultEntity>
 }

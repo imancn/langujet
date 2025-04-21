@@ -1,11 +1,11 @@
 package com.cn.langujet.actor.correction.payload.response
 
 import com.cn.langujet.domain.answer.model.AnswerType
-import com.cn.langujet.domain.exam.model.enums.SectionType
 import com.cn.langujet.domain.exam.model.enums.QuestionType
+import com.cn.langujet.domain.exam.model.enums.SectionType
 
 data class CorrectorCorrectionExamSessionContentResponse(
-    val examSessionId: String,
+    val examSessionId: Long,
     val section: CorrectorCorrectionSectionResponse,
 )
 
@@ -46,7 +46,7 @@ sealed class CorrectorCorrectionQuestionResponse(
 
 data class SpeakingCorrectorCorrectionQuestionResponse(
     override val header: String,
-    val audioId: String?,
+    val audioUrl: String?,
 ) : CorrectorCorrectionQuestionResponse(header, QuestionType.SPEAKING, AnswerType.VOICE)
 
 data class WritingCorrectorCorrectionQuestionResponse(

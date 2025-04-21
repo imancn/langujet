@@ -23,7 +23,7 @@ sealed class PartDTO(
     open var partOrder: Int,
     open var type: SectionType
 ) {
-    inline fun <reified T : PartEntity> toPart(examId: String, sectionId: String): T {
+    inline fun <reified T : PartEntity> toPart(examId: Long, sectionId: Long): T {
         val part = when (this) {
             is ReadingPartDTO -> ReadingPartEntity(
                 id = null,
@@ -116,7 +116,7 @@ data class PassageDTO(
 
 data class ListeningPartDTO(
     override var partOrder: Int,
-    val audioId: String,
+    val audioId: Long,
     var questionList: List<QuestionDTO>,
     var time: Long
 ) : PartDTO(partOrder = partOrder, SectionType.LISTENING) {

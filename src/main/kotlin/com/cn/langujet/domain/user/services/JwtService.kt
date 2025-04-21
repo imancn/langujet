@@ -25,7 +25,7 @@ class JwtService(
     fun generateJwtToken(userPrincipal: UserDetailsImpl): String {
         val roles = userPrincipal.authorities.map { it.authority }
         return Jwts.builder()
-            .setSubject(userPrincipal.username)
+            .setSubject(userPrincipal.id.toString())
             .claim("roles", roles)
             .claim("email", userPrincipal.email)
             .setIssuedAt(Date())
@@ -49,10 +49,10 @@ class JwtService(
             .signWith(SignatureAlgorithm.HS512, jwtSecret)
             .compact()
     }
-
-    fun getUserIdFromJwtToken(token: String?): String {
+    
+    fun getUserIdFromJwtToken(token: String?): Long {
         return try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).body.subject
+            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).body.subject.toLong()
         } catch (e: SignatureException) {
             throw InvalidCredentialException("Authorization JWT token is invalid: Invalid JWT signature")
         } catch (e: MalformedJwtException) {
@@ -89,7 +89,7 @@ class JwtService(
         }
     }
     
-    fun generateTokenFromUserId(userId: String): String {
-        return generateJwtToken(userDetailsServiceImpl.loadUserByUsername(userId))
+    fun generateTokenFromUserId(userId: Long): String {
+        return generateJwtToken(userDetailsServiceImpl.loadUserByUsername(userId.toString()))
     }
 }

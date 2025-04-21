@@ -1,9 +1,8 @@
 package com.cn.langujet.domain.correction.model
 
-import com.cn.langujet.application.arch.models.Historical
+import com.cn.langujet.application.arch.models.entity.HistoricalEntity
 import com.cn.langujet.domain.answer.model.AnswerType
 import com.cn.langujet.domain.answer.model.TrueFalseAnswerType
-import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.index.CompoundIndexes
@@ -23,18 +22,18 @@ import org.springframework.data.mongodb.core.mapping.Document
 )
 @Document(collection = "correct_answers")
 sealed class CorrectAnswerEntity(
-    @Id var id: String? = null,
-    var examId: String,
+    id: Long? = null,
+    var examId: Long,
     var sectionOrder: Int,
     var partOrder: Int,
     var questionOrder: Int,
     var type: AnswerType,
-) : Historical() {
+) : HistoricalEntity(id = id) {
     @Document(collection = "correct_answers")
     @TypeAlias("correct_text_answers")
     class CorrectTextAnswerEntity(
-        id: String? = null,
-        examId: String,
+        id: Long? = null,
+        examId: Long,
         sectionOrder: Int,
         partOrder: Int,
         questionOrder: Int,
@@ -44,8 +43,8 @@ sealed class CorrectAnswerEntity(
     @Document(collection = "correct_answers")
     @TypeAlias("correct_text_issues_answers")
     class CorrectTextIssuesAnswerEntity(
-        id: String? = null,
-        examId: String,
+        id: Long? = null,
+        examId: Long,
         sectionOrder: Int,
         partOrder: Int,
         questionOrder: Int,
@@ -55,8 +54,8 @@ sealed class CorrectAnswerEntity(
     @Document(collection = "correct_answers")
     @TypeAlias("correct_true_false_answers")
     class CorrectTrueFalseAnswerEntity(
-        id: String? = null,
-        examId: String,
+        id: Long? = null,
+        examId: Long,
         sectionOrder: Int,
         partOrder: Int,
         questionOrder: Int,
@@ -66,8 +65,8 @@ sealed class CorrectAnswerEntity(
     @Document(collection = "correct_answers")
     @TypeAlias("correct_multiple_choice_answers")
     class CorrectMultipleChoiceAnswerEntity(
-        id: String? = null,
-        examId: String,
+        id: Long? = null,
+        examId: Long,
         sectionOrder: Int,
         partOrder: Int,
         questionOrder: Int,

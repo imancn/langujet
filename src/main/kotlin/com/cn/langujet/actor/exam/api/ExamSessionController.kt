@@ -20,14 +20,14 @@ class ExamSessionController(
     @PostMapping("/admin/exam-sessions/enroll")
     fun enrollExamSession(
         @RequestParam @NotBlank email: String,
-        @RequestParam @NotBlank examServiceId: String,
-        @RequestParam examId: String?,
+        @RequestParam @NotBlank examServiceId: Long,
+        @RequestParam examId: Long?,
     ): ExamSessionEnrollResponse = examSessionService.enrollExamSessionByEmail(email, examServiceId, examId)
     
     @PreAuthorize("hasRole('STUDENT')")
     @GetMapping("/student/exam-sessions/details")
     fun getStudentExamSession(
-        @RequestParam @NotBlank examSessionId: String
+        @RequestParam @NotBlank examSessionId: Long
     ): ExamSessionDetailsResponse = examSessionService.getStudentExamSessionDetailsResponse(examSessionId)
 
     @PreAuthorize("hasRole('STUDENT')")
@@ -49,13 +49,13 @@ class ExamSessionController(
     @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/student/exam-sessions/section")
     fun getExamSection(
-        @RequestParam @NotBlank examSessionId: String,
+        @RequestParam @NotBlank examSessionId: Long,
         @RequestParam sectionOrder: Int
     ): SectionDTO = examSessionService.getExamSection(examSessionId, sectionOrder)
 
     @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/student/exam-sessions/finish")
     fun finishExamSession(
-        @RequestParam @NotBlank examSessionId: String?
+        @RequestParam @NotBlank examSessionId: Long?
     ): ExamSessionFinishResponse = examSessionService.finishExamSession(examSessionId!!)
 }

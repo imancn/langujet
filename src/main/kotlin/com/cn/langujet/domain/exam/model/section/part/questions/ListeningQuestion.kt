@@ -9,8 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document(collection = "questions")
 class ListeningTextCompletion(
     id: Long?,
-    examId: String,
-    sectionId: String,
+    examId: Long,
+    sectionId: Long,
     partId: Long,
     order: Int,
     header: String,
@@ -30,8 +30,8 @@ class ListeningTextCompletion(
 @Document(collection = "questions")
 class ListeningTableCompletion(
     id: Long?,
-    examId: String,
-    sectionId: String,
+    examId: Long,
+    sectionId: Long,
     partId: Long,
     order: Int,
     header: String,
@@ -52,8 +52,8 @@ class ListeningTableCompletion(
 @Document(collection = "questions")
 class ListeningMultipleChoice(
     id: Long?,
-    examId: String,
-    sectionId: String,
+    examId: Long,
+    sectionId: Long,
     partId: Long,
     order: Int,
     header: String,
@@ -74,8 +74,8 @@ class ListeningMultipleChoice(
 @Document(collection = "questions")
 class ListeningMatchingFeatures(
     id: Long?,
-    examId: String,
-    sectionId: String,
+    examId: Long,
+    sectionId: Long,
     partId: Long,
     order: Int,
     header: String,
@@ -98,8 +98,8 @@ class ListeningMatchingFeatures(
 @Document(collection = "questions")
 class ListeningLabelling(
     id: Long?,
-    examId: String,
-    sectionId: String,
+    examId: Long,
+    sectionId: Long,
     partId: Long,
     order: Int,
     header: String,
@@ -121,8 +121,8 @@ class ListeningLabelling(
 @Document(collection = "questions")
 class ListeningPhotoCompletion(
     id: Long?,
-    examId: String,
-    sectionId: String,
+    examId: Long,
+    sectionId: Long,
     partId: Long,
     order: Int,
     header: String,
@@ -143,8 +143,8 @@ class ListeningPhotoCompletion(
 @Document(collection = "questions")
 class ListeningSelectivePhotoCompletion(
     id: Long?,
-    examId: String,
-    sectionId: String,
+    examId: Long,
+    sectionId: Long,
     partId: Long,
     order: Int,
     header: String,

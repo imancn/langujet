@@ -40,8 +40,8 @@ sealed class QuestionDTO(
     var answerType: AnswerType
 ) {
     inline fun <reified T : QuestionEntity> toQuestion(
-        examId: String,
-        sectionId: String,
+        examId: Long,
+        sectionId: Long,
         partId: Long,
         id: Long? = null
     ): T {
@@ -279,7 +279,7 @@ sealed class QuestionDTO(
 class SpeakingQuestionDTO(
     questionOrder: Int,
     header: String,
-    var audioId: String?,
+    var audioId: Long?,
     var time: Long
 ) : QuestionDTO(
     questionOrder = questionOrder,

@@ -3,7 +3,7 @@ package com.cn.langujet.actor.correction.payload.dto
 import com.cn.langujet.domain.correction.model.CorrectAnswerEntity
 
 data class CorrectAnswerListDTO(
-    val examId: String? = null,
+    val examId: Long? = null,
     val sectionOrder: Int? = null,
     val answers: List<CorrectAnswerDTO>? = null
 ) {

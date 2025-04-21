@@ -19,7 +19,7 @@ class ExamContentController(
     @PostMapping("admin/exam-contents")
     @PreAuthorize("hasRole('ADMIN')")
     fun uploadExamContent(
-        @RequestParam @NotBlank examId: String?,
+        @RequestParam @NotBlank examId: Long?,
         @RequestParam @NotNull sectionOrder: Int?,
         @RequestParam @NotNull partOrder: Int?,
         @RequestParam @NotNull questionOrder: Int?,
@@ -31,7 +31,7 @@ class ExamContentController(
     @GetMapping("/admin/exam-contents/download-links")
     @PreAuthorize("hasAnyRole('ADMIN')")
     fun getAdminExamContentDownloadLink(
-        @RequestParam examId: @NotBlank String?,
+        @RequestParam examId: @NotBlank Long?,
         @RequestParam sectionOrder: @NotNull Int?
     ): List<ExamContentDownloadLink> {
         return examContentService.getAdminExamContentDownloadLink(
@@ -42,7 +42,7 @@ class ExamContentController(
     @GetMapping("/student/exam-contents/download-links")
     @PreAuthorize("hasAnyRole('STUDENT')")
     fun getStudentExamContentDownloadLink(
-        @RequestParam examSessionId: @NotBlank String?,
+        @RequestParam examSessionId: @NotBlank Long?,
         @RequestParam sectionOrder: @NotNull Int?
     ): List<ExamContentDownloadLink> {
         return examContentService.getStudentExamContentDownloadLink(

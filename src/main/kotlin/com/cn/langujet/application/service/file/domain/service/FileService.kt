@@ -2,6 +2,7 @@ package com.cn.langujet.application.service.file.domain.service
 
 import com.cn.langujet.application.arch.advice.InternalServerError
 import com.cn.langujet.application.arch.advice.UnprocessableException
+import com.cn.langujet.application.arch.models.entity.Entity
 import com.cn.langujet.application.service.file.domain.data.model.FileBucket
 import com.cn.langujet.application.service.file.domain.data.model.FileEntity
 import com.cn.langujet.application.service.file.domain.data.repository.FileRepository
@@ -45,15 +46,15 @@ class FileService(
                     .build()
             )
         } catch (ex: Exception) {
-            fileRepository.deleteById(fileEntity.id ?: "")
+            fileRepository.deleteById(fileEntity.id ?: Entity.UNKNOWN_ID)
             logger.error(ex.toString())
             throw InternalServerError("Upload Failed")
         }
 
         return fileEntity
     }
-
-    fun generatePublicDownloadLink(fileId: String, expiryDuration: Int): String {
+    
+    fun generatePublicDownloadLink(fileId: Long, expiryDuration: Int): String {
         val fileEntity = fileRepository.findById(fileId).orElseThrow {
             throw UnprocessableException("File with id: $fileId not found")
         }

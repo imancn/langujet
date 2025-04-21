@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestParam
 interface StripePaymentClient {
     @PostMapping("api/v1/payments/stripe/create-session")
     fun createPaymentSession(
-        @RequestParam price: Double, @RequestParam orderId: String, @RequestHeader("Authorization") langujetProxyClientSecret: String
+        @RequestParam price: Double,
+        @RequestParam orderId: Long,
+        @RequestHeader("Authorization") langujetProxyClientSecret: String
     ): StripeSessionInfo
 }
 

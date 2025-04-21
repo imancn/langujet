@@ -23,7 +23,7 @@ class ZarinPalPaymentService(
     
     private val gateWayUrl: String = "https://www.zarinpal.com/pg/StartPay/"
     
-    fun createPaymentSession(amount: Int, orderId: String): ZarinPalPaymentDetails {
+    fun createPaymentSession(amount: Int, orderId: Long): ZarinPalPaymentDetails {
         try {
             val parameters = ZarinPalPaymentRequest(
                 merchantId = merchantId,

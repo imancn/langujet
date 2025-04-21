@@ -3,6 +3,7 @@ package com.cn.langujet.domain.correction.service
 import com.cn.langujet.actor.correction.payload.dto.CorrectAnswerListDTO
 import com.cn.langujet.application.arch.advice.InvalidInputException
 import com.cn.langujet.application.arch.advice.UnprocessableException
+import com.cn.langujet.application.arch.mongo.HistoricalEntityService
 import com.cn.langujet.domain.correction.model.CorrectAnswerEntity
 import com.cn.langujet.domain.correction.repository.CorrectAnswerCustomRepository
 import com.cn.langujet.domain.correction.repository.CorrectAnswerRepository
@@ -19,31 +20,31 @@ class CorrectAnswerService(
     private val sectionService: SectionService,
     private val partService: PartService,
     private val questionService: QuestionService
-) {
+) : HistoricalEntityService<CorrectAnswerEntity>() {
     fun createCorrectAnswer(request: CorrectAnswerListDTO): CorrectAnswerListDTO {
         request.answers?.forEach { it.id = null }
         validate(request)
         return CorrectAnswerListDTO.fromCorrectAnswer(
-            repository.saveAll(request.toCorrectAnswer())
+            createMany(request.toCorrectAnswer())
         ).firstOrNull() ?: throw InvalidInputException("Correct Answer list is empty")
     }
 
     fun updateCorrectAnswer(request: CorrectAnswerListDTO): CorrectAnswerListDTO {
         validate(request)
         return CorrectAnswerListDTO.fromCorrectAnswer(
-            repository.saveAll(
-                request.toCorrectAnswer<CorrectAnswerEntity>()
-            )
+            request.toCorrectAnswer<CorrectAnswerEntity>().map {
+                save(it)
+            }
         ).firstOrNull() ?: throw InvalidInputException("Correct Answer list is empty")
     }
     
     fun getSectionCorrectAnswers(
-        examId: String,
+        examId: Long,
         sectionOrder: Int
     ) = repository.findAllByExamIdAndSectionOrder(examId, sectionOrder)
 
     fun getCorrectAnswer(
-        examId: String,
+        examId: Long,
         sectionOrder: Int,
         partOrder: Int?,
         questionOrder: Int?
@@ -52,8 +53,8 @@ class CorrectAnswerService(
             customRepository.findCorrectAnswersByOptionalCriteria(examId, sectionOrder, partOrder, questionOrder)
         ).firstOrNull() ?: throw UnprocessableException("Correct Answer not found")
     }
-
-    fun deleteCorrectAnswer(id: String) {
+    
+    fun deleteCorrectAnswer(id: Long) {
         if (!repository.existsById(id))
             throw UnprocessableException("CorrectAnswer with id $id not found")
         repository.deleteById(id)

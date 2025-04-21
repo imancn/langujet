@@ -11,12 +11,12 @@ abstract class HistoricalEntity(id: Long?) : Entity<Long>(id) {
     var deleted: Boolean = false
     
     @field:CreatedBy
-    var createdBy: String = "undefined"
+    var createdBy: Long = Auth.UNDEFINED
     @field:CreatedDate
     var createdAt: Date = Date(0)
     
     @field:LastModifiedBy
-    var updatedBy: String = "undefined"
+    var updatedBy: Long = Auth.UNDEFINED
     @field:LastModifiedDate
     var updatedAt: Date = Date(0)
     

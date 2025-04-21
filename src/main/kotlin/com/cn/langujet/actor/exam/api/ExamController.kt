@@ -1,8 +1,8 @@
 package com.cn.langujet.actor.exam.api
 
 import com.cn.langujet.actor.exam.payload.ExamDTO
-import com.cn.langujet.application.arch.controller.payload.response.PageResponse
 import com.cn.langujet.actor.util.toOkResponseEntity
+import com.cn.langujet.application.arch.controller.payload.response.PageResponse
 import com.cn.langujet.domain.exam.service.ExamService
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
@@ -35,7 +35,7 @@ class ExamController(private val examService: ExamService) {
     
     @GetMapping("/admin/exams/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    fun getExamById(@PathVariable id: String): ResponseEntity<ExamDTO> =
+    fun getExamById(@PathVariable id: Long): ResponseEntity<ExamDTO> =
         toOkResponseEntity(ExamDTO(examService.getExamById(id)))
     
     @GetMapping("/admin/exams")

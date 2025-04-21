@@ -1,7 +1,6 @@
 package com.cn.langujet.domain.user.model
 
-import com.cn.langujet.application.arch.models.Log
-import org.springframework.data.annotation.Id
+import com.cn.langujet.application.arch.models.entity.HistoricalEntity
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.DBRef
@@ -10,15 +9,14 @@ import java.util.*
 
 @Document(collection = "reset_password_tokens")
 @TypeAlias("reset_password_tokens")
-data class ResetPasswordTokenEntity(
-    @Id
-    var id: String?,
+class ResetPasswordTokenEntity(
+    id: Long?,
     @DBRef
     var user: UserEntity,
     var token: String,
     @Indexed(name = "expiry_date_ttl", expireAfterSeconds = 0)
     var expiryDate: Date,
-) : Log() {
+) : HistoricalEntity(id = id) {
     constructor(user: UserEntity) : this(
         id = null,
         user = user,

@@ -6,8 +6,8 @@ import com.cn.langujet.domain.result.model.ResultEntity
 import org.springframework.data.mongodb.repository.MongoRepository
 import java.util.*
 
-interface ResultRepository : MongoRepository<ResultEntity, String> {
-    fun findByExamSessionId(examSessionId: String): Optional<ResultEntity>
+interface ResultRepository : MongoRepository<ResultEntity, Long> {
+    fun findByExamSessionId(examSessionId: Long): Optional<ResultEntity>
     fun findByCorrectorTypeAndStatusOrderByCreatedAtAsc(
         correctorType: CorrectorType,
         correctionStatus: CorrectionStatus
@@ -15,6 +15,6 @@ interface ResultRepository : MongoRepository<ResultEntity, String> {
     
     fun findByStatusAndCorrectorUserIdOrderByCreatedAtAsc(
         correctionStatus: CorrectionStatus,
-        correctorId: String
+        correctorId: Long
     ): List<ResultEntity>
 }

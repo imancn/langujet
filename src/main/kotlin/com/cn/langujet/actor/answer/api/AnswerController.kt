@@ -1,6 +1,6 @@
 package com.cn.langujet.actor.answer.api
 
-import com.cn.langujet.actor.answer.payload.request.*
+import com.cn.langujet.actor.answer.payload.request.AnswerBulkRequest
 import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.domain.answer.AnswerService
 import jakarta.validation.Valid
@@ -21,7 +21,7 @@ class AnswerController(
     @PostMapping("/student/answers/voices")
     @PreAuthorize("hasRole('ROLE_STUDENT')")
     fun submitVoiceAnswer(
-        @RequestParam @NotBlank examSessionId: String?,
+        @RequestParam @NotBlank examSessionId: Long?,
         @RequestParam @NotNull sectionOrder: Int?,
         @RequestParam @NotNull partOrder: Int?,
         @RequestParam @NotNull questionOrder: Int?,
@@ -40,7 +40,7 @@ class AnswerController(
     @PostMapping("/student/answers")
     @PreAuthorize("hasRole('ROLE_STUDENT')")
     fun submitBulkAnswers(
-        @RequestParam @NotBlank examSessionId: String?,
+        @RequestParam @NotBlank examSessionId: Long?,
         @RequestParam @NotNull sectionOrder: Int?,
         @RequestBody @Valid request: List<AnswerBulkRequest>,
     ): ResponseEntity<Boolean> {

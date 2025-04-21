@@ -17,7 +17,7 @@ class CorrectAnswerController(
     @GetMapping("admin/correct-answers")
     @PreAuthorize("hasRole('ADMIN')")
     fun getCorrectAnswers(
-        @RequestParam @NotBlank examId: String?,
+        @RequestParam @NotBlank examId: Long?,
         @RequestParam @NotNull sectionOrder: Int?,
         @RequestParam partOrder: Int?,
         @RequestParam questionOrder: Int?
@@ -42,7 +42,7 @@ class CorrectAnswerController(
     @PostMapping("admin/correct-answers/delete/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     fun deleteCorrectAnswer(
-        @PathVariable @NotBlank id: String?,
+        @PathVariable @NotBlank id: Long?,
     ) {
         correctAnswerService.deleteCorrectAnswer(id!!)
     }
