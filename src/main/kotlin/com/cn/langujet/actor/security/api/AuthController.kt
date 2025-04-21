@@ -31,6 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import kotlin.jvm.optionals.getOrElse
+import kotlin.jvm.optionals.getOrNull
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -59,7 +60,8 @@ class AuthController(
         @RequestParam @NotBlank @Email email: String,
         @RequestParam @NotBlank password: String,
     ): ResponseEntity<JwtResponse> {
-        return signIn(email.toStandardMail(), password)
+        val user = userRepository.findByEmailAndDeleted(email).getOrNull()
+        return user?.username?.let { signIn(it, password) } ?: signIn(email.toStandardMail(), password)
     }
     
     @PostMapping("/sign-in/username")
