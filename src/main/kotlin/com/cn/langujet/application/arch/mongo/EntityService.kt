@@ -22,7 +22,7 @@ class EntityService<T : Entity<ID>, ID> : EntityServiceInterface<T, ID> {
     lateinit var mongoOperations: MongoOperations
     
     override fun save(entity: T): T {
-        return if (entity.id != null) {
+        return if (entity.id == null) {
             create(entity)
         } else {
             update(entity)
