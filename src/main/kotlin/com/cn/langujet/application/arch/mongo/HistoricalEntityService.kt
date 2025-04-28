@@ -11,9 +11,8 @@ import org.springframework.stereotype.Service
 @Service
 class HistoricalEntityService<T : HistoricalEntity> : EntityService<T, Long>() {
     
-    override fun create(entity: T): T {
-        entity.id(generateSequence())
-        return mongoOperations.save(entity)
+    fun create(entity: T): T {
+        return super.create(entity, generateSequence())
     }
     
     override fun createMany(entities: List<T>): List<T> {

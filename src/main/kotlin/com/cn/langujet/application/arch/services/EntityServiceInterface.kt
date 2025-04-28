@@ -9,7 +9,7 @@ interface EntityServiceInterface<T : Entity<ID>, ID> {
     fun save(entity: T): T
     fun saveMany(entities: List<T>): List<T>
     
-    fun create(entity: T): T
+    fun create(entity: T, id: ID? = null): T
     fun createMany(entities: List<T>): List<T>
     
     fun update(entity: T): T

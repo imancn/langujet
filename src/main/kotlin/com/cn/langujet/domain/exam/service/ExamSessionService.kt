@@ -75,8 +75,7 @@ class ExamSessionService(
                 correctionDateInterval = request.correctionDateInterval,
                 pageSize = request.pageSize,
                 pageNumber = request.pageNumber,
-            ),
-            userService.getUserByEmail(request.studentEmail).id ?: Entity.UNKNOWN_ID
+            ), userService.getUserByEmail(request.studentEmail).id ?: Entity.UNKNOWN_ID
         )
     }
     
@@ -89,7 +88,7 @@ class ExamSessionService(
     fun enrollExamSession(userId: Long, examServiceId: Long, examId: Long? = null): ExamSessionEnrollResponse {
         val service = serviceService.getById(examServiceId) as ServiceEntity.ExamServiceEntity
         val exam = if (examId != null) {
-            examService.getExamById(examId).let {
+            examService.getById(examId).let {
                 if (service.examMode != it.mode || service.examType != it.type) {
                     throw UnprocessableException("Exam and Exam Service are not compatible")
                 } else {
@@ -141,9 +140,7 @@ class ExamSessionService(
         val parts = partService.find(criteria)
         val questions = questionService.find(criteria)
         return SectionComposite(
-            section = section,
-            parts = parts,
-            questions = questions
+            section = section, parts = parts, questions = questions
         ).also { it.id = null; it.examId = null }
     }
     
@@ -169,13 +166,11 @@ class ExamSessionService(
         if (examSession.state == ExamSessionState.FINISHED) {
             examSession.state = ExamSessionState.CORRECTED
             examSession.correctionDate = Date(System.currentTimeMillis())
-            val exam = examService.getExamById(examSession.examId)
+            val exam = examService.getById(examSession.examId)
             save(examSession).run {
                 val student = studentService.getStudentByUserId(examSession.studentUserId)
                 mailSenderService.sendExamCorrectionNotificationEmail(
-                    student.user.username,
-                    student.fullName,
-                    exam.name
+                    student.user.username, student.fullName, exam.name
                 )
             }
         }

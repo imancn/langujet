@@ -1,8 +1,11 @@
 package com.cn.langujet.application.arch.mongo
 
+import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.application.arch.log.LoggerService
 import com.cn.langujet.application.arch.models.entity.Entity
 import com.cn.langujet.application.arch.services.EntityServiceInterface
+import com.mongodb.DuplicateKeyException
+import com.mongodb.MongoWriteException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -18,12 +21,13 @@ import java.lang.reflect.ParameterizedType
 class EntityService<T : Entity<ID>, ID> : EntityServiceInterface<T, ID> {
     @field:Autowired
     lateinit var loggerService: LoggerService
+    
     @field:Autowired
     lateinit var mongoOperations: MongoOperations
     
     override fun save(entity: T): T {
         return if (entity.id == null) {
-            create(entity)
+            create(entity, null)
         } else {
             update(entity)
         }
@@ -33,9 +37,32 @@ class EntityService<T : Entity<ID>, ID> : EntityServiceInterface<T, ID> {
         return entities.map { save(it) }
     }
     
-    override fun create(entity: T): T {
-        entity.id(null)
-        return mongoOperations.save(entity)
+    override fun create(entity: T, id: ID?): T {
+        entity.id(id)
+        return try {
+            mongoOperations.save(entity)
+        } catch (e: Exception) {
+            throwUnprocessableException(e)
+        }
+    }
+    
+    private fun throwUnprocessableException(e: Exception): Nothing {
+        when (e) {
+            is MongoWriteException, is DuplicateKeyException -> {
+                val errorMessage = e.message ?: "Duplicate key error"
+                val collectionMatch = Regex("collection: (\\w+\\.\\w+)").find(errorMessage)
+                val keyMatch = Regex("dup key: \\{ ([^}]+) }").find(errorMessage)
+                
+                val collection = collectionMatch?.groupValues?.get(1) ?: "unknown collection"
+                val duplicateKey = keyMatch?.groupValues?.get(1) ?: "unknown fields"
+                throw UnprocessableException(
+                    "duplicate.key.error", collection, duplicateKey
+                )
+            }
+            else -> throw throw UnprocessableException(
+                "duplicate.key.error", "unknown collection", "unknown fields",
+            )
+        }
     }
     
     override fun createMany(entities: List<T>): List<T> {
@@ -65,9 +92,7 @@ class EntityService<T : Entity<ID>, ID> : EntityServiceInterface<T, ID> {
     }
     
     override fun findTop(count: Int): List<T> {
-        val query = Query()
-            .with(PageRequest.of(0, count))
-            .with(Sort.by(Sort.Direction.DESC, "_id"))
+        val query = Query().with(PageRequest.of(0, count)).with(Sort.by(Sort.Direction.DESC, "_id"))
         return mongoOperations.find(query, clazz, collection)
     }
     

@@ -1,56 +1,46 @@
 package com.cn.langujet.actor.exam.api
 
-import com.cn.langujet.actor.exam.payload.ExamDTO
-import com.cn.langujet.actor.util.toOkResponseEntity
-import com.cn.langujet.application.arch.controller.payload.response.PageResponse
+import com.cn.langujet.application.arch.controller.HistoricalEntityCrudController
+import com.cn.langujet.application.arch.controller.payload.response.MessageResponse
+import com.cn.langujet.domain.exam.model.ExamEntity
 import com.cn.langujet.domain.exam.service.ExamService
-import jakarta.validation.Valid
-import jakarta.validation.constraints.NotBlank
-import org.springframework.data.domain.PageRequest
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/admin/exams")
 @Validated
-class ExamController(private val examService: ExamService) {
+class ExamController(
+    override val service: ExamService
+) : HistoricalEntityCrudController<ExamService, ExamEntity>(service) {
     
-    @PostMapping("/admin/exams")
-    @PreAuthorize("hasRole('ADMIN')")
-    fun createExam(
-        @RequestBody @Valid exam: ExamDTO
-    ): ResponseEntity<ExamDTO> = toOkResponseEntity(
-        examService.createExam(exam)
-    )
-    
-    @PostMapping("/admin/exams/update")
-    @PreAuthorize("hasRole('ADMIN')")
-    fun updateExam(
-        @RequestBody exam: ExamDTO
-    ): ResponseEntity<ExamDTO> = toOkResponseEntity(
-        examService.updateExam(exam)
-    )
-    
-    @GetMapping("/admin/exams/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    fun getExamById(@PathVariable id: Long): ResponseEntity<ExamDTO> =
-        toOkResponseEntity(ExamDTO(examService.getExamById(id)))
-    
-    @GetMapping("/admin/exams")
-    @PreAuthorize("hasRole('ADMIN')")
-    fun getAllExams(): ResponseEntity<List<ExamDTO>> = toOkResponseEntity(examService.getAllExams())
-    
-    @GetMapping("/admin/exams/by-name")
-    @PreAuthorize("hasRole('ADMIN')")
-    fun getAllExamsByName(
-        @RequestParam @NotBlank name: String?,
-        @RequestParam(defaultValue = "10") pageSize: Int,
-        @RequestParam(defaultValue = "0") pageNumber: Int,
-    ): ResponseEntity<PageResponse<ExamDTO>> = toOkResponseEntity(
-        examService.getAllExamsByName(
-            name!!, PageRequest.of(pageNumber, pageSize)
+    @PutMapping("activate/{id}")
+    fun activate(@PathVariable id: Long): ResponseEntity<MessageResponse> {
+        return ResponseEntity.ok(
+            bundle.getMessageResponse(
+                if (service.activate(id)) {
+                    "successful"
+                } else {
+                    "failed"
+                }
+            )
         )
-    )
+    }
+    
+    @PutMapping("deactivate/{id}")
+    fun deactivate(@PathVariable id: Long): ResponseEntity<MessageResponse> {
+        return ResponseEntity.ok(
+            bundle.getMessageResponse(
+                if (service.deactivate(id)) {
+                    "successful"
+                } else {
+                    "failed"
+                }
+            )
+        )
+    }
 }

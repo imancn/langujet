@@ -8,15 +8,16 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/admin/campaigns")
-class CampaignController(private val campaignService: CampaignService) :
-    HistoricalEntityViewController<CampaignEntity>() {
+class CampaignController(
+    override val service: CampaignService
+): HistoricalEntityViewController<CampaignService, CampaignEntity>(service) {
     
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     fun createCampaign(
         @RequestBody request: CreateCampaignRequest
     ): CampaignEntity {
-        return campaignService.createCampaign(request)
+        return service.createCampaign(request)
     }
     
     @PreAuthorize("hasRole('ADMIN')")
@@ -24,7 +25,7 @@ class CampaignController(private val campaignService: CampaignService) :
     fun changeCampaignActiveFlag(
         @RequestParam campaignId: Long, @RequestParam active: Boolean
     ): CampaignEntity {
-        return campaignService.changeCampaignActiveFlag(campaignId, active)
+        return service.changeCampaignActiveFlag(campaignId, active)
     }
     
     @PreAuthorize("hasRole('ADMIN')")
@@ -33,7 +34,7 @@ class CampaignController(private val campaignService: CampaignService) :
         @RequestParam campaignId: Long, @RequestParam name: String? = null,
         @RequestParam tag: String? = null, @RequestParam description: String? = null
     ): CampaignEntity {
-        return campaignService.changeCampaignMetadata(campaignId, name, tag, description)
+        return service.changeCampaignMetadata(campaignId, name, tag, description)
     }
     
     @PreAuthorize("hasRole('ADMIN')")
@@ -41,6 +42,6 @@ class CampaignController(private val campaignService: CampaignService) :
     fun changeUsageLimit(
         @RequestParam campaignId: Long, @RequestParam usageLimit: Int,
     ): CampaignEntity {
-        return campaignService.changeUsageLimit(campaignId, usageLimit)
+        return service.changeUsageLimit(campaignId, usageLimit)
     }
 }

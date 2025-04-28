@@ -29,7 +29,7 @@ class AutoCorrectorService(
     fun correctExamSection(
         examSession: ExamSessionEntity, resultId: Long, sectionOrder: Int, sectionType: SectionType
     ): SectionResultEntity? {
-        val exam = examService.getExamById(examSession.examId)
+        val exam = examService.getById(examSession.examId)
         val section = sectionService.getSectionByExamIdAndOrder(examSession.examId, sectionOrder)
         val correctAnswers = correctAnswerService.getSectionCorrectAnswers(examSession.examId, sectionOrder)
         val answers =
