@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.data.annotation.TypeAlias
+import org.springframework.data.mongodb.core.index.CompoundIndex
+import org.springframework.data.mongodb.core.index.CompoundIndexes
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Schema(
@@ -56,6 +58,13 @@ import org.springframework.data.mongodb.core.mapping.Document
 )
 @TypeAlias("questions")
 @Document(collection = "questions")
+@CompoundIndexes(
+    CompoundIndex(
+        name = "unique_questions_index",
+        def = "{'examId': -1, 'sectionId: 1, 'partId': 1 'order': 1}",
+        unique = true
+    )
+)
 sealed class QuestionEntity(
     id: Long?,
     var examId: Long,
