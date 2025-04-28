@@ -24,6 +24,10 @@ class HistoricalEntityService<T : HistoricalEntity> : EntityService<T, Long>() {
         return update(entity.also { it.deleted = true }).id != null
     }
     
+    fun restore(entity: T): Boolean {
+        return update(entity.also { it.deleted = false }).id != null
+    }
+    
     private fun generateSequence(): Long {
         var retryCount = 0
         val maxRetries = 5
@@ -45,4 +49,6 @@ class HistoricalEntityService<T : HistoricalEntity> : EntityService<T, Long>() {
         }
         throw RuntimeException("Unexpected error generating sequence")
     }
+    
+    
 }

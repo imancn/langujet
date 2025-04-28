@@ -2,12 +2,27 @@ package com.cn.langujet.domain.exam.model.section.part
 
 import com.cn.langujet.application.arch.models.entity.HistoricalEntity
 import com.cn.langujet.domain.exam.model.enums.SectionType
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.data.annotation.TypeAlias
 import org.springframework.data.mongodb.core.mapping.Document
 
+@Schema(subTypes = [ReadingPartEntity::class, ListeningPartEntity::class, WritingPartEntity::class, SpeakingPartEntity::class])
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.EXISTING_PROPERTY,
+    property = "type"
+)
+@JsonSubTypes(
+    JsonSubTypes.Type(value = ReadingPartEntity::class, name = "READING"),
+    JsonSubTypes.Type(value = ListeningPartEntity::class, name = "LISTENING"),
+    JsonSubTypes.Type(value = WritingPartEntity::class, name = "WRITING"),
+    JsonSubTypes.Type(value = SpeakingPartEntity::class, name = "SPEAKING")
+)
 @TypeAlias("parts")
 @Document(collection = "parts")
-sealed class PartEntity(
+abstract class PartEntity(
     id: Long?,
     var examId: Long,
     var sectionId: Long,

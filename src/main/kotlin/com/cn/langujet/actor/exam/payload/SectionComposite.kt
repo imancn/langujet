@@ -6,7 +6,7 @@ import com.cn.langujet.domain.exam.model.section.part.PartEntity
 import com.cn.langujet.domain.exam.model.section.part.questions.QuestionEntity
 import com.fasterxml.jackson.annotation.JsonInclude
 
-data class SectionDTO(
+data class SectionComposite(
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
     var id: Long? = null,
     @field:JsonInclude(JsonInclude.Include.NON_NULL)
@@ -14,7 +14,7 @@ data class SectionDTO(
     var header: String,
     var sectionOrder: Int,
     var sectionType: SectionType,
-    var parts: List<PartDTO>,
+    var parts: List<PartComposite>,
     var time: Long
 ) {
     fun toSection(): SectionEntity {
@@ -37,7 +37,7 @@ data class SectionDTO(
         questions.groupBy { question ->
             question.partId
         }.mapNotNull { (partId, questions) ->
-            parts.find { part -> part.id == partId }?.let { PartDTO.from(it, questions) }
+            parts.find { part -> part.id == partId }?.let { PartComposite.from(it, questions) }
         },
         section.time
     )

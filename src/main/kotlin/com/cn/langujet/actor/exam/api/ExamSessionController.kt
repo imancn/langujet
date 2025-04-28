@@ -51,7 +51,7 @@ class ExamSessionController(
     fun getExamSection(
         @RequestParam @NotBlank examSessionId: Long,
         @RequestParam sectionOrder: Int
-    ): SectionDTO = examSessionService.getExamSection(examSessionId, sectionOrder)
+    ): SectionComposite = examSessionService.getExamSection(examSessionId, sectionOrder)
 
     @PreAuthorize("hasRole('STUDENT')")
     @PostMapping("/student/exam-sessions/finish")

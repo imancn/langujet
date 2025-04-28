@@ -7,25 +7,27 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(subTypes = [ReadingPartDTO::class, ListeningPartDTO::class, WritingPartDTO::class, SpeakingPartDTO::class])
+@Schema(subTypes = [ReadingPartComposite::class, ListeningPartComposite::class, WritingPartComposite::class, SpeakingPartComposite::class])
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.EXISTING_PROPERTY,
     property = "type"
 )
 @JsonSubTypes(
-    JsonSubTypes.Type(value = ReadingPartDTO::class, name = "READING"),
-    JsonSubTypes.Type(value = ListeningPartDTO::class, name = "LISTENING"),
-    JsonSubTypes.Type(value = WritingPartDTO::class, name = "WRITING"),
-    JsonSubTypes.Type(value = SpeakingPartDTO::class, name = "SPEAKING")
+    JsonSubTypes.Type(value = ReadingPartComposite::class, name = "READING"),
+    JsonSubTypes.Type(value = ListeningPartComposite::class, name = "LISTENING"),
+    JsonSubTypes.Type(value = WritingPartComposite::class, name = "WRITING"),
+    JsonSubTypes.Type(value = SpeakingPartComposite::class, name = "SPEAKING")
 )
-sealed class PartDTO(
+sealed class PartComposite(
+    id: Long? = null,
     open var partOrder: Int,
-    open var type: SectionType
+    open var type: SectionType,
+    open var questions: List<QuestionDTO>
 ) {
     inline fun <reified T : PartEntity> toPart(examId: Long, sectionId: Long): T {
         val part = when (this) {
-            is ReadingPartDTO -> ReadingPartEntity(
+            is ReadingPartComposite -> ReadingPartEntity(
                 id = null,
                 examId = examId,
                 sectionId = sectionId,
@@ -39,7 +41,7 @@ sealed class PartDTO(
                 }
             )
             
-            is ListeningPartDTO -> ListeningPartEntity(
+            is ListeningPartComposite -> ListeningPartEntity(
                 id = null,
                 examId = examId,
                 sectionId = sectionId,
@@ -48,14 +50,14 @@ sealed class PartDTO(
                 time = this.time
             )
             
-            is WritingPartDTO -> WritingPartEntity(
+            is WritingPartComposite -> WritingPartEntity(
                 id = null,
                 examId = examId,
                 sectionId = sectionId,
                 order = this.partOrder
             )
             
-            is SpeakingPartDTO -> SpeakingPartEntity(
+            is SpeakingPartComposite -> SpeakingPartEntity(
                 id = null,
                 examId = examId,
                 sectionId = sectionId,
@@ -70,38 +72,71 @@ sealed class PartDTO(
     }
 
     companion object {
-        inline fun <reified T : PartDTO> from(part: PartEntity, questions: List<QuestionEntity>): T {
+        inline fun <reified T : PartComposite> from(part: PartEntity, questions: List<QuestionEntity>): T {
             val partDTO = when (part) {
-                is ReadingPartEntity -> ReadingPartDTO(part = part, questions = questions)
-                is ListeningPartEntity -> ListeningPartDTO(part = part, questions = questions)
-                is WritingPartEntity -> WritingPartDTO(part = part, question = questions.first())
-                is SpeakingPartEntity -> SpeakingPartDTO(part = part, questions = questions)
+                is ReadingPartEntity -> ReadingPartComposite(part, questions = questions)
+                is ListeningPartEntity -> ListeningPartComposite(part, questions = questions)
+                is WritingPartEntity -> WritingPartComposite(part, questions = questions)
+                is SpeakingPartEntity -> SpeakingPartComposite(part, questions = questions)
                 else -> throw IllegalArgumentException("Unknown Part type")
             }
             if (partDTO !is T) throw TypeCastException("The type of question does not match the reified type.")
             return partDTO
         }
     }
-    
-    abstract fun getQuestions(): List<QuestionDTO>
 }
 
-data class ReadingPartDTO(
+class ReadingPartComposite(
+    id: Long? = null,
     override var partOrder: Int,
+    override var questions: List<QuestionDTO>,
     var passageHeader: String?,
     var passage: List<PassageDTO>,
-    var questionList: List<QuestionDTO>
-) : PartDTO(partOrder = partOrder, SectionType.READING) {
+) : PartComposite(id = id, partOrder = partOrder, questions = questions, type = SectionType.READING) {
     constructor(part: ReadingPartEntity, questions: List<QuestionEntity>) : this(
         partOrder = part.order,
         passageHeader = part.passageHeader,
         passage = part.passage.map { PassageDTO(it) },
-        questionList = questions.map { QuestionDTO.from(it) },
+        questions = questions.map { QuestionDTO.from(it) }
     )
-    
-    override fun getQuestions(): List<QuestionDTO> {
-        return questionList
-    }
+}
+
+class ListeningPartComposite(
+    id: Long? = null,
+    override var partOrder: Int,
+    override var questions: List<QuestionDTO>,
+    val audioId: Long,
+    var time: Long
+) : PartComposite(id = id, partOrder = partOrder, questions = questions, type = SectionType.LISTENING) {
+    constructor(part: ListeningPartEntity, questions: List<QuestionEntity>) : this(
+        partOrder = part.order,
+        audioId = part.audioId,
+        time = part.time,
+        questions = questions.map { QuestionDTO.from(it) }
+    )
+}
+
+class WritingPartComposite(
+    id: Long? = null,
+    override var partOrder: Int,
+    override var questions: List<QuestionDTO>
+) : PartComposite(id = id, partOrder = partOrder, questions = questions, type = SectionType.WRITING) {
+    constructor(part: WritingPartEntity, questions: List<QuestionEntity>) : this(
+        partOrder = part.order, questions = questions.map { QuestionDTO.from(it) }
+    )
+}
+
+class SpeakingPartComposite(
+    id: Long? = null,
+    override var partOrder: Int,
+    override var questions: List<QuestionDTO>,
+    var focus: String? = null
+) : PartComposite(id = id, partOrder = partOrder, questions = questions, type = SectionType.SPEAKING) {
+    constructor(part: SpeakingPartEntity, questions: List<QuestionEntity>) : this(
+        partOrder = part.order,
+        focus = part.focus,
+        questions = questions.map { QuestionDTO.from(it) }
+    )
 }
 
 data class PassageDTO(
@@ -112,52 +147,4 @@ data class PassageDTO(
         readingPassage.indicator,
         readingPassage.paragraph
     )
-}
-
-data class ListeningPartDTO(
-    override var partOrder: Int,
-    val audioId: Long,
-    var questionList: List<QuestionDTO>,
-    var time: Long
-) : PartDTO(partOrder = partOrder, SectionType.LISTENING) {
-    constructor(part: ListeningPartEntity, questions: List<QuestionEntity>) : this(
-        partOrder = part.order,
-        audioId = part.audioId,
-        questionList = questions.map { QuestionDTO.from(it) },
-        time = part.time
-    )
-    
-    override fun getQuestions(): List<QuestionDTO> {
-        return questionList
-    }
-}
-
-data class WritingPartDTO(
-    override var partOrder: Int,
-    var question: WritingQuestionDTO
-) : PartDTO(partOrder = partOrder, SectionType.WRITING) {
-    constructor(part: WritingPartEntity, question: QuestionEntity) : this(
-        partOrder = part.order,
-        question = QuestionDTO.from(question),
-    )
-    
-    override fun getQuestions(): List<QuestionDTO> {
-        return listOf(question)
-    }
-}
-
-data class SpeakingPartDTO(
-    override var partOrder: Int,
-    var questionList: List<SpeakingQuestionDTO>,
-    var focus: String? = null
-) : PartDTO(partOrder = partOrder, SectionType.SPEAKING) {
-    constructor(part: SpeakingPartEntity, questions: List<QuestionEntity>) : this(
-        partOrder = part.order,
-        questionList = questions.map { QuestionDTO.from(it) },
-        focus = part.focus
-    )
-    
-    override fun getQuestions(): List<QuestionDTO> {
-        return questionList
-    }
 }

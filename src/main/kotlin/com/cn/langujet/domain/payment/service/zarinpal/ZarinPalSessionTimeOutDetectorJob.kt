@@ -15,7 +15,8 @@ class ZarinPalSessionTimeOutDetectorJob(
     @Scheduled(fixedDelay = 10 * 60 * 1000)
     fun failTimeoutSessions() {
         zarinPalPaymentRepository.findByStatusAndPaymentType(PaymentStatus.PENDING).forEach { payment ->
-            if (payment.createdAt.time < Date().time - (15 * 60 * 1000)) {
+            val paymentCreatedDate = payment.createdAt?.time ?: 0
+            if (paymentCreatedDate < Date().time - (15 * 60 * 1000)) {
                 orderService.rejectOrder(payment.orderId)
                 payment.status = PaymentStatus.EXPIRED
                 zarinPalPaymentRepository.save(payment)

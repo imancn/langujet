@@ -1,24 +1,33 @@
 package com.cn.langujet.application.arch.models.entity
 
 import com.cn.langujet.actor.util.Auth
+import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.data.annotation.*
 import java.util.*
 
 abstract class HistoricalEntity(id: Long?) : Entity<Long>(id) {
     @field:Version
-    var version: Long = 0
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    open var version: Long = 0
     
-    var deleted: Boolean = false
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    open var deleted: Boolean = false
     
     @field:CreatedBy
-    var createdBy: Long = Auth.UNDEFINED
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    open var createdBy: Long? = null
+    
     @field:CreatedDate
-    var createdAt: Date = Date(0)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    open var createdAt: Date? = null
     
     @field:LastModifiedBy
-    var updatedBy: Long = Auth.UNDEFINED
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    open var updatedBy: Long? = null
+    
     @field:LastModifiedDate
-    var updatedAt: Date = Date(0)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    open var updatedAt: Date? = null
     
     fun updateLog() {
         this.also {

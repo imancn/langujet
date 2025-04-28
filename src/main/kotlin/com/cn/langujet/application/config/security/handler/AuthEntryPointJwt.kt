@@ -1,6 +1,6 @@
 package com.cn.langujet.application.config.security.handler
 
-import com.cn.langujet.application.arch.advice.ErrorMessageResponse
+import com.cn.langujet.application.arch.BundleService
 import com.cn.langujet.application.arch.advice.InvalidCredentialException
 import com.cn.langujet.domain.user.services.JwtService
 import com.cn.langujet.domain.user.services.UserDetailsServiceImpl
@@ -14,14 +14,13 @@ import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.stereotype.Component
 import java.io.IOException
-import java.util.*
 
 @Component
 class AuthEntryPointJwt(
     private val jwtService: JwtService,
     private val userDetailsService: UserDetailsServiceImpl,
     private val modelMapper: ObjectMapper,
-    private val resourceBundle: ResourceBundle
+    private val bundle: BundleService
 ) : AuthenticationEntryPoint {
     @Throws(IOException::class, ServletException::class)
     override fun commence(
@@ -46,10 +45,9 @@ class AuthEntryPointJwt(
             val key = "invalid.credentials"
             response.writer.print(
                 modelMapper.writeValueAsString(
-                    ErrorMessageResponse(key, resourceBundle.getString(key) ?: "Unexpected error")
+                    bundle.getMessageResponse(key)
                 )
             )
         }
-        
     }
 }

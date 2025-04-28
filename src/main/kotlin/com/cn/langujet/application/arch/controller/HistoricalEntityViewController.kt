@@ -4,40 +4,89 @@ import com.cn.langujet.application.arch.controller.payload.request.search.Search
 import com.cn.langujet.application.arch.controller.payload.response.PageResponse
 import com.cn.langujet.application.arch.models.entity.HistoricalEntity
 import com.cn.langujet.application.arch.mongo.HistoricalEntityService
-import com.fasterxml.jackson.databind.ObjectMapper
+import io.swagger.v3.oas.annotations.Operation
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.*
 
-abstract class HistoricalEntityViewController<T : HistoricalEntity> {
+abstract class HistoricalEntityViewController<E : HistoricalEntity> {
     
     @field:Autowired
-    lateinit var service: HistoricalEntityService<T>
+    lateinit var service: HistoricalEntityService<E>
     
-    @field:Autowired
-    lateinit var mapper: ObjectMapper
-    
+    @Operation(
+        summary = "Get an entity by id",
+        description = "Gets an entity by id. Requires ADMIN role."
+    )
     @GetMapping("/{id}") @PreAuthorize("hasRole('ADMIN')")
-    open fun getEntity(@PathVariable id: Long): ResponseEntity<T> {
+    open fun getEntity(@PathVariable id: Long): ResponseEntity<E> {
         val entity = service.getById(id)
         return ResponseEntity.ok(entity)
     }
     
+    @Operation(
+        summary = "Get 10 latest created entities",
+        description = "Gets 10 latest created entities. Requires ADMIN role."
+    )
     @GetMapping @PreAuthorize("hasRole('ADMIN')")
-    open fun getTop(@RequestParam count: Int = 10): ResponseEntity<List<T>> {
+    open fun getTop(@RequestParam count: Int = 10): ResponseEntity<List<E>> {
         return ResponseEntity.ok(service.findTop(count))
     }
     
+    @Operation(
+        summary = "Search entities with advanced filtering and pagination",
+        description = """
+        ## Advanced Search API
+        
+        Performs a paginated search with filtering and sorting capabilities.
+        Returns results in a standardized page response format.
+        
+        ### Features:
+        - **Filtering**: Apply multiple filters using logical AND conditions
+        - **Sorting**: Sort by multiple fields with ascending/descending direction
+        - **Pagination**: Control page size and number
+        - **Default behavior**: Returns top 10 entities when no request body provided
+        
+        ### Request Structure:
+        ```json
+        {
+          "filters": {
+            "expressions": [
+              {
+                "key": "fieldName",
+                "values": ["value1", "value2"]
+              }
+            ]
+          },
+          "sorts": [
+            {
+              "key": "fieldName",
+              "direction": true // true=ascending, false=descending
+            }
+          ],
+          "page": {
+            "number": 0, // page index (0-based)
+            "size": 20   // items per page
+          }
+        }
+        ```
+        
+        ### Filter Behavior:
+        - Each expression creates an `IN` clause (field IN [values])
+        - Multiple expressions are combined with AND logic
+        - Omit filters to disable filtering
+        
+        ### Sorting:
+        - Supports multiple sort fields
+        - Direction: `true` = ascending, `false` = descending
+    """
+    )
     @PostMapping("/search") @PreAuthorize("hasRole('ADMIN')")
-    open fun getEntities(@RequestBody request: SearchRequest?): ResponseEntity<PageResponse<T>> {
+    open fun getEntities(@RequestBody request: SearchRequest?): ResponseEntity<PageResponse<E>> {
         if (request != null) {
             val pageable = if (!request.sorts.isNullOrEmpty()) {
                 val sort = Sort.by(

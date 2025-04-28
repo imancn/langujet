@@ -1,6 +1,6 @@
 package com.cn.langujet.domain.exam.service
 
-import com.cn.langujet.actor.exam.payload.SectionDTO
+import com.cn.langujet.actor.exam.payload.SectionComposite
 import com.cn.langujet.application.arch.advice.InvalidInputException
 import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.application.arch.models.entity.Entity
@@ -20,12 +20,12 @@ class SectionService(
     private val questionService: QuestionService,
     private val partService: PartService
 ) : HistoricalEntityService<SectionEntity>() {
-    fun getSectionById(id: Long): SectionDTO {
+    fun getSectionCompositeById(id: Long): SectionComposite {
         val section = sectionRepository.findById(id).orElseThrow {
             UnprocessableException("Section with id $id not found")
         }
         val criteria = Criteria.where("sectionId").`is`(section.id)
-        return SectionDTO(
+        return SectionComposite(
             section = section,
             questions = questionService.find(criteria),
             parts = partService.find(criteria)

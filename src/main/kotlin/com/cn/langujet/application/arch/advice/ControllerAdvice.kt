@@ -1,5 +1,6 @@
 package com.cn.langujet.application.arch.advice
 
+import com.cn.langujet.application.arch.controller.payload.response.MessageResponse
 import com.cn.langujet.application.arch.log.LoggerService
 import jakarta.validation.ValidationException
 import org.springframework.http.HttpStatus
@@ -14,19 +15,22 @@ import org.springframework.web.context.request.WebRequest
 @RestControllerAdvice
 class ControllerAdvice(private val loggerService: LoggerService) {
     @ExceptionHandler(value = [MethodArgumentNotValidException::class])
-    fun handleValidationException(ex: MethodArgumentNotValidException, request: WebRequest): ResponseEntity<ErrorMessageResponse> {
+    fun handleValidationException(
+        ex: MethodArgumentNotValidException,
+        request: WebRequest
+    ): ResponseEntity<MessageResponse> {
         loggerService.error(ex)
         return ResponseEntity(
-            ErrorMessageResponse("invalid.input", ex.detailMessageArguments.toString()),
+            MessageResponse("invalid.input", ex.detailMessageArguments.toString()),
             HttpStatus.BAD_REQUEST
         )
     }
     
     @ExceptionHandler(value = [ValidationException::class])
-    fun handleValidationException(ex: ValidationException, request: WebRequest): ResponseEntity<ErrorMessageResponse> {
+    fun handleValidationException(ex: ValidationException, request: WebRequest): ResponseEntity<MessageResponse> {
         loggerService.error(ex)
         return ResponseEntity(
-            ErrorMessageResponse("invalid.input", ex.message ?: ""),
+            MessageResponse("invalid.input", ex.message ?: ""),
             HttpStatus.BAD_REQUEST
         )
     }
@@ -35,20 +39,23 @@ class ControllerAdvice(private val loggerService: LoggerService) {
     fun handleNoSuchElementException(
         ex: NoSuchElementException,
         request: WebRequest
-    ): ResponseEntity<ErrorMessageResponse> {
+    ): ResponseEntity<MessageResponse> {
         loggerService.error(ex)
         return ResponseEntity(
-            ErrorMessageResponse("not.found", ex.message ?: ""),
+            MessageResponse("not.found", ex.message ?: ""),
             HttpStatus.NOT_FOUND
         )
     }
     
     // Todo: Remove after test
     @ExceptionHandler(value = [HttpMessageConversionException::class])
-    fun handleHttpMessageConversionException(ex: HttpMessageNotReadableException, request: WebRequest): ResponseEntity<ErrorMessageResponse> {
+    fun handleHttpMessageConversionException(
+        ex: HttpMessageNotReadableException,
+        request: WebRequest
+    ): ResponseEntity<MessageResponse> {
         loggerService.error(ex)
         return ResponseEntity(
-            ErrorMessageResponse("invalid.input", ex.message ?: ""),
+            MessageResponse("invalid.input", ex.message ?: ""),
             HttpStatus.BAD_REQUEST
         )
     }

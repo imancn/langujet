@@ -6,9 +6,9 @@ import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
 
 interface LoggerService {
-    fun log(msg: String): String
-    fun error(exp: HttpException): String
-    fun error(exp: Exception): String
+    fun log(msg: String)
+    fun error(exp: HttpException)
+    fun error(exp: Exception)
     fun logChanges(old: Entity<*>, new: Entity<*>)
     fun path(): String {
         val attrs = RequestContextHolder.getRequestAttributes() as? ServletRequestAttributes

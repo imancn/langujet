@@ -114,7 +114,7 @@ class ExamSessionService(
     
     fun getExamSection(
         examSessionId: Long, sectionOrder: Int
-    ): SectionDTO {
+    ): SectionComposite {
         val examSession = examSessionRepository.findByStudentUserIdAndState(
             Auth.userId(), ExamSessionState.STARTED
         ).getOrElse(0) {
@@ -140,7 +140,7 @@ class ExamSessionService(
         val criteria = Criteria.where("sectionId").`is`(section.id)
         val parts = partService.find(criteria)
         val questions = questionService.find(criteria)
-        return SectionDTO(
+        return SectionComposite(
             section = section,
             parts = parts,
             questions = questions
