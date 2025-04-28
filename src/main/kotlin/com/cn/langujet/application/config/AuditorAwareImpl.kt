@@ -8,7 +8,7 @@ import java.util.*
 @Component
 class AuditorAwareImpl : AuditorAware<Long> {
     override fun getCurrentAuditor(): Optional<Long> {
-        val principal = SecurityContextHolder.getContext().authentication?.name?.toLong()
-        return Optional.ofNullable(principal)
+        val userId = try { SecurityContextHolder.getContext().authentication?.name?.toLong() } catch (e: Exception) { null }
+        return Optional.ofNullable(userId)
     }
 }
