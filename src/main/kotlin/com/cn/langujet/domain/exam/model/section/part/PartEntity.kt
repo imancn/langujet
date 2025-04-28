@@ -27,7 +27,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 @CompoundIndexes(
     CompoundIndex(
         name = "unique_parts_index",
-        def = "{'examId': -1, 'sectionId: 1, 'order': 1}",
+        def = "{'examId': -1, 'sectionId': 1, 'order': 1}",
         unique = true
     )
 )
