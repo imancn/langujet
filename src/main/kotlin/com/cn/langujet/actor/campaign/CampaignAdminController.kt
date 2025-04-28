@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/admin/campaigns")
-class CampaignController(
+class CampaignAdminController(
     override var service: CampaignService,
 ) : HistoricalEntityViewController<CampaignRepository, CampaignService, CampaignEntity>() {
     

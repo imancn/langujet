@@ -2,7 +2,6 @@ package com.cn.langujet.actor.student.api
 
 import com.cn.langujet.actor.student.payload.response.StudentProfileResponse
 import com.cn.langujet.actor.util.Auth
-import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.domain.student.service.StudentService
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -19,7 +18,7 @@ class StudentController(
     @GetMapping("/profile")
     @PreAuthorize("hasRole('STUDENT')")
     fun getProfile(): ResponseEntity<StudentProfileResponse> {
-        return toOkResponseEntity(StudentProfileResponse(studentService.getStudentByUserId(Auth.userId())))
+        return ResponseEntity.ok(StudentProfileResponse(studentService.getStudentByUserId(Auth.userId())))
     }
     @PostMapping("/profile")
     @PreAuthorize("hasRole('STUDENT')")
@@ -27,6 +26,6 @@ class StudentController(
         @RequestParam fullName: String?,
         @RequestParam biography: String?,
     ): ResponseEntity<StudentProfileResponse> {
-        return toOkResponseEntity(studentService.editProfile(fullName, biography))
+        return ResponseEntity.ok(studentService.editProfile(fullName, biography))
     }
 }

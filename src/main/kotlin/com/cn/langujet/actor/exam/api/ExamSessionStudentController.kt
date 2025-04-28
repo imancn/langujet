@@ -10,38 +10,21 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/student/exam-sessions")
 @Validated
-class ExamSessionController(
+class ExamSessionStudentController(
     private val examSessionService: ExamSessionService
 ){
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/admin/exam-sessions/enroll")
-    fun enrollExamSession(
-        @RequestParam @NotBlank email: String,
-        @RequestParam @NotBlank examServiceId: Long,
-        @RequestParam examId: Long?,
-    ): ExamSessionEnrollResponse = examSessionService.enrollExamSessionByEmail(email, examServiceId, examId)
-    
     @PreAuthorize("hasRole('STUDENT')")
-    @GetMapping("/student/exam-sessions/details")
+    @GetMapping("/details")
     fun getStudentExamSession(
         @RequestParam @NotBlank examSessionId: Long
     ): ExamSessionDetailsResponse = examSessionService.getStudentExamSessionDetailsResponse(examSessionId)
 
     @PreAuthorize("hasRole('STUDENT')")
-    @PostMapping("/student/exam-sessions/search")
+    @PostMapping("/search")
     fun searchStudentExamSessions(
         @RequestBody @Valid request: ExamSessionSearchStudentRequest
-    ): PageResponse<ExamSessionSearchResponse> {
-        return examSessionService.searchExamSessions(request)
-    }
-    
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/admin/exam-sessions/search")
-    fun searchStudentExamSessionsByAdmin(
-        @RequestBody @Valid request: ExamSessionSearchAdminRequest
     ): PageResponse<ExamSessionSearchResponse> {
         return examSessionService.searchExamSessions(request)
     }

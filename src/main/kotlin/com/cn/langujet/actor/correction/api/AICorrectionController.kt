@@ -13,18 +13,18 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/v1/ai")
+@RequestMapping("/api/v1/ai/corrections")
 @Validated
 class AICorrectionController(
     private val correctionService: CorrectionService
 ) {
-    @GetMapping("/corrections/pending")
+    @GetMapping("/pending")
     @PreAuthorize("hasRole('CORRECTOR_AI')")
     fun getCorrectorPendingCorrections(): List<CorrectorAvailableCorrectionResponse> {
         return correctionService.getCorrectorPendingCorrections(CorrectorType.valueOf(Auth.claim("type")))
     }
     
-    @PostMapping("/corrections/assign")
+    @PostMapping("/assign")
     @PreAuthorize("hasRole('CORRECTOR_AI')")
     fun assignCorrection(
         @RequestBody assignCorrectionRequest: AssignCorrectionRequest
@@ -35,19 +35,19 @@ class AICorrectionController(
         )
     }
     
-    @GetMapping("/corrections/processing")
+    @GetMapping("/processing")
     @PreAuthorize("hasRole('CORRECTOR_AI')")
     fun getCorrectorProcessingCorrection(): CorrectionResponse {
         return correctionService.getCorrectorProcessingCorrection()
     }
     
-    @GetMapping("/corrections")
+    @GetMapping
     @PreAuthorize("hasRole('CORRECTOR_AI')")
     fun getCorrectorCorrectionsByStatus(@RequestParam status: CorrectionStatus): List<CorrectionResponse> {
         return correctionService.getCorrectorCorrectionsByStatus(status)
     }
     
-    @GetMapping("/corrections/exam-session-contents/{correctionId}")
+    @GetMapping("/exam-session-contents/{correctionId}")
     @PreAuthorize("hasRole('CORRECTOR_AI')")
     fun getCorrectorCorrectionExamSessionContent(
         @PathVariable correctionId: Long

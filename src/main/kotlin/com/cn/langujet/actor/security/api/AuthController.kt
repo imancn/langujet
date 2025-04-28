@@ -3,7 +3,6 @@ package com.cn.langujet.actor.security.api
 import com.cn.langujet.actor.security.response.JwtResponse
 import com.cn.langujet.actor.security.response.RefreshTokenResponse
 import com.cn.langujet.actor.util.Auth
-import com.cn.langujet.actor.util.toOkResponseEntity
 import com.cn.langujet.application.arch.advice.InvalidCredentialException
 import com.cn.langujet.application.arch.advice.InvalidInputException
 import com.cn.langujet.application.arch.advice.UnprocessableException
@@ -85,7 +84,7 @@ class AuthController(
         val userDetails = authentication.principal as UserDetailsImpl
         if (!userDetails.emailVerified) throw UnprocessableException("Your email isn't verified")
         val refreshToken = refreshTokenService.createRefreshToken(userDetails.id)
-        return toOkResponseEntity(
+        return ResponseEntity.ok(
             JwtResponse(
                 jwt, refreshToken.id ?: "", userDetails.email
             )
@@ -107,7 +106,7 @@ class AuthController(
         val user = registerUserByEmail(email, password, mutableSetOf(Role.ROLE_STUDENT))
         sendVerificationMail(user.email)
         studentService.create(StudentEntity(user, fullName))
-        return toOkResponseEntity("User registered successfully!")
+        return ResponseEntity.ok("User registered successfully!")
     }
     
     @PreAuthorize("hasRole('ADMIN')")
@@ -126,7 +125,7 @@ class AuthController(
         user.roles =  user.roles.toMutableSet().also { it.add(Role.ROLE_CORRECTOR) }
         user = userService.save(user)
         correctorService.save(CorrectorEntity(user, fullName, ieltsScore))
-        return toOkResponseEntity("Corrector registered successfully!")
+        return ResponseEntity.ok("Corrector registered successfully!")
     }
     
     private fun registerUserByEmail(email: String, password: String, roles: Set<Role>): UserEntity {
@@ -158,7 +157,7 @@ class AuthController(
         }
         if (verificationToken.token == verificationCode) userService.save(user.also { it.emailVerified = true })
         else throw InvalidInputException("Your verification code is not available.")
-        return toOkResponseEntity("Email Verified successfully!")
+        return ResponseEntity.ok("Email Verified successfully!")
     }
     
     @PostMapping("/signup/email/verification-mail")
@@ -172,14 +171,14 @@ class AuthController(
             emailVerificationTokenService.save(EmailVerificationTokenEntity(user))
         }
         mailSenderService.sendEmailVerificationMail(emailVerificationToken)
-        return toOkResponseEntity("Verification Mail Has Been Sent.")
+        return ResponseEntity.ok("Verification Mail Has Been Sent.")
     }
     
     @PostMapping("/refresh-token")
     fun refreshToken(
         @RequestParam @NotBlank refreshToken: String,
     ): ResponseEntity<RefreshTokenResponse> {
-        return toOkResponseEntity(refreshTokenService.findByToken(refreshToken).map { refreshTokenEntity ->
+        return ResponseEntity.ok(refreshTokenService.findByToken(refreshToken).map { refreshTokenEntity ->
             val user = userService.getById(refreshTokenEntity.userId)
             val token = jwtService.generateTokenFromUsername(user.username)
             val newRefreshToken = refreshTokenService.createRefreshToken(refreshTokenEntity.userId)
@@ -198,7 +197,7 @@ class AuthController(
             resetPasswordTokenService.save(ResetPasswordTokenEntity(user))
         }
         mailSenderService.sendResetPasswordMail(token)
-        return toOkResponseEntity("The reset password link has been mailed to you.")
+        return ResponseEntity.ok("The reset password link has been mailed to you.")
     }
     
     @PostMapping("/reset-password/set")
@@ -217,7 +216,7 @@ class AuthController(
             userService.save(user)
             resetPasswordTokenRepository.delete(token)
         } else throw InvalidCredentialException("Your reset password token is invalid.")
-        return toOkResponseEntity("Your password has been reset successfully")
+        return ResponseEntity.ok("Your password has been reset successfully")
     }
     
     @PostMapping("/change-password")
@@ -230,13 +229,13 @@ class AuthController(
         if (user.password.isNullOrBlank()) throw UnprocessableException("You must reset your password")
         if (encoder.matches(oldPassword, user.password)) user.password = encoder.encode(newPassword)
         else throw InvalidInputException("Old Password is not correct.")
-        return toOkResponseEntity("Your password has been changed.")
+        return ResponseEntity.ok("Your password has been changed.")
     }
     
     @PostMapping("/sign-out")
     fun signOutUser(): ResponseEntity<String> {
         refreshTokenService.deleteByUserId(Auth.userId())
-        return toOkResponseEntity("User signed out successfully")
+        return ResponseEntity.ok("User signed out successfully")
     }
     
     @PostMapping("/delete-account")

@@ -16,14 +16,14 @@ import org.springframework.web.bind.annotation.*
 
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/student/orders")
 @Validated
-class OrderController(
+class OrderStudentController(
     private val orderService: OrderService,
     private val couponService: CouponService,
     private val clientRegionService: ClientRegionService
 ) {
-    @PostMapping("/student/orders")
+    @PostMapping
     @PreAuthorize("hasRole('STUDENT')")
     fun submitOrder(
         @Valid @RequestBody request: SubmitOrderRequest,
@@ -31,33 +31,33 @@ class OrderController(
         return orderService.submitOrder(request)
     }
     
-    @GetMapping("student/orders")
+    @GetMapping
     @PreAuthorize("hasRole('STUDENT')")
     fun getOrders(
         @RequestParam orderStatus: OrderStatus?,
         @RequestParam pageNumber: Int,
         @RequestParam pageSize: Int,
-    ) : PageResponse<StudentOrderResponse> {
+    ): PageResponse<StudentOrderResponse> {
         return orderService.getStudentOrders(
             orderStatus, pageNumber, pageSize
         )
     }
     
-    @GetMapping("student/orders/details")
+    @GetMapping("/details")
     fun getOrderDetails(
         @RequestParam orderId: Long
-    ) : StudentOrderDetailsResponse {
+    ): StudentOrderDetailsResponse {
         return orderService.getStudentOrderDetails(orderId)
     }
     
-    @GetMapping("student/orders/payments/result")
+    @GetMapping("/payments/result")
     fun getOrderPaymentResult(
         @RequestParam orderId: Long
-    ) : StudentOrderPaymentResultResponse {
+    ): StudentOrderPaymentResultResponse {
         return orderService.getOrderPaymentResult(orderId)
     }
     
-    @GetMapping("/student/orders/checkout")
+    @GetMapping("/checkout")
     @PreAuthorize("hasRole('STUDENT')")
     fun getPaymentDetails(
         request: HttpServletRequest,
@@ -68,7 +68,7 @@ class OrderController(
         )
     }
     
-    fun getClientIp(request: HttpServletRequest): String? {
+    private fun getClientIp(request: HttpServletRequest): String? {
         try {
             val header = request.getHeader("X-Forwarded-For")
             return if (header == null || header.isEmpty()) {

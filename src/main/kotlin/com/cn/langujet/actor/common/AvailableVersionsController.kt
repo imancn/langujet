@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/v1/student/mobile-app/available-versions")
+@RequestMapping("/api/v1/public/mobile-app/available-versions")
 class AvailableVersionsController {
     @GetMapping
     fun getMobileAppAvailableVersions(): MobileAppAvailableVersions {

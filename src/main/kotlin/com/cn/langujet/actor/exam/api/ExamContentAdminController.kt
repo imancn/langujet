@@ -1,7 +1,9 @@
 package com.cn.langujet.actor.exam.api
 
 import com.cn.langujet.actor.exam.payload.ExamContentDownloadLink
+import com.cn.langujet.application.arch.controller.HistoricalEntityViewController
 import com.cn.langujet.domain.exam.model.ExamContentEntity
+import com.cn.langujet.domain.exam.repository.ExamContentRepository
 import com.cn.langujet.domain.exam.service.ExamContentService
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
@@ -11,12 +13,12 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
 @RestController
-@RequestMapping("api/v1")
+@RequestMapping("api/v1/admin/exam-contents")
 @Validated
-class ExamContentController(
+class ExamContentAdminController(
     private val examContentService: ExamContentService
-) {
-    @PostMapping("admin/exam-contents")
+) : HistoricalEntityViewController<ExamContentRepository, ExamContentService, ExamContentEntity>() {
+    @PostMapping("/exam-contents")
     @PreAuthorize("hasRole('ADMIN')")
     fun uploadExamContent(
         @RequestParam @NotBlank examId: Long?,
@@ -28,7 +30,7 @@ class ExamContentController(
         return examContentService.uploadExamContent(file, examId!!, sectionOrder, partOrder, questionOrder)
     }
     
-    @GetMapping("/admin/exam-contents/download-links")
+    @GetMapping("/exam-contents/download-links")
     @PreAuthorize("hasAnyRole('ADMIN')")
     fun getAdminExamContentDownloadLink(
         @RequestParam examId: @NotBlank Long?,
@@ -36,17 +38,6 @@ class ExamContentController(
     ): List<ExamContentDownloadLink> {
         return examContentService.getAdminExamContentDownloadLink(
             examId!!, sectionOrder!!
-        )
-    }
-    
-    @GetMapping("/student/exam-contents/download-links")
-    @PreAuthorize("hasAnyRole('STUDENT')")
-    fun getStudentExamContentDownloadLink(
-        @RequestParam examSessionId: @NotBlank Long?,
-        @RequestParam sectionOrder: @NotNull Int?
-    ): List<ExamContentDownloadLink> {
-        return examContentService.getStudentExamContentDownloadLink(
-            examSessionId!!, sectionOrder!!
         )
     }
 }

@@ -13,29 +13,20 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
 @RestController
-@RequestMapping("api/v1")
+@RequestMapping("api/v1/corrector/results")
 @Validated
-class ResultController(
+class ResultCorrectorController(
     private val resultService: ResultService, private val sectionResultService: SectionResultService
 ) {
-    
-    @GetMapping("/student/results")
-    @PreAuthorize("hasRole('STUDENT')")
-    fun getStudentResultsByExamSessionId(
-        @RequestParam @NotBlank examSessionId: Long
-    ): DetailedResultResponse {
-        return resultService.getStudentDetailedResultByExamSessionId(examSessionId)
-    }
-    
-    @GetMapping("/corrector/results")
-    @PreAuthorize("hasAnyRole('ADMIN', 'CORRECTOR')")
+    @GetMapping
+    @PreAuthorize("hasAnyRole('CORRECTOR')")
     fun getCorrectorDetailedResultByExamCorrectionId(
         @RequestParam @NotBlank examCorrectionId: Long
     ): DetailedResultResponse {
         return resultService.getCorrectorDetailedResultByExamCorrectionId(examCorrectionId)
     }
     
-    @PostMapping("/corrector/results/sections")
+    @PostMapping("/sections")
     @PreAuthorize("hasAnyRole('CORRECTOR_AI', 'CORRECTOR')")
     fun submitCorrectorSectionResult(
         @RequestBody submitCorrectorSectionResultRequest: SubmitCorrectorSectionResultRequest
@@ -43,7 +34,7 @@ class ResultController(
         return sectionResultService.submitCorrectorSectionResult(submitCorrectorSectionResultRequest)
     }
     
-    @PostMapping("/corrector/results")
+    @PostMapping
     @PreAuthorize("hasAnyRole('CORRECTOR_AI', 'CORRECTOR')")
     fun submitCorrectorResult(
         @RequestBody submitCorrectorResultRequest: SubmitCorrectorResultRequest
@@ -51,7 +42,7 @@ class ResultController(
         return resultService.submitCorrectorResult(submitCorrectorResultRequest)
     }
     
-    @PostMapping("/corrector/results/sections/attachment", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    @PostMapping("/sections/attachment", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     @PreAuthorize("hasAnyRole('CORRECTOR_AI', 'CORRECTOR')")
     fun attachCorrectorSectionResultFile(
         @RequestParam attachment: MultipartFile,
