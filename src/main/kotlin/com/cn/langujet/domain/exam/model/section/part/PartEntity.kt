@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.data.annotation.TypeAlias
+import org.springframework.data.mongodb.core.index.CompoundIndex
+import org.springframework.data.mongodb.core.index.CompoundIndexes
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Schema(subTypes = [ReadingPartEntity::class, ListeningPartEntity::class, WritingPartEntity::class, SpeakingPartEntity::class])
@@ -22,6 +24,13 @@ import org.springframework.data.mongodb.core.mapping.Document
 )
 @TypeAlias("parts")
 @Document(collection = "parts")
+@CompoundIndexes(
+    CompoundIndex(
+        name = "unique_parts_index",
+        def = "{'examId': -1, 'sectionId: 1, 'order': 1}",
+        unique = true
+    )
+)
 abstract class PartEntity(
     id: Long?,
     var examId: Long,
