@@ -36,7 +36,7 @@ class OrderService(
     private val examSessionService: ExamSessionService,
     private val couponService: CouponService,
     private val rollbar: Rollbar,
-) : HistoricalEntityService<OrderEntity>() {
+) : HistoricalEntityService<OrderRepository, OrderEntity>() {
     private val logger = LoggerFactory.getLogger(javaClass.simpleName)
     
     fun submitOrder(submitOrderRequest: SubmitOrderRequest): SubmitOrderResponse {

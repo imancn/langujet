@@ -12,7 +12,7 @@ class PaymentService(
     private val paymentRepository: PaymentRepository,
     private val zarinPalPaymentService: ZarinPalPaymentService,
     private val stripePaymentService: StripePaymentService
-) : HistoricalEntityService<PaymentEntity>() {
+) : HistoricalEntityService<PaymentRepository, PaymentEntity>() {
     fun createPayment(orderId: Long, amount: Double, paymentType: PaymentType): PaymentEntity {
         return when(paymentType) {
             PaymentType.STRIPE -> createStripePayment(orderId, amount, paymentType)

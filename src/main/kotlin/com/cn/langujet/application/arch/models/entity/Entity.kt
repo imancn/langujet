@@ -2,7 +2,7 @@ package com.cn.langujet.application.arch.models.entity
 
 import org.springframework.data.annotation.Id
 
-abstract class Entity<ID>(
+abstract class Entity<ID : Any>(
     @field:Id open var id: ID? = null
 ): EntityInterface<ID> {
     

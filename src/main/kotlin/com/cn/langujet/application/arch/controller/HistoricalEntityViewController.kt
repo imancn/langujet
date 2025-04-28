@@ -4,6 +4,7 @@ import com.cn.langujet.application.arch.controller.payload.request.search.Search
 import com.cn.langujet.application.arch.controller.payload.response.PageResponse
 import com.cn.langujet.application.arch.models.entity.HistoricalEntity
 import com.cn.langujet.application.arch.mongo.HistoricalEntityService
+import com.cn.langujet.application.arch.mongo.HistoricalMongoRepository
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -12,9 +13,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
-abstract class HistoricalEntityViewController<S: HistoricalEntityService<E>, E : HistoricalEntity> (
-    protected open val service: S
-) {
+abstract class HistoricalEntityViewController<R : HistoricalMongoRepository<E>, S : HistoricalEntityService<R, E>, E : HistoricalEntity> {
+    protected open lateinit var service: S
     
     @Operation(
         summary = "Get an entity by id",

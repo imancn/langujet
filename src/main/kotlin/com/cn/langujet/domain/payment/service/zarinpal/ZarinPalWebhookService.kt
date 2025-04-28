@@ -18,7 +18,7 @@ class ZarinPalWebhookService(
     private val zarinPalClient: ZarinPalClient,
     private val zarinPalPaymentRepository: ZarinPalPaymentRepository,
     private val orderService: OrderService
-) : HistoricalEntityService<ZarinPalPaymentEntity>() {
+) : HistoricalEntityService<ZarinPalPaymentRepository, ZarinPalPaymentEntity>() {
     @Value("\${payment.redirect.url}")
     private lateinit var paymentRedirectUrl: String
     

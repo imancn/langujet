@@ -13,10 +13,10 @@ import org.springframework.web.multipart.MultipartFile
 
 @Service
 class AnswerService(
-    private val answerRepository: AnswerRepository,
+    override var repository: AnswerRepository,
     private val examSessionService: ExamSessionService,
     private val fileService: FileService
-) : HistoricalEntityService<AnswerEntity>() {
+) : HistoricalEntityService<AnswerRepository, AnswerEntity>() {
     fun submitVoiceAnswer(
         examSessionId: Long,
         sectionOrder: Int,
@@ -27,7 +27,7 @@ class AnswerService(
         examSessionPreCheck(examSessionId)
         val fileEntity = fileService.uploadFile(voice, FileBucket.ANSWERS)
         
-        if (answerRepository.existsByExamSessionIdAndSectionOrderAndPartOrderAndQuestionOrder(
+        if (repository.existsByExamSessionIdAndSectionOrderAndPartOrderAndQuestionOrder(
                 examSessionId ,sectionOrder ,partOrder ,questionOrder)
         ) {
             throw UnprocessableException("You have submitted this answer once")
@@ -51,8 +51,8 @@ class AnswerService(
         answerRequestList: List<AnswerBulkRequest>,
     ): Boolean {
         examSessionPreCheck(examSessionId!!)
-        val existingAnswers = answerRepository.findAllByExamSessionIdAndSectionOrder(examSessionId, sectionOrder!!)
-        answerRepository.saveAll(
+        val existingAnswers = repository.findAllByExamSessionIdAndSectionOrder(examSessionId, sectionOrder!!)
+        repository.saveAll(
             answerRequestList.map<AnswerBulkRequest, AnswerEntity> {
                 convertAnswerBulkRequestToAnswer(it, examSessionId, sectionOrder)
             }.onEach { answer ->

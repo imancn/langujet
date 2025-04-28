@@ -4,15 +4,17 @@ import com.cn.langujet.application.arch.BundleService
 import com.cn.langujet.application.arch.controller.payload.response.MessageResponse
 import com.cn.langujet.application.arch.models.entity.HistoricalEntity
 import com.cn.langujet.application.arch.mongo.HistoricalEntityService
+import com.cn.langujet.application.arch.mongo.HistoricalMongoRepository
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
-abstract class HistoricalEntityCrudController<S: HistoricalEntityService<E>, E : HistoricalEntity> (
-    override val service: S
-): HistoricalEntityViewController<S, E>(service) {
+abstract class HistoricalEntityCrudController<R : HistoricalMongoRepository<E>, S : HistoricalEntityService<R, E>, E : HistoricalEntity> :
+    HistoricalEntityViewController<R, S, E>() {
+    
+    override lateinit var service: S
     
     @Autowired
     lateinit var bundle: BundleService

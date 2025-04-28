@@ -14,23 +14,22 @@ import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Service
 import java.lang.reflect.ParameterizedType
 
 @Service
-class EntityService<T : Entity<ID>, ID> : EntityServiceInterface<T, ID> {
+class EntityService<R : MongoRepository<T, ID>, T : Entity<ID>, ID : Any> : EntityServiceInterface<T, ID> {
     @field:Autowired
     lateinit var loggerService: LoggerService
     
     @field:Autowired
     lateinit var mongoOperations: MongoOperations
     
+    lateinit var repository: R
+    
     override fun save(entity: T): T {
-        return if (entity.id == null) {
-            create(entity, null)
-        } else {
-            update(entity)
-        }
+        return repository.save(entity)
     }
     
     override fun saveMany(entities: List<T>): List<T> {
@@ -40,7 +39,7 @@ class EntityService<T : Entity<ID>, ID> : EntityServiceInterface<T, ID> {
     override fun create(entity: T, id: ID?): T {
         entity.id(id)
         return try {
-            mongoOperations.save(entity)
+            repository.save(entity)
         } catch (e: Exception) {
             throwUnprocessableException(e)
         }
@@ -72,7 +71,7 @@ class EntityService<T : Entity<ID>, ID> : EntityServiceInterface<T, ID> {
     
     override fun update(entity: T): T {
         return doIfExist(entity) {
-            mongoOperations.save(entity)
+            repository.save(entity)
         }
     }
     
@@ -81,9 +80,9 @@ class EntityService<T : Entity<ID>, ID> : EntityServiceInterface<T, ID> {
     }
     
     override fun getById(id: ID): T {
-        val query = Query(Criteria.where("_id").`is`(id))
-        return mongoOperations.findOne(query, clazz, collection)
-            ?: throw NoSuchElementException("Entity with id $id not found")
+        return repository.findById(id).orElseThrow {
+            NoSuchElementException("Entity with id $id not found")
+        }
     }
     
     override fun tryById(id: ID): T? {
@@ -92,8 +91,7 @@ class EntityService<T : Entity<ID>, ID> : EntityServiceInterface<T, ID> {
     }
     
     override fun findTop(count: Int): List<T> {
-        val query = Query().with(PageRequest.of(0, count)).with(Sort.by(Sort.Direction.DESC, "_id"))
-        return mongoOperations.find(query, clazz, collection)
+        return repository.findAll(PageRequest.of(0, count, Sort.by(Sort.Order.desc("_id")))).content
     }
     
     override fun find(query: Query, pageable: Pageable?): List<T> {
@@ -122,7 +120,7 @@ class EntityService<T : Entity<ID>, ID> : EntityServiceInterface<T, ID> {
     
     @Suppress("UNCHECKED_CAST")
     protected val clazz: Class<T> by lazy {
-        (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<T>
+        (javaClass.genericSuperclass as ParameterizedType).actualTypeArguments[1] as Class<T>
     }
     
     protected val collection: String by lazy {

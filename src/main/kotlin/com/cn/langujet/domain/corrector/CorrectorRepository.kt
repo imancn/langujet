@@ -1,9 +1,9 @@
 package com.cn.langujet.domain.corrector
 
-import org.springframework.data.mongodb.repository.MongoRepository
+import com.cn.langujet.application.arch.mongo.HistoricalMongoRepository
 import java.util.*
 
-interface CorrectorRepository : MongoRepository<CorrectorEntity, Long> {
+interface CorrectorRepository : HistoricalMongoRepository<CorrectorEntity> {
     fun findByUser_Id(userId: Long): Optional<CorrectorEntity>
     fun existsByUser_Id(userId: Long): Boolean
 }

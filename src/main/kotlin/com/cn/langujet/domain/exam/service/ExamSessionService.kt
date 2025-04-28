@@ -35,7 +35,7 @@ class ExamSessionService(
     private val studentService: StudentService,
     private val partService: PartService,
     private val questionService: QuestionService
-) : HistoricalEntityService<ExamSessionEntity>() {
+) : HistoricalEntityService<ExamSessionRepository, ExamSessionEntity>() {
     fun getExamSessionById(id: Long): ExamSessionEntity {
         return examSessionRepository.findById(id).orElseThrow {
             UnprocessableException("ExamSession with id: $id not found")

@@ -4,4 +4,6 @@ import com.cn.langujet.application.arch.mongo.HistoricalEntityService
 import org.springframework.stereotype.Service
 
 @Service
-class ContentService: HistoricalEntityService<ContentEntity>()
+class ContentService(
+    override var repository: ContentRepository
+) : HistoricalEntityService<ContentRepository, ContentEntity>()

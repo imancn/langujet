@@ -22,9 +22,9 @@ import org.springframework.web.multipart.MultipartFile
 
 @Service
 class SectionResultService(
-    private val sectionResultRepository: SectionResultRepository,
+    override var repository: SectionResultRepository,
     private val fileService: FileService,
-) : HistoricalEntityService<SectionResultEntity>() {
+) : HistoricalEntityService<SectionResultRepository, SectionResultEntity>() {
     @Autowired @Lazy
     private lateinit var resultService: ResultService
     
@@ -52,21 +52,21 @@ class SectionResultService(
     }
     
     fun getSectionResultsByResultId(resultId: Long): List<SectionResultEntity> {
-        return sectionResultRepository.findByResultId(resultId)
+        return repository.findByResultId(resultId)
     }
     
     fun getSectionResultById(id: Long): SectionResultEntity {
-        return sectionResultRepository.findById(id).orElseThrow {
+        return repository.findById(id).orElseThrow {
             UnprocessableException("Section Result not found")
         }
     }
     
     fun getByStatusAndResultId(correctionStatus: CorrectionStatus, resultId: Long): List<SectionResultEntity> {
-        return sectionResultRepository.findByStatusAndResultId(correctionStatus, resultId)
+        return repository.findByStatusAndResultId(correctionStatus, resultId)
     }
     
     fun getByResultId(resultId: Long): List<SectionResultEntity> {
-        return sectionResultRepository.findByResultId(resultId)
+        return repository.findByResultId(resultId)
     }
     
     fun addAutoCorrectionSectionResult(

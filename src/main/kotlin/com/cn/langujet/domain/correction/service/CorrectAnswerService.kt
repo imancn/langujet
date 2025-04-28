@@ -15,12 +15,12 @@ import org.springframework.stereotype.Service
 
 @Service
 class CorrectAnswerService(
-    private val repository: CorrectAnswerRepository,
+    override var repository: CorrectAnswerRepository,
     private val customRepository: CorrectAnswerCustomRepository,
     private val sectionService: SectionService,
     private val partService: PartService,
     private val questionService: QuestionService
-) : HistoricalEntityService<CorrectAnswerEntity>() {
+) : HistoricalEntityService<CorrectAnswerRepository, CorrectAnswerEntity>() {
     fun createCorrectAnswer(request: CorrectAnswerListDTO): CorrectAnswerListDTO {
         request.answers?.forEach { it.id = null }
         validate(request)

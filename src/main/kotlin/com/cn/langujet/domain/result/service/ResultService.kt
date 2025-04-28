@@ -24,9 +24,9 @@ import kotlin.math.ceil
 
 @Service
 class ResultService(
-    private val resultRepository: ResultRepository,
+    override var repository: ResultRepository,
     private val sectionResultService: SectionResultService
-) : HistoricalEntityService<ResultEntity>() {
+) : HistoricalEntityService<ResultRepository, ResultEntity>() {
     @Autowired
     private lateinit var fileService: FileService
     
@@ -115,11 +115,11 @@ class ResultService(
     }
     
     fun getResultByExamSessionId(examSessionId: Long): Optional<ResultEntity> {
-        return resultRepository.findByExamSessionId(examSessionId)
+        return repository.findByExamSessionId(examSessionId)
     }
     
     fun getResultById(resultId: Long): ResultEntity {
-        return resultRepository.findById(resultId).orElseThrow {
+        return repository.findById(resultId).orElseThrow {
             UnprocessableException("Result not found")
         }
     }
@@ -128,7 +128,7 @@ class ResultService(
         correctionStatus: CorrectionStatus,
         correctorType: CorrectorType
     ): List<ResultEntity> {
-        return resultRepository.findByCorrectorTypeAndStatusOrderByCreatedAtAsc(
+        return repository.findByCorrectorTypeAndStatusOrderByCreatedAtAsc(
             correctorType, correctionStatus
         )
     }
@@ -136,7 +136,7 @@ class ResultService(
     fun getCorrectorResultsByStatus(
         correctionStatus: CorrectionStatus, correctorId: Long
     ): List<ResultEntity> {
-        return resultRepository.findByStatusAndCorrectorUserIdOrderByCreatedAtAsc(
+        return repository.findByStatusAndCorrectorUserIdOrderByCreatedAtAsc(
             correctionStatus, correctorId
         )
     }

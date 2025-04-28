@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 @Service
 class CorrectorService(
     private val correctorRepository: CorrectorRepository,
-) : HistoricalEntityService<CorrectorEntity>() {
+) : HistoricalEntityService<CorrectorRepository, CorrectorEntity>() {
     
     fun editProfile(
         fullName: String?,

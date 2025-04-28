@@ -1,6 +1,6 @@
 package com.cn.langujet.application.service.file.domain.data.repository
 
+import com.cn.langujet.application.arch.mongo.HistoricalMongoRepository
 import com.cn.langujet.application.service.file.domain.data.model.FileEntity
-import org.springframework.data.mongodb.repository.MongoRepository
 
-interface FileRepository : MongoRepository<FileEntity, Long>
+interface FileRepository : HistoricalMongoRepository<FileEntity>

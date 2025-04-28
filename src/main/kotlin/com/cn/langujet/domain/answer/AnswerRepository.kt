@@ -1,9 +1,9 @@
 package com.cn.langujet.domain.answer
 
+import com.cn.langujet.application.arch.mongo.HistoricalMongoRepository
 import com.cn.langujet.domain.answer.model.AnswerEntity
-import org.springframework.data.mongodb.repository.MongoRepository
 
-interface AnswerRepository : MongoRepository<AnswerEntity, Long> {
+interface AnswerRepository : HistoricalMongoRepository<AnswerEntity> {
     fun findAllByExamSessionIdAndSectionOrder(examSessionId: Long, sectionOrder: Int): List<AnswerEntity>
     
     fun existsByExamSessionIdAndSectionOrderAndPartOrderAndQuestionOrder(

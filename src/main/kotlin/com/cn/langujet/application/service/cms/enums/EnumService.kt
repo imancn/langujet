@@ -4,4 +4,4 @@ import com.cn.langujet.application.arch.mongo.HistoricalEntityService
 import org.springframework.stereotype.Service
 
 @Service
-class EnumService: HistoricalEntityService<EnumEntity>()
+class EnumService : HistoricalEntityService<EnumRepository, EnumEntity>()

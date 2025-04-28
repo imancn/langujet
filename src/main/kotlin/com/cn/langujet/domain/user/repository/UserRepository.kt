@@ -1,10 +1,10 @@
 package com.cn.langujet.domain.user.repository
 
+import com.cn.langujet.application.arch.mongo.HistoricalMongoRepository
 import com.cn.langujet.domain.user.model.UserEntity
-import org.springframework.data.mongodb.repository.MongoRepository
 import java.util.*
 
-interface UserRepository : MongoRepository<UserEntity, Long> {
+interface UserRepository : HistoricalMongoRepository<UserEntity> {
     fun findByUsernameAndDeleted(standardEmail: String, deleted: Boolean = false): Optional<UserEntity>
     fun findByEmailAndDeleted(email: String, deleted: Boolean = false): Optional<UserEntity>
     fun existsByUsernameAndDeleted(standardEmail: String, deleted: Boolean = false): Boolean

@@ -19,7 +19,7 @@ class SectionService(
     private val sectionCustomRepository: SectionCustomRepository,
     private val questionService: QuestionService,
     private val partService: PartService
-) : HistoricalEntityService<SectionEntity>() {
+) : HistoricalEntityService<SectionRepository, SectionEntity>() {
     fun getSectionCompositeById(id: Long): SectionComposite {
         val section = sectionRepository.findById(id).orElseThrow {
             UnprocessableException("Section with id $id not found")

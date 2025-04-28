@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class UserService(
-    private val repository: UserRepository
-) : HistoricalEntityService<UserEntity>() {
+    override var repository: UserRepository
+) : HistoricalEntityService<UserRepository, UserEntity>() {
     
     fun getUserByEmail(email: String): UserEntity {
         return repository.findByUsernameAndDeleted(

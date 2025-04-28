@@ -6,5 +6,6 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("api/admin/contents")
-class ContentController(override val service: ContentService) : HistoricalEntityCrudController<ContentService, ContentEntity>(service) {
-}
+class ContentController(
+    override var service: ContentService
+) : HistoricalEntityCrudController<ContentRepository, ContentService, ContentEntity>()

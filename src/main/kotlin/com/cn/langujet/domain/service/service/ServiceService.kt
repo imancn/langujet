@@ -20,7 +20,7 @@ import java.util.stream.Collectors
 class ServiceService(
     private val serviceRepository: ServiceRepository,
     private val examGeneratorService: ExamGeneratorService,
-) : HistoricalEntityService<ServiceEntity>() {
+) : HistoricalEntityService<ServiceRepository, ServiceEntity>() {
     fun createService(request: ServiceRequest): ServiceEntity {
         val serviceEntity = request.convertToServiceEntity<ServiceEntity>()
         return save(serviceEntity)

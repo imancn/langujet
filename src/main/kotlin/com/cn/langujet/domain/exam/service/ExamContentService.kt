@@ -24,7 +24,7 @@ class ExamContentService(
     private val sectionService: SectionService,
     private val examService: ExamService,
     private val fileService: FileService
-) : HistoricalEntityService<ExamContentEntity>() {
+) : HistoricalEntityService<ExamContentRepository, ExamContentEntity>() {
     fun uploadExamContent(
         file: MultipartFile, examId: Long, sectionOrder: Int?, partOrder: Int?, questionOrder: Int?
     ): ExamContentEntity {

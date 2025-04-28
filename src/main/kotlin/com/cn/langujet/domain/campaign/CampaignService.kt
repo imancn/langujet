@@ -9,8 +9,8 @@ import kotlin.jvm.optionals.toList
 
 @Service
 class CampaignService(
-    private val campaignRepository: CampaignRepository
-) : HistoricalEntityService<CampaignEntity>() {
+    override var repository: CampaignRepository
+) : HistoricalEntityService<CampaignRepository, CampaignEntity>() {
     fun createCampaign(request: CreateCampaignRequest): CampaignEntity {
         if (request.percentage > 100 || request.percentage < 1) throw UnprocessableException("Percentage must be between 1% to 100%")
         if (request.amount < 0) throw UnprocessableException("Amount must not be negative")
@@ -31,14 +31,14 @@ class CampaignService(
     fun changeCampaignActiveFlag(campaignId: Long, active: Boolean): CampaignEntity {
         val campaign = getForUpdate(campaignId)
         if (active) {
-            if (campaignRepository.existsByActiveAndCode(true, campaign.code)) {
+            if (repository.existsByActiveAndCode(true, campaign.code)) {
                 throw UnprocessableException("Another [${campaign.code}] campaign active flag is already active")
             }
             campaign.active = true
         } else {
             campaign.active = false
         }
-        return campaignRepository.save(campaign)
+        return repository.save(campaign)
     }
     
     fun changeCampaignMetadata(
@@ -51,7 +51,7 @@ class CampaignService(
         name?.let { campaign.name = it }
         tag?.let { campaign.tag = it }
         description?.let { campaign.description = it }
-        return campaignRepository.save(campaign)
+        return repository.save(campaign)
     }
     
     fun changeUsageLimit(campaignId: Long, usageLimit: Int): CampaignEntity {
@@ -63,38 +63,38 @@ class CampaignService(
         } else {
             campaign.usedTimes = usageLimit
         }
-        return campaignRepository.save(campaign)
+        return repository.save(campaign)
     }
     
     private fun getForUpdate(campaignId: Long): CampaignEntity {
-        return campaignRepository.findById(campaignId).orElseThrow {
+        return repository.findById(campaignId).orElseThrow {
             UnprocessableException("Campaign with id $campaignId does not exist")
         }
     }
     
     fun getCampaigns(active: Boolean?, campaignId: Long?): List<CampaignEntity> {
-        campaignId?.let { return campaignRepository.findById(campaignId).toList() }
+        campaignId?.let { return repository.findById(campaignId).toList() }
         return if (active == null) {
-            campaignRepository.findAll()
+            repository.findAll()
         } else {
-            campaignRepository.findAllByActive(active)
+            repository.findAllByActive(active)
         }
     }
     
     fun getActiveCampaignByCode(code: String): CampaignEntity? {
-        return campaignRepository.findByCodeAndActive(code, true)
+        return repository.findByCodeAndActive(code, true)
     }
     
     fun useCampaign(campaignId: Long): CampaignEntity? {
-        val campaign = campaignRepository.findById(campaignId).getOrNull() ?: return null
+        val campaign = repository.findById(campaignId).getOrNull() ?: return null
         if (!campaign.active) return null
         if (campaign.usedTimes + 1 > campaign.usageLimit) {
             campaign.active = false
-            campaignRepository.save(campaign)
+            repository.save(campaign)
             return null
         } else {
             campaign.usedTimes++
-            return campaignRepository.save(campaign)
+            return repository.save(campaign)
         }
     }
 }

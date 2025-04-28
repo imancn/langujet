@@ -18,7 +18,7 @@ class CouponService(
     private val couponRepository: CouponRepository,
     private val userService: UserService,
     private val campaignService: CampaignService
-) : HistoricalEntityService<CouponEntity>() {
+) : HistoricalEntityService<CouponRepository, CouponEntity>() {
     
     private val random = SecureRandom()
     private val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"

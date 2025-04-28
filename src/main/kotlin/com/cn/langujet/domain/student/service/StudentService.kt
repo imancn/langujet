@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service
 
 @Service
 class StudentService(
-    private val studentRepository: StudentRepository
-) : HistoricalEntityService<StudentEntity>() {
+    override var repository: StudentRepository
+) : HistoricalEntityService<StudentRepository, StudentEntity>() {
     
     fun editProfile(fullName: String?, biography: String?): StudentProfileResponse {
         val student = getStudentByUserId(Auth.userId())
@@ -20,12 +20,12 @@ class StudentService(
         if (!biography.isNullOrBlank()) student.biography = biography
         
         return StudentProfileResponse(
-            studentRepository.save(student)
+            repository.save(student)
         )
     }
     
     fun getStudentByUserId(userId: Long): StudentEntity {
-        return studentRepository.findByUser_Id(userId).orElseThrow {
+        return repository.findByUser_Id(userId).orElseThrow {
             UnprocessableException("Student not found")
         }
     }

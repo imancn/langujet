@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service
 class StripeWebhookService(
     private val stripePaymentRepository: StripePaymentRepository,
     private val orderService: OrderService
-) : HistoricalEntityService<StripePaymentEntity>() {
+) : HistoricalEntityService<StripePaymentRepository, StripePaymentEntity>() {
     @Value("\${stripe.webhook.secret}")
     private lateinit var webhookSecret: String
     

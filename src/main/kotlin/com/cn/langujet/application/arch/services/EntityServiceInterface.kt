@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 
-interface EntityServiceInterface<T : Entity<ID>, ID> {
+interface EntityServiceInterface<T : Entity<ID>, ID : Any> {
     fun save(entity: T): T
     fun saveMany(entities: List<T>): List<T>
     
