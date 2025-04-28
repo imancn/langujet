@@ -1,7 +1,7 @@
 package com.cn.langujet.actor.corrector.api
 
 import com.cn.langujet.actor.corrector.payload.response.CorrectorProfileResponse
-import com.cn.langujet.actor.util.Auth
+import com.cn.langujet.application.service.users.Auth
 import com.cn.langujet.domain.corrector.CorrectorService
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize

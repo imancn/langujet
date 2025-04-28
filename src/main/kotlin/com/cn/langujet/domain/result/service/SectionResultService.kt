@@ -1,7 +1,7 @@
 package com.cn.langujet.domain.result.service
 
 import com.cn.langujet.actor.result.payload.request.SubmitCorrectorSectionResultRequest
-import com.cn.langujet.actor.util.Auth
+import com.cn.langujet.application.service.users.Auth
 import com.cn.langujet.application.arch.advice.InternalServerError
 import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.application.arch.models.entity.Entity

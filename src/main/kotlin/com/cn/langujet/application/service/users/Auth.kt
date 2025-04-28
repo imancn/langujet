@@ -1,4 +1,4 @@
-package com.cn.langujet.actor.util
+package com.cn.langujet.application.service.users
 
 import com.cn.langujet.application.arch.models.entity.Entity
 import io.jsonwebtoken.Claims

@@ -1,7 +1,7 @@
 package com.cn.langujet.domain.corrector
 
 import com.cn.langujet.actor.corrector.payload.response.CorrectorProfileResponse
-import com.cn.langujet.actor.util.Auth
+import com.cn.langujet.application.service.users.Auth
 import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.application.arch.mongo.HistoricalEntityService
 import org.springframework.stereotype.Service

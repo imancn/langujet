@@ -1,6 +1,6 @@
 package com.cn.langujet.application.arch.models.entity
 
-import com.cn.langujet.actor.util.Auth
+import com.cn.langujet.application.service.users.Auth
 import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.CreatedDate
 import java.util.*

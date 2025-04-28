@@ -1,7 +1,7 @@
 package com.cn.langujet.domain.exam.service
 
 import com.cn.langujet.actor.exam.payload.ExamContentDownloadLink
-import com.cn.langujet.actor.util.Auth
+import com.cn.langujet.application.service.users.Auth
 import com.cn.langujet.application.arch.advice.InternalServerError
 import com.cn.langujet.application.arch.advice.InvalidCredentialException
 import com.cn.langujet.application.arch.advice.UnprocessableException

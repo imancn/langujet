@@ -1,6 +1,6 @@
 package com.cn.langujet.application.config.security
 
-import com.cn.langujet.actor.util.Auth
+import com.cn.langujet.application.service.users.Auth
 import com.cn.langujet.domain.user.services.JwtService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletException

@@ -4,7 +4,7 @@ import com.cn.langujet.actor.correction.payload.request.AssignCorrectionRequest
 import com.cn.langujet.actor.correction.payload.request.AssignCorrectionToCorrectorRequest
 import com.cn.langujet.actor.correction.payload.request.AssignSpecificCorrectionToCorrectorRequest
 import com.cn.langujet.actor.correction.payload.response.*
-import com.cn.langujet.actor.util.Auth
+import com.cn.langujet.application.service.users.Auth
 import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.application.arch.models.entity.Entity
 import com.cn.langujet.application.service.file.domain.service.FileService

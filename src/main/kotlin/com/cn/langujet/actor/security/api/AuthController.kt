@@ -2,7 +2,7 @@ package com.cn.langujet.actor.security.api
 
 import com.cn.langujet.actor.security.response.JwtResponse
 import com.cn.langujet.actor.security.response.RefreshTokenResponse
-import com.cn.langujet.actor.util.Auth
+import com.cn.langujet.application.service.users.Auth
 import com.cn.langujet.application.arch.advice.InvalidCredentialException
 import com.cn.langujet.application.arch.advice.InvalidInputException
 import com.cn.langujet.application.arch.advice.UnprocessableException

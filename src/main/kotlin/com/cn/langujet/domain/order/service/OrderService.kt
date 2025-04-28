@@ -1,7 +1,7 @@
 package com.cn.langujet.domain.order.service
 
 import com.cn.langujet.actor.order.payload.*
-import com.cn.langujet.actor.util.Auth
+import com.cn.langujet.application.service.users.Auth
 import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.application.arch.controller.payload.response.PageResponse
 import com.cn.langujet.application.arch.models.entity.Entity
