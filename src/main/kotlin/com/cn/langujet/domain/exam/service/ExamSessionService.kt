@@ -23,7 +23,7 @@ import java.util.*
 
 @Service
 class ExamSessionService(
-    private val examSessionRepository: ExamSessionRepository,
+    override var repository: ExamSessionRepository,
     private val examSessionCustomRepository: ExamSessionCustomRepository,
     private val examService: ExamService,
     private val sectionService: SectionService,
@@ -37,7 +37,7 @@ class ExamSessionService(
     private val questionService: QuestionService
 ) : HistoricalEntityService<ExamSessionRepository, ExamSessionEntity>() {
     fun getExamSessionById(id: Long): ExamSessionEntity {
-        return examSessionRepository.findById(id).orElseThrow {
+        return repository.findById(id).orElseThrow {
             UnprocessableException("ExamSession with id: $id not found")
         }
     }
@@ -114,7 +114,7 @@ class ExamSessionService(
     fun getExamSection(
         examSessionId: Long, sectionOrder: Int
     ): SectionComposite {
-        val examSession = examSessionRepository.findByStudentUserIdAndState(
+        val examSession = repository.findByStudentUserIdAndState(
             Auth.userId(), ExamSessionState.STARTED
         ).getOrElse(0) {
             getStudentExamSession(examSessionId)

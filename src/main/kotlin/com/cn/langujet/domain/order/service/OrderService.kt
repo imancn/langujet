@@ -35,7 +35,7 @@ class OrderService(
     private val paymentService: PaymentService,
     private val examSessionService: ExamSessionService,
     private val couponService: CouponService,
-    private val rollbar: Rollbar,
+    private val rollbar: Rollbar, override var repository: OrderRepository,
 ) : HistoricalEntityService<OrderRepository, OrderEntity>() {
     private val logger = LoggerFactory.getLogger(javaClass.simpleName)
     

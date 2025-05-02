@@ -19,7 +19,7 @@ import kotlin.jvm.optionals.getOrNull
 
 @Service
 class ExamContentService(
-    private val examContentRepository: ExamContentRepository,
+    override var repository: ExamContentRepository,
     private val examSessionRepository: ExamSessionRepository,
     private val sectionService: SectionService,
     private val examService: ExamService,
@@ -51,7 +51,7 @@ class ExamContentService(
     ): List<ExamContentDownloadLink> {
         val exam = examService.getById(examId)
         val examSectionContents =
-            examContentRepository.findAllByExamIdAndSectionOrder(exam.id ?: Entity.UNKNOWN_ID, sectionOrder)
+            repository.findAllByExamIdAndSectionOrder(exam.id ?: Entity.UNKNOWN_ID, sectionOrder)
         
         return examSectionContents.map {
             ExamContentDownloadLink(
@@ -69,7 +69,7 @@ class ExamContentService(
         }
         val exam = examService.getById(examSession.examId)
         val examSectionContents =
-            examContentRepository.findAllByExamIdAndSectionOrder(exam.id ?: Entity.UNKNOWN_ID, sectionOrder)
+            repository.findAllByExamIdAndSectionOrder(exam.id ?: Entity.UNKNOWN_ID, sectionOrder)
         
         return examSectionContents.map {
             ExamContentDownloadLink(

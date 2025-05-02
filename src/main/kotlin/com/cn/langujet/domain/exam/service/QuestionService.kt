@@ -6,4 +6,4 @@ import com.cn.langujet.domain.exam.repository.QuestionRepository
 import org.springframework.stereotype.Service
 
 @Service
-class QuestionService : HistoricalEntityService<QuestionRepository, QuestionEntity>()
+class QuestionService(override var repository: QuestionRepository) : HistoricalEntityService<QuestionRepository, QuestionEntity>()

@@ -16,7 +16,7 @@ import org.springframework.web.servlet.view.RedirectView
 @Service
 class ZarinPalWebhookService(
     private val zarinPalClient: ZarinPalClient,
-    private val zarinPalPaymentRepository: ZarinPalPaymentRepository,
+    override var repository: ZarinPalPaymentRepository,
     private val orderService: OrderService
 ) : HistoricalEntityService<ZarinPalPaymentRepository, ZarinPalPaymentEntity>() {
     @Value("\${payment.redirect.url}")
@@ -27,7 +27,7 @@ class ZarinPalWebhookService(
     
     fun handleWebhook(authority: String, status: String): RedirectView {
         Auth.setCustomUserId(Auth.EXTERNAL_SERVICE)
-        val payment = zarinPalPaymentRepository.findByAuthority(authority).orElseThrow {
+        val payment = repository.findByAuthority(authority).orElseThrow {
             UnprocessableException("Payment not found with authority = $authority")
         }
         if (!orderService.isAwaitingPayment(payment.orderId)) {

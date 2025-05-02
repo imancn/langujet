@@ -6,5 +6,5 @@ import com.cn.langujet.domain.user.repository.EmailVerificationTokenRepository
 import org.springframework.stereotype.Service
 
 @Service
-class EmailVerificationTokenService :
+class EmailVerificationTokenService(override var repository: EmailVerificationTokenRepository) :
     HistoricalEntityService<EmailVerificationTokenRepository, EmailVerificationTokenEntity>()

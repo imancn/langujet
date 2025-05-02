@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class StripeWebhookService(
-    private val stripePaymentRepository: StripePaymentRepository,
+    override var repository: StripePaymentRepository,
     private val orderService: OrderService
 ) : HistoricalEntityService<StripePaymentRepository, StripePaymentEntity>() {
     @Value("\${stripe.webhook.secret}")
@@ -34,7 +34,7 @@ class StripeWebhookService(
             Auth.setCustomUserId(Auth.EXTERNAL_SERVICE)
             logger.info("${event.type} Event received")
             val session = event.data.`object` as Session
-            val payment = stripePaymentRepository.findBySessionId(session.id).orElseThrow {
+            val payment = repository.findBySessionId(session.id).orElseThrow {
                 UnprocessableException("Order with sessionId ${session.id} not found")
             }
             if (!orderService.isAwaitingPayment(payment.orderId)) {

@@ -19,14 +19,14 @@ import org.springframework.stereotype.Service
 import java.lang.reflect.ParameterizedType
 
 @Service
-class EntityService<R : MongoRepository<T, ID>, T : Entity<ID>, ID : Any> : EntityServiceInterface<T, ID> {
+abstract class EntityService<R : MongoRepository<T, ID>, T : Entity<ID>, ID : Any> : EntityServiceInterface<T, ID> {
     @field:Autowired
     lateinit var loggerService: LoggerService
     
     @field:Autowired
     lateinit var mongoOperations: MongoOperations
     
-    lateinit var repository: R
+    protected abstract var repository: R
     
     override fun save(entity: T): T {
         return repository.save(entity)
@@ -41,26 +41,19 @@ class EntityService<R : MongoRepository<T, ID>, T : Entity<ID>, ID : Any> : Enti
         return try {
             repository.save(entity)
         } catch (e: Exception) {
-            throwUnprocessableException(e)
-        }
-    }
-    
-    private fun throwUnprocessableException(e: Exception): Nothing {
-        when (e) {
-            is MongoWriteException, is DuplicateKeyException -> {
-                val errorMessage = e.message ?: "Duplicate key error"
-                val collectionMatch = Regex("collection: (\\w+\\.\\w+)").find(errorMessage)
-                val keyMatch = Regex("dup key: \\{ ([^}]+) }").find(errorMessage)
-                
-                val collection = collectionMatch?.groupValues?.get(1) ?: "unknown collection"
-                val duplicateKey = keyMatch?.groupValues?.get(1) ?: "unknown fields"
-                throw UnprocessableException(
-                    "duplicate.key.error", collection, duplicateKey
-                )
+            when (e) {
+                is MongoWriteException, is DuplicateKeyException -> {
+                    val errorMessage = e.message ?: "Duplicate key error"
+                    val collectionMatch = Regex("collection: (\\w+\\.\\w+)").find(errorMessage)
+                    val keyMatch = Regex("dup key: \\{ ([^}]+) }").find(errorMessage)
+                    val collection = collectionMatch?.groupValues?.get(1) ?: "unknown collection"
+                    val duplicateKey = keyMatch?.groupValues?.get(1) ?: "unknown fields"
+                    throw UnprocessableException(
+                        "duplicate.key.error", collection, duplicateKey
+                    )
+                }
+                else -> throw e
             }
-            else -> throw throw UnprocessableException(
-                "duplicate.key.error", "unknown collection", "unknown fields",
-            )
         }
     }
     

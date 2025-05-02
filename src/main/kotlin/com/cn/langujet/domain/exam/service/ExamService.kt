@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class ExamService(
+    override var repository: ExamRepository,
     private val examValidatorService: ExamValidatorService,
 ) : HistoricalEntityService<ExamRepository, ExamEntity>() {
     fun activate(id: Long): Boolean {

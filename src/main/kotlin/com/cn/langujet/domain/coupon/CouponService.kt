@@ -15,7 +15,7 @@ import java.security.SecureRandom
 
 @Service
 class CouponService(
-    private val couponRepository: CouponRepository,
+    override var repository: CouponRepository,
     private val userService: UserService,
     private val campaignService: CampaignService
 ) : HistoricalEntityService<CouponRepository, CouponEntity>() {
@@ -32,7 +32,7 @@ class CouponService(
     
     fun verifyUserCoupon(code: String): VerifyUserCoupon {
         return try {
-            val coupon = verifyUserCoupon(couponRepository.findByCode(code.uppercase()))
+            val coupon = verifyUserCoupon(repository.findByCode(code.uppercase()))
             VerifyUserCoupon(isValid = true, message = "Coupon is valid", ActiveCouponsResponse(coupon))
         } catch (e: UnprocessableException) {
             createCoupon(code, Auth.userId())?.let {
@@ -43,8 +43,8 @@ class CouponService(
     
     fun getCouponsByUserId(userId: Long, active: Boolean?): List<ActiveCouponsResponse> {
         val coupons = when (active) {
-            null -> couponRepository.findByUserId(userId)
-            else -> couponRepository.findByUserIdAndActive(userId, active)
+            null -> repository.findByUserId(userId)
+            else -> repository.findByUserIdAndActive(userId, active)
         }
         return coupons.map {
             ActiveCouponsResponse(it)
@@ -57,7 +57,7 @@ class CouponService(
     
     fun getUserActiveCouponByCode(couponCode: String?): CouponEntity? {
         if (!couponCode.isNullOrBlank()) {
-            val coupon = couponRepository.findByCode(couponCode.uppercase())
+            val coupon = repository.findByCode(couponCode.uppercase())
             verifyUserCoupon(coupon)
             return coupon
         } else {
@@ -66,7 +66,7 @@ class CouponService(
     }
     
     fun getCouponById(id: Long): CouponEntity {
-        return couponRepository.findById(id).orElseThrow {
+        return repository.findById(id).orElseThrow {
             throw UnprocessableException("Payment with Id $id not found")
         }
     }
@@ -90,14 +90,14 @@ class CouponService(
             }
             code = (1..5).map { chars[random.nextInt(chars.length)] }.joinToString("")
             attempts++
-        } while (couponRepository.findByCode(code) != null)
+        } while (repository.findByCode(code) != null)
         return code
     }
     
     private fun createCoupon(campaignCode: String, userId: Long? = null): CouponEntity? {
         val campaign = campaignService.getActiveCampaignByCode(campaignCode.uppercase()) ?: return null
         val campaignId = campaign.id ?: Entity.UNKNOWN_ID
-        if (userId?.let { couponRepository.existsByUserIdAndCampaignId(it, campaignId) } == true) {
+        if (userId?.let { repository.existsByUserIdAndCampaignId(it, campaignId) } == true) {
             return null
         }
         val code = generateCouponCode()

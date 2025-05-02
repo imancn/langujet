@@ -15,13 +15,13 @@ import kotlin.jvm.optionals.getOrElse
 
 @Service
 class SectionService(
-    private val sectionRepository: SectionRepository,
+    override var repository: SectionRepository,
     private val sectionCustomRepository: SectionCustomRepository,
     private val questionService: QuestionService,
     private val partService: PartService
 ) : HistoricalEntityService<SectionRepository, SectionEntity>() {
     fun getSectionCompositeById(id: Long): SectionComposite {
-        val section = sectionRepository.findById(id).orElseThrow {
+        val section = repository.findById(id).orElseThrow {
             UnprocessableException("Section with id $id not found")
         }
         val criteria = Criteria.where("sectionId").`is`(section.id)
@@ -33,17 +33,17 @@ class SectionService(
     }
     
     fun getSectionsByExamId(examId: Long): List<SectionEntity> {
-        return sectionRepository.findAllByExamId(examId)
+        return repository.findAllByExamId(examId)
     }
     
     fun getSectionByExamIdAndOrder(examId: Long, order: Int): SectionEntity {
-        return sectionRepository.findByExamIdAndOrder(examId, order).orElseThrow {
+        return repository.findByExamIdAndOrder(examId, order).orElseThrow {
             throw UnprocessableException("Section not found")
         }
     }
 
     fun createSection(section: SectionEntity): SectionEntity {
-        if (sectionRepository.existsByExamIdAndOrder(section.examId, section.order)) {
+        if (repository.existsByExamIdAndOrder(section.examId, section.order)) {
             throw UnprocessableException("Section with order ${section.order} already exists.")
         }
         return save(
@@ -55,7 +55,7 @@ class SectionService(
 
     fun updateSection(section: SectionEntity): SectionEntity {
         if (section.id == null) throw InvalidInputException("Section Id is empty")
-        val existingSection = sectionRepository.findById(section.id ?: Entity.UNKNOWN_ID)
+        val existingSection = repository.findById(section.id ?: Entity.UNKNOWN_ID)
             .getOrElse { throw NoSuchElementException("Section with id ${section.id} not found") }
         section.examId.let { existingSection.examId = it }
         section.header.let { existingSection.header = it }
@@ -65,9 +65,9 @@ class SectionService(
     }
     
     fun deleteSection(id: Long): Boolean {
-        val section = sectionRepository.findById(id).orElse(null)
+        val section = repository.findById(id).orElse(null)
         return if (section != null) {
-            sectionRepository.delete(section)
+            repository.delete(section)
             true
         } else {
             false

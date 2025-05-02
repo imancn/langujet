@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class CorrectorService(
-    private val correctorRepository: CorrectorRepository,
+    override var repository: CorrectorRepository,
 ) : HistoricalEntityService<CorrectorRepository, CorrectorEntity>() {
     
     fun editProfile(
@@ -30,12 +30,12 @@ class CorrectorService(
     }
     
     fun getCorrectorByUserId(userId: Long): CorrectorEntity {
-        return correctorRepository.findByUser_Id(userId).orElseThrow {
+        return repository.findByUser_Id(userId).orElseThrow {
             UnprocessableException("Corrector not found")
         }
     }
     
     fun correctorExistsByUserId(userId: Long): Boolean {
-        return correctorRepository.existsByUser_Id(userId)
+        return repository.existsByUser_Id(userId)
     }
 }

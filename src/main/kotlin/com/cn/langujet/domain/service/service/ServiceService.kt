@@ -18,7 +18,7 @@ import java.util.stream.Collectors
 
 @Service
 class ServiceService(
-    private val serviceRepository: ServiceRepository,
+    override var repository: ServiceRepository,
     private val examGeneratorService: ExamGeneratorService,
 ) : HistoricalEntityService<ServiceRepository, ServiceEntity>() {
     fun createService(request: ServiceRequest): ServiceEntity {
@@ -28,7 +28,7 @@ class ServiceService(
     
     fun updateService(id: Long, request: ServiceRequest): ServiceEntity {
         val existingService =
-            serviceRepository.findById(id).orElseThrow { NoSuchElementException("Service with ID: $id not found") }
+            repository.findById(id).orElseThrow { NoSuchElementException("Service with ID: $id not found") }
         
         existingService.apply {
             name = request.name ?: name
@@ -42,11 +42,11 @@ class ServiceService(
     }
     
     fun getAllServices(): List<ServiceEntity> {
-        return serviceRepository.findAll()
+        return repository.findAll()
     }
     
     fun getAvailableExamServices(request: GetAvailableExamServicesRequest): PageResponse<GetAvailableExamServicesResponse> {
-        val examServices = serviceRepository.findByTypeAndActiveOrderByOrder(ServiceType.EXAM, true)
+        val examServices = repository.findByTypeAndActiveOrderByOrder(ServiceType.EXAM, true)
             .filterIsInstance<ServiceEntity.ExamServiceEntity>()
         val availableServiceCount = examGeneratorService.countAvailableExamsForExamServices(
             Auth.userId(), examServices
@@ -69,7 +69,7 @@ class ServiceService(
     }
     
     override fun getById(id: Long): ServiceEntity {
-        return serviceRepository.findById(id)
+        return repository.findById(id)
             .orElseThrow { UnprocessableException("Service with id $id not found") }
     }
 }

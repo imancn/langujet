@@ -9,9 +9,9 @@ import org.springframework.data.mongodb.core.query.Update
 import org.springframework.stereotype.Service
 
 @Service
-class HistoricalEntityService<R : HistoricalMongoRepository<T>, T : HistoricalEntity> : EntityService<R, T, Long>() {
+abstract class HistoricalEntityService<R : HistoricalMongoRepository<T>, T : HistoricalEntity> : EntityService<R, T, Long>() {
     
-    override lateinit var repository: R
+    abstract override var repository: R
     
     fun create(entity: T): T {
         return super.create(entity, generateSequence())

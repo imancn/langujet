@@ -6,4 +6,4 @@ import com.cn.langujet.domain.user.repository.ResetPasswordTokenRepository
 import org.springframework.stereotype.Service
 
 @Service
-class ResetPasswordTokenService : HistoricalEntityService<ResetPasswordTokenRepository, ResetPasswordTokenEntity>()
+class ResetPasswordTokenService(override var repository: ResetPasswordTokenRepository) : HistoricalEntityService<ResetPasswordTokenRepository, ResetPasswordTokenEntity>()

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class PaymentService(
-    private val paymentRepository: PaymentRepository,
+    override var repository: PaymentRepository,
     private val zarinPalPaymentService: ZarinPalPaymentService,
     private val stripePaymentService: StripePaymentService
 ) : HistoricalEntityService<PaymentRepository, PaymentEntity>() {

@@ -6,4 +6,4 @@ import com.cn.langujet.domain.order.repository.OrderDetailRepository
 import org.springframework.stereotype.Service
 
 @Service
-class OrderDetailService : HistoricalEntityService<OrderDetailRepository, OrderDetailEntity>()
+class OrderDetailService(override var repository: OrderDetailRepository) : HistoricalEntityService<OrderDetailRepository, OrderDetailEntity>()
