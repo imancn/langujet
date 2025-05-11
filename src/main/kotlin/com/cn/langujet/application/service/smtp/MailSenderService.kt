@@ -1,8 +1,7 @@
 package com.cn.langujet.application.service.smtp
 
 import com.cn.langujet.application.arch.advice.InternalServerError
-import com.cn.langujet.domain.user.model.EmailVerificationTokenEntity
-import com.cn.langujet.domain.user.model.ResetPasswordTokenEntity
+import com.cn.langujet.application.service.otp.OTP
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -20,58 +19,17 @@ class MailSenderService(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass.simpleName)
 
-    fun sendWithTemplate(to: List<String>, subject: String, contentParams: Map<String, String>, templateName: String) {
-        val content = JinjaEngineUtil.render("${templateName}.html", contentParams)
-        try {
-            val message = MimeMessage(session)
-            message.setFrom(InternetAddress("langujet@gmail.com"))
-            message.setRecipients(Message.RecipientType.TO, to.map { InternetAddress(it) }.toTypedArray())
-            message.subject = subject
-            sendMimeMessage(content, message)
-        } catch (e: Exception) {
-            logger.error("Email not sent. error: ${e.message}")
-            throw InternalServerError("Email not sent.\nerror: ${e.message}")
-        }
-    }
-
-    fun sendWithTemplate(to: String, subject: String, contentParams: Map<String, String>, templateName: String) =
-        sendWithTemplate(
-            listOf(to),
-            subject,
-            contentParams,
-            templateName
-        )
-
-    fun sendEmailVerificationMail(emailVerificationToken: EmailVerificationTokenEntity) {
-        val token = emailVerificationToken.token
+    fun sendOTP(otp: OTP, email: String) {
+        val token = otp.token
         val contentParams = mapOf(
             "TOKEN" to token,
         )
+        val template = otp.key.template ?: throw InternalServerError("mail.sender.send.otp.template.not.found")
         sendWithTemplate(
-            emailVerificationToken.user.email, "Verification Mail", contentParams, "email_verification"
-        )
-    }
-    
-    fun sendDeleteAccountVerificationMail(emailVerificationToken: EmailVerificationTokenEntity) {
-        val token = emailVerificationToken.token
-        val contentParams = mapOf(
-            "TOKEN" to token,
-        )
-        sendWithTemplate(
-            emailVerificationToken.user.email, "Delete Account Verification Mail", contentParams, "delete_account_verification_mail"
+            otp.key.subject, contentParams, template, email
         )
     }
 
-    fun sendResetPasswordMail(resetPasswordToken: ResetPasswordTokenEntity) {
-        val token = resetPasswordToken.token
-        val contentParams = mapOf(
-            "TOKEN" to token,
-        )
-        sendWithTemplate(
-            resetPasswordToken.user.email, "Reset Password Mail", contentParams, "reset_password"
-        )
-    }
-    
     fun sendExamCorrectionNotificationEmail(
         email: String, username: String, examName: String,
         correctionLink: String = "https://app.langujet.com/exams/participated"
@@ -83,22 +41,36 @@ class MailSenderService(
             "CURRENT_YEAR" to LocalDateTime.now().year.toString()
         )
         sendWithTemplate(
-            email,
             "Exam Correction Notification",
             contentParams,
-            "exam_correction_notification_mail"
+            "exam_correction_notification_mail",
+            email
         )
     }
-    
-    
-    fun sendMimeMessage(htmlText: String, message: MimeMessage) {
-        val htmlPart = MimeBodyPart()
-        htmlPart.setContent(htmlText, "text/html; charset=utf-8")
 
-        val mp = MimeMultipart("alternative")
-        mp.addBodyPart(htmlPart)
+    private fun sendWithTemplate(
+        subject: String,
+        contentParams: Map<String, String>,
+        templateName: String,
+        vararg receivers: String,
+    ) {
+        val content = JinjaEngineUtil.render("${templateName}.html", contentParams)
+        try {
+            val message = MimeMessage(session)
+            message.setFrom(InternetAddress("langujet@gmail.com"))
+            message.setRecipients(Message.RecipientType.TO, receivers.map { InternetAddress(it) }.toTypedArray())
+            message.subject = subject
+            val htmlPart = MimeBodyPart()
+            htmlPart.setContent(content, "text/html; charset=utf-8")
 
-        message.setContent(mp)
-        Transport.send(message)
+            val mp = MimeMultipart("alternative")
+            mp.addBodyPart(htmlPart)
+
+            message.setContent(mp)
+            Transport.send(message)
+        } catch (e: Exception) {
+            logger.error("Email not sent. error: ${e.message}")
+            throw InternalServerError("Email not sent.\nerror: ${e.message}")
+        }
     }
 }

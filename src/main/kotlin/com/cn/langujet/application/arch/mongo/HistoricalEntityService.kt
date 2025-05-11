@@ -12,6 +12,12 @@ import org.springframework.stereotype.Service
 abstract class HistoricalEntityService<R : HistoricalMongoRepository<T>, T : HistoricalEntity> : EntityService<R, T, Long>() {
     
     abstract override var repository: R
+
+    override fun save(entity: T): T {
+        return if (entity.id == null) {
+            create(entity)
+        } else update(entity)
+    }
     
     fun create(entity: T): T {
         return super.create(entity, generateSequence())

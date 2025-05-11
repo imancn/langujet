@@ -2,25 +2,32 @@ package com.cn.langujet.actor.security.api
 
 import com.cn.langujet.actor.security.response.JwtResponse
 import com.cn.langujet.actor.security.response.RefreshTokenResponse
-import com.cn.langujet.application.service.users.Auth
 import com.cn.langujet.application.arch.advice.InvalidCredentialException
 import com.cn.langujet.application.arch.advice.InvalidInputException
 import com.cn.langujet.application.arch.advice.UnprocessableException
+import com.cn.langujet.application.arch.controller.payload.response.MessageResponse
+import com.cn.langujet.application.service.otp.OTP
+import com.cn.langujet.application.service.otp.OTPService
 import com.cn.langujet.application.service.smtp.MailSenderService
+import com.cn.langujet.application.service.users.Auth
 import com.cn.langujet.domain.corrector.CorrectorEntity
 import com.cn.langujet.domain.corrector.CorrectorRepository
 import com.cn.langujet.domain.corrector.CorrectorService
 import com.cn.langujet.domain.student.model.StudentEntity
 import com.cn.langujet.domain.student.service.StudentService
-import com.cn.langujet.domain.user.model.*
-import com.cn.langujet.domain.user.repository.EmailVerificationTokenRepository
-import com.cn.langujet.domain.user.repository.ResetPasswordTokenRepository
+import com.cn.langujet.domain.user.model.Role
+import com.cn.langujet.domain.user.model.UserDetailsImpl
+import com.cn.langujet.domain.user.model.UserEntity
 import com.cn.langujet.domain.user.repository.UserRepository
-import com.cn.langujet.domain.user.services.*
+import com.cn.langujet.domain.user.services.GoogleAuthService
+import com.cn.langujet.domain.user.services.JwtService
+import com.cn.langujet.domain.user.services.UserService
+import com.cn.langujet.domain.user.services.toStandardMail
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.authentication.AuthenticationManager
@@ -39,9 +46,7 @@ class AuthController(
     private val authenticationManager: AuthenticationManager,
     private val userRepository: UserRepository,
     private val correctorRepository: CorrectorRepository,
-    private val refreshTokenService: RefreshTokenService,
-    private val emailVerificationTokenRepository: EmailVerificationTokenRepository,
-    private val resetPasswordTokenRepository: ResetPasswordTokenRepository,
+    private val otpService: OTPService,
     private val mailSenderService: MailSenderService,
     private val encoder: PasswordEncoder,
     private val jwtService: JwtService,
@@ -49,10 +54,11 @@ class AuthController(
     private val studentService: StudentService,
     private val userService: UserService,
     private val correctorService: CorrectorService,
-    private val emailVerificationTokenService: EmailVerificationTokenService,
-    private val resetPasswordTokenService: ResetPasswordTokenService,
 ) {
 //    @Todo: Move the logic to the service layer
+
+    @Value("\${app.jwtRefreshExpirationMs}")
+    private val jwtRefreshExpirationMs = 0L
     
     @PostMapping("/sign-in/mail")
     fun signingByEmail(
@@ -83,14 +89,21 @@ class AuthController(
         val jwt = jwtService.generateJwtToken(authentication.principal as UserDetailsImpl)
         val userDetails = authentication.principal as UserDetailsImpl
         if (!userDetails.emailVerified) throw UnprocessableException("Your email isn't verified")
-        val refreshToken = refreshTokenService.createRefreshToken(userDetails.id)
-        return ResponseEntity.ok(
-            JwtResponse(
-                jwt, refreshToken.id ?: "", userDetails.email
-            )
+        val refreshToken = generateRefreshToken(user)
+        return ResponseEntity.ok(JwtResponse(jwt, refreshToken.token, userDetails.email))
+    }
+
+    private fun generateRefreshToken(user: UserEntity): OTP {
+        return otpService.generate(
+            key = OTP.Keys.REFRESH_TOKEN,
+            userId = user.id(),
+            ttl = jwtRefreshExpirationMs,
+            len = 64,
+            numeric = true,
+            characters = true
         )
     }
-    
+
     @PostMapping("/google")
     fun googleAuth(@RequestParam @NotBlank authCode: String): JwtResponse {
         throw UnprocessableException("Temporary unavailable")
@@ -118,7 +131,7 @@ class AuthController(
         var user = userRepository.findByUsernameAndDeleted(email.toStandardMail()).getOrElse {
             throw UnprocessableException("user must sign-up as student first")
         }
-        if (user.id?.let { correctorRepository.existsByUser_Id(it) } != false){
+        if (correctorRepository.existsByUser_Id(user.id())) {
             throw UnprocessableException("Corrector already registered")
         }
         val fullName = user.id?.let { studentService.getStudentByUserId(it) }?.fullName ?: user.email
@@ -148,55 +161,56 @@ class AuthController(
     ): ResponseEntity<String> {
         val user = userRepository.findByUsernameAndDeleted(email.toStandardMail())
             .orElseThrow { UnprocessableException("User Not Found") }
-        if (user.emailVerified) throw UnprocessableException("Your Email Was Verified")
-        val verificationToken = emailVerificationTokenRepository.findByUser(user).orElseThrow {
-            mailSenderService.sendEmailVerificationMail(
-                emailVerificationTokenService.save(EmailVerificationTokenEntity(user))
+        if (user.emailVerified) throw UnprocessableException("email.verification.already.verified")
+        if (otpService.isValid(OTP.Keys.EMAIL_VERIFICATION, verificationCode, user.id())) {
+            userService.save(user.also { it.emailVerified = true })
+        } else {
+            mailSenderService.sendOTP(
+                otpService.generate(OTP.Keys.EMAIL_VERIFICATION, user.id()), user.email
             )
-            UnprocessableException("Your verification code has been expired.\nWe sent a new verification code.")
+            throw UnprocessableException("email.verification.resend.code")
         }
-        if (verificationToken.token == verificationCode) userService.save(user.also { it.emailVerified = true })
-        else throw InvalidInputException("Your verification code is not available.")
-        return ResponseEntity.ok("Email Verified successfully!")
+        return ResponseEntity.ok("email.verification.successful")
     }
     
     @PostMapping("/signup/email/verification-mail")
     fun sendVerificationMail(@RequestParam @Email @NotBlank email: String): ResponseEntity<String> {
         val user = userRepository.findByUsernameAndDeleted(email.toStandardMail())
             .orElseThrow { UnprocessableException("User Not Found") }
-        
-        if (user.emailVerified) throw UnprocessableException("Your Email Was Verified")
-        
-        val emailVerificationToken = emailVerificationTokenRepository.findByUser(user).getOrElse {
-            emailVerificationTokenService.save(EmailVerificationTokenEntity(user))
-        }
-        mailSenderService.sendEmailVerificationMail(emailVerificationToken)
+
+        if (user.emailVerified) throw UnprocessableException("email.verification.already.verified")
+
+        val userId = user.id()
+        val otp = otpService.findByUserId(OTP.Keys.EMAIL_VERIFICATION, userId) ?: otpService.generate(
+            key = OTP.Keys.EMAIL_VERIFICATION,
+            userId = userId
+        )
+        mailSenderService.sendOTP(otp, user.email)
         return ResponseEntity.ok("Verification Mail Has Been Sent.")
     }
     
     @PostMapping("/refresh-token")
     fun refreshToken(
         @RequestParam @NotBlank refreshToken: String,
-    ): ResponseEntity<RefreshTokenResponse> {
-        return ResponseEntity.ok(refreshTokenService.findByToken(refreshToken).map { refreshTokenEntity ->
-            val user = userService.getById(refreshTokenEntity.userId)
-            val token = jwtService.generateTokenFromUsername(user.username)
-            val newRefreshToken = refreshTokenService.createRefreshToken(refreshTokenEntity.userId)
-            refreshTokenService.deleteById(refreshToken)
-            RefreshTokenResponse(token, newRefreshToken.id ?: "")
-        }.orElseThrow {
-            InvalidCredentialException("Your Session has been expired")
-        })
+    ): RefreshTokenResponse {
+        val otp = otpService.findByToken(OTP.Keys.REFRESH_TOKEN, refreshToken)
+            ?: throw UnprocessableException("invalid.refresh.token")
+        val user = userService.getById(otp.userId)
+        val token = jwtService.generateTokenFromUsername(user.username)
+        val newOTP = otpService.generate(OTP.Keys.REFRESH_TOKEN, otp.userId)
+        return RefreshTokenResponse(token, newOTP.token)
     }
     
     @PostMapping("/reset-password")
     fun resetPassword(@RequestParam @Email @NotBlank email: String): ResponseEntity<String> {
         val user = userRepository.findByUsernameAndDeleted(email.toStandardMail())
             .orElseThrow { UnprocessableException("User Not Found") }
-        val token = resetPasswordTokenRepository.findByUser(user).getOrElse {
-            resetPasswordTokenService.save(ResetPasswordTokenEntity(user))
-        }
-        mailSenderService.sendResetPasswordMail(token)
+        val token = this.otpService.findByUserId(
+            OTP.Keys.RESET_PASSWORD, user.id()
+        ) ?: this.otpService.generate(
+            OTP.Keys.RESET_PASSWORD, user.id()
+        )
+        mailSenderService.sendOTP(token, user.email)
         return ResponseEntity.ok("The reset password link has been mailed to you.")
     }
     
@@ -208,14 +222,15 @@ class AuthController(
     ): ResponseEntity<String> {
         val user = userRepository.findByUsernameAndDeleted(email.toStandardMail())
             .orElseThrow { UnprocessableException("User Not Found") }
-        val token = resetPasswordTokenRepository.findByUser(user).orElseThrow {
-            InvalidCredentialException("Your reset password token has been expired. Request for reset password again.")
-        }
+
+        val token = this.otpService.findByUserId(OTP.Keys.RESET_PASSWORD, user.id())
+            ?: throw InvalidCredentialException("Your reset password token has been expired. Request for reset password again.")
+
         if (token.token == code) {
             user.password = encoder.encode(newPassword)
             userService.save(user)
-            resetPasswordTokenRepository.delete(token)
         } else throw InvalidCredentialException("Your reset password token is invalid.")
+
         return ResponseEntity.ok("Your password has been reset successfully")
     }
     
@@ -234,34 +249,34 @@ class AuthController(
     
     @PostMapping("/sign-out")
     fun signOutUser(): ResponseEntity<String> {
-        refreshTokenService.deleteByUserId(Auth.userId())
+        otpService.findByUserId(OTP.Keys.REFRESH_TOKEN, Auth.userId())?.let { otp -> otpService.invalidate(otp) }
         return ResponseEntity.ok("User signed out successfully")
     }
     
     @PostMapping("/delete-account")
     @PreAuthorize("hasAnyRole('STUDENT')")
-    fun deleteAccount(): String {
-        val user = userRepository.findByUsernameAndDeleted(Auth.email())
+    fun deleteAccount(): MessageResponse {
+        val user = userRepository.findByUsernameAndDeleted(Auth.username())
             .orElseThrow { UnprocessableException("User Not Found") }
-        val emailVerificationToken = emailVerificationTokenRepository.findByUser(user).getOrElse {
-            emailVerificationTokenService.save(EmailVerificationTokenEntity(user))
-        }
-        mailSenderService.sendDeleteAccountVerificationMail(emailVerificationToken)
-        return "Verification Mail Has Been Sent"
+        val otp = otpService.findOrGenerate(OTP.Keys.DELETE_ACCOUNT, user.id())
+        mailSenderService.sendOTP(otp, user.email)
+        return MessageResponse("successful", "Verification Mail Has Been Sent")
     }
-    
+
     @PostMapping("/delete-account/verify")
-    fun verifyDeleteAccount(@RequestParam @NotBlank verificationCode: String): String {
+    fun verifyDeleteAccount(@RequestParam @NotBlank verificationCode: String): MessageResponse {
         val user = userRepository.findByUsernameAndDeleted(Auth.email())
             .orElseThrow { UnprocessableException("User Not Found") }
-        val verificationToken = emailVerificationTokenRepository.findByUser(user).orElseThrow {
-            mailSenderService.sendDeleteAccountVerificationMail(
-                emailVerificationTokenService.save(EmailVerificationTokenEntity(user))
-            )
-            UnprocessableException("Your verification code has been expired.\nWe sent a new verification code")
+
+        val otp = otpService.findByUserId(OTP.Keys.DELETE_ACCOUNT, user.id())
+        if (otp == null) {
+            mailSenderService.sendOTP(otpService.generate(OTP.Keys.DELETE_ACCOUNT, user.id()), user.email)
+            throw UnprocessableException("Your verification code has been expired.\nWe sent a new verification code")
+        } else if (otp.token != verificationCode) {
+            throw InvalidInputException("Your verification code is not available")
+        } else {
+            userService.save(user.also { it.deleted = true })
+            return MessageResponse("successful", "Your account has been deleted successfully")
         }
-        if (verificationToken.token == verificationCode) userService.save(user.also { it.deleted = true })
-        else throw InvalidInputException("Your verification code is not available")
-        return "Your account has been deleted successfully"
     }
 }

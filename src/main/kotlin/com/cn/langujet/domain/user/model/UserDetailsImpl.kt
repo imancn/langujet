@@ -3,19 +3,24 @@ package com.cn.langujet.domain.user.model
 import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.core.userdetails.User
 
 class UserDetailsImpl(
-    @field:JsonIgnore val id: Long,
-    val _username: String,
+    username: String,
+    @field:JsonIgnore
+    private val password: String?,
+    private val authorities: Collection<GrantedAuthority>,
+    @field:JsonIgnore
+    val id: Long,
     val email: String,
-    val emailVerified: Boolean,
-    @field:JsonIgnore private val password: String?,
-    private val authorities: Collection<GrantedAuthority>
-) : UserDetails {
+    @field:JsonIgnore
+    val emailVerified: Boolean
+) : User(
+    username, password, authorities
+) {
     constructor(user: UserEntity): this(
         id = user.id!!,
-        _username = user.username,
+        username = user.username,
         email = user.email,
         emailVerified = user.emailVerified,
         password = user.password,
@@ -32,10 +37,6 @@ class UserDetailsImpl(
 
     override fun getPassword(): String? {
         return password
-    }
-
-    override fun getUsername(): String {
-        return _username
     }
 
     override fun isAccountNonExpired(): Boolean {
