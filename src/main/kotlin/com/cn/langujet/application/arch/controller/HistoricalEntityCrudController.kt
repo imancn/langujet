@@ -23,7 +23,7 @@ abstract class HistoricalEntityCrudController<R : HistoricalMongoRepository<E>, 
         summary = "Create a new entity",
         description = "Creates a new entity. Requires ADMIN role."
     )
-    @PostMapping @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/create") @PreAuthorize("hasRole('ADMIN')")
     open fun create(@RequestBody dto: E): ResponseEntity<E> {
         return ResponseEntity.ok(service.create(dto))
     }
@@ -32,7 +32,7 @@ abstract class HistoricalEntityCrudController<R : HistoricalMongoRepository<E>, 
         summary = "Update an existing entity",
         description = "Updates an existing entity. Requires ADMIN role."
     )
-    @PutMapping @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/update") @PreAuthorize("hasRole('ADMIN')")
     open fun update(@RequestBody dto: E): ResponseEntity<E> {
         return ResponseEntity.ok(service.update(dto))
     }
@@ -41,7 +41,7 @@ abstract class HistoricalEntityCrudController<R : HistoricalMongoRepository<E>, 
         summary = "Archive an entity",
         description = "Archives an entity by ID. Requires ADMIN role."
     )
-    @DeleteMapping("/{id}") @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("archive/{id}") @PreAuthorize("hasRole('ADMIN')")
     open fun delete(@PathVariable id: Long): ResponseEntity<MessageResponse> {
         val entity = service.getById(id)
         val deleted = service.archive(entity)
@@ -58,7 +58,7 @@ abstract class HistoricalEntityCrudController<R : HistoricalMongoRepository<E>, 
         summary = "Restore an archived entity",
         description = "Restores an archived entity by ID. Requires ADMIN role."
     )
-    @PostMapping("/{id}")
+    @PostMapping("restore/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     open fun restore(@PathVariable id: Long): ResponseEntity<MessageResponse> {
         val entity = service.getById(id)

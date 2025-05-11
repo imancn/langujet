@@ -19,7 +19,7 @@ class CorrectorController(
     fun getProfile(): ResponseEntity<CorrectorProfileResponse> =
         ResponseEntity.ok(CorrectorProfileResponse(correctorService.getCorrectorByUserId(Auth.userId())))
     
-    @PutMapping("/profile")
+    @PostMapping("/profile")
     @PreAuthorize("hasRole('CORRECTOR')")
     fun editProfile(
         @RequestParam fullName: String?,

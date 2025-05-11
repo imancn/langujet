@@ -22,7 +22,7 @@ class CampaignAdminController(
     }
     
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/active")
+    @PostMapping("/active")
     fun changeCampaignActiveFlag(
         @RequestParam campaignId: Long, @RequestParam active: Boolean
     ): CampaignEntity {
@@ -30,7 +30,7 @@ class CampaignAdminController(
     }
     
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/metadata")
+    @PostMapping("/metadata")
     fun changeCampaignMetadata(
         @RequestParam campaignId: Long, @RequestParam name: String? = null,
         @RequestParam tag: String? = null, @RequestParam description: String? = null
@@ -39,7 +39,7 @@ class CampaignAdminController(
     }
     
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/usage-limit")
+    @PostMapping("/usage-limit")
     fun changeUsageLimit(
         @RequestParam campaignId: Long, @RequestParam usageLimit: Int,
     ): CampaignEntity {
