@@ -61,8 +61,7 @@ abstract class HistoricalEntityCrudController<R : HistoricalMongoRepository<E>, 
     @PostMapping("restore/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     open fun restore(@PathVariable id: Long): ResponseEntity<MessageResponse> {
-        val entity = service.getById(id)
-        val restored = service.restore(entity)
+        val restored = service.restore(id)
         return if (restored) {
             "successful"
         } else {

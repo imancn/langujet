@@ -4,14 +4,15 @@ import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 
 class FilterRequest(
-    val expressions: List<Expression>
+    private val expressions: List<Expression>
 ) {
     fun query(): Query {
-        if (expressions.isEmpty()) return Query()
         return Query(
             Criteria().andOperator(
-                *expressions.map {
-                    Criteria(it.key).`in`(it.values)
+                *(expressions + Expression("deleted", listOf(true))).map {
+                    if (it.values.size > 1) { Criteria(it.key).`in`(it.values) }
+                    else if (it.values.size == 1) { Criteria(it.key).`in`(it.values[0]) }
+                    else { return Query() }
                 }.toTypedArray()
             )
         )

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
+import org.springframework.data.mongodb.core.FindAndReplaceOptions
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.query.Criteria
@@ -63,9 +64,10 @@ abstract class EntityService<R : MongoRepository<T, ID>, T : Entity<ID>, ID : An
     
     
     override fun update(entity: T): T {
-        return doIfExist(entity) {
-            repository.save(entity)
-        }
+        val oldEntity = getById(entity.id())
+        loggerService.logChanges(oldEntity, entity)
+        val query = Query(Criteria.where("_id").`is`(entity.id()))
+        return mongoOperations.findAndReplace(query, entity, FindAndReplaceOptions.options().upsert(), clazz, collection)!!
     }
     
     override fun updateMany(entities: List<T>): List<T> {
@@ -73,13 +75,13 @@ abstract class EntityService<R : MongoRepository<T, ID>, T : Entity<ID>, ID : An
     }
     
     override fun getById(id: ID): T {
-        return repository.findById(id).orElseThrow {
-            NoSuchElementException("Entity with id $id not found")
-        }
+        val query = Query(Criteria.where("_id").`is`(id).and("deleted").`is`(false))
+        return mongoOperations.findOne(query, clazz, collection)
+            ?: throw NoSuchElementException("Entity with id $id not found")
     }
     
     override fun tryById(id: ID): T? {
-        val query = Query(Criteria.where("_id").`is`(id))
+        val query = Query(Criteria.where("_id").`is`(id).and("deleted").`is`(false))
         return mongoOperations.findOne(query, clazz, collection)
     }
     
@@ -89,7 +91,9 @@ abstract class EntityService<R : MongoRepository<T, ID>, T : Entity<ID>, ID : An
     
     override fun find(query: Query, pageable: Pageable?): List<T> {
         return if (pageable == null) {
-            return mongoOperations.find(query, clazz, collection)
+            return mongoOperations.find(
+                query,
+                clazz, collection)
         } else {
             mongoOperations.find(query.with(pageable).with(pageable.sort), clazz, collection)
         }
@@ -105,8 +109,7 @@ abstract class EntityService<R : MongoRepository<T, ID>, T : Entity<ID>, ID : An
     }
     
     private fun <R> doIfExist(entity: T, operation: () -> R): R {
-        val id = entity.id() ?: throw NoSuchElementException("Entity with id ${entity.id()} not found")
-        val oldEntity = getById(id)
+        val oldEntity = getById(entity.id())
         loggerService.logChanges(oldEntity, entity)
         return operation.invoke()
     }
