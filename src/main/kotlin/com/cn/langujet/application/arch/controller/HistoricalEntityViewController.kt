@@ -84,7 +84,9 @@ abstract class HistoricalEntityViewController<R : HistoricalMongoRepository<E>, 
     """
     )
     @PostMapping("/search") @PreAuthorize("hasRole('ADMIN')")
-    open fun getEntities(@RequestBody request: SearchRequest?): ResponseEntity<PageResponse<E>> {
+    open fun getEntities(
+        @RequestBody request: SearchRequest?, @RequestParam(required = false) includeArchived: Boolean?
+    ): ResponseEntity<PageResponse<E>> {
         if (request != null) {
             val pageable = if (!request.sorts.isNullOrEmpty()) {
                 val sort = Sort.by(
@@ -96,7 +98,7 @@ abstract class HistoricalEntityViewController<R : HistoricalMongoRepository<E>, 
             } else {
                 PageRequest.of(request.page.number, request.page.size)
             }
-            val entities = service.find(request.filters?.query() ?: Query(), pageable)
+            val entities = service.find(request.filters?.query(includeArchived) ?: Query(), pageable)
             return ResponseEntity.ok(PageResponse(entities, request.page))
         } else {
             return ResponseEntity.ok(PageResponse(service.findTop(10), 0, 10, 20))
