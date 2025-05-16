@@ -26,10 +26,10 @@ class ExamContentService(
     private val fileService: FileService
 ) : HistoricalEntityService<ExamContentRepository, ExamContentEntity>() {
     fun uploadExamContent(
-        file: MultipartFile, examId: Long, sectionOrder: Int?, partOrder: Int?, questionOrder: Int?
+        file: MultipartFile, examId: Long, sectionId: Int?, partId: Int?, questionId: Int?
     ): ExamContentEntity {
         sectionService.getSectionsByExamId(examId).find {
-            it.order == sectionOrder
+            it.order == sectionId
         } ?: throw UnprocessableException("Section not found")
         
         val fileEntity = fileService.uploadFile(file, FileBucket.EXAM_CONTENTS)
@@ -38,20 +38,20 @@ class ExamContentService(
             ExamContentEntity(
                 null,
                 examId,
-                sectionOrder,
-                partOrder,
-                questionOrder,
+                sectionId,
+                partId,
+                questionId,
                 fileEntity.id ?: throw InternalServerError("Upload Failed")
             )
         )
     }
     
     fun getAdminExamContentDownloadLink(
-        examId: Long, sectionOrder: Int
+        examId: Long, sectionId: Int
     ): List<ExamContentDownloadLink> {
         val exam = examService.getById(examId)
         val examSectionContents =
-            repository.findAllByExamIdAndSectionOrder(exam.id ?: Entity.UNKNOWN_ID, sectionOrder)
+            repository.findAllByExamIdAndSectionId(exam.id ?: Entity.UNKNOWN_ID, sectionId)
         
         return examSectionContents.map {
             ExamContentDownloadLink(
@@ -61,7 +61,7 @@ class ExamContentService(
     }
     
     fun getStudentExamContentDownloadLink(
-        examSessionId: Long, sectionOrder: Int
+        examSessionId: Long, sectionId: Int
     ): List<ExamContentDownloadLink> {
         val examSession = examSessionRepository.findById(examSessionId).getOrNull() ?: return emptyList()
         if (Auth.userId() != examSession.studentUserId) {
@@ -69,7 +69,7 @@ class ExamContentService(
         }
         val exam = examService.getById(examSession.examId)
         val examSectionContents =
-            repository.findAllByExamIdAndSectionOrder(exam.id ?: Entity.UNKNOWN_ID, sectionOrder)
+            repository.findAllByExamIdAndSectionId(exam.id ?: Entity.UNKNOWN_ID, sectionId)
         
         return examSectionContents.map {
             ExamContentDownloadLink(

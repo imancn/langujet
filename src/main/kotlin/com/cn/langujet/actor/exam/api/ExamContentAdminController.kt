@@ -21,13 +21,13 @@ class ExamContentAdminController(
     @PostMapping("/exam-contents")
     @PreAuthorize("hasRole('ADMIN')")
     fun uploadExamContent(
-        @RequestParam @NotBlank examId: Long?,
-        @RequestParam @NotNull sectionOrder: Int?,
-        @RequestParam @NotNull partOrder: Int?,
-        @RequestParam @NotNull questionOrder: Int?,
+        @RequestParam @NotNull examId: Long?,
+        @RequestParam sectionId: Int?,
+        @RequestParam partId: Int?,
+        @RequestParam questionId: Int?,
         @RequestParam("file") file: MultipartFile
     ): ExamContentEntity {
-        return examContentService.uploadExamContent(file, examId!!, sectionOrder, partOrder, questionOrder)
+        return examContentService.uploadExamContent(file, examId!!, sectionId, partId, questionId)
     }
     
     @GetMapping("/exam-contents/download-links")

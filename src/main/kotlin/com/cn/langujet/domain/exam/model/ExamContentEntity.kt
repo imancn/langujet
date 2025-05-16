@@ -9,13 +9,13 @@ import org.springframework.data.mongodb.core.mapping.Document
 
 @CompoundIndexes(
     CompoundIndex(
-        name = "exam_id_section_order_index",
-        def = "{'examId': -1, 'sectionOrder': 1}",
+        name = "exam_id_section_id_index",
+        def = "{'examId': -1, 'sectionId': 1}",
         unique = false
     ),
     CompoundIndex(
-        name = "exam_id_section_order_part_order_question_order_index",
-        def = "{'examId': -1, 'sectionOrder': 1, 'partOrder': 1, 'questionOrder': 1}",
+        name = "exam_id_section_id_part_id_question_id_index",
+        def = "{'examId': -1, 'sectionId': 1, 'partId': 1, 'questionId': 1}",
         unique = false
     )
 )
@@ -25,9 +25,9 @@ class ExamContentEntity(
     id: Long? = null,
     @Indexed(name = "exam_id_index", unique = false)
     var examId: Long,
-    var sectionOrder: Int?,
-    var partOrder: Int?,
-    var questionOrder: Int?,
+    var sectionId: Int?,
+    var partId: Int?,
+    var questionId: Int?,
     @Indexed(name = "unique_file_id_index", unique = true)
     var fileId: Long,
 ) : HistoricalEntity(id = id)
