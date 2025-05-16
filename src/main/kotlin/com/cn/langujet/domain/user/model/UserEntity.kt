@@ -15,4 +15,5 @@ class UserEntity(
     var emailVerified: Boolean,
     var password: String? = null,
     var roles: Set<Role> = HashSet(),
+    var deleted: Boolean = false
 ) : HistoricalEntity(id = id)

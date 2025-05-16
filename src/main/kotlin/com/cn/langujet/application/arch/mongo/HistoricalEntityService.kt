@@ -3,12 +3,10 @@ package com.cn.langujet.application.arch.mongo
 import com.cn.langujet.application.arch.models.entity.HistoricalEntity
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.data.mongodb.core.FindAndModifyOptions
-import org.springframework.data.mongodb.core.FindAndReplaceOptions
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
 import org.springframework.stereotype.Service
-import kotlin.jvm.optionals.getOrNull
 
 @Service
 abstract class HistoricalEntityService<R : HistoricalMongoRepository<T>, T : HistoricalEntity> : EntityService<R, T, Long>() {
@@ -28,21 +26,7 @@ abstract class HistoricalEntityService<R : HistoricalMongoRepository<T>, T : His
     override fun createMany(entities: List<T>): List<T> {
         return entities.map { create(it) }
     }
-    
-    fun archive(entity: T): Boolean {
-        return update(entity.also { it.deleted = true }).id != null
-    }
-    
-    fun restore(id: Long): Boolean {
-        val oldEntity = repository.findById(id).getOrNull() ?: throw NoSuchElementException("Entity with id $id not found")
-        val entity = oldEntity.also { it.deleted = false }
-        val query = Query(Criteria.where("_id").`is`(entity.id()))
-        loggerService.logChanges(oldEntity, entity)
-        return mongoOperations.findAndReplace(
-            query, entity, FindAndReplaceOptions.options().upsert(), clazz, collection
-        )?.let { true } ?: false
-    }
-    
+
     private fun generateSequence(): Long {
         var retryCount = 0
         val maxRetries = 5
@@ -64,6 +48,4 @@ abstract class HistoricalEntityService<R : HistoricalMongoRepository<T>, T : His
         }
         throw RuntimeException("Unexpected error generating sequence")
     }
-    
-    
 }

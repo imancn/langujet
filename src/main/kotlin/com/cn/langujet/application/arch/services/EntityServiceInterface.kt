@@ -21,6 +21,6 @@ interface EntityServiceInterface<T : Entity<ID>, ID : Any> {
     fun findTop(count: Int): List<T>
     fun find(query: Query, pageable: Pageable? = null): List<T>
     fun find(criteria: Criteria, pageable: Pageable? = null): List<T>
-    
-    fun delete(entity: T): Boolean
+
+    fun delete(id: ID): Boolean
 }

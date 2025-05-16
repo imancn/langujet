@@ -3,6 +3,7 @@ package com.cn.langujet.application.arch.mongo
 import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.application.arch.log.LoggerService
 import com.cn.langujet.application.arch.models.entity.Entity
+import com.cn.langujet.application.arch.recyclebin.RecycleBin
 import com.cn.langujet.application.arch.services.EntityServiceInterface
 import com.mongodb.DuplicateKeyException
 import com.mongodb.MongoWriteException
@@ -21,6 +22,9 @@ import java.lang.reflect.ParameterizedType
 
 @Service
 abstract class EntityService<R : MongoRepository<T, ID>, T : Entity<ID>, ID : Any> : EntityServiceInterface<T, ID> {
+    @Autowired
+    lateinit var recycleBin: RecycleBin
+
     @field:Autowired
     lateinit var loggerService: LoggerService
     
@@ -102,16 +106,11 @@ abstract class EntityService<R : MongoRepository<T, ID>, T : Entity<ID>, ID : An
     override fun find(criteria: Criteria, pageable: Pageable?): List<T> {
         return find(Query(criteria))
     }
-    
-    @Deprecated("use archive()", ReplaceWith("archive"))
-    override fun delete(entity: T): Boolean {
-        return doIfExist(entity) { mongoOperations.remove(entity).wasAcknowledged() }
-    }
-    
-    private fun <R> doIfExist(entity: T, operation: () -> R): R {
-        val oldEntity = getById(entity.id())
-        loggerService.logChanges(oldEntity, entity)
-        return operation.invoke()
+
+    override fun delete(id: ID): Boolean {
+        val entity = getById(id)
+        recycleBin.drop(entity)
+        return mongoOperations.remove(entity).wasAcknowledged()
     }
     
     @Suppress("UNCHECKED_CAST")

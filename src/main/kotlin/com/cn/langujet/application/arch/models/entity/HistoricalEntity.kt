@@ -10,9 +10,6 @@ abstract class HistoricalEntity(id: Long?) : Entity<Long>(id) {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     open var version: Long = 0
     
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    open var deleted: Boolean = false
-    
     @field:CreatedBy
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     open var createdBy: Long? = null
@@ -31,15 +28,13 @@ abstract class HistoricalEntity(id: Long?) : Entity<Long>(id) {
     
     fun updateLog() {
         this.also {
-            updatedBy = userId()
+            updatedBy = Auth.userId()
             updatedAt = Date()
         }
     }
     
     fun setLog(){
-        this.createdBy = userId()
+        this.createdBy = Auth.userId()
         this.createdAt = Date()
     }
-    
-    private fun userId() = Auth.userId()
 }
