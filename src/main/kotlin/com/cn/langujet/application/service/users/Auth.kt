@@ -20,7 +20,7 @@ object Auth {
     }
     
     fun userId(): Long {
-        return getClaims()?.get("id", Long::class.java) ?: Entity.UNKNOWN_ID
+        return getAuthentication()?.name?.toLong() ?: Entity.UNKNOWN_ID
     }
     
     fun email(): String {

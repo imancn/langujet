@@ -71,7 +71,8 @@ abstract class EntityService<R : MongoRepository<T, ID>, T : Entity<ID>, ID : An
         val oldEntity = getById(entity.id())
         loggerService.logChanges(oldEntity, entity)
         val query = Query(Criteria.where("_id").`is`(entity.id()))
-        return mongoOperations.findAndReplace(query, entity, FindAndReplaceOptions.options().upsert(), clazz, collection)!!
+        mongoOperations.findAndReplace(query, entity, FindAndReplaceOptions.options().upsert(), clazz, collection)
+        return entity
     }
     
     override fun updateMany(entities: List<T>): List<T> {
@@ -79,13 +80,13 @@ abstract class EntityService<R : MongoRepository<T, ID>, T : Entity<ID>, ID : An
     }
     
     override fun getById(id: ID): T {
-        val query = Query(Criteria.where("_id").`is`(id).and("deleted").`is`(false))
+        val query = Query(Criteria.where("_id").`is`(id))
         return mongoOperations.findOne(query, clazz, collection)
             ?: throw NoSuchElementException("Entity with id $id not found")
     }
     
     override fun tryById(id: ID): T? {
-        val query = Query(Criteria.where("_id").`is`(id).and("deleted").`is`(false))
+        val query = Query(Criteria.where("_id").`is`(id))
         return mongoOperations.findOne(query, clazz, collection)
     }
     

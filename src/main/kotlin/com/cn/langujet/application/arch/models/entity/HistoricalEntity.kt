@@ -5,7 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.data.annotation.*
 import java.util.*
 
-abstract class HistoricalEntity(id: Long?) : Entity<Long>(id) {
+abstract class HistoricalEntity(
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    id: Long?
+) : Entity<Long>(id) {
     @field:Version
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     open var version: Long = 0

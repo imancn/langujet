@@ -16,7 +16,7 @@ class RecycleBin {
     fun drop(entity: Entity<*>): Boolean {
         mongoOperations.save(
             Trash(
-                clazz = entity.javaClass,
+                className = entity.javaClass.name,
                 alias = entity.javaClass.getAnnotation(Document::class.java)?.collection ?: entity.javaClass.name,
                 entity = entity,
                 deletedAt = Date(),
@@ -27,13 +27,13 @@ class RecycleBin {
     }
 
     @Document("trash")
-    private class Trash(
+    class Trash(
         @Autowired
-        private val id: String? = null,
-        private val clazz: Class<*>,
-        private val alias: String,
-        private val entity: Entity<*>,
-        private val deletedAt: Date,
-        private val deletedBy: Long
+        var id: String? = null,
+        var className: String,
+        var alias: String,
+        var entity: Entity<*>,
+        var deletedAt: Date,
+        var deletedBy: Long
     )
 }
