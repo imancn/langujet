@@ -3,6 +3,7 @@ package com.cn.langujet.application.service.file.domain.service
 import com.cn.langujet.application.arch.advice.InternalServerError
 import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.application.arch.models.entity.Entity
+import com.cn.langujet.application.arch.mongo.HistoricalEntityService
 import com.cn.langujet.application.service.file.domain.data.model.FileBucket
 import com.cn.langujet.application.service.file.domain.data.model.FileEntity
 import com.cn.langujet.application.service.file.domain.data.repository.FileRepository
@@ -16,16 +17,16 @@ import org.springframework.web.multipart.MultipartFile
 
 @Service
 class FileService(
-    private val minioClient: MinioClient,
-    private val fileRepository: FileRepository
-) {
+    override var repository: FileRepository,
+    private val minioClient: MinioClient
+) : HistoricalEntityService<FileRepository, FileEntity>() {
     private val logger = LoggerFactory.getLogger(javaClass.simpleName)
 
     fun uploadFile(file: MultipartFile, bucket: FileBucket): FileEntity {
         val originalFileName = file.originalFilename ?: ""
         val extension = originalFileName.substringAfterLast('.', "")
 
-        val fileEntity = fileRepository.save(
+        val fileEntity = create(
             FileEntity(
                 id = null,
                 name = originalFileName,
@@ -46,7 +47,7 @@ class FileService(
                     .build()
             )
         } catch (ex: Exception) {
-            fileRepository.deleteById(fileEntity.id ?: Entity.UNKNOWN_ID)
+            repository.deleteById(fileEntity.id ?: Entity.UNKNOWN_ID)
             logger.error(ex.toString())
             throw InternalServerError("Upload Failed")
         }
@@ -55,7 +56,7 @@ class FileService(
     }
     
     fun generatePublicDownloadLink(fileId: Long, expiryDuration: Int): String {
-        val fileEntity = fileRepository.findById(fileId).orElseThrow {
+        val fileEntity = repository.findById(fileId).orElseThrow {
             throw UnprocessableException("File with id: $fileId not found")
         }
 
