@@ -8,4 +8,4 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("api/admin/enums")
 class EnumController(
     override var service: EnumService
-) : HistoricalEntityCrudController<EnumRepository, EnumService, EnumEntity>()
+) : HistoricalEntityCrudController<EnumService, EnumEntity>()

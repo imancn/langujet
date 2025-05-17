@@ -3,7 +3,6 @@ package com.cn.langujet.actor.exam.api
 import com.cn.langujet.application.arch.controller.HistoricalEntityCrudController
 import com.cn.langujet.application.arch.controller.payload.response.MessageResponse
 import com.cn.langujet.domain.exam.model.ExamEntity
-import com.cn.langujet.domain.exam.repository.ExamRepository
 import com.cn.langujet.domain.exam.service.ExamService
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController
 @Validated
 class ExamAdminController(
     override var service: ExamService
-) : HistoricalEntityCrudController<ExamRepository, ExamService, ExamEntity>() {
+) : HistoricalEntityCrudController<ExamService, ExamEntity>() {
     
     @PostMapping("activate/{id}")
     fun activate(@PathVariable id: Long): ResponseEntity<MessageResponse> {

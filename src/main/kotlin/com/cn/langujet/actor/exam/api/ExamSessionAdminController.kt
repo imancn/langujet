@@ -3,7 +3,6 @@ package com.cn.langujet.actor.exam.api
 import com.cn.langujet.actor.exam.payload.ExamSessionEnrollResponse
 import com.cn.langujet.application.arch.controller.HistoricalEntityViewController
 import com.cn.langujet.domain.exam.model.ExamSessionEntity
-import com.cn.langujet.domain.exam.repository.ExamSessionRepository
 import com.cn.langujet.domain.exam.service.ExamSessionService
 import jakarta.validation.constraints.NotBlank
 import org.springframework.security.access.prepost.PreAuthorize
@@ -17,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/admin/exam-sessions")
 @Validated
 class ExamSessionAdminController(
-    private val examSessionService: ExamSessionService
-) : HistoricalEntityViewController<ExamSessionRepository, ExamSessionService, ExamSessionEntity>() {
+    private val examSessionService: ExamSessionService, override var service: ExamSessionService
+) : HistoricalEntityViewController<ExamSessionService, ExamSessionEntity>() {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/enroll")
     fun enrollExamSession(

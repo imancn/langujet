@@ -2,7 +2,6 @@ package com.cn.langujet.actor.campaign
 
 import com.cn.langujet.application.arch.controller.HistoricalEntityViewController
 import com.cn.langujet.domain.campaign.CampaignEntity
-import com.cn.langujet.domain.campaign.CampaignRepository
 import com.cn.langujet.domain.campaign.CampaignService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -11,7 +10,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/admin/campaigns")
 class CampaignAdminController(
     override var service: CampaignService,
-) : HistoricalEntityViewController<CampaignRepository, CampaignService, CampaignEntity>() {
+) : HistoricalEntityViewController<CampaignService, CampaignEntity>() {
     
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
