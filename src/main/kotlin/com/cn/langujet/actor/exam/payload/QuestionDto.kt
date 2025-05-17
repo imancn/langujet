@@ -31,7 +31,7 @@ import io.swagger.v3.oas.annotations.media.Schema
     JsonSubTypes.Type(value = ListeningMatchingFeaturesDTO::class, name = "LISTENING_MATCHING_FEATURES"),
     JsonSubTypes.Type(value = ListeningLabellingDTO::class, name = "LISTENING_LABELLING"),
     JsonSubTypes.Type(value = ListeningPhotoCompletionDTO::class, name = "LISTENING_PHOTO_COMPLETION"),
-    JsonSubTypes.Type(value = ListeningSelectivePhotoCompletionDTO::class, name = "LISTENING_SELECTIVE_MAP_COMPLETION")
+    JsonSubTypes.Type(value = ListeningSelectivePhotoCompletionDTO::class, name = "LISTENING_SELECTIVE_PHOTO_COMPLETION")
 )
 sealed class QuestionDTO(
     id: Long? = null,
