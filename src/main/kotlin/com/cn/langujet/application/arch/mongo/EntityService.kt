@@ -5,9 +5,9 @@ import com.cn.langujet.application.arch.log.LoggerService
 import com.cn.langujet.application.arch.models.entity.Entity
 import com.cn.langujet.application.arch.recyclebin.RecycleBin
 import com.cn.langujet.application.arch.services.EntityServiceInterface
-import com.mongodb.DuplicateKeyException
 import com.mongodb.MongoWriteException
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.DuplicateKeyException
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
