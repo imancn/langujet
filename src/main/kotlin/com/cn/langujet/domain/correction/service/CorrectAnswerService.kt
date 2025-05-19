@@ -41,7 +41,7 @@ class CorrectAnswerService(
     fun getSectionCorrectAnswers(
         examId: Long,
         sectionOrder: Int
-    ) = repository.findAllByExamIdAndSectionOrder(examId, sectionOrder)
+    ) = repository.findAllByExamIdAndSectionId(examId, sectionOrder)
 
     fun getCorrectAnswer(
         examId: Long,
@@ -80,7 +80,7 @@ class CorrectAnswerService(
                 ?: throw UnprocessableException("There is no question with part order: ${correctAnswer.partOrder} and question order ${correctAnswer.questionOrder}")
             
             if (correctAnswer.id == null) { /// just for create
-                val doesExist = repository.existsByExamIdAndSectionOrderAndPartOrderAndQuestionOrder(
+                val doesExist = repository.existsByExamIdAndSectionIdAndPartIdAndQuestionId(
                     request.examId,
                     request.sectionOrder,
                     correctAnswer.partOrder!!,
@@ -99,9 +99,9 @@ class CorrectAnswerService(
                 correctAnswers.add(existing)
             }
         }
-        correctAnswers.groupBy { "${it.sectionOrder}-${it.partOrder}-${it.questionOrder}" }.forEach {
+        correctAnswers.groupBy { "${it.sectionId}-${it.partId}-${it.questionId}" }.forEach {
             if (it.value.size > 1) {
-                throw UnprocessableException("Duplicate correct answer for examId: ${it.value.first().examId} and section order: ${it.value.first().sectionOrder} and part order: ${it.value.first().partOrder} and question order: ${it.value.first().questionOrder}")
+                throw UnprocessableException("Duplicate correct answer for examId: ${it.value.first().examId} and section order: ${it.value.first().sectionId} and part order: ${it.value.first().partId} and question order: ${it.value.first().questionId}")
             }
         }
     }

@@ -79,9 +79,9 @@ class ExamValidatorService(
                 questions.filter { it.partId == part.id }.forEach { question ->
                     correctAnswers.find { correctAnswer ->
                         correctAnswer.examId == section.examId &&
-                            correctAnswer.sectionOrder == section.order &&
-                            correctAnswer.partOrder == part.order &&
-                            correctAnswer.questionOrder == question.order
+                                correctAnswer.sectionId == section.order &&
+                                correctAnswer.partId == part.order &&
+                                correctAnswer.questionId == question.order
                     } ?: throw UnprocessableException("There is no correct answer for examId: ${section.examId}, sectionOrder: ${section.order}, partOrder: ${part.order}, questionOrder: ${question.order}")
                 }
             }

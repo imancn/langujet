@@ -13,9 +13,9 @@ class AutoCorrectionUtil {
     companion object {
         fun getCorrectionScore(answers: List<AnswerEntity>, correctAnswers: List<CorrectAnswerEntity>): Int {
             var correctIssuesCount = 0
-            correctAnswers.sortedBy { "${it.partOrder}-${it.questionOrder}" }.forEach { correctAnswer ->
+            correctAnswers.sortedBy { "${it.partId}-${it.questionId}" }.forEach { correctAnswer ->
                 val answer = answers.find {
-                    it.partOrder == correctAnswer.partOrder && it.questionOrder == correctAnswer.questionOrder
+                    it.partOrder == correctAnswer.partId && it.questionOrder == correctAnswer.questionId
                 }
                 if (answer != null) {
                     correctIssuesCount += when (correctAnswer) {
@@ -192,7 +192,7 @@ class AutoCorrectionUtil {
                         it.sectionOrder == section.order && it.partOrder == part.order && it.questionOrder == question.order
                     }
                     val correctAnswer = correctAnswers.find {
-                        it.sectionOrder == section.order && it.partOrder == part.order && it.questionOrder == question.order
+                        it.sectionId == section.order && it.partId == part.order && it.questionId == question.order
                     }
                     val emptyAnswer = "    "
                     if (correctAnswer != null) {

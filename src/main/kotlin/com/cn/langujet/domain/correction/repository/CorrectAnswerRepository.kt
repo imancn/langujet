@@ -4,12 +4,12 @@ import com.cn.langujet.application.arch.mongo.HistoricalMongoRepository
 import com.cn.langujet.domain.correction.model.CorrectAnswerEntity
 
 interface CorrectAnswerRepository : HistoricalMongoRepository<CorrectAnswerEntity> {
-    fun existsByExamIdAndSectionOrder(examId: Long, sectionOrder: Int): Boolean
-    fun findAllByExamIdAndSectionOrder(examId: Long, sectionOrder: Int): List<CorrectAnswerEntity>
-    fun existsByExamIdAndSectionOrderAndPartOrderAndQuestionOrder(
+    fun existsByExamIdAndSectionId(examId: Long, sectionId: Int): Boolean
+    fun findAllByExamIdAndSectionId(examId: Long, sectionId: Int): List<CorrectAnswerEntity>
+    fun existsByExamIdAndSectionIdAndPartIdAndQuestionId(
         examId: Long,
-        sectionOrder: Int,
-        partOrder: Int,
-        questionOrder: Int
+        sectionId: Int,
+        partId: Int,
+        questionId: Int
     ): Boolean
 }

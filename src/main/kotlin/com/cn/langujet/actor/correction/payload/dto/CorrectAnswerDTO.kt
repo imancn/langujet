@@ -103,8 +103,8 @@ data class CorrectTextAnswerDTO(
 ) : CorrectAnswerDTO(id, partOrder, questionOrder, AnswerType.TEXT) {
     constructor(answer: CorrectAnswerEntity.CorrectTextAnswerEntity) : this(
         id = answer.id,
-        partOrder = answer.partOrder,
-        questionOrder = answer.questionOrder,
+        partOrder = answer.partId,
+        questionOrder = answer.questionId,
         text = answer.text
     )
 }
@@ -117,8 +117,8 @@ data class CorrectTextIssuesAnswerDTO(
 ) : CorrectAnswerDTO(id, partOrder, questionOrder, AnswerType.TEXT_ISSUES) {
     constructor(answer: CorrectAnswerEntity.CorrectTextIssuesAnswerEntity) : this(
         id = answer.id,
-        partOrder = answer.partOrder,
-        questionOrder = answer.questionOrder,
+        partOrder = answer.partId,
+        questionOrder = answer.questionId,
         issues = answer.issues
     )
 }
@@ -131,8 +131,8 @@ data class CorrectTrueFalseAnswerDTO(
 ) : CorrectAnswerDTO(id, partOrder, questionOrder, AnswerType.TRUE_FALSE) {
     constructor(answer: CorrectAnswerEntity.CorrectTrueFalseAnswerEntity) : this(
         id = answer.id,
-        partOrder = answer.partOrder,
-        questionOrder = answer.questionOrder,
+        partOrder = answer.partId,
+        questionOrder = answer.questionId,
         issues = answer.issues
     )
 }
@@ -145,8 +145,8 @@ data class CorrectMultipleChoiceAnswerDTO(
 ) : CorrectAnswerDTO(id, partOrder, questionOrder, AnswerType.MULTIPLE_CHOICE) {
     constructor(answer: CorrectAnswerEntity.CorrectMultipleChoiceAnswerEntity) : this(
         id = answer.id,
-        partOrder = answer.partOrder,
-        questionOrder = answer.questionOrder,
+        partOrder = answer.partId,
+        questionOrder = answer.questionId,
         issues = answer.issues.map { issue -> CorrectMultipleChoiceIssueAnswerDTO(issue) }
     )
 }

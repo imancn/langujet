@@ -4,10 +4,10 @@ import com.cn.langujet.actor.correction.payload.request.AssignCorrectionRequest
 import com.cn.langujet.actor.correction.payload.request.AssignCorrectionToCorrectorRequest
 import com.cn.langujet.actor.correction.payload.request.AssignSpecificCorrectionToCorrectorRequest
 import com.cn.langujet.actor.correction.payload.response.*
-import com.cn.langujet.application.service.users.Auth
 import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.application.arch.models.entity.Entity
 import com.cn.langujet.application.service.file.domain.service.FileService
+import com.cn.langujet.application.service.users.Auth
 import com.cn.langujet.domain.answer.AnswerRepository
 import com.cn.langujet.domain.answer.model.AnswerEntity
 import com.cn.langujet.domain.correction.model.CorrectionStatus
@@ -57,7 +57,7 @@ class CorrectionService(
         val sections = sectionService.getSectionsMetaData(examSession.examId)
         val result = resultService.initiateResult(examSession)
         val sectionResults = sections.map { section ->
-            val isAutoCorrection = correctAnswerRepository.existsByExamIdAndSectionOrder(examSession.examId, section.order)
+            val isAutoCorrection = correctAnswerRepository.existsByExamIdAndSectionId(examSession.examId, section.order)
             if (isAutoCorrection) {
                 autoCorrectorService.correctExamSection(
                     examSession, result.id ?: Entity.UNKNOWN_ID,
