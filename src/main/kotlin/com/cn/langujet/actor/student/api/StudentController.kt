@@ -1,7 +1,7 @@
 package com.cn.langujet.actor.student.api
 
 import com.cn.langujet.actor.student.payload.response.StudentProfileResponse
-import com.cn.langujet.application.service.users.Auth
+import com.cn.langujet.application.arch.Auth
 import com.cn.langujet.domain.student.service.StudentService
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize

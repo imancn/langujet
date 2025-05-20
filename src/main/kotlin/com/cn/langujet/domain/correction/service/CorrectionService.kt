@@ -7,7 +7,7 @@ import com.cn.langujet.actor.correction.payload.response.*
 import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.application.arch.models.entity.Entity
 import com.cn.langujet.application.service.file.domain.service.FileService
-import com.cn.langujet.application.service.users.Auth
+import com.cn.langujet.application.arch.Auth
 import com.cn.langujet.domain.answer.AnswerRepository
 import com.cn.langujet.domain.answer.model.AnswerEntity
 import com.cn.langujet.domain.correction.model.CorrectionStatus

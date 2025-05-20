@@ -4,7 +4,7 @@ import com.cn.langujet.actor.correction.payload.request.AssignCorrectionRequest
 import com.cn.langujet.actor.correction.payload.response.CorrectionResponse
 import com.cn.langujet.actor.correction.payload.response.CorrectorAvailableCorrectionResponse
 import com.cn.langujet.actor.correction.payload.response.CorrectorCorrectionExamSessionContentResponse
-import com.cn.langujet.application.service.users.Auth
+import com.cn.langujet.application.arch.Auth
 import com.cn.langujet.domain.correction.model.CorrectionStatus
 import com.cn.langujet.domain.correction.model.CorrectorType
 import com.cn.langujet.domain.correction.service.CorrectionService

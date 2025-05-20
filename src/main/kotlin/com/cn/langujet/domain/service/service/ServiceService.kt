@@ -3,7 +3,7 @@ package com.cn.langujet.domain.service.service
 import com.cn.langujet.actor.service.payload.GetAvailableExamServicesRequest
 import com.cn.langujet.actor.service.payload.GetAvailableExamServicesResponse
 import com.cn.langujet.actor.service.payload.ServiceRequest
-import com.cn.langujet.application.service.users.Auth
+import com.cn.langujet.application.arch.Auth
 import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.application.arch.controller.payload.response.PageResponse
 import com.cn.langujet.application.arch.controller.payload.response.paginate

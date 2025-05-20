@@ -1,7 +1,7 @@
 package com.cn.langujet.actor.order
 
 import com.cn.langujet.actor.order.payload.*
-import com.cn.langujet.application.service.users.Auth
+import com.cn.langujet.application.arch.Auth
 import com.cn.langujet.application.arch.controller.payload.response.PageResponse
 import com.cn.langujet.domain.coupon.CouponService
 import com.cn.langujet.domain.order.model.OrderStatus

@@ -2,7 +2,7 @@ package com.cn.langujet.domain.result.service
 
 import com.cn.langujet.actor.result.payload.request.SubmitCorrectorResultRequest
 import com.cn.langujet.actor.result.payload.response.DetailedResultResponse
-import com.cn.langujet.application.service.users.Auth
+import com.cn.langujet.application.arch.Auth
 import com.cn.langujet.application.arch.advice.InvalidCredentialException
 import com.cn.langujet.application.arch.advice.UnprocessableException
 import com.cn.langujet.application.arch.models.entity.Entity

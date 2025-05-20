@@ -9,7 +9,7 @@ import com.cn.langujet.application.arch.controller.payload.response.MessageRespo
 import com.cn.langujet.application.service.otp.OTP
 import com.cn.langujet.application.service.otp.OTPService
 import com.cn.langujet.application.service.smtp.MailSenderService
-import com.cn.langujet.application.service.users.Auth
+import com.cn.langujet.application.arch.Auth
 import com.cn.langujet.domain.corrector.CorrectorEntity
 import com.cn.langujet.domain.corrector.CorrectorRepository
 import com.cn.langujet.domain.corrector.CorrectorService
@@ -19,10 +19,7 @@ import com.cn.langujet.domain.user.model.Role
 import com.cn.langujet.domain.user.model.UserDetailsImpl
 import com.cn.langujet.domain.user.model.UserEntity
 import com.cn.langujet.domain.user.repository.UserRepository
-import com.cn.langujet.domain.user.services.GoogleAuthService
-import com.cn.langujet.domain.user.services.JwtService
-import com.cn.langujet.domain.user.services.UserService
-import com.cn.langujet.domain.user.services.toStandardMail
+import com.cn.langujet.domain.user.services.*
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
@@ -54,6 +51,8 @@ class AuthController(
     private val studentService: StudentService,
     private val userService: UserService,
     private val correctorService: CorrectorService,
+
+    private val authService: AuthService
 ) {
 //    @Todo: Move the logic to the service layer
 

@@ -2,7 +2,7 @@ package com.cn.langujet.actor.coupon
 
 import com.cn.langujet.actor.coupon.payload.response.ActiveCouponsResponse
 import com.cn.langujet.actor.coupon.payload.response.VerifyUserCoupon
-import com.cn.langujet.application.service.users.Auth
+import com.cn.langujet.application.arch.Auth
 import com.cn.langujet.domain.coupon.CouponService
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*

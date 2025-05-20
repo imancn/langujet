@@ -1,7 +1,7 @@
 package com.cn.langujet.application.arch.recyclebin
 
 import com.cn.langujet.application.arch.models.entity.Entity
-import com.cn.langujet.application.service.users.Auth
+import com.cn.langujet.application.arch.Auth
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.core.mapping.Document

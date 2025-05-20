@@ -1,6 +1,6 @@
 package com.cn.langujet.application.arch.models.entity
 
-import com.cn.langujet.application.service.users.Auth
+import com.cn.langujet.application.arch.Auth
 import com.fasterxml.jackson.annotation.JsonProperty
 import org.springframework.data.annotation.*
 import java.util.*
