@@ -29,12 +29,35 @@ class WebSecurityConfig(
     
     @Bean
     @Throws(Exception::class)
-    fun filterChain(http: HttpSecurity): SecurityFilterChain? {
-        return http.cors().and().csrf().disable()
-            .authorizeHttpRequests().anyRequest().permitAll().and()
-            .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-            .exceptionHandling().accessDeniedHandler(accessDeniedHandler).and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+    fun filterChain(http: HttpSecurity): SecurityFilterChain {
+        return http
+            .cors { cors -> cors.configurationSource(corsConfigurationSource()) }
+            .csrf { csrf -> csrf.disable() }
+            .authorizeHttpRequests { authorize ->
+                authorize.requestMatchers("/v3/api-docs/**").permitAll()
+                authorize.requestMatchers("/swagger-ui.html").permitAll()
+                authorize.requestMatchers("/swagger-ui/**").permitAll()
+
+                authorize.requestMatchers("/error").permitAll()
+
+                authorize.requestMatchers("/actuator/**").permitAll()
+
+                authorize.requestMatchers("/api/*/public/**").permitAll()
+                authorize.requestMatchers("/api/*/auth/**").permitAll()
+                authorize.requestMatchers("/api/*/students/**").hasRole("STUDENTS")
+                authorize.requestMatchers("/api/*/professors/**").hasRole("PROFESSORS")
+                authorize.requestMatchers("/api/*/admin/**").hasRole("ADMIN")
+
+                authorize.anyRequest().authenticated()
+            }
+            .exceptionHandling { exceptions ->
+                exceptions
+                    .authenticationEntryPoint(unauthorizedHandler)
+                    .accessDeniedHandler(accessDeniedHandler)
+            }
+            .sessionManagement { session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            }
             .addFilterBefore(AuthTokenFilter(jwtService, internalClientSecret), UsernamePasswordAuthenticationFilter::class.java)
             .build()
     }
